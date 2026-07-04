@@ -148,7 +148,7 @@
            </widget>
           </item>
           <item row="1" column="0" alignment="Qt::AlignmentFlag::AlignHCenter">
-           <widget class="QLabel" name="lblPMDUEValue">
+           <widget class="QLabel" name="lblPMDueValue">
             <property name="font">
              <font>
               <pointsize>24</pointsize>

@@ -110,13 +110,13 @@ class Ui_DashboardWindow(object):
 
         self.gridLayout_5.addWidget(self.lblPMDueTitle, 0, 0, 1, 1)
 
-        self.lblPMDUEValue = QLabel(self.framePMDue)
-        self.lblPMDUEValue.setObjectName(u"lblPMDUEValue")
+        self.lblPMDueValue = QLabel(self.framePMDue)
+        self.lblPMDueValue.setObjectName(u"lblPMDueValue")
         font = QFont()
         font.setPointSize(24)
-        self.lblPMDUEValue.setFont(font)
+        self.lblPMDueValue.setFont(font)
 
-        self.gridLayout_5.addWidget(self.lblPMDUEValue, 1, 0, 1, 1, Qt.AlignmentFlag.AlignHCenter)
+        self.gridLayout_5.addWidget(self.lblPMDueValue, 1, 0, 1, 1, Qt.AlignmentFlag.AlignHCenter)
 
 
         self.gridLayout_2.addWidget(self.framePMDue, 2, 0, 1, 1)
@@ -221,7 +221,7 @@ class Ui_DashboardWindow(object):
         self.btnSettings.setText(QCoreApplication.translate("DashboardWindow", u"Settings", None))
         self.btnLogout.setText(QCoreApplication.translate("DashboardWindow", u"Logout", None))
         self.lblPMDueTitle.setText(QCoreApplication.translate("DashboardWindow", u"PM Due", None))
-        self.lblPMDUEValue.setText(QCoreApplication.translate("DashboardWindow", u"123", None))
+        self.lblPMDueValue.setText(QCoreApplication.translate("DashboardWindow", u"123", None))
         self.lblTitle.setText(QCoreApplication.translate("DashboardWindow", u"Dashboard", None))
         self.lblAssetsTitle.setText(QCoreApplication.translate("DashboardWindow", u"Assets", None))
         self.lblAssetsValue.setText(QCoreApplication.translate("DashboardWindow", u"123", None))
