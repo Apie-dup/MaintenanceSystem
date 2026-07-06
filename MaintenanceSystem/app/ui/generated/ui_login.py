@@ -15,9 +15,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QCheckBox, QLabel, QLineEdit,
-    QMainWindow, QMenuBar, QPushButton, QSizePolicy,
-    QStatusBar, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QHBoxLayout, QLabel,
+    QLineEdit, QMainWindow, QMenuBar, QPushButton,
+    QSizePolicy, QStatusBar, QVBoxLayout, QWidget)
 
 class Ui_LoginWindow(object):
     def setupUi(self, LoginWindow):
@@ -38,47 +38,62 @@ class Ui_LoginWindow(object):
 
         self.verticalLayout.addWidget(self.lblTitle)
 
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.lblUsername = QLabel(self.centralwidget)
         self.lblUsername.setObjectName(u"lblUsername")
         font1 = QFont()
         font1.setBold(True)
         self.lblUsername.setFont(font1)
 
-        self.verticalLayout.addWidget(self.lblUsername)
+        self.horizontalLayout.addWidget(self.lblUsername)
 
         self.txtUsername = QLineEdit(self.centralwidget)
         self.txtUsername.setObjectName(u"txtUsername")
 
-        self.verticalLayout.addWidget(self.txtUsername)
+        self.horizontalLayout.addWidget(self.txtUsername)
 
+
+        self.verticalLayout.addLayout(self.horizontalLayout)
+
+        self.horizontalLayout_2 = QHBoxLayout()
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.lblPassword = QLabel(self.centralwidget)
         self.lblPassword.setObjectName(u"lblPassword")
         self.lblPassword.setFont(font1)
 
-        self.verticalLayout.addWidget(self.lblPassword)
+        self.horizontalLayout_2.addWidget(self.lblPassword)
 
         self.txtPassword = QLineEdit(self.centralwidget)
         self.txtPassword.setObjectName(u"txtPassword")
         self.txtPassword.setEchoMode(QLineEdit.EchoMode.Password)
 
-        self.verticalLayout.addWidget(self.txtPassword)
+        self.horizontalLayout_2.addWidget(self.txtPassword)
 
-        self.chkRememberMe = QCheckBox(self.centralwidget)
-        self.chkRememberMe.setObjectName(u"chkRememberMe")
 
-        self.verticalLayout.addWidget(self.chkRememberMe)
+        self.verticalLayout.addLayout(self.horizontalLayout_2)
 
+        self.horizontalLayout_3 = QHBoxLayout()
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.btnLogin = QPushButton(self.centralwidget)
         self.btnLogin.setObjectName(u"btnLogin")
         self.btnLogin.setFont(font1)
 
-        self.verticalLayout.addWidget(self.btnLogin)
+        self.horizontalLayout_3.addWidget(self.btnLogin)
 
         self.btnExit = QPushButton(self.centralwidget)
         self.btnExit.setObjectName(u"btnExit")
         self.btnExit.setFont(font1)
 
-        self.verticalLayout.addWidget(self.btnExit)
+        self.horizontalLayout_3.addWidget(self.btnExit)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout_3)
+
+        self.chkRememberMe = QCheckBox(self.centralwidget)
+        self.chkRememberMe.setObjectName(u"chkRememberMe")
+
+        self.verticalLayout.addWidget(self.chkRememberMe)
 
         self.lblVersion = QLabel(self.centralwidget)
         self.lblVersion.setObjectName(u"lblVersion")
@@ -106,9 +121,9 @@ class Ui_LoginWindow(object):
         self.txtUsername.setPlaceholderText(QCoreApplication.translate("LoginWindow", u"Enter username", None))
         self.lblPassword.setText(QCoreApplication.translate("LoginWindow", u"Password", None))
         self.txtPassword.setPlaceholderText(QCoreApplication.translate("LoginWindow", u"Enter Password", None))
-        self.chkRememberMe.setText(QCoreApplication.translate("LoginWindow", u"Remember Me", None))
         self.btnLogin.setText(QCoreApplication.translate("LoginWindow", u"Login", None))
         self.btnExit.setText(QCoreApplication.translate("LoginWindow", u"Exit", None))
+        self.chkRememberMe.setText(QCoreApplication.translate("LoginWindow", u"Remember Me", None))
         self.lblVersion.setText(QCoreApplication.translate("LoginWindow", u"Version 1.0", None))
     # retranslateUi
 

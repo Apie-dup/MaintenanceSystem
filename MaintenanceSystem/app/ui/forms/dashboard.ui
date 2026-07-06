@@ -50,49 +50,49 @@
          </property>
         </widget>
        </item>
-       <item>
+       <item alignment="Qt::AlignmentFlag::AlignLeft">
         <widget class="QPushButton" name="btnDashboard">
          <property name="text">
           <string>Dashboard</string>
          </property>
         </widget>
        </item>
-       <item>
+       <item alignment="Qt::AlignmentFlag::AlignLeft">
         <widget class="QPushButton" name="btnAssets">
          <property name="text">
           <string>Assets</string>
          </property>
         </widget>
        </item>
-       <item>
+       <item alignment="Qt::AlignmentFlag::AlignLeft">
         <widget class="QPushButton" name="btnWorkOrders">
          <property name="text">
           <string>Work Orders</string>
          </property>
         </widget>
        </item>
-       <item>
+       <item alignment="Qt::AlignmentFlag::AlignLeft">
         <widget class="QPushButton" name="btnPreventive">
          <property name="text">
           <string>Preventive Maitenance</string>
          </property>
         </widget>
        </item>
-       <item>
+       <item alignment="Qt::AlignmentFlag::AlignLeft">
         <widget class="QPushButton" name="btnInventory">
          <property name="text">
           <string>Inventory</string>
          </property>
         </widget>
        </item>
-       <item>
+       <item alignment="Qt::AlignmentFlag::AlignLeft">
         <widget class="QPushButton" name="btnReports">
          <property name="text">
           <string>Reports</string>
          </property>
         </widget>
        </item>
-       <item>
+       <item alignment="Qt::AlignmentFlag::AlignLeft">
         <widget class="QPushButton" name="btnSettings">
          <property name="text">
           <string>Settings</string>
@@ -131,24 +131,17 @@
        <enum>QFrame::Shadow::Raised</enum>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="2" column="0">
-        <widget class="QFrame" name="framePMDue">
+       <item row="1" column="2">
+        <widget class="QFrame" name="frameOpenWorkOrders">
          <property name="frameShape">
           <enum>QFrame::Shape::StyledPanel</enum>
          </property>
          <property name="frameShadow">
           <enum>QFrame::Shadow::Raised</enum>
          </property>
-         <layout class="QGridLayout" name="gridLayout_5">
-          <item row="0" column="0">
-           <widget class="QLabel" name="lblPMDueTitle">
-            <property name="text">
-             <string>PM Due</string>
-            </property>
-           </widget>
-          </item>
+         <layout class="QGridLayout" name="gridLayout_4">
           <item row="1" column="0" alignment="Qt::AlignmentFlag::AlignHCenter">
-           <widget class="QLabel" name="lblPMDueValue">
+           <widget class="QLabel" name="lblOpenWorkOrdersValue">
             <property name="font">
              <font>
               <pointsize>24</pointsize>
@@ -156,6 +149,13 @@
             </property>
             <property name="text">
              <string>123</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="lblOpenWorkOrdersTitle">
+            <property name="text">
+             <string>Open Work Orders</string>
             </property>
            </widget>
           </item>
@@ -173,43 +173,6 @@
          <property name="text">
           <string>Dashboard</string>
          </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QFrame" name="frameAssets">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::Shape::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Shadow::Raised</enum>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_3">
-          <item row="0" column="0">
-           <widget class="QLabel" name="lblAssetsTitle">
-            <property name="text">
-             <string>Assets</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0" alignment="Qt::AlignmentFlag::AlignHCenter">
-           <widget class="QLabel" name="lblAssetsValue">
-            <property name="font">
-             <font>
-              <pointsize>24</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>123</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
         </widget>
        </item>
        <item row="2" column="2">
@@ -243,17 +206,23 @@
          </layout>
         </widget>
        </item>
-       <item row="1" column="2">
-        <widget class="QFrame" name="frameOpenWorkOrders">
+       <item row="1" column="0">
+        <widget class="QFrame" name="frameAssets">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="frameShape">
           <enum>QFrame::Shape::StyledPanel</enum>
          </property>
          <property name="frameShadow">
           <enum>QFrame::Shadow::Raised</enum>
          </property>
-         <layout class="QGridLayout" name="gridLayout_4">
+         <layout class="QGridLayout" name="gridLayout_3">
           <item row="1" column="0" alignment="Qt::AlignmentFlag::AlignHCenter">
-           <widget class="QLabel" name="lblOpenWorkOrdersValue">
+           <widget class="QLabel" name="lblAssetsValue">
             <property name="font">
              <font>
               <pointsize>24</pointsize>
@@ -265,9 +234,40 @@
            </widget>
           </item>
           <item row="0" column="0">
-           <widget class="QLabel" name="lblOpenWorkOrdersTitle">
+           <widget class="QLabel" name="lblAssetsTitle">
             <property name="text">
-             <string>Open Work Orders</string>
+             <string>Assets</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QFrame" name="framePMDue">
+         <property name="frameShape">
+          <enum>QFrame::Shape::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Shadow::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_5">
+          <item row="0" column="0">
+           <widget class="QLabel" name="lblPMDueTitle">
+            <property name="text">
+             <string>PM Due</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" alignment="Qt::AlignmentFlag::AlignHCenter">
+           <widget class="QLabel" name="lblPMDueValue">
+            <property name="font">
+             <font>
+              <pointsize>24</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>123</string>
             </property>
            </widget>
           </item>

@@ -26,3 +26,7 @@ class AssetService:
     @staticmethod
     def delete_asset(asset_id):
         AssetModel.delete(asset_id)
+
+    @staticmethod
+    def search_assets(search_text):
+        return AssetModel.search(search_text)

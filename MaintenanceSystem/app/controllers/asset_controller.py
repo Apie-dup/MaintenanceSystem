@@ -5,6 +5,7 @@ from PySide6.QtWidgets import (
 )
 
 from PySide6.QtWidgets import QAbstractItemView
+from PySide6.QtWidgets import QHeaderView
 
 from app.ui.generated.ui_assets import Ui_AssetsWindow
 from app.services.asset_service import AssetService
@@ -33,11 +34,15 @@ class AssetsController(QMainWindow):
         self.ui.btnAdd.clicked.connect(self.add_asset)
         self.ui.btnEdit.clicked.connect(self.edit_asset)
         self.ui.btnDelete.clicked.connect(self.delete_asset)
+        self.ui.txtSearch.textChanged.connect(self.search_assets)
         
     def load_assets(self):
 
         assets = AssetService.get_assets()
+        self.populate_table(assets)
 
+    def populate_table(self, assets):
+        
         self.ui.tblAssets.setRowCount(len(assets))
 
         for row, asset in enumerate(assets):
@@ -49,10 +54,18 @@ class AssetsController(QMainWindow):
                     column,
                     QTableWidgetItem(str(value))
                 )
+        # Apply table seetings only once
+        self.ui.tblAssets.setColumnHidden(0, True)  # Hide the ID column
 
-                #Hide database ID
-                self.ui.tblAssets.hideColumn(0)
+        header = self.ui.tblAssets.horizontalHeader()
+        header.setSectionResizeMode(QHeaderView.Stretch)
 
+        self.ui.tblAssets.setAlternatingRowColors(True)
+        self.ui.tblAssets.setSortingEnabled(True)
+        self.ui.lblStatus.setText(
+            f"Showing {len(assets)} assets"
+        )
+    
     def add_asset(self):
 
         dialog = AddAssetController()
@@ -110,3 +123,12 @@ class AssetsController(QMainWindow):
             )
 
             self.load_assets()
+
+    def search_assets(self):
+        text = self.ui.txtSearch.text().strip()
+        if text == "":
+            assets = AssetService.get_assets()
+        else:
+            assets = AssetService.search_assets(text)
+        self.populate_table(assets)
+

@@ -143,4 +143,50 @@ class AssetModel:
         conn.commit()
         conn.close()
 
+    @staticmethod
+    def search(search_text):
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        search = f"%{search_text}%"
+        
+        cursor.execute("""
+            SELECT
+                id,
+                asset_name,
+                asset_number,
+                category,
+                location,
+                manufacturer,
+                model,
+                serial_number,
+                status
+            FROM assets
+            WHERE
+                asset_name LIKE ? 
+                OR asset_number LIKE ?
+                OR category LIKE ? 
+                OR location LIKE ? 
+                OR manufacturer LIKE ? 
+                OR model LIKE ? 
+                OR serial_number LIKE ?
+                OR status LIKE ?       
+            ORDER BY asset_number
+        """, (
+            search,
+            search,
+            search,
+            search,
+            search,
+            search,
+            search,
+            search
+        ))
+        rows = cursor.fetchall()
+
+        conn.close()
+
+        return rows
+
         
