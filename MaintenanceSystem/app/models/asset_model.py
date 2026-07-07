@@ -1,4 +1,4 @@
-from database import Database
+from app.database.connection import Database
 
 
 class AssetModel:
@@ -114,6 +114,7 @@ class AssetModel:
         cursor.execute("""
             UPDATE assets
             SET
+                asset_number = ?,
                 asset_name = ?,
                 category = ?,
                 location = ?,
@@ -154,13 +155,14 @@ class AssetModel:
         cursor.execute("""
             SELECT
                 id,
-                asset_name,
                 asset_number,
+                asset_name,
                 category,
                 location,
                 manufacturer,
                 model,
                 serial_number,
+                warranty_expiry,
                 status
             FROM assets
             WHERE
@@ -171,6 +173,7 @@ class AssetModel:
                 OR manufacturer LIKE ? 
                 OR model LIKE ? 
                 OR serial_number LIKE ?
+                OR warranty_expiry LIKE ?
                 OR status LIKE ?       
             ORDER BY asset_number
         """, (
@@ -181,8 +184,11 @@ class AssetModel:
             search,
             search,
             search,
+            search,
+            search,
             search
         ))
+            
         rows = cursor.fetchall()
 
         conn.close()

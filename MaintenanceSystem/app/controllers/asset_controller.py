@@ -35,6 +35,7 @@ class AssetsController(QMainWindow):
         self.ui.btnEdit.clicked.connect(self.edit_asset)
         self.ui.btnDelete.clicked.connect(self.delete_asset)
         self.ui.txtSearch.textChanged.connect(self.search_assets)
+        self.ui.tblAssets.doubleClicked.connect(self.edit_asset)
         
     def load_assets(self):
 

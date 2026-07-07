@@ -145,8 +145,8 @@ class AddAssetController(QDialog):
             self.ui.txtManufacturer.text().strip(),
             self.ui.txtModel.text().strip(),
             self.ui.txtSerialNumber.text().strip(),
-            self.ui.dtPurchaseDate.date().toString("dd-MM-yyyy"),
-            self.ui.dtWarrantyExpiry.date().toString("dd-MM-yyyy"),
+            self.ui.dtPurchaseDate.date().toString("yyyy-MM-dd"),
+            self.ui.dtWarrantyExpiry.date().toString("yyyy-MM-dd"),
             self.ui.cmbStatus.currentText()
         )
 
@@ -167,8 +167,8 @@ class AddAssetController(QDialog):
                 self.ui.txtManufacturer.text().strip(),
                 self.ui.txtModel.text().strip(),
                 self.ui.txtSerialNumber.text().strip(),
-                self.ui.dtPurchaseDate.date().toString("dd-MM-yyyy"),
-                self.ui.dtWarrantyExpiry.date().toString("dd-MM-yyyy"),
+                self.ui.dtPurchaseDate.date().toString("yyyy-MM-dd"),
+                self.ui.dtWarrantyExpiry.date().toString("yyyy-MM-dd"),
                 self.ui.cmbStatus.currentText(),
                 self.asset_id
             )

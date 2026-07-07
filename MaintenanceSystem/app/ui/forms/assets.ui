@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>910</width>
+    <width>1022</width>
     <height>600</height>
    </rect>
   </property>
@@ -49,16 +49,11 @@
     <item>
      <widget class="QTableWidget" name="tblAssets">
       <property name="columnCount">
-       <number>9</number>
+       <number>10</number>
       </property>
       <column>
        <property name="text">
         <string>ID</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Asset Name</string>
        </property>
       </column>
       <column>
@@ -68,7 +63,7 @@
       </column>
       <column>
        <property name="text">
-        <string>Description</string>
+        <string>Asset Name</string>
        </property>
       </column>
       <column>
@@ -93,7 +88,17 @@
       </column>
       <column>
        <property name="text">
+        <string>Serial No.</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
         <string>Status</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Warranty Expiry</string>
        </property>
       </column>
      </widget>
@@ -151,7 +156,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>910</width>
+     <width>1022</width>
      <height>33</height>
     </rect>
    </property>
