@@ -1,4 +1,4 @@
-from database import Database
+from app.database.connection import Database
 
 
 class UserModel:

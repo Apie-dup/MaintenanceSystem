@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'assets.ui'
+## Form generated from reading UI file 'work_orders.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.11.1
 ##
@@ -20,23 +20,23 @@ from PySide6.QtWidgets import (QApplication, QHBoxLayout, QHeaderView, QLabel,
     QSizePolicy, QStatusBar, QTableWidget, QTableWidgetItem,
     QVBoxLayout, QWidget)
 
-class Ui_AssetsWindow(object):
-    def setupUi(self, AssetsWindow):
-        if not AssetsWindow.objectName():
-            AssetsWindow.setObjectName(u"AssetsWindow")
-        AssetsWindow.resize(1022, 600)
-        self.centralwidget = QWidget(AssetsWindow)
+class Ui_WorkOrdersWindow(object):
+    def setupUi(self, WorkOrdersWindow):
+        if not WorkOrdersWindow.objectName():
+            WorkOrdersWindow.setObjectName(u"WorkOrdersWindow")
+        WorkOrdersWindow.resize(822, 600)
+        self.centralwidget = QWidget(WorkOrdersWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.verticalLayout = QVBoxLayout(self.centralwidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.lblTitle = QLabel(self.centralwidget)
-        self.lblTitle.setObjectName(u"lblTitle")
+        self.lblWorkOrders = QLabel(self.centralwidget)
+        self.lblWorkOrders.setObjectName(u"lblWorkOrders")
         font = QFont()
         font.setPointSize(20)
         font.setBold(True)
-        self.lblTitle.setFont(font)
+        self.lblWorkOrders.setFont(font)
 
-        self.verticalLayout.addWidget(self.lblTitle)
+        self.verticalLayout.addWidget(self.lblWorkOrders)
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
@@ -53,42 +53,34 @@ class Ui_AssetsWindow(object):
 
         self.verticalLayout.addLayout(self.horizontalLayout)
 
-        self.tblAssets = QTableWidget(self.centralwidget)
-        if (self.tblAssets.columnCount() < 10):
-            self.tblAssets.setColumnCount(10)
+        self.tblWorkOrders = QTableWidget(self.centralwidget)
+        if (self.tblWorkOrders.columnCount() < 8):
+            self.tblWorkOrders.setColumnCount(8)
         __qtablewidgetitem = QTableWidgetItem()
-        self.tblAssets.setHorizontalHeaderItem(0, __qtablewidgetitem)
+        self.tblWorkOrders.setHorizontalHeaderItem(0, __qtablewidgetitem)
         __qtablewidgetitem1 = QTableWidgetItem()
-        self.tblAssets.setHorizontalHeaderItem(1, __qtablewidgetitem1)
+        self.tblWorkOrders.setHorizontalHeaderItem(1, __qtablewidgetitem1)
         __qtablewidgetitem2 = QTableWidgetItem()
-        self.tblAssets.setHorizontalHeaderItem(2, __qtablewidgetitem2)
+        self.tblWorkOrders.setHorizontalHeaderItem(2, __qtablewidgetitem2)
         __qtablewidgetitem3 = QTableWidgetItem()
-        self.tblAssets.setHorizontalHeaderItem(3, __qtablewidgetitem3)
+        self.tblWorkOrders.setHorizontalHeaderItem(3, __qtablewidgetitem3)
         __qtablewidgetitem4 = QTableWidgetItem()
-        self.tblAssets.setHorizontalHeaderItem(4, __qtablewidgetitem4)
+        self.tblWorkOrders.setHorizontalHeaderItem(4, __qtablewidgetitem4)
         __qtablewidgetitem5 = QTableWidgetItem()
-        self.tblAssets.setHorizontalHeaderItem(5, __qtablewidgetitem5)
+        self.tblWorkOrders.setHorizontalHeaderItem(5, __qtablewidgetitem5)
         __qtablewidgetitem6 = QTableWidgetItem()
-        self.tblAssets.setHorizontalHeaderItem(6, __qtablewidgetitem6)
+        self.tblWorkOrders.setHorizontalHeaderItem(6, __qtablewidgetitem6)
         __qtablewidgetitem7 = QTableWidgetItem()
-        self.tblAssets.setHorizontalHeaderItem(7, __qtablewidgetitem7)
-        __qtablewidgetitem8 = QTableWidgetItem()
-        self.tblAssets.setHorizontalHeaderItem(8, __qtablewidgetitem8)
-        __qtablewidgetitem9 = QTableWidgetItem()
-        self.tblAssets.setHorizontalHeaderItem(9, __qtablewidgetitem9)
-        self.tblAssets.setObjectName(u"tblAssets")
-        self.tblAssets.setColumnCount(10)
+        self.tblWorkOrders.setHorizontalHeaderItem(7, __qtablewidgetitem7)
+        self.tblWorkOrders.setObjectName(u"tblWorkOrders")
 
-        self.verticalLayout.addWidget(self.tblAssets)
+        self.verticalLayout.addWidget(self.tblWorkOrders)
 
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.btnAdd = QPushButton(self.centralwidget)
         self.btnAdd.setObjectName(u"btnAdd")
         self.btnAdd.setMinimumSize(QSize(90, 32))
-        font1 = QFont()
-        font1.setFamilies([u"Segoe UI"])
-        self.btnAdd.setFont(font1)
         self.btnAdd.setStyleSheet(u"QPushButton {\n"
 "    background-color: #f3f3f3;        /* Windows 11 light button background */\n"
 "    color: #000000;                   /* Text color */\n"
@@ -249,50 +241,46 @@ class Ui_AssetsWindow(object):
 
         self.verticalLayout.addWidget(self.lblStatus)
 
-        AssetsWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QMenuBar(AssetsWindow)
+        WorkOrdersWindow.setCentralWidget(self.centralwidget)
+        self.menubar = QMenuBar(WorkOrdersWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1022, 33))
-        AssetsWindow.setMenuBar(self.menubar)
-        self.statusbar = QStatusBar(AssetsWindow)
+        self.menubar.setGeometry(QRect(0, 0, 822, 33))
+        WorkOrdersWindow.setMenuBar(self.menubar)
+        self.statusbar = QStatusBar(WorkOrdersWindow)
         self.statusbar.setObjectName(u"statusbar")
-        AssetsWindow.setStatusBar(self.statusbar)
+        WorkOrdersWindow.setStatusBar(self.statusbar)
 
-        self.retranslateUi(AssetsWindow)
+        self.retranslateUi(WorkOrdersWindow)
 
-        QMetaObject.connectSlotsByName(AssetsWindow)
+        QMetaObject.connectSlotsByName(WorkOrdersWindow)
     # setupUi
 
-    def retranslateUi(self, AssetsWindow):
-        AssetsWindow.setWindowTitle(QCoreApplication.translate("AssetsWindow", u"Assets", None))
-        self.lblTitle.setText(QCoreApplication.translate("AssetsWindow", u"Assets", None))
-        self.lblSearch.setText(QCoreApplication.translate("AssetsWindow", u"Search:", None))
-        self.txtSearch.setPlaceholderText(QCoreApplication.translate("AssetsWindow", u"Search by asset number, name, category, location....", None))
-        ___qtablewidgetitem = self.tblAssets.horizontalHeaderItem(0)
-        ___qtablewidgetitem.setText(QCoreApplication.translate("AssetsWindow", u"ID", None))
-        ___qtablewidgetitem1 = self.tblAssets.horizontalHeaderItem(1)
-        ___qtablewidgetitem1.setText(QCoreApplication.translate("AssetsWindow", u"Asset No.", None))
-        ___qtablewidgetitem2 = self.tblAssets.horizontalHeaderItem(2)
-        ___qtablewidgetitem2.setText(QCoreApplication.translate("AssetsWindow", u"Asset Name", None))
-        ___qtablewidgetitem3 = self.tblAssets.horizontalHeaderItem(3)
-        ___qtablewidgetitem3.setText(QCoreApplication.translate("AssetsWindow", u"Category", None))
-        ___qtablewidgetitem4 = self.tblAssets.horizontalHeaderItem(4)
-        ___qtablewidgetitem4.setText(QCoreApplication.translate("AssetsWindow", u"Location", None))
-        ___qtablewidgetitem5 = self.tblAssets.horizontalHeaderItem(5)
-        ___qtablewidgetitem5.setText(QCoreApplication.translate("AssetsWindow", u"Manufacturer", None))
-        ___qtablewidgetitem6 = self.tblAssets.horizontalHeaderItem(6)
-        ___qtablewidgetitem6.setText(QCoreApplication.translate("AssetsWindow", u"Model", None))
-        ___qtablewidgetitem7 = self.tblAssets.horizontalHeaderItem(7)
-        ___qtablewidgetitem7.setText(QCoreApplication.translate("AssetsWindow", u"Serial No.", None))
-        ___qtablewidgetitem8 = self.tblAssets.horizontalHeaderItem(8)
-        ___qtablewidgetitem8.setText(QCoreApplication.translate("AssetsWindow", u"Status", None))
-        ___qtablewidgetitem9 = self.tblAssets.horizontalHeaderItem(9)
-        ___qtablewidgetitem9.setText(QCoreApplication.translate("AssetsWindow", u"Warranty Expiry", None))
-        self.btnAdd.setText(QCoreApplication.translate("AssetsWindow", u"Add", None))
-        self.btnEdit.setText(QCoreApplication.translate("AssetsWindow", u"Edit", None))
-        self.btnDelete.setText(QCoreApplication.translate("AssetsWindow", u"Delete", None))
-        self.btnRefresh.setText(QCoreApplication.translate("AssetsWindow", u"Refresh", None))
-        self.btnClose.setText(QCoreApplication.translate("AssetsWindow", u"Close", None))
-        self.lblStatus.setText(QCoreApplication.translate("AssetsWindow", u"Status", None))
+    def retranslateUi(self, WorkOrdersWindow):
+        WorkOrdersWindow.setWindowTitle(QCoreApplication.translate("WorkOrdersWindow", u"WorkOrders", None))
+        self.lblWorkOrders.setText(QCoreApplication.translate("WorkOrdersWindow", u"Work Orders", None))
+        self.lblSearch.setText(QCoreApplication.translate("WorkOrdersWindow", u"Search:", None))
+        self.txtSearch.setPlaceholderText(QCoreApplication.translate("WorkOrdersWindow", u"Search work orders....", None))
+        ___qtablewidgetitem = self.tblWorkOrders.horizontalHeaderItem(0)
+        ___qtablewidgetitem.setText(QCoreApplication.translate("WorkOrdersWindow", u"ID", None))
+        ___qtablewidgetitem1 = self.tblWorkOrders.horizontalHeaderItem(1)
+        ___qtablewidgetitem1.setText(QCoreApplication.translate("WorkOrdersWindow", u"WO Number", None))
+        ___qtablewidgetitem2 = self.tblWorkOrders.horizontalHeaderItem(2)
+        ___qtablewidgetitem2.setText(QCoreApplication.translate("WorkOrdersWindow", u"Asset", None))
+        ___qtablewidgetitem3 = self.tblWorkOrders.horizontalHeaderItem(3)
+        ___qtablewidgetitem3.setText(QCoreApplication.translate("WorkOrdersWindow", u"Title", None))
+        ___qtablewidgetitem4 = self.tblWorkOrders.horizontalHeaderItem(4)
+        ___qtablewidgetitem4.setText(QCoreApplication.translate("WorkOrdersWindow", u"Priority", None))
+        ___qtablewidgetitem5 = self.tblWorkOrders.horizontalHeaderItem(5)
+        ___qtablewidgetitem5.setText(QCoreApplication.translate("WorkOrdersWindow", u"Status", None))
+        ___qtablewidgetitem6 = self.tblWorkOrders.horizontalHeaderItem(6)
+        ___qtablewidgetitem6.setText(QCoreApplication.translate("WorkOrdersWindow", u"Technician", None))
+        ___qtablewidgetitem7 = self.tblWorkOrders.horizontalHeaderItem(7)
+        ___qtablewidgetitem7.setText(QCoreApplication.translate("WorkOrdersWindow", u"Due Date", None))
+        self.btnAdd.setText(QCoreApplication.translate("WorkOrdersWindow", u"Add", None))
+        self.btnEdit.setText(QCoreApplication.translate("WorkOrdersWindow", u"Edit", None))
+        self.btnDelete.setText(QCoreApplication.translate("WorkOrdersWindow", u"Delete", None))
+        self.btnRefresh.setText(QCoreApplication.translate("WorkOrdersWindow", u"Refresh", None))
+        self.btnClose.setText(QCoreApplication.translate("WorkOrdersWindow", u"Close", None))
+        self.lblStatus.setText(QCoreApplication.translate("WorkOrdersWindow", u"Status", None))
     # retranslateUi
 

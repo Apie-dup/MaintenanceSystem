@@ -185,9 +185,9 @@ class AssetModel:
             search,
             search,
             search,
-            search,
             search
         ))
+            
             
         rows = cursor.fetchall()
 

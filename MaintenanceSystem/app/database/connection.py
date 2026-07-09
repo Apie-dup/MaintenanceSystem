@@ -9,10 +9,23 @@ DATABASE.parent.mkdir(exist_ok=True)
 
 
 class Database:
+    DATABASE = DATABASE
 
     @staticmethod
     def connect():
-        return sqlite3.connect(DATABASE)
+        return sqlite3.connect(Database.DATABASE)
+
+    @staticmethod
+    def _ensure_columns(conn, table_name, columns):
+        cursor = conn.cursor()
+        cursor.execute(f"PRAGMA table_info({table_name})")
+        existing_columns = {row[1] for row in cursor.fetchall()}
+
+        for column_name, definition in columns.items():
+            if column_name not in existing_columns:
+                cursor.execute(
+                    f"ALTER TABLE {table_name} ADD COLUMN {column_name} {definition}"
+                )
 
     @staticmethod
     def initialize():
@@ -33,6 +46,17 @@ class Database:
             )
         """)
 
+        Database._ensure_columns(
+            conn,
+            "users",
+            {
+                "password_hash": "TEXT",
+                "fullname": "TEXT",
+                "role": "TEXT",
+                "active": "INTEGER DEFAULT 1",
+            },
+        )
+
         # -----------------------------
         # ASSETS TABLE
         # -----------------------------
@@ -52,6 +76,18 @@ class Database:
                 created_at TEXT DEFAULT CURRENT_TIMESTAMP
             )
         """)
+
+        Database._ensure_columns(
+            conn,
+            "assets",
+            {
+                "description": "TEXT",
+                "purchase_date": "TEXT",
+                "warranty_expiry": "TEXT",
+                "status": "TEXT DEFAULT 'Active'",
+                "created_at": "TEXT DEFAULT CURRENT_TIMESTAMP",
+            },
+        )
 
         # -----------------------------
         # WORK ORDERS

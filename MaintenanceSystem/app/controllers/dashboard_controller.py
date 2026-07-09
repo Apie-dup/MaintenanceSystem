@@ -3,6 +3,7 @@ from PySide6.QtWidgets import QMainWindow
 from app.ui.generated.ui_dashboard import Ui_DashboardWindow
 from app.services.dashboard_service import DashboardService
 from app.controllers.asset_controller import AssetsController
+from app.controllers.work_order_controller import WorkOrderController
 
 
 class DashboardController(QMainWindow):
@@ -25,11 +26,17 @@ class DashboardController(QMainWindow):
 
         self.setWindowTitle(f"Maintenance Management System - {user.get('fullname', '')}")
         self.ui.btnAssets.clicked.connect(self.open_assets)
+        self.ui.btnWorkOrders.clicked.connect(self.open_work_orders)
 
     def open_assets(self):
 
         self.assets_window = AssetsController()
         self.assets_window.show()
+
+    def open_work_orders(self):
+
+        self.work_order_window = WorkOrderController()
+        self.work_order_window.show()
 
 
     

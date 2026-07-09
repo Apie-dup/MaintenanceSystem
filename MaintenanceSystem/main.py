@@ -2,13 +2,12 @@ import sys
 
 from PySide6.QtWidgets import QApplication
 
-from database import Database
 from app.controllers.login_controller import LoginController
+from app.database.setup import setup_database
 
 
 def main():
-
-    Database.initialize()
+    setup_database()
 
     app = QApplication(sys.argv)
 

@@ -6,6 +6,13 @@ from PySide6.QtCore import QDate
 
 from app.ui.generated.ui_add_asset import Ui_AddAssetDialog
 from app.services.asset_service import AssetService
+from app.constants import (
+    ASSET_CATEGORIES,
+    ASSET_LOCATIONS,
+    ASSET_STATUSES
+)
+from app.utils.validators import Validator
+
 
 
 class AddAssetController(QDialog):
@@ -129,12 +136,11 @@ class AddAssetController(QDialog):
 
         asset_name = self.ui.txtAssetName.text().strip()
 
-        if not asset_name:
-            QMessageBox.warning(
-                self,
-                "Validation",
-                "Asset Name is required."
-            )
+        if not Validator.required(
+            self,
+            asset_name,
+            "Asset Name"
+        ):
             return
 
         asset = (
