@@ -2,8 +2,9 @@ from PySide6.QtWidgets import QWidget, QAbstractItemView, QTableWidgetItem, QHea
 from app.services.asset_service import AssetService
 from app.ui.generated.ui_assets_page import Ui_AssetsWindow
 from app.controllers.add_asset_controller import AddAssetController
+from app.core.base_page import BasePage
 
-class AssetsPage(QWidget):
+class AssetsPage(BasePage):
 
 
     def __init__(self):
@@ -12,10 +13,10 @@ class AssetsPage(QWidget):
         self.ui = Ui_AssetsWindow()
         self.ui.setupUi(self)
 
-        self.ui.tblAssets.setAlternatingRowColors(True)
-        self.ui.tblAssets.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        self.ui.tblAssets.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.ui.tblAssets.horizontalHeader().setStretchLastSection(True)
+        self.configure_table(
+            self.ui.tblAssets
+        )
+
 
         self.load_assets()
 
@@ -24,42 +25,19 @@ class AssetsPage(QWidget):
         self.ui.btnEdit.clicked.connect(self.edit_asset)
         self.ui.btnDelete.clicked.connect(self.delete_asset)
         self.ui.txtSearch.textChanged.connect(self.search_assets)
-        self.ui.tblAssets.doubleClicked.connect(self.edit_asset)
+
         
     def load_assets(self):
 
         assets = AssetService.get_assets()
-        self.populate_table(assets)
-
-    def populate_table(self, assets):
         
-        self.ui.tblAssets.setRowCount(len(assets))
-        self.ui.tblAssets.setColumnCount(11)
-
-        for row, asset in enumerate(assets):
-            values = list(asset)
-            if len(values) < 11:
-                values += [""] * (11 - len(values))
-
-            for column, value in enumerate(values[:11]):
-                item = self.ui.tblAssets.item(row, column)
-                if item is None:
-                    item = QTableWidgetItem()
-                    self.ui.tblAssets.setItem(row, column, item)
-
-                item.setText(str(value if value is not None else ""))
-
-        self.ui.tblAssets.setColumnHidden(0, True)
-
-        header = self.ui.tblAssets.horizontalHeader()
-        header.setSectionResizeMode(QHeaderView.Stretch)
-
-        self.ui.tblAssets.setAlternatingRowColors(True)
-        self.ui.tblAssets.setSortingEnabled(True)
-        self.ui.lblStatus.setText(
-            f"Showing {len(assets)} assets"
+        self.populate_table(
+            self.ui.tblAssets,
+            assets,
+            self.ui.lblStatus,
+            "assets"
         )
-    
+
     def add_asset(self):
 
         dialog = AddAssetController()
@@ -127,10 +105,16 @@ class AssetsPage(QWidget):
             self.load_assets()
 
     def search_assets(self):
+        
         text = self.ui.txtSearch.text().strip()
-        if text == "":
-            assets = AssetService.get_assets()
-        else:
-            assets = AssetService.search_assets(text)
-        self.populate_table(assets)
+        
+        if text:
+            assets = AssetService.get_asset()
+
+            self.populate_table(
+                self.ui.tblAssets,
+                assets,
+                self.ui.lblStatus,
+                "assets"
+            )
 

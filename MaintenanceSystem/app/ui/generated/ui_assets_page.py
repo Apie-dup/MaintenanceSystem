@@ -15,9 +15,10 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QHBoxLayout, QHeaderView, QLabel,
-    QLineEdit, QPushButton, QSizePolicy, QSpacerItem,
-    QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QHBoxLayout, QHeaderView,
+    QLabel, QLineEdit, QPushButton, QSizePolicy,
+    QSpacerItem, QTableWidget, QTableWidgetItem, QVBoxLayout,
+    QWidget)
 
 class Ui_AssetsWindow(object):
     def setupUi(self, AssetsWindow):
@@ -78,7 +79,9 @@ class Ui_AssetsWindow(object):
         __qtablewidgetitem10 = QTableWidgetItem()
         self.tblAssets.setHorizontalHeaderItem(10, __qtablewidgetitem10)
         self.tblAssets.setObjectName(u"tblAssets")
+        self.tblAssets.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.tblAssets.setAlternatingRowColors(True)
+        self.tblAssets.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.tblAssets.setSortingEnabled(True)
         self.tblAssets.setColumnCount(11)
 

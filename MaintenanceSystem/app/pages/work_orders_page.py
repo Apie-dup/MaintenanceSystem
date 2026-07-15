@@ -11,7 +11,7 @@ from app.ui.generated.ui_work_orders_page import Ui_WorkOrdersWindow
 from app.services.work_order_service import WorkOrderService
 from app.controllers.add_work_order_controller import AddWorkOrderController
 
-class WorkOrderPage(QWidget):
+class WorkOrdersPage(QWidget):
 
     def __init__(self):
         super().__init__()
@@ -19,7 +19,9 @@ class WorkOrderPage(QWidget):
         self.ui = Ui_WorkOrdersWindow()
         self.ui.setupUi(self)
 
-        self.initialize_window()
+        self.configure_table(
+            self.ui.tblWorkOrders
+        )
 
     def initialize_window(self):
 
@@ -30,10 +32,6 @@ class WorkOrderPage(QWidget):
         self.ui.btnDelete.clicked.connect(self.delete_work_order)
         self.ui.btnRefresh.clicked.connect(self.load_work_orders)
         self.ui.btnClose.clicked.connect(self.close)
-
-        self.ui.tblWorkOrders.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.ui.tblWorkOrders.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        self.ui.tblWorkOrders.doubleClicked.connect(self.edit_work_order)
 
         self.ui.txtSearch.textChanged.connect(self.search_work_orders)
 

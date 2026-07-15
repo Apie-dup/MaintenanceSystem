@@ -4,10 +4,11 @@ from PySide6.QtGui import QAction, QIcon, QPixmap
 
 from app.ui.generated.ui_dashboard import Ui_DashboardWindow
 from app.services.dashboard_service import DashboardService
-from app.controllers.asset_controller import AssetsController
-from app.controllers.work_order_controller import WorkOrderController
+from app.pages.assets_page import AssetsPage
+from app.pages.work_orders_page import WorkOrderPage
 from app.controllers.lookup_controller import LookupController
-from app.controllers.pm_controller import PMController
+from app.pages.pm_page import PMPage
+from app.pages.technicians_page import TechniciansPage
 from datetime import datetime
 from app.database.connection import Database
 
@@ -68,7 +69,7 @@ class DashboardController(QMainWindow):
 
     def open_assets(self):
 
-        self.assets_window = AssetsController()
+        self.assets_window = AssetsPage()
         self.assets_window.show()
 
         self.assets_window.destroyed.connect(
@@ -77,7 +78,7 @@ class DashboardController(QMainWindow):
 
     def open_work_orders(self):
 
-        self.work_order_window = WorkOrderController()
+        self.work_order_window = WorkOrderPage()
         self.work_order_window.show()
 
         self.work_order_window.destroyed.connect(
@@ -85,9 +86,9 @@ class DashboardController(QMainWindow):
         )
 
     def open_technicians(self):
-        from app.controllers.technician_controller import TechnicianController
+        
 
-        self.technician_window = TechnicianController()
+        self.technician_window = TechniciansPage()
         self.technician_window.show()
 
         self.technician_window.destroyed.connect(
@@ -101,7 +102,7 @@ class DashboardController(QMainWindow):
 
     def open_pm(self):
 
-        self.pm_window = PMController()
+        self.pm_window = PMPage()
         self.pm_window.show()
 
     def load_statistics(self):

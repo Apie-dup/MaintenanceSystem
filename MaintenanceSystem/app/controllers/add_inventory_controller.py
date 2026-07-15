@@ -4,8 +4,8 @@ from PySide6.QtCore import Qt
 from app.ui.generated.ui_add_inventory import Ui_AddInventoryDialog
 from app.services.inventory_service import InventoryService
 from app.services.lookup_service import LookupService
-from app.services.supplier_service import SupplierService
-from app.utils.validator import Validator
+"from app.services.supplier_service import SupplierService"
+"from app.utils.validator import Validator"
 
 
 class AddInventoryController(QDialog):

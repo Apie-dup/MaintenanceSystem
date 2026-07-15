@@ -15,15 +15,16 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QHBoxLayout, QHeaderView, QLabel,
-    QLineEdit, QPushButton, QSizePolicy, QTableWidget,
-    QTableWidgetItem, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QHBoxLayout, QHeaderView,
+    QLabel, QLineEdit, QPushButton, QSizePolicy,
+    QSpacerItem, QTableWidget, QTableWidgetItem, QVBoxLayout,
+    QWidget)
 
 class Ui_TechniciansWindow(object):
     def setupUi(self, TechniciansWindow):
         if not TechniciansWindow.objectName():
             TechniciansWindow.setObjectName(u"TechniciansWindow")
-        TechniciansWindow.resize(1320, 696)
+        TechniciansWindow.resize(1966, 696)
         self.verticalLayout = QVBoxLayout(TechniciansWindow)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.lblTechnicians = QLabel(TechniciansWindow)
@@ -70,7 +71,9 @@ class Ui_TechniciansWindow(object):
         __qtablewidgetitem7 = QTableWidgetItem()
         self.tblTechnicians.setHorizontalHeaderItem(7, __qtablewidgetitem7)
         self.tblTechnicians.setObjectName(u"tblTechnicians")
+        self.tblTechnicians.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.tblTechnicians.setAlternatingRowColors(True)
+        self.tblTechnicians.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.tblTechnicians.setSortingEnabled(True)
 
         self.verticalLayout.addWidget(self.tblTechnicians)
@@ -95,9 +98,6 @@ class Ui_TechniciansWindow(object):
 
         self.btnRefresh = QPushButton(TechniciansWindow)
         self.btnRefresh.setObjectName(u"btnRefresh")
-        self.btnRefresh.setMinimumSize(QSize(90, 32))
-        self.btnRefresh.setStyleSheet(u"")
-        self.btnRefresh.setCheckable(True)
 
         self.horizontalLayout_2.addWidget(self.btnRefresh)
 
@@ -108,6 +108,18 @@ class Ui_TechniciansWindow(object):
         self.btnDelete.setCheckable(True)
 
         self.horizontalLayout_2.addWidget(self.btnDelete)
+
+        self.horizontalSpacer = QSpacerItem(1299, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_2.addItem(self.horizontalSpacer)
+
+        self.btnClose = QPushButton(TechniciansWindow)
+        self.btnClose.setObjectName(u"btnClose")
+        self.btnClose.setMinimumSize(QSize(90, 32))
+        self.btnClose.setStyleSheet(u"")
+        self.btnClose.setCheckable(True)
+
+        self.horizontalLayout_2.addWidget(self.btnClose)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout_2)
@@ -148,6 +160,7 @@ class Ui_TechniciansWindow(object):
         self.btnEdit.setText(QCoreApplication.translate("TechniciansWindow", u"Edit", None))
         self.btnRefresh.setText(QCoreApplication.translate("TechniciansWindow", u"Refresh", None))
         self.btnDelete.setText(QCoreApplication.translate("TechniciansWindow", u"Delete", None))
+        self.btnClose.setText(QCoreApplication.translate("TechniciansWindow", u"Close", None))
         self.lblStatus.setText(QCoreApplication.translate("TechniciansWindow", u"Status", None))
     # retranslateUi
 
