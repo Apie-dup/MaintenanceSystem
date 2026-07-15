@@ -49,3 +49,16 @@ WORK_ORDER_STATUSES = [
     "Closed"
     "Cancelled"
 ]
+
+TRADES = [
+    "Electrical",
+    "Mechanical",
+    "HVAC",
+    "Plumbing",
+    "Carpentry",
+    "Welder",
+    "Painter",
+    "General Maintenance",
+    "Groundskeeper",
+    "IT"
+]

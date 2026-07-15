@@ -16,6 +16,13 @@ def main():
 
     sys.exit(app.exec())
 
+from app.database.seed import (
+    seed_default_admin,
+    seed_app_settings,
+    seed_lookup_tables,
+    seed_preventive_maintenance
+)
+
 
 if __name__ == "__main__":
     main()

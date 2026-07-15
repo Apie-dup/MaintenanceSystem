@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>722</width>
+    <width>822</width>
     <height>600</height>
    </rect>
   </property>
@@ -14,296 +14,216 @@
    <string>Technicians</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <widget class="QLabel" name="lblTechnicians">
-      <property name="font">
-       <font>
-        <pointsize>20</pointsize>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>Technicians</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QLabel" name="lblSearch">
-        <property name="text">
-         <string>Search:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="txtSearch">
-        <property name="placeholderText">
-         <string>Search technicians...</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <widget class="QTableWidget" name="tblTechnicians">
-      <column>
+   <widget class="QLabel" name="lblTechnicians">
+    <property name="geometry">
+     <rect>
+      <x>9</x>
+      <y>9</y>
+      <width>145</width>
+      <height>36</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>20</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Technicians</string>
+    </property>
+   </widget>
+   <widget class="QTableWidget" name="tblTechnicians">
+    <property name="geometry">
+     <rect>
+      <x>9</x>
+      <y>85</y>
+      <width>256</width>
+      <height>192</height>
+     </rect>
+    </property>
+    <property name="alternatingRowColors">
+     <bool>true</bool>
+    </property>
+    <property name="sortingEnabled">
+     <bool>true</bool>
+    </property>
+    <column>
+     <property name="text">
+      <string>ID</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Employee No.</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Emplyee Name</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Last Name</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Trade</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Department</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Phone</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Status</string>
+     </property>
+    </column>
+   </widget>
+   <widget class="QLabel" name="lblStatus">
+    <property name="geometry">
+     <rect>
+      <x>9</x>
+      <y>521</y>
+      <width>33</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Status</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="lblSearch">
        <property name="text">
-        <string>ID</string>
+        <string>Search:</string>
        </property>
-      </column>
-      <column>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="txtSearch">
+       <property name="placeholderText">
+        <string>Search technicians...</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QPushButton" name="btnAdd">
+       <property name="minimumSize">
+        <size>
+         <width>90</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
        <property name="text">
-        <string>Employee No.</string>
+        <string>Add</string>
        </property>
-      </column>
-      <column>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnEdit">
+       <property name="minimumSize">
+        <size>
+         <width>90</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
        <property name="text">
-        <string>Emplyee Name</string>
+        <string>Edit</string>
        </property>
-      </column>
-      <column>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnDelete">
+       <property name="minimumSize">
+        <size>
+         <width>90</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
        <property name="text">
-        <string>Last Name</string>
+        <string>Delete</string>
        </property>
-      </column>
-      <column>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnRefresh">
+       <property name="minimumSize">
+        <size>
+         <width>90</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
        <property name="text">
-        <string>Trade</string>
+        <string>Refresh</string>
        </property>
-      </column>
-      <column>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnClose">
+       <property name="minimumSize">
+        <size>
+         <width>90</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
        <property name="text">
-        <string>Department</string>
+        <string>Close</string>
        </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Status</string>
-       </property>
-      </column>
-     </widget>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
-       <widget class="QPushButton" name="btnAdd">
-        <property name="minimumSize">
-         <size>
-          <width>90</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QPushButton {
-    background-color: #f3f3f3;        /* Windows 11 light button background */
-    color: #000000;                   /* Text color */
-    border: 1px solid #c9c9c9;        /* Soft border */
-    border-radius: 6px;               /* Windows 11 rounded corners */
-    padding: 6px 14px;                /* Standard Win11 padding */
-    font-family: &quot;Segoe UI&quot;;
-    font-size: 14px;
-}
-
-QPushButton:hover {
-    background-color: #e5e5e5;        /* Slightly darker hover */
-}
-
-QPushButton:pressed {
-    background-color: #dcdcdc;        /* Pressed state */
-    border: 1px solid #b5b5b5;
-}
-
-QPushButton:disabled {
-    background-color: #f0f0f0;
-    color: #a0a0a0;
-    border: 1px solid #e0e0e0;
-}
-</string>
-        </property>
-        <property name="text">
-         <string>Add</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btnEdit">
-        <property name="minimumSize">
-         <size>
-          <width>90</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QPushButton {
-    background-color: #f3f3f3;        /* Windows 11 light button background */
-    color: #000000;                   /* Text color */
-    border: 1px solid #c9c9c9;        /* Soft border */
-    border-radius: 6px;               /* Windows 11 rounded corners */
-    padding: 6px 14px;                /* Standard Win11 padding */
-    font-family: &quot;Segoe UI&quot;;
-    font-size: 14px;
-}
-
-QPushButton:hover {
-    background-color: #e5e5e5;        /* Slightly darker hover */
-}
-
-QPushButton:pressed {
-    background-color: #dcdcdc;        /* Pressed state */
-    border: 1px solid #b5b5b5;
-}
-
-QPushButton:disabled {
-    background-color: #f0f0f0;
-    color: #a0a0a0;
-    border: 1px solid #e0e0e0;
-}
-</string>
-        </property>
-        <property name="text">
-         <string>Edit</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btnDelete">
-        <property name="minimumSize">
-         <size>
-          <width>90</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QPushButton {
-    background-color: #f3f3f3;        /* Windows 11 light button background */
-    color: #000000;                   /* Text color */
-    border: 1px solid #c9c9c9;        /* Soft border */
-    border-radius: 6px;               /* Windows 11 rounded corners */
-    padding: 6px 14px;                /* Standard Win11 padding */
-    font-family: &quot;Segoe UI&quot;;
-    font-size: 14px;
-}
-
-QPushButton:hover {
-    background-color: #e5e5e5;        /* Slightly darker hover */
-}
-
-QPushButton:pressed {
-    background-color: #dcdcdc;        /* Pressed state */
-    border: 1px solid #b5b5b5;
-}
-
-QPushButton:disabled {
-    background-color: #f0f0f0;
-    color: #a0a0a0;
-    border: 1px solid #e0e0e0;
-}
-</string>
-        </property>
-        <property name="text">
-         <string>Delete</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btnRefresh">
-        <property name="minimumSize">
-         <size>
-          <width>90</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QPushButton {
-    background-color: #f3f3f3;        /* Windows 11 light button background */
-    color: #000000;                   /* Text color */
-    border: 1px solid #c9c9c9;        /* Soft border */
-    border-radius: 6px;               /* Windows 11 rounded corners */
-    padding: 6px 14px;                /* Standard Win11 padding */
-    font-family: &quot;Segoe UI&quot;;
-    font-size: 14px;
-}
-
-QPushButton:hover {
-    background-color: #e5e5e5;        /* Slightly darker hover */
-}
-
-QPushButton:pressed {
-    background-color: #dcdcdc;        /* Pressed state */
-    border: 1px solid #b5b5b5;
-}
-
-QPushButton:disabled {
-    background-color: #f0f0f0;
-    color: #a0a0a0;
-    border: 1px solid #e0e0e0;
-}
-</string>
-        </property>
-        <property name="text">
-         <string>Refresh</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btnClose">
-        <property name="minimumSize">
-         <size>
-          <width>90</width>
-          <height>32</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QPushButton {
-    background-color: #f3f3f3;        /* Windows 11 light button background */
-    color: #000000;                   /* Text color */
-    border: 1px solid #c9c9c9;        /* Soft border */
-    border-radius: 6px;               /* Windows 11 rounded corners */
-    padding: 6px 14px;                /* Standard Win11 padding */
-    font-family: &quot;Segoe UI&quot;;
-    font-size: 14px;
-}
-
-QPushButton:hover {
-    background-color: #e5e5e5;        /* Slightly darker hover */
-}
-
-QPushButton:pressed {
-    background-color: #dcdcdc;        /* Pressed state */
-    border: 1px solid #b5b5b5;
-}
-
-QPushButton:disabled {
-    background-color: #f0f0f0;
-    color: #a0a0a0;
-    border: 1px solid #e0e0e0;
-}
-</string>
-        </property>
-        <property name="text">
-         <string>Close</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <widget class="QLabel" name="lblStatus">
-      <property name="text">
-       <string>Status</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>722</width>
+     <width>822</width>
      <height>33</height>
     </rect>
    </property>

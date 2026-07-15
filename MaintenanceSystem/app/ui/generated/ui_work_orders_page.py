@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'work_orders.ui'
+## Form generated from reading UI file 'work_orders_page.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.11.1
 ##
@@ -16,20 +16,17 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QHBoxLayout, QHeaderView, QLabel,
-    QLineEdit, QMainWindow, QMenuBar, QPushButton,
-    QSizePolicy, QStatusBar, QTableWidget, QTableWidgetItem,
-    QVBoxLayout, QWidget)
+    QLineEdit, QPushButton, QSizePolicy, QSpacerItem,
+    QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget)
 
 class Ui_WorkOrdersWindow(object):
     def setupUi(self, WorkOrdersWindow):
         if not WorkOrdersWindow.objectName():
             WorkOrdersWindow.setObjectName(u"WorkOrdersWindow")
-        WorkOrdersWindow.resize(822, 600)
-        self.centralwidget = QWidget(WorkOrdersWindow)
-        self.centralwidget.setObjectName(u"centralwidget")
-        self.verticalLayout = QVBoxLayout(self.centralwidget)
+        WorkOrdersWindow.resize(1205, 709)
+        self.verticalLayout = QVBoxLayout(WorkOrdersWindow)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.lblWorkOrders = QLabel(self.centralwidget)
+        self.lblWorkOrders = QLabel(WorkOrdersWindow)
         self.lblWorkOrders.setObjectName(u"lblWorkOrders")
         font = QFont()
         font.setPointSize(20)
@@ -40,12 +37,12 @@ class Ui_WorkOrdersWindow(object):
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.lblSearch = QLabel(self.centralwidget)
+        self.lblSearch = QLabel(WorkOrdersWindow)
         self.lblSearch.setObjectName(u"lblSearch")
 
         self.horizontalLayout.addWidget(self.lblSearch)
 
-        self.txtSearch = QLineEdit(self.centralwidget)
+        self.txtSearch = QLineEdit(WorkOrdersWindow)
         self.txtSearch.setObjectName(u"txtSearch")
 
         self.horizontalLayout.addWidget(self.txtSearch)
@@ -53,7 +50,7 @@ class Ui_WorkOrdersWindow(object):
 
         self.verticalLayout.addLayout(self.horizontalLayout)
 
-        self.tblWorkOrders = QTableWidget(self.centralwidget)
+        self.tblWorkOrders = QTableWidget(WorkOrdersWindow)
         if (self.tblWorkOrders.columnCount() < 8):
             self.tblWorkOrders.setColumnCount(8)
         __qtablewidgetitem = QTableWidgetItem()
@@ -78,177 +75,53 @@ class Ui_WorkOrdersWindow(object):
 
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.btnAdd = QPushButton(self.centralwidget)
+        self.btnAdd = QPushButton(WorkOrdersWindow)
         self.btnAdd.setObjectName(u"btnAdd")
         self.btnAdd.setMinimumSize(QSize(90, 32))
-        self.btnAdd.setStyleSheet(u"QPushButton {\n"
-"    background-color: #f3f3f3;        /* Windows 11 light button background */\n"
-"    color: #000000;                   /* Text color */\n"
-"    border: 1px solid #c9c9c9;        /* Soft border */\n"
-"    border-radius: 6px;               /* Windows 11 rounded corners */\n"
-"    padding: 6px 14px;                /* Standard Win11 padding */\n"
-"    font-family: \"Segoe UI\";\n"
-"    font-size: 14px;\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    background-color: #e5e5e5;        /* Slightly darker hover */\n"
-"}\n"
-"\n"
-"QPushButton:pressed {\n"
-"    background-color: #dcdcdc;        /* Pressed state */\n"
-"    border: 1px solid #b5b5b5;\n"
-"}\n"
-"\n"
-"QPushButton:disabled {\n"
-"    background-color: #f0f0f0;\n"
-"    color: #a0a0a0;\n"
-"    border: 1px solid #e0e0e0;\n"
-"}\n"
-"")
+        self.btnAdd.setStyleSheet(u"")
 
         self.horizontalLayout_2.addWidget(self.btnAdd)
 
-        self.btnEdit = QPushButton(self.centralwidget)
+        self.btnEdit = QPushButton(WorkOrdersWindow)
         self.btnEdit.setObjectName(u"btnEdit")
         self.btnEdit.setMinimumSize(QSize(90, 32))
-        self.btnEdit.setStyleSheet(u"QPushButton {\n"
-"    background-color: #f3f3f3;        /* Windows 11 light button background */\n"
-"    color: #000000;                   /* Text color */\n"
-"    border: 1px solid #c9c9c9;        /* Soft border */\n"
-"    border-radius: 6px;               /* Windows 11 rounded corners */\n"
-"    padding: 6px 14px;                /* Standard Win11 padding */\n"
-"    font-family: \"Segoe UI\";\n"
-"    font-size: 14px;\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    background-color: #e5e5e5;        /* Slightly darker hover */\n"
-"}\n"
-"\n"
-"QPushButton:pressed {\n"
-"    background-color: #dcdcdc;        /* Pressed state */\n"
-"    border: 1px solid #b5b5b5;\n"
-"}\n"
-"\n"
-"QPushButton:disabled {\n"
-"    background-color: #f0f0f0;\n"
-"    color: #a0a0a0;\n"
-"    border: 1px solid #e0e0e0;\n"
-"}\n"
-"")
+        self.btnEdit.setStyleSheet(u"")
 
         self.horizontalLayout_2.addWidget(self.btnEdit)
 
-        self.btnDelete = QPushButton(self.centralwidget)
-        self.btnDelete.setObjectName(u"btnDelete")
-        self.btnDelete.setMinimumSize(QSize(90, 32))
-        self.btnDelete.setStyleSheet(u"QPushButton {\n"
-"    background-color: #f3f3f3;        /* Windows 11 light button background */\n"
-"    color: #000000;                   /* Text color */\n"
-"    border: 1px solid #c9c9c9;        /* Soft border */\n"
-"    border-radius: 6px;               /* Windows 11 rounded corners */\n"
-"    padding: 6px 14px;                /* Standard Win11 padding */\n"
-"    font-family: \"Segoe UI\";\n"
-"    font-size: 14px;\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    background-color: #e5e5e5;        /* Slightly darker hover */\n"
-"}\n"
-"\n"
-"QPushButton:pressed {\n"
-"    background-color: #dcdcdc;        /* Pressed state */\n"
-"    border: 1px solid #b5b5b5;\n"
-"}\n"
-"\n"
-"QPushButton:disabled {\n"
-"    background-color: #f0f0f0;\n"
-"    color: #a0a0a0;\n"
-"    border: 1px solid #e0e0e0;\n"
-"}\n"
-"")
-
-        self.horizontalLayout_2.addWidget(self.btnDelete)
-
-        self.btnRefresh = QPushButton(self.centralwidget)
+        self.btnRefresh = QPushButton(WorkOrdersWindow)
         self.btnRefresh.setObjectName(u"btnRefresh")
         self.btnRefresh.setMinimumSize(QSize(90, 32))
-        self.btnRefresh.setStyleSheet(u"QPushButton {\n"
-"    background-color: #f3f3f3;        /* Windows 11 light button background */\n"
-"    color: #000000;                   /* Text color */\n"
-"    border: 1px solid #c9c9c9;        /* Soft border */\n"
-"    border-radius: 6px;               /* Windows 11 rounded corners */\n"
-"    padding: 6px 14px;                /* Standard Win11 padding */\n"
-"    font-family: \"Segoe UI\";\n"
-"    font-size: 14px;\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    background-color: #e5e5e5;        /* Slightly darker hover */\n"
-"}\n"
-"\n"
-"QPushButton:pressed {\n"
-"    background-color: #dcdcdc;        /* Pressed state */\n"
-"    border: 1px solid #b5b5b5;\n"
-"}\n"
-"\n"
-"QPushButton:disabled {\n"
-"    background-color: #f0f0f0;\n"
-"    color: #a0a0a0;\n"
-"    border: 1px solid #e0e0e0;\n"
-"}\n"
-"")
+        self.btnRefresh.setStyleSheet(u"")
 
         self.horizontalLayout_2.addWidget(self.btnRefresh)
 
-        self.btnClose = QPushButton(self.centralwidget)
+        self.btnDelete = QPushButton(WorkOrdersWindow)
+        self.btnDelete.setObjectName(u"btnDelete")
+        self.btnDelete.setMinimumSize(QSize(90, 32))
+        self.btnDelete.setStyleSheet(u"")
+
+        self.horizontalLayout_2.addWidget(self.btnDelete)
+
+        self.horizontalSpacer = QSpacerItem(852, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_2.addItem(self.horizontalSpacer)
+
+        self.btnClose = QPushButton(WorkOrdersWindow)
         self.btnClose.setObjectName(u"btnClose")
         self.btnClose.setMinimumSize(QSize(90, 32))
-        self.btnClose.setStyleSheet(u"QPushButton {\n"
-"    background-color: #f3f3f3;        /* Windows 11 light button background */\n"
-"    color: #000000;                   /* Text color */\n"
-"    border: 1px solid #c9c9c9;        /* Soft border */\n"
-"    border-radius: 6px;               /* Windows 11 rounded corners */\n"
-"    padding: 6px 14px;                /* Standard Win11 padding */\n"
-"    font-family: \"Segoe UI\";\n"
-"    font-size: 14px;\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    background-color: #e5e5e5;        /* Slightly darker hover */\n"
-"}\n"
-"\n"
-"QPushButton:pressed {\n"
-"    background-color: #dcdcdc;        /* Pressed state */\n"
-"    border: 1px solid #b5b5b5;\n"
-"}\n"
-"\n"
-"QPushButton:disabled {\n"
-"    background-color: #f0f0f0;\n"
-"    color: #a0a0a0;\n"
-"    border: 1px solid #e0e0e0;\n"
-"}\n"
-"")
+        self.btnClose.setStyleSheet(u"")
 
         self.horizontalLayout_2.addWidget(self.btnClose)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout_2)
 
-        self.lblStatus = QLabel(self.centralwidget)
+        self.lblStatus = QLabel(WorkOrdersWindow)
         self.lblStatus.setObjectName(u"lblStatus")
 
         self.verticalLayout.addWidget(self.lblStatus)
 
-        WorkOrdersWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QMenuBar(WorkOrdersWindow)
-        self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 822, 33))
-        WorkOrdersWindow.setMenuBar(self.menubar)
-        self.statusbar = QStatusBar(WorkOrdersWindow)
-        self.statusbar.setObjectName(u"statusbar")
-        WorkOrdersWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(WorkOrdersWindow)
 
@@ -256,7 +129,7 @@ class Ui_WorkOrdersWindow(object):
     # setupUi
 
     def retranslateUi(self, WorkOrdersWindow):
-        WorkOrdersWindow.setWindowTitle(QCoreApplication.translate("WorkOrdersWindow", u"WorkOrders", None))
+        WorkOrdersWindow.setWindowTitle(QCoreApplication.translate("WorkOrdersWindow", u"Work Orders Window", None))
         self.lblWorkOrders.setText(QCoreApplication.translate("WorkOrdersWindow", u"Work Orders", None))
         self.lblSearch.setText(QCoreApplication.translate("WorkOrdersWindow", u"Search:", None))
         self.txtSearch.setPlaceholderText(QCoreApplication.translate("WorkOrdersWindow", u"Search work orders....", None))
@@ -278,8 +151,8 @@ class Ui_WorkOrdersWindow(object):
         ___qtablewidgetitem7.setText(QCoreApplication.translate("WorkOrdersWindow", u"Due Date", None))
         self.btnAdd.setText(QCoreApplication.translate("WorkOrdersWindow", u"Add", None))
         self.btnEdit.setText(QCoreApplication.translate("WorkOrdersWindow", u"Edit", None))
-        self.btnDelete.setText(QCoreApplication.translate("WorkOrdersWindow", u"Delete", None))
         self.btnRefresh.setText(QCoreApplication.translate("WorkOrdersWindow", u"Refresh", None))
+        self.btnDelete.setText(QCoreApplication.translate("WorkOrdersWindow", u"Delete", None))
         self.btnClose.setText(QCoreApplication.translate("WorkOrdersWindow", u"Close", None))
         self.lblStatus.setText(QCoreApplication.translate("WorkOrdersWindow", u"Status", None))
     # retranslateUi

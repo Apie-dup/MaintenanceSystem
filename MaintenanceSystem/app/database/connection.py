@@ -97,14 +97,38 @@ class Database:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 wo_number TEXT UNIQUE,
                 asset_id INTEGER,
+                title TEXT,
                 description TEXT,
                 priority TEXT,
                 status TEXT,
-                assigned_to TEXT,
+                technician_id INTEGER,
+                requested_by TEXT,
                 date_created TEXT,
-                date_completed TEXT
+                due_date TEXT,
+                completion_date TEXT,
+                labour_hours REAL DEFAULT 0,
+                estimated_cost REAL DEFAULT 0,
+                actual_cost REAL DEFAULT 0,
+                notes TEXT
             )
         """)
+
+        Database._ensure_columns(
+            conn,
+            "work_orders",
+            {
+                "title": "TEXT",
+                "technician_id": "INTEGER",
+                "requested_by": "TEXT",
+                "date_created": "TEXT",
+                "due_date": "TEXT",
+                "completion_date": "TEXT",
+                "labour_hours": "REAL DEFAULT 0",
+                "estimated_cost": "REAL DEFAULT 0",
+                "actual_cost": "REAL DEFAULT 0",
+                "notes": "TEXT",
+            },
+        )
 
         # -----------------------------
         # PREVENTIVE MAINTENANCE
@@ -112,12 +136,20 @@ class Database:
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS preventive_maintenance (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                asset_id INTEGER,
-                task TEXT,
-                frequency TEXT,
-                next_due TEXT,
-                last_completed TEXT,
-                status TEXT
+                pm_number TEXT UNIQUE NOT NULL,
+                asset_id INTEGER NOT NULL,
+                task TEXT NOT NULL,
+                description TEXT,
+                frequency_type TEXT NOT NULL,
+                frequency_value INTEGER DEFAULT 1,
+                last_service_date TEXT,
+                next_due_date TEXT NOT NULL,
+                estimated_hours REAL DEFAULT 0,
+                estimated_cost REAL DEFAULT 0,
+                priority TEXT DEFAULT 'Medium',
+                active INTEGER DEFAULT 1,
+                notes TEXT,
+            FOREIGN KEY(asset_id) REFERENCES assets(id)
             )
         """)
 
@@ -178,3 +210,12 @@ class Database:
 
         conn.commit()
         conn.close()
+
+    @staticmethod
+    def is_connected():
+        try:
+            conn = Database.connect()
+            conn.close()
+            return True
+        except Exception:
+            return False

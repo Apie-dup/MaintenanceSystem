@@ -108,7 +108,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="txtDepartment"/>
+      <widget class="QComboBox" name="cmbDepartment"/>
      </item>
     </layout>
    </item>

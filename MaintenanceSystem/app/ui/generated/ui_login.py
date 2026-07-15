@@ -17,13 +17,14 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QCheckBox, QHBoxLayout, QLabel,
     QLineEdit, QMainWindow, QMenuBar, QPushButton,
-    QSizePolicy, QStatusBar, QVBoxLayout, QWidget)
+    QSizePolicy, QSpacerItem, QStatusBar, QVBoxLayout,
+    QWidget)
 
 class Ui_LoginWindow(object):
     def setupUi(self, LoginWindow):
         if not LoginWindow.objectName():
             LoginWindow.setObjectName(u"LoginWindow")
-        LoginWindow.resize(800, 600)
+        LoginWindow.resize(1054, 600)
         LoginWindow.setMinimumSize(QSize(520, 340))
         self.centralwidget = QWidget(LoginWindow)
         self.centralwidget.setObjectName(u"centralwidget")
@@ -87,6 +88,10 @@ class Ui_LoginWindow(object):
 
         self.horizontalLayout_3.addWidget(self.btnExit)
 
+        self.horizontalSpacer = QSpacerItem(779, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_3.addItem(self.horizontalSpacer)
+
 
         self.verticalLayout.addLayout(self.horizontalLayout_3)
 
@@ -103,7 +108,7 @@ class Ui_LoginWindow(object):
         LoginWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(LoginWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 800, 33))
+        self.menubar.setGeometry(QRect(0, 0, 1054, 33))
         LoginWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(LoginWindow)
         self.statusbar.setObjectName(u"statusbar")

@@ -4,8 +4,10 @@ from PySide6.QtWidgets import QDialog, QMessageBox
 from app.ui.generated.ui_add_work_order import Ui_AddWorkOrderDialog
 from app.services.work_order_service import WorkOrderService
 from app.services.asset_service import AssetService
+from app.services.technician_service import TechnicianService
+from app.services.lookup_service import LookupService
 
-class AddWorkOrderConttoller(QDialog):
+class AddWorkOrderController(QDialog):
     
     def __init__(self, work_order_id=None):
         super().__init__()
@@ -14,14 +16,18 @@ class AddWorkOrderConttoller(QDialog):
 
         self.ui = Ui_AddWorkOrderDialog()
         self.ui.setupUi(self)
+        self.ui.cmbAsset.currentIndexChanged.connect(
+        self.load_asset_details
+    )
 
         self.initialize_dialog()
 
     def initialize_dialog(self):
 
-        self.load_prorities()
+        self.load_priorities()
         self.load_status()
         self.load_assets()
+        self.load_technicians()
 
         self.ui.dtDateCreated.setCalendarPopup(True)
         self.ui.dtDueDate.setCalendarPopup(True)
@@ -75,7 +81,7 @@ class AddWorkOrderConttoller(QDialog):
 
         self.ui.cmbAsset.clear()
 
-        assets = AssetService.get_asset()
+        assets = AssetService.get_assets()
 
         for asset in assets:
 
@@ -87,8 +93,6 @@ class AddWorkOrderConttoller(QDialog):
                 f"{asset_number} - {asset_name}",
                 asset_id
             )
-
-        self.ui.cmbThechnician.addItem("Unassigned", None)
 
     def save_work_order(self):
 
@@ -103,7 +107,7 @@ class AddWorkOrderConttoller(QDialog):
             return
         
         asset_id = self.ui.cmbAsset.currentData()
-        technician_id = self.ui.cmbThechnician.currentData()
+        technician_id = self.ui.cmbTechnician.currentData()
 
         work_order = (
 
@@ -133,7 +137,7 @@ class AddWorkOrderConttoller(QDialog):
 
             self.ui.dsbLabourHours.value(),
 
-            self.ui.teNotes.toPlaintText().strip()
+            self.ui.teNotes.toPlainText().strip()
         
 
         )
@@ -194,9 +198,16 @@ class AddWorkOrderConttoller(QDialog):
 
     def load_work_order(self):
 
-        work_order = WorkOrderService.get_work_order(
-            self.work_order_id
-        )
+        work_order = WorkOrderService.get_work_order(self.work_order_id)
+
+        if not work_order:
+            QMessageBox.warning(
+                self,
+                "Error",
+                "Work order not found."
+            )
+            self.reject()
+            return
 
         (
             _,
@@ -215,3 +226,76 @@ class AddWorkOrderConttoller(QDialog):
             labour_hours,
             notes
         ) = work_order
+
+        self.ui.txtWorkOrderNumber.setText(work_order_number)
+        self.ui.txtWorkOrderNumber.setReadOnly(True)
+
+        self.ui.txtTitle.setText(title or "")
+        self.ui.teDescription.setPlainText(description or "")
+
+        self.ui.cmbPriority.setCurrentText(priority or "Low")
+        self.ui.cmbStatus.setCurrentText(status or "Open")
+
+        self.ui.txtRequestedBy.setText(requested_by or "")
+
+        if date_created:
+            self.ui.dtDateCreated.setDate(QDate.fromString(date_created, "yyyy-MM-dd"))
+
+        if due_date:
+            self.ui.dtDueDate.setDate(QDate.fromString(due_date, "yyyy-MM-dd"))
+
+        self.ui.dsbEstimatedCost.setValue(estimated_cost or 0)
+        self.ui.dsbActualCost.setValue(actual_cost or 0)
+        self.ui.dsbLabourHours.setValue(labour_hours or 0)
+
+        self.ui.teNotes.setPlainText(notes or "")
+
+        index = self.ui.cmbAsset.findData(asset_id)
+        if index >= 0:
+            self.ui.cmbAsset.setCurrentIndex(index)
+
+        index = self.ui.cmbTechnician.findData(technician_id)
+        if index >= 0:
+            self.ui.cmbTechnician.setCurrentIndex(index)
+
+    def load_technicians(self):
+
+        self.ui.cmbTechnician.clear()
+        self.ui.cmbTechnician.addItem("Unassigned", None)
+
+        technicians = TechnicianService.get_technicians()
+
+        for technician in technicians:
+
+            technician_id = technician[0]
+            employee_number = technician[1]
+            first_name = technician[2]
+            last_name = technician[3]
+
+            self.ui.cmbTechnician.addItem(
+                f"{employee_number} - {first_name} {last_name}",
+                technician_id
+            )
+
+    def load_asset_details(self):
+
+        asset_id = self.ui.cmbAsset.currentData()
+
+        if asset_id is None:
+            return
+
+        asset = AssetService.get_asset(asset_id)
+
+        if not asset:
+            return
+
+        category = asset[3] if len(asset) > 3 else ""
+        location = asset[4] if len(asset) > 4 else ""
+
+        category_widget = getattr(self.ui, "cmbCategory", None)
+        if category_widget is not None and hasattr(category_widget, "setCurrentText"):
+            category_widget.setCurrentText(category)
+
+        location_widget = getattr(self.ui, "cmbLocation", None)
+        if location_widget is not None and hasattr(location_widget, "setCurrentText"):
+            location_widget.setCurrentText(location)

@@ -50,52 +50,73 @@
          </property>
         </widget>
        </item>
-       <item alignment="Qt::AlignmentFlag::AlignLeft">
+       <item>
         <widget class="QPushButton" name="btnDashboard">
          <property name="text">
           <string>Dashboard</string>
          </property>
         </widget>
        </item>
-       <item alignment="Qt::AlignmentFlag::AlignLeft">
+       <item>
         <widget class="QPushButton" name="btnAssets">
          <property name="text">
           <string>Assets</string>
          </property>
         </widget>
        </item>
-       <item alignment="Qt::AlignmentFlag::AlignLeft">
+       <item>
         <widget class="QPushButton" name="btnWorkOrders">
          <property name="text">
           <string>Work Orders</string>
          </property>
         </widget>
        </item>
-       <item alignment="Qt::AlignmentFlag::AlignLeft">
-        <widget class="QPushButton" name="btnPreventive">
+       <item>
+        <widget class="QPushButton" name="btnPM">
          <property name="text">
           <string>Preventive Maitenance</string>
          </property>
         </widget>
        </item>
-       <item alignment="Qt::AlignmentFlag::AlignLeft">
+       <item>
         <widget class="QPushButton" name="btnInventory">
          <property name="text">
           <string>Inventory</string>
          </property>
         </widget>
        </item>
-       <item alignment="Qt::AlignmentFlag::AlignLeft">
+       <item>
         <widget class="QPushButton" name="btnReports">
          <property name="text">
           <string>Reports</string>
          </property>
         </widget>
        </item>
-       <item alignment="Qt::AlignmentFlag::AlignLeft">
+       <item>
         <widget class="QPushButton" name="btnSettings">
          <property name="text">
           <string>Settings</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnThecnicians">
+         <property name="text">
+          <string>Technicians</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnSuppliers">
+         <property name="text">
+          <string>Suppliers</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnLookups">
+         <property name="text">
+          <string>Lookup Management</string>
          </property>
         </widget>
        </item>
@@ -131,81 +152,6 @@
        <enum>QFrame::Shadow::Raised</enum>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="1" column="2">
-        <widget class="QFrame" name="frameOpenWorkOrders">
-         <property name="frameShape">
-          <enum>QFrame::Shape::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Shadow::Raised</enum>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_4">
-          <item row="1" column="0" alignment="Qt::AlignmentFlag::AlignHCenter">
-           <widget class="QLabel" name="lblOpenWorkOrdersValue">
-            <property name="font">
-             <font>
-              <pointsize>24</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>123</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="lblOpenWorkOrdersTitle">
-            <property name="text">
-             <string>Open Work Orders</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLabel" name="lblTitle">
-         <property name="font">
-          <font>
-           <pointsize>20</pointsize>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Dashboard</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="2">
-        <widget class="QFrame" name="frameLowStock">
-         <property name="frameShape">
-          <enum>QFrame::Shape::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Shadow::Raised</enum>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_6">
-          <item row="0" column="0">
-           <widget class="QLabel" name="lblLowStockTitle">
-            <property name="text">
-             <string>Low Stock</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0" alignment="Qt::AlignmentFlag::AlignHCenter">
-           <widget class="QLabel" name="lblLowStockValue">
-            <property name="font">
-             <font>
-              <pointsize>24</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>123</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
        <item row="1" column="0">
         <widget class="QFrame" name="frameAssets">
          <property name="minimumSize">
@@ -243,6 +189,19 @@
          </layout>
         </widget>
        </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="lblTitle">
+         <property name="font">
+          <font>
+           <pointsize>20</pointsize>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Dashboard</string>
+         </property>
+        </widget>
+       </item>
        <item row="2" column="0">
         <widget class="QFrame" name="framePMDue">
          <property name="frameShape">
@@ -274,6 +233,130 @@
          </layout>
         </widget>
        </item>
+       <item row="1" column="2">
+        <widget class="QFrame" name="frameLowStock">
+         <property name="frameShape">
+          <enum>QFrame::Shape::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Shadow::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_6">
+          <item row="0" column="0">
+           <widget class="QLabel" name="lblLowStockTitle">
+            <property name="text">
+             <string>Low Stock</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" alignment="Qt::AlignmentFlag::AlignHCenter">
+           <widget class="QLabel" name="lblLowStockValue">
+            <property name="font">
+             <font>
+              <pointsize>24</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>123</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QFrame" name="frame">
+         <property name="frameShape">
+          <enum>QFrame::Shape::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Shadow::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_7">
+          <item row="0" column="0">
+           <widget class="QLabel" name="lblTechnisiansTitle">
+            <property name="text">
+             <string>Technisians</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" alignment="Qt::AlignmentFlag::AlignHCenter">
+           <widget class="QLabel" name="lblTechniciansValue">
+            <property name="font">
+             <font>
+              <pointsize>24</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>123</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QFrame" name="frameOpenWorkOrders">
+         <property name="frameShape">
+          <enum>QFrame::Shape::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Shadow::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_4">
+          <item row="1" column="0" alignment="Qt::AlignmentFlag::AlignHCenter">
+           <widget class="QLabel" name="lblOpenWorkOrdersValue">
+            <property name="font">
+             <font>
+              <pointsize>24</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>123</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="lblOpenWorkOrdersTitle">
+            <property name="text">
+             <string>Open Work Orders</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="QFrame" name="frame_2">
+         <property name="frameShape">
+          <enum>QFrame::Shape::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Shadow::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_8">
+          <item row="0" column="0">
+           <widget class="QLabel" name="lblSuppliersTitle">
+            <property name="text">
+             <string>Suppliers</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" alignment="Qt::AlignmentFlag::AlignHCenter">
+           <widget class="QLabel" name="label">
+            <property name="font">
+             <font>
+              <pointsize>24</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>123</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>
@@ -285,11 +368,37 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>33</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QToolBar" name="mainToolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>32</width>
+     <height>32</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
  </widget>
  <resources/>
  <connections/>

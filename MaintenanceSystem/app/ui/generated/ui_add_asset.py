@@ -17,7 +17,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractButton, QApplication, QComboBox, QDateEdit,
     QDialog, QDialogButtonBox, QHBoxLayout, QLabel,
-    QLineEdit, QSizePolicy, QVBoxLayout, QWidget)
+    QLineEdit, QSizePolicy, QTextEdit, QVBoxLayout,
+    QWidget)
 
 class Ui_AddAssetDialog(object):
     def setupUi(self, AddAssetDialog):
@@ -57,6 +58,21 @@ class Ui_AddAssetDialog(object):
 
 
         self.verticalLayout.addLayout(self.horizontalLayout_2)
+
+        self.horizontalLayout_3 = QHBoxLayout()
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.lblDescription = QLabel(AddAssetDialog)
+        self.lblDescription.setObjectName(u"lblDescription")
+
+        self.horizontalLayout_3.addWidget(self.lblDescription)
+
+        self.teDescription = QTextEdit(AddAssetDialog)
+        self.teDescription.setObjectName(u"teDescription")
+
+        self.horizontalLayout_3.addWidget(self.teDescription)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout_3)
 
         self.horizontalLayout_4 = QHBoxLayout()
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
@@ -199,6 +215,7 @@ class Ui_AddAssetDialog(object):
         AddAssetDialog.setWindowTitle(QCoreApplication.translate("AddAssetDialog", u"Add Asset", None))
         self.lblAssetNumber.setText(QCoreApplication.translate("AddAssetDialog", u"Asset Number", None))
         self.lblAssetName.setText(QCoreApplication.translate("AddAssetDialog", u"Asset Name", None))
+        self.lblDescription.setText(QCoreApplication.translate("AddAssetDialog", u"Description", None))
         self.lblCategory.setText(QCoreApplication.translate("AddAssetDialog", u"Category", None))
         self.lblLocation.setText(QCoreApplication.translate("AddAssetDialog", u"Location", None))
         self.lblManufacturer.setText(QCoreApplication.translate("AddAssetDialog", u"Manufacturer", None))

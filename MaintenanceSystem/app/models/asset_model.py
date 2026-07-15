@@ -14,6 +14,7 @@ class AssetModel:
                 id,
                 asset_number,
                 asset_name,
+                description,
                 category,
                 location,
                 manufacturer,
@@ -40,6 +41,7 @@ class AssetModel:
             INSERT INTO assets (
                 asset_number,
                 asset_name,
+                description,
                 category,
                 location,
                 manufacturer,
@@ -49,7 +51,7 @@ class AssetModel:
                 warranty_expiry,
                 status
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
         """, asset)
 
         conn.commit()
@@ -88,6 +90,7 @@ class AssetModel:
                 id,
                 asset_number,
                 asset_name,
+                description,
                 category,
                 location,
                 manufacturer,
@@ -116,6 +119,7 @@ class AssetModel:
             SET
                 asset_number = ?,
                 asset_name = ?,
+                description = ?,
                 category = ?,
                 location = ?,
                 manufacturer = ?,
@@ -157,26 +161,29 @@ class AssetModel:
                 id,
                 asset_number,
                 asset_name,
+                description,
                 category,
                 location,
                 manufacturer,
                 model,
                 serial_number,
-                warranty_expiry,
-                status
+                status,
+                warranty_expiry
             FROM assets
             WHERE
                 asset_name LIKE ? 
                 OR asset_number LIKE ?
+                OR description LIKE ?
                 OR category LIKE ? 
                 OR location LIKE ? 
                 OR manufacturer LIKE ? 
                 OR model LIKE ? 
                 OR serial_number LIKE ?
+                OR status LIKE ?
                 OR warranty_expiry LIKE ?
-                OR status LIKE ?       
             ORDER BY asset_number
         """, (
+            search,
             search,
             search,
             search,

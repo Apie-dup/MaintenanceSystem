@@ -1,18 +1,10 @@
-from PySide6.QtWidgets import (
-    QMainWindow,
-    QMessageBox,
-    QTableWidgetItem
-)
-
-from PySide6.QtWidgets import QAbstractItemView
-from PySide6.QtWidgets import QHeaderView
-
-from app.ui.generated.ui_assets import Ui_AssetsWindow
+from PySide6.QtWidgets import QWidget, QAbstractItemView, QTableWidgetItem, QHeaderView, QMessageBox
 from app.services.asset_service import AssetService
+from app.ui.generated.ui_assets_page import Ui_AssetsWindow
 from app.controllers.add_asset_controller import AddAssetController
 
+class AssetsPage(QWidget):
 
-class AssetsController(QMainWindow):
 
     def __init__(self):
         super().__init__()
@@ -25,12 +17,9 @@ class AssetsController(QMainWindow):
         self.ui.tblAssets.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.ui.tblAssets.horizontalHeader().setStretchLastSection(True)
 
-        self.setWindowTitle("Assets")
-
         self.load_assets()
 
         self.ui.btnRefresh.clicked.connect(self.load_assets)
-        self.ui.btnClose.clicked.connect(self.close)
         self.ui.btnAdd.clicked.connect(self.add_asset)
         self.ui.btnEdit.clicked.connect(self.edit_asset)
         self.ui.btnDelete.clicked.connect(self.delete_asset)
@@ -45,18 +34,22 @@ class AssetsController(QMainWindow):
     def populate_table(self, assets):
         
         self.ui.tblAssets.setRowCount(len(assets))
+        self.ui.tblAssets.setColumnCount(11)
 
         for row, asset in enumerate(assets):
+            values = list(asset)
+            if len(values) < 11:
+                values += [""] * (11 - len(values))
 
-            for column, value in enumerate(asset):
+            for column, value in enumerate(values[:11]):
+                item = self.ui.tblAssets.item(row, column)
+                if item is None:
+                    item = QTableWidgetItem()
+                    self.ui.tblAssets.setItem(row, column, item)
 
-                self.ui.tblAssets.setItem(
-                    row,
-                    column,
-                    QTableWidgetItem(str(value))
-                )
-        # Apply table seetings only once
-        self.ui.tblAssets.setColumnHidden(0, True)  # Hide the ID column
+                item.setText(str(value if value is not None else ""))
+
+        self.ui.tblAssets.setColumnHidden(0, True)
 
         header = self.ui.tblAssets.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.Stretch)
@@ -70,19 +63,27 @@ class AssetsController(QMainWindow):
     def add_asset(self):
 
         dialog = AddAssetController()
-        dialog.exec()
+        
+        if dialog.exec():
+            self.load_assets()
 
 
     def edit_asset(self):
 
         row = self.ui.tblAssets.currentRow()
+
         if row < 0:
-            QMessageBox.warning(self, "Edit Asset", "Please select an asset")
+            QMessageBox.warning(
+                self,
+                "Edit Asset",
+                "Please select an asset."
+            )
             return
-        
+
         asset_id = int(self.ui.tblAssets.item(row, 0).text())
 
         dialog = AddAssetController(asset_id)
+
         if dialog.exec():
             self.load_assets()
 

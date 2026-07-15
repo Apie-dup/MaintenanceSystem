@@ -15,7 +15,7 @@ class WorkOrderService:
         WorkOrderModel.insert(work_order)
 
     @staticmethod
-    def Update_work_order(work_order):
+    def update_work_order(work_order):
         WorkOrderModel.update(work_order)
 
     @staticmethod

@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QMainWindow, QMessageBox
 
 from app.ui.generated.ui_login import Ui_LoginWindow
 from app.services.auth_service import AuthService
-from app.controllers.dashboard_controller import DashboardController
+from app.controllers.main_controller import MainController
 
 
 class LoginController(QMainWindow):
@@ -34,9 +34,9 @@ class LoginController(QMainWindow):
 
         if user:
 
-            self.dashboard = DashboardController(user)
+            self.main_window = MainController(user)
 
-            self.dashboard.show()
+            self.main_window.show()
 
             self.close()
 

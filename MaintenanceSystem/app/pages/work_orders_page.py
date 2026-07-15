@@ -1,15 +1,17 @@
 from PySide6.QtWidgets import (
-    QMainWindow,
+    QWidget,
     QMessageBox,
     QTableWidgetItem,
-    QHeaderView
+    QHeaderView,
+    QAbstractItemView,
+
 )
 
-from app.ui.generated.ui_work_orders import Ui_WorkOrdersWindow
+from app.ui.generated.ui_work_orders_page import Ui_WorkOrdersWindow
 from app.services.work_order_service import WorkOrderService
-from app.controllers.add_work_order_controller import AddWorkOrderConttoller
+from app.controllers.add_work_order_controller import AddWorkOrderController
 
-class WorkOrderController(QMainWindow):
+class WorkOrderPage(QWidget):
 
     def __init__(self):
         super().__init__()
@@ -28,6 +30,10 @@ class WorkOrderController(QMainWindow):
         self.ui.btnDelete.clicked.connect(self.delete_work_order)
         self.ui.btnRefresh.clicked.connect(self.load_work_orders)
         self.ui.btnClose.clicked.connect(self.close)
+
+        self.ui.tblWorkOrders.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.ui.tblWorkOrders.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.ui.tblWorkOrders.doubleClicked.connect(self.edit_work_order)
 
         self.ui.txtSearch.textChanged.connect(self.search_work_orders)
 
@@ -63,7 +69,7 @@ class WorkOrderController(QMainWindow):
 
     def add_work_order(self):
 
-        dialog = AddWorkOrderConttoller()
+        dialog = AddWorkOrderController()
 
         if dialog.exec():
 
@@ -86,7 +92,7 @@ class WorkOrderController(QMainWindow):
             self.ui.tblWorkOrders.item(row, 0).text()
         )
 
-        dialog = AddWorkOrderConttoller(work_order_id)
+        dialog = AddWorkOrderController(work_order_id)
 
         if dialog.exec():
 
@@ -128,7 +134,7 @@ class WorkOrderController(QMainWindow):
 
         if text:
 
-            work_orders = WorkOrderService.search_work_orders(text)
+            work_orders = WorkOrderService.search_work_order(text)
 
         else:
 

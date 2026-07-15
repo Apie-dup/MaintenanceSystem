@@ -6,6 +6,7 @@ from PySide6.QtCore import QDate
 
 from app.ui.generated.ui_add_asset import Ui_AddAssetDialog
 from app.services.asset_service import AssetService
+from app.services.lookup_service import LookupService
 from app.constants import (
     ASSET_CATEGORIES,
     ASSET_LOCATIONS,
@@ -28,46 +29,7 @@ class AddAssetController(QDialog):
         self.initialize_dialog()
 
     def initialize_dialog(self):
-        # Categories
-        self.ui.cmbCategory.clear()
-        self.ui.cmbCategory.addItems([
-            "Electrical",
-            "Mechanical",
-            "HVAC",
-            "Plumbing",
-            "Kitchen",
-            "Laundry",
-            "Vehicle",
-            "IT",
-            "Fire Safety"
-        ])
-
-        # Locations
-        self.ui.cmbLocation.clear()
-        self.ui.cmbLocation.addItems([
-            "Reception",
-            "Office",
-            "Kitchen",
-            "Workshop",
-            "Laundry",
-            "Restaurant",
-            "Bar",
-            "Guest Rooms",
-            "Solar Plant",
-            "Borehole",
-            "Parking",
-            "Swimming Pool"
-        ])
-
-        # Status
-        self.ui.cmbStatus.clear()
-        self.ui.cmbStatus.addItems([
-            "Active",
-            "Inactive",
-            "Under Repair",
-            "Disposed",
-            "Wait for Parts"
-        ])
+        self.load_lookup_values()
 
         # Enable popup calendars
         self.ui.dtPurchaseDate.setCalendarPopup(True)
@@ -82,10 +44,20 @@ class AddAssetController(QDialog):
             # EDIT MODE
             asset = AssetService.get_asset(self.asset_id)
 
+            if not asset:
+                QMessageBox.warning(
+                    self,
+                    "Error",
+                    "Asset not found."
+                )
+                self.reject()
+                return
+
             (
                 _,
                 asset_number,
                 asset_name,
+                description,
                 category,
                 location,
                 manufacturer,
@@ -98,6 +70,7 @@ class AddAssetController(QDialog):
 
             self.ui.txtAssetNumber.setText(asset_number)
             self.ui.txtAssetName.setText(asset_name)
+            self.ui.teDescription.toPlainText(description)
             self.ui.cmbCategory.setCurrentText(category)
             self.ui.cmbLocation.setCurrentText(location)
             self.ui.txtManufacturer.setText(manufacturer)
@@ -132,6 +105,25 @@ class AddAssetController(QDialog):
         else:
             self.setWindowTitle("Edit Asset")
 
+    def load_lookup_values(self):
+        self.ui.cmbCategory.clear()
+        category_rows = LookupService.get_lookup_values("Asset Categories")
+        if category_rows:
+            self.ui.cmbCategory.addItems([value for _, value in category_rows])
+        else:
+            self.ui.cmbCategory.addItems(ASSET_CATEGORIES)
+
+        self.ui.cmbLocation.clear()
+        location_rows = LookupService.get_lookup_values("Asset Locations")
+        if location_rows:
+            self.ui.cmbLocation.addItems([value for _, value in location_rows])
+        else:
+            self.ui.cmbLocation.addItems(ASSET_LOCATIONS)
+
+        self.ui.cmbStatus.clear()
+        self.ui.cmbStatus.addItems(ASSET_STATUSES)
+
+
     def save_asset(self):
 
         asset_name = self.ui.txtAssetName.text().strip()
@@ -143,9 +135,12 @@ class AddAssetController(QDialog):
         ):
             return
 
+        asset_number = self.ui.txtAssetNumber.text()
+
         asset = (
-            self.ui.txtAssetNumber.text(),
+            asset_number,
             asset_name,
+            self.ui.teDescription.toPlainText().strip(),
             self.ui.cmbCategory.currentText(),
             self.ui.cmbLocation.currentText(),
             self.ui.txtManufacturer.text().strip(),
@@ -167,7 +162,9 @@ class AddAssetController(QDialog):
 
         else:
             update_asset = (
+                asset_number,
                 asset_name,
+                self.ui.teDescription.toPlainText().strip(),
                 self.ui.cmbCategory.currentText(),
                 self.ui.cmbLocation.currentText(),
                 self.ui.txtManufacturer.text().strip(),

@@ -125,10 +125,10 @@ class Ui_AddWorkOrderDialog(object):
 
         self.horizontalLayout_7.addWidget(self.lblTechnician)
 
-        self.cmbThechnician = QComboBox(AddWorkOrderDialog)
-        self.cmbThechnician.setObjectName(u"cmbThechnician")
+        self.cmbTechnician = QComboBox(AddWorkOrderDialog)
+        self.cmbTechnician.setObjectName(u"cmbTechnician")
 
-        self.horizontalLayout_7.addWidget(self.cmbThechnician)
+        self.horizontalLayout_7.addWidget(self.cmbTechnician)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout_7)

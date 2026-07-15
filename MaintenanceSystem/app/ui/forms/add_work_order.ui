@@ -112,7 +112,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="cmbThechnician"/>
+      <widget class="QComboBox" name="cmbTechnician"/>
      </item>
     </layout>
    </item>

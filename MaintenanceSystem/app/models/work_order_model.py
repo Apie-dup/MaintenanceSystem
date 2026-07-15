@@ -9,40 +9,36 @@ class WorkOrderModel:
 
         cursor.execute("""
             SELECT
-
                 wo.id,
-
-                wo.work_order_number,
-
-                a.asset_number || ' - ' || a.asset_name,
-
+                wo.wo_number,
+                a.asset_number || ' - ' || a.asset_name AS asset,
                 wo.title,
-
                 wo.priority,
-
                 wo.status,
-
-                COALESCE(wo.technician_id, 'Unassigned'),
-                       
+                t.first_name || ' ' || t.last_name AS technician,
                 wo.due_date
-                       
-                FROM JOIN assets a
-                    ON wo.asset_id a.id
-                       
-            ORDER BY wo.work_order_number
+            FROM work_orders wo
+
+            LEFT JOIN assets a
+                ON wo.asset_id = a.id
+
+            LEFT JOIN technicians t
+                ON wo.technician_id = t.id
+
+            ORDER BY wo.wo_number;
         """)
 
         rows = cursor.fetchall()
         conn.close()
         return rows
-
+    
     @staticmethod
     def get_next_work_order_number():
         conn = Database.connect()
         cursor = conn.cursor()
 
         cursor.execute("""
-            SELECT work_order_number
+            SELECT wo_number
             FROM work_orders
             ORDER BY id DESC
             LIMIT 1
@@ -64,14 +60,14 @@ class WorkOrderModel:
 
         cursor.execute("""
             INSERT INTO work_orders (
-                work_order_number,
+                wo_number,
                 asset_id,
                 title,
                 description,
                 priority,
                 status,
-                technician,
-                request_by,
+                technician_id,
+                requested_by,
                 date_created,
                 due_date,
                 estimated_cost,
@@ -91,11 +87,10 @@ class WorkOrderModel:
 
     @staticmethod
     def update(work_order):
+        conn = Database.connect()
+        cursor = conn.cursor()
 
-       conn = Database.connect()
-       cursor = conn.cursor()
-
-       cursor.execute("""
+        cursor.execute("""
             UPDATE work_orders
             SET
                 asset_id = ?,
@@ -103,19 +98,19 @@ class WorkOrderModel:
                 description = ?,
                 priority = ?,
                 status = ?,
-                technician_id = ?
-                requested_by =?,
+                technician_id = ?,
+                requested_by = ?,
                 date_created = ?,
                 due_date = ?,
-                estimadted_cost = ?,
+                estimated_cost = ?,
                 actual_cost = ?,
                 labour_hours = ?,
                 notes = ?
             WHERE id = ?
         """, work_order)
-       
-       conn.commit()
-       conn.close
+
+        conn.commit()
+        conn.close()
 
     @staticmethod
     def get_by_id(work_order_id):
@@ -123,7 +118,22 @@ class WorkOrderModel:
         cursor = conn.cursor()
 
         cursor.execute("""
-            SELECT *
+            SELECT
+                id,
+                wo_number,
+                asset_id,
+                title,
+                description,
+                priority,
+                status,
+                technician_id,
+                requested_by,
+                date_created,
+                due_date,
+                estimated_cost,
+                actual_cost,
+                labour_hours,
+                notes
             FROM work_orders
             WHERE id = ?
         """, (work_order_id,))
@@ -156,24 +166,27 @@ class WorkOrderModel:
         cursor.execute("""
             SELECT
                 wo.id,
-                wo.work_order_number,
-                a.asset_number || ' - ' || a.asset_name,
+                wo.wo_number,
+                a.asset_number || ' - ' || a.asset_name AS asset,
                 wo.title,
                 wo.priority,
                 wo.status,
-                wo.technician_id,
+                t.first_name || ' ' || t.last_name AS technician,
                 wo.due_date
             FROM work_orders wo
                        
             LEFT JOIN assets a
                 ON wo.asset_id = a.id
                        
+            LEFT JOIN technicians t
+                ON wo.technician_id = t.id
+                       
             WHERE
-                wo.work_order_number LIKE ?
+                wo.wo_number LIKE ?
                 OR wo.title LIKE ?
                 OR wo.priority LIKE ?
                 OR wo.status LIKE ?
-            ORDER BY wo.work_order_number
+            ORDER BY wo.wo_number
         """, (
             search,
             search,
