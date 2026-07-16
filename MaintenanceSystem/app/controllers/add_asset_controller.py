@@ -70,7 +70,8 @@ class AddAssetController(QDialog):
 
             self.ui.txtAssetNumber.setText(asset_number)
             self.ui.txtAssetName.setText(asset_name)
-            self.ui.teDescription.toPlainText(description)
+            self.ui.teDescription.setPlainText(
+                description if description else "")
             self.ui.cmbCategory.setCurrentText(category)
             self.ui.cmbLocation.setCurrentText(location)
             self.ui.txtManufacturer.setText(manufacturer)
@@ -78,20 +79,15 @@ class AddAssetController(QDialog):
             self.ui.txtSerialNumber.setText(serial_number)
 
             if purchase_date:
-                self.ui.dtPurchaseDate.setDate(
-                    QDate.fromString(
-                        purchase_date,
-                        "yyyy-MM-dd"
-                    )
-                )
+                date = QDate.fromString(purchase_date, "yyyy-MM-dd")
+                if date.isValid():
+                 self.ui.dtPurchaseDate.setDate(date)
+                
 
             if warranty_expiry:
-                self.ui.dtWarrantyExpiry.setDate(
-                    QDate.fromString(
-                        warranty_expiry,
-                        "yyyy-MM-dd"
-                    )
-                )
+                date = QDate.fromString(warranty_expiry, "yyyy-MM-dd")
+                if date.isValid():
+                 self.ui.dtWarrantyExpiry.setDate(date)
 
             self.ui.cmbStatus.setCurrentText(status)
             self.ui.txtAssetNumber.setReadOnly(True)

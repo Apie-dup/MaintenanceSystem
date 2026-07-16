@@ -1,5 +1,6 @@
 import sqlite3
 from pathlib import Path
+import sqlite3
 import bcrypt
 
 DATABASE = Path("database") / "maintenance.db"
@@ -13,8 +14,12 @@ class Database:
 
     @staticmethod
     def connect():
-        return sqlite3.connect(Database.DATABASE)
+        db_path = Path("database") / "maintenance.db"
 
+        print(f"Connected to: {db_path.resolve()}")
+
+        return sqlite3.connect(db_path)
+    
     @staticmethod
     def _ensure_columns(conn, table_name, columns):
         cursor = conn.cursor()

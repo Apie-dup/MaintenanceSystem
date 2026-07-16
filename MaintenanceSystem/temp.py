@@ -1,11 +1,22 @@
-from app.database.connection import Database
+import sqlite3
 
-conn = Database.connect()
-cursor = conn.cursor()
+def get_assets():
+    conn = sqlite3.connect("database/maintenance.db")
+    cursor = conn.cursor()
 
-cursor.execute("DROP TABLE IF EXISTS preventive_maintenance")
+    query = """
+    SELECT id, asset_number, asset_name
+    FROM assets;
+    """
 
-conn.commit()
-conn.close()
+    cursor.execute(query)
+    rows = cursor.fetchall()
 
-print("preventive_maintenance table dropped successfully.")
+    conn.close()
+    return rows
+
+
+# Example usage
+assets = get_assets()
+for asset in assets:
+    print(asset)

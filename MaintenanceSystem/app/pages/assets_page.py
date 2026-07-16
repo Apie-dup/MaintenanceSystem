@@ -26,6 +26,8 @@ class AssetsPage(BasePage):
         self.ui.btnDelete.clicked.connect(self.delete_asset)
         self.ui.txtSearch.textChanged.connect(self.search_assets)
 
+        self.ui.tblAssets.doubleClicked.connect(self.edit_asset)
+
         
     def load_assets(self):
 
@@ -46,7 +48,7 @@ class AssetsPage(BasePage):
             self.load_assets()
 
 
-    def edit_asset(self):
+    def edit_asset(self, index = None):
 
         row = self.ui.tblAssets.currentRow()
 
@@ -109,12 +111,14 @@ class AssetsPage(BasePage):
         text = self.ui.txtSearch.text().strip()
         
         if text:
+            assets = AssetService.search_assets(text)
+        else:
             assets = AssetService.get_asset()
 
-            self.populate_table(
-                self.ui.tblAssets,
-                assets,
-                self.ui.lblStatus,
-                "assets"
-            )
+        self.populate_table(
+            self.ui.tblAssets,
+            assets,
+            self.ui.lblStatus,
+            "assets"
+        )
 

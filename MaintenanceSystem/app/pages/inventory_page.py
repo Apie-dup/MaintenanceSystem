@@ -9,9 +9,10 @@ from PySide6.QtWidgets import (
 from app.ui.generated.ui_inventory_page import Ui_InventoryWindow
 from app.services.inventory_service import InventoryService
 from app.controllers.add_inventory_controller import AddInventoryController
+from app.core.base_page import BasePage
 
 
-class InventoryPage(QWidget):
+class InventoryPage(BasePage):
 
     def __init__(self):
         super().__init__()
@@ -19,27 +20,10 @@ class InventoryPage(QWidget):
         self.ui = Ui_InventoryWindow()
         self.ui.setupUi(self)
 
-        self.configure_table()
-
-        self.load_inventory()
-
-        self.connect_signals()
-
-    def configure_table(self):
-
-        self.ui.tblInventory.setAlternatingRowColors(True)
-
-        self.ui.tblInventory.setSelectionBehavior(
-            QAbstractItemView.SelectionBehavior.SelectRows
+        
+        self.configure_table(
+            self.ui.tblInventory
         )
-
-        self.ui.tblInventory.setEditTriggers(
-            QAbstractItemView.EditTrigger.NoEditTriggers
-        )
-
-        self.ui.tblInventory.horizontalHeader().setStretchLastSection(True)
-
-        self.ui.tblInventory.setSortingEnabled(True)
 
     def connect_signals(self):
 
@@ -104,18 +88,18 @@ class InventoryPage(QWidget):
         )
 
     def search_inventory(self):
-
+        
         text = self.ui.txtSearch.text().strip()
-
+        
         if text:
+            assets = InventoryService.get_asset()
 
-            inventory = InventoryService.search_inventory(text)
-
-        else:
-
-            inventory = InventoryService.get_inventory()
-
-        self.populate_table(inventory)
+            self.populate_table(
+                self.ui.tblAssets,
+                assets,
+                self.ui.lblStatus,
+                "assets"
+            )
 
     def add_inventory(self):
 

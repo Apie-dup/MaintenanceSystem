@@ -9,9 +9,10 @@ from PySide6.QtWidgets import (
 from app.ui.generated.ui_pm_page import Ui_PMWindow
 from app.services.pm_service import PMService
 from app.controllers.add_pm_controller import AddPMController
+from app.core.base_page import BasePage
 
 
-class PMPage(QWidget):
+class PMPage(BasePage):
 
     def __init__(self):
         super().__init__()
@@ -23,38 +24,8 @@ class PMPage(QWidget):
             "Preventive Maintenance"
         )
 
-        self.ui.tblPM.setSelectionBehavior(
-            QAbstractItemView.SelectionBehavior.SelectRows
-        )
-
-        self.ui.tblPM.setEditTriggers(
-            QAbstractItemView.EditTrigger.NoEditTriggers
-        )
-
-        self.load_pm()
-
-        self.ui.btnRefresh.clicked.connect(
-            self.load_pm
-        )
-
-        self.ui.btnAdd.clicked.connect(
-            self.add_pm
-        )
-
-        self.ui.btnEdit.clicked.connect(
-            self.edit_pm
-        )
-
-        self.ui.btnDelete.clicked.connect(
-            self.delete_pm
-        )
-
-        self.ui.txtSearch.textChanged.connect(
-            self.search_pm
-        )
-
-        self.ui.tblPM.doubleClicked.connect(
-            self.edit_pm
+        self.configure_table(
+            self.ui.tblPM
         )
 
 
