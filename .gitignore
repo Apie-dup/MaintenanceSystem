@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual Environment
+venv/
+
+# VS Code
+.vscode/
+
+# Logs
+logs/
+
+# Backup files
+backups/
+
+# SQLite database
+database/*.db
+
+# Qt generated cache
+*.qmlc
+*.jsc
