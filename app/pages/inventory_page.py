@@ -20,9 +20,21 @@ class InventoryPage(BasePage):
         self.ui = Ui_InventoryWindow()
         self.ui.setupUi(self)
 
-        
-        self.configure_table(
-            self.ui.tblInventory
+        self.configure_table(self.ui.tblInventory)
+
+        self.refresh()
+
+        self.ui.btnRefresh.clicked.connect(self.refresh)
+        self.ui.btnAdd.clicked.connect(self.add_item)
+        self.ui.btnEdit.clicked.connect(self.edit_item)
+        self.ui.btnDelete.clicked.connect(self.delete_item)
+
+        self.ui.tblInventory.doubleClicked.connect(
+            self.edit_item
+        )
+
+        self.ui.txtSearch.textChanged.connect(
+            self.search_items
         )
 
     def connect_signals(self):
@@ -87,28 +99,29 @@ class InventoryPage(BasePage):
             f"Showing {len(inventory)} parts"
         )
 
-    def search_inventory(self):
-        
+    def search_items(self):
+
         text = self.ui.txtSearch.text().strip()
-        
+
         if text:
-            assets = InventoryService.get_asset()
+            items = InventoryService.search_items(text)
+        else:
+            items = InventoryService.get_inventory()
 
-            self.populate_table(
-                self.ui.tblAssets,
-                assets,
-                self.ui.lblStatus,
-                "assets"
-            )
+        self.populate_table(
+            self.ui.tblInventory,
+            items,
+            self.ui.lblStatus,
+            "items"
+        )
 
-    def add_inventory(self):
+    def add_item(self):
 
         dialog = AddInventoryController()
 
         if dialog.exec():
-
-            self.load_inventory()
-
+            self.refresh()
+            
     def edit_inventory(self):
 
         row = self.ui.tblInventory.currentRow()
@@ -177,4 +190,12 @@ class InventoryPage(BasePage):
             self.load_inventory()
 
     def refresh(self):
-        self.load_inventory()
+
+        items = InventoryService.get_inventory()
+
+        self.populate_table(
+            self.ui.tblInventory,
+            items,
+            self.ui.lblStatus,
+            "items"
+        )

@@ -3,6 +3,7 @@ from PySide6.QtWidgets import QMainWindow, QVBoxLayout
 from app.ui.generated.ui_main_window import Ui_MainWindow
 from app.core.page_manager import PageManager
 from app.core.navigation_manager import NavigationManager
+from app.core.application_manager import ApplicationManager
 
 # Pages
 from app.pages.dashboard_page import DashboardPage
@@ -31,6 +32,11 @@ class MainController(QMainWindow):
             self.ui.stackedWidget
         )
 
+        self.app = ApplicationManager(
+            self.ui.stackedWidget,
+            user
+        )
+
         self.setWindowTitle(
             f"Maintenance Management System - {user.get('fullname', '')}"
         )
@@ -42,128 +48,6 @@ class MainController(QMainWindow):
         # Start on Dashboard
         self.show_page(self.ui.pageDashboard)
 
-    # -------------------------------------------------------
-    # Create all pages
-    # -------------------------------------------------------
-
-    def create_pages(self):
-
-        dashboard = DashboardPage()
-
-        self.page_manager.register(
-            "dashboard",
-            self.ui.pageDashboard,
-            dashboard
-        )
-
-        self.app.register_module(
-            "dashboard",
-            dashboard
-        )
-
-        assets = AssetsPage
-
-        self.page_manager.register(
-            "assets",
-            self.ui.pageAssets,
-            assets
-        )
-
-        self.app.register_module(
-            "assets",
-            assets
-        )
-
-        work_orders = WorkOrdersPage
-        
-        self.page_manager.register(
-            "work_orders",
-            self.ui.pageWorkOrders,
-            work_orders
-        )
-
-        self.app.register_module(
-            "wor_orders",
-            work_orders
-        )
-
-        pm = PMPage
-
-        self.page_manager.register(
-            "pm",
-            self.ui.pagePM,
-            pm
-        )
-
-        self.app.register_module(
-            "pm",
-            pm
-        )
-
-        technicians = TechniciansPage
-
-        self.page_manager.register(
-            "technicians",
-            self.ui.pageTechnicians,
-            technicians
-        )
-
-        self.app.register_module(
-            "technicians",
-            technicians
-        )
-
-        inventory = InventoryPage
-
-        self.page_manager.register(
-            "inventory",
-            self.ui.pageInventory,
-            inventory
-        )
-
-        self.app.register_module(
-            "inventory",
-            inventory
-        )
-
-        suppliers = SuppliersPage
-
-        self.page_manager.register(
-            "suppliers",
-            self.ui.pageSuppliers,
-            suppliers
-        )
-
-        self.app.register_module(
-            "suppliers",
-            suppliers
-        )
-
-        reports = ReportsPage
-
-        self.page_manager.register(
-            "reports",
-            self.ui.pageReports,
-            reports
-        )
-
-        self.app.register_module(
-            "reports",
-            reports
-        )
-
-        settings = SettingsPage
-
-        self.page_manager.register(
-            "settings",
-            self.ui.pageSettings,
-            settings
-        )
-
-        self.app.register_module(
-            "settings",
-            settings
-        )
 
     # -------------------------------------------------------
     # Insert pages into the stacked pages
@@ -171,49 +55,49 @@ class MainController(QMainWindow):
 
     def load_pages(self):
 
-        self.page_manager.add_page(
+        self.app.page_manager.register(
             self.ui.pageDashboard,
-            self.dashboard_page
+            DashboardPage
         )
 
-        self.page_manager.add_page(
+        self.app.page_manager.register(
             self.ui.pageAssets,
-            self.assets_page
+            AssetsPage
         )
 
-        self.page_manager.add_page(
+        self.app.page_manager.register(
             self.ui.pageWorkOrders,
-            self.work_orders_page
+            WorkOrdersPage
         )
 
-        self.page_manager.add_page(
+        self.app.page_manager.register(
             self.ui.pagePM,
-            self.pm_page
+            PMPage
         )
 
-        self.page_manager.add_page(
+        self.app.page_manager.register(
             self.ui.pageTechnicians,
-            self.technicians_page
+            TechniciansPage
         )
 
-        self.page_manager.add_page(
+        self.app.page_manager.register(
             self.ui.pageInventory,
-            self.inventory_page
+            InventoryPage
         )
 
-        self.page_manager.add_page(
+        self.app.page_manager.register(
             self.ui.pageSuppliers,
-            self.suppliers_page
+            SuppliersPage
         )
 
-        self.page_manager.add_page(
+        self.app.page_manager.register(
             self.ui.pageReports,
-            self.reports_page
+            ReportsPage
         )
 
-        self.page_manager.add_page(
+        self.app.page_manager.register(
             self.ui.pageSettings,
-            self.settings_page
+            SettingsPage
         )
 
     # -------------------------------------------------------
@@ -237,39 +121,39 @@ class MainController(QMainWindow):
     def connect_navigation(self):
 
         self.ui.btnDashboard.clicked.connect(
-            lambda: self.navigation.show(self.ui.pageDashboard)
+            lambda: self.app.navigation.show(self.ui.pageDashboard)
         )
 
         self.ui.btnAssets.clicked.connect(
-            lambda: self.navigation.show(self.ui.pageAssets)
+            lambda: self.app.navigation.show(self.ui.pageAssets)
         )
 
         self.ui.btnWorkOrders.clicked.connect(
-            lambda: self.navigation.show(self.ui.pageWorkOrders)
+            lambda: self.app.navigation.show(self.ui.pageWorkOrders)
         )
 
         self.ui.btnPM.clicked.connect(
-            lambda: self.navigation.show(self.ui.pagePM)
+            lambda: self.app.navigation.show(self.ui.pagePM)
         )
 
         self.ui.btnTechnicians.clicked.connect(
-            lambda: self.navigation.show(self.ui.pageTechnicians)
+            lambda: self.app.navigation.show(self.ui.pageTechnicians)
         )
 
         self.ui.btnInventory.clicked.connect(
-            lambda: self.navigation.show(self.ui.pageInventory)
+            lambda: self.app.navigation.show(self.ui.pageInventory)
         )
 
         self.ui.btnSuppliers.clicked.connect(
-            lambda: self.navigation.show(self.ui.pageSuppliers)
+            lambda: self.app.navigation.show(self.ui.pageSuppliers)
         )
 
         self.ui.btnReports.clicked.connect(
-            lambda: self.navigation.show(self.ui.pageReports)
+            lambda: self.app.navigation.show(self.ui.pageReports)
         )
 
         self.ui.btnSettings.clicked.connect(
-            lambda: self.navigation.show(self.ui.pageSettings)
+            lambda: self.app.navigation.show(self.ui.pageSettings)
         )
 
         self.ui.btnLogout.clicked.connect(self.close)

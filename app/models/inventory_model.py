@@ -112,7 +112,7 @@ class InventoryModel:
         conn.close()
 
     @staticmethod
-    def get_by_id(part_id):
+    def get(part_id):
 
         conn = Database.connect()
         cursor = conn.cursor()
