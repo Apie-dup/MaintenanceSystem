@@ -26,7 +26,8 @@ class MainController(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        self.page_manager = PageManager(
+        self.page_manager = PageManager()
+        self.navigation = NavigationManager(
             self.ui.stackedWidget
         )
 
@@ -170,47 +171,47 @@ class MainController(QMainWindow):
 
     def load_pages(self):
 
-        self.add_page(
+        self.page_manager.add_page(
             self.ui.pageDashboard,
             self.dashboard_page
         )
 
-        self.add_page(
+        self.page_manager.add_page(
             self.ui.pageAssets,
             self.assets_page
         )
 
-        self.add_page(
+        self.page_manager.add_page(
             self.ui.pageWorkOrders,
             self.work_orders_page
         )
 
-        self.add_page(
+        self.page_manager.add_page(
             self.ui.pagePM,
             self.pm_page
         )
 
-        self.add_page(
+        self.page_manager.add_page(
             self.ui.pageTechnicians,
             self.technicians_page
         )
 
-        self.add_page(
+        self.page_manager.add_page(
             self.ui.pageInventory,
             self.inventory_page
         )
 
-        self.add_page(
+        self.page_manager.add_page(
             self.ui.pageSuppliers,
             self.suppliers_page
         )
 
-        self.add_page(
+        self.page_manager.add_page(
             self.ui.pageReports,
             self.reports_page
         )
 
-        self.add_page(
+        self.page_manager.add_page(
             self.ui.pageSettings,
             self.settings_page
         )
@@ -235,9 +236,43 @@ class MainController(QMainWindow):
 
     def connect_navigation(self):
 
-        self.navigation = NavigationManager(
-            self.page_manager
+        self.ui.btnDashboard.clicked.connect(
+            lambda: self.navigation.show(self.ui.pageDashboard)
         )
+
+        self.ui.btnAssets.clicked.connect(
+            lambda: self.navigation.show(self.ui.pageAssets)
+        )
+
+        self.ui.btnWorkOrders.clicked.connect(
+            lambda: self.navigation.show(self.ui.pageWorkOrders)
+        )
+
+        self.ui.btnPM.clicked.connect(
+            lambda: self.navigation.show(self.ui.pagePM)
+        )
+
+        self.ui.btnTechnicians.clicked.connect(
+            lambda: self.navigation.show(self.ui.pageTechnicians)
+        )
+
+        self.ui.btnInventory.clicked.connect(
+            lambda: self.navigation.show(self.ui.pageInventory)
+        )
+
+        self.ui.btnSuppliers.clicked.connect(
+            lambda: self.navigation.show(self.ui.pageSuppliers)
+        )
+
+        self.ui.btnReports.clicked.connect(
+            lambda: self.navigation.show(self.ui.pageReports)
+        )
+
+        self.ui.btnSettings.clicked.connect(
+            lambda: self.navigation.show(self.ui.pageSettings)
+        )
+
+        self.ui.btnLogout.clicked.connect(self.close)
 
     def register_navigation(self):
 
@@ -284,14 +319,6 @@ class MainController(QMainWindow):
         self.navigation.register(
             self.ui.btnSettings
         )
-
-    # -------------------------------------------------------
-    # Switch pages
-    # -------------------------------------------------------
-
-    def show_page(self, page):
-
-        self.ui.stackedWidget.setCurrentWidget(page)
 
     # -------------------------------------------------------
     # Refresh pages

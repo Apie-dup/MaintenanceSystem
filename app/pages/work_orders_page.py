@@ -39,11 +39,8 @@ class WorkOrdersPage(BasePage):
 
         self.ui.txtSearch.textChanged.connect(self.search_work_orders)
 
-    def load_work_orders(self):
-
-        work_orders = WorkOrderService.get_work_orders()
-
-        self.populate_table(work_orders)
+    def refresh(self):
+        self.load_work_orders()
 
     def populate_table(self, work_orders):
 
@@ -144,5 +141,4 @@ class WorkOrdersPage(BasePage):
 
         self.populate_table(work_orders)
 
-    def refresh(self):
-        self.load_work_orders()
+    

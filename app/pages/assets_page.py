@@ -30,16 +30,8 @@ class AssetsPage(BasePage):
         self.ui.tblAssets.doubleClicked.connect(self.edit_asset)
 
         
-    def load_assets(self):
-
-        assets = AssetService.get_assets()
-        
-        self.populate_table(
-            self.ui.tblAssets,
-            assets,
-            self.ui.lblStatus,
-            "assets"
-        )
+    def refresh(self):
+        self.load_assets()
 
     def add_asset(self):
 

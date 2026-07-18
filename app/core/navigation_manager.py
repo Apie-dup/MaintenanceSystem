@@ -1,29 +1,13 @@
-from PySide6.QtCore import QObject
+class NavigationManager:
 
-class NavigationManager(object):
+    def __init__(self, stacked_widget):
+        self.stacked_widget = stacked_widget
 
-    def __init__(self, page_manager):
-        super().__init__()
-
-        self.page_manager = page_manager
-        self.routes = {}
-
-    def register(self, button, page_name):
-
+    def show(self, page):
         """
-        Register a navigation button.
+        Display the selected page.
         """
+        self.stacked_widget.setCurrentWidget(page)
 
-        self.routes[button] = page_name
-
-        button.clicked.connect(
-            lambda checked=False, name=page_name: self.navigate(name)
-        )
-
-    def navigate(self, page_name):
-
-        """
-        Navigate to a page
-        """
-
-        self.page_manager.show(page_name)
+    def current_page(self):
+        return self.stacked_widget.currentWidget()

@@ -2,18 +2,14 @@ from PySide6.QtWidgets import QVBoxLayout
 
 class PageManager:
 
-    def __init__(self, stacked_widget):
+    def __init__(self):
+        self.page = {}
 
-        self.stacked_widget = stacked_widget
+    def add_page(self, container, page):
 
-        self.pages = {}
-
-    def register(self, name, container, page):
-
-        self.pages[name] = {
-            "container": container,
-            "page": page
-        }
+        """
+        Insert a page into a placeholder widget.
+        """
 
         layout = container.layout()
 
@@ -21,31 +17,20 @@ class PageManager:
             layout = QVBoxLayout(container)
             layout.setContentsMargins(0, 0, 0, 0)
 
-            layout.addWidget
+        # Prevent duplicate widgets
+        if layout.count() == 0:
+            layout.addWidget(page)
 
-    def show(self, name):
-
-        if name in self.pages:
-
-            container = self.pages[name]["container"]
-
-            self.stacked_widget.setCurrentWidget(container)
-
-    def page(self, name):
-
-        if name in self.pages:
-            return self.pages[name]["pages"]
-        
-        return None
+    def get_page(self, name):
+        return self.page.get(name)
     
-    def refresh(self, name):
-
-        page = self.page(name)
+    def refresh_page(self, name):
+        page = self.get_page(name)
 
         if page and hasattr(page, "refresh"):
             page.refresh()
 
     def refresh_all(self):
-
-        for name in self.pages:
-            self.refresh(name)
+        for page in self.pages.values():
+            if hasattr(page, "refresh"):
+                page.refresh()

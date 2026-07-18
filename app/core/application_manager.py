@@ -1,19 +1,23 @@
+from app.core.page_manager import PageManager
+from app.core.navigation_manager import NavigationManager
+
+
 class ApplicationManager:
 
-    def __init__(self, main_window):
+    def __init__(self, stacked_widget, user):
 
-        self.main = main_window
+        self.user = user
 
-        self.page_manager = None
-        self.navigation_manager = None
+        self.page_manager = PageManager()
 
-    def initialize(self):
+        self.navigation = NavigationManager(
+            stacked_widget
+        )
 
-        from app.core.page_manager import PageManager
-        from app.core.navigation_manager import NavigationManager
+    def refresh(self):
 
-        self.page_manager = PageManager(self.main)
-        self.navigation_manager = NavigationManager(self.main)
+        self.page_manager.refresh_all()
 
-        self.page_manager.initialize()
-        self.navigation_manager.initialize()
+    def current_user(self):
+
+        return self.user

@@ -8,7 +8,7 @@ class ModuleRegistry:
 
         self.module[name] = page_name
 
-    def get(self, name)
+    def get(self, name):
         
         return self.module.get(name)
     
