@@ -4,11 +4,11 @@ from app.models.inventory_model import InventoryModel
 class InventoryService:
 
     @staticmethod
-    def get_inventory():
+    def get_all():
         return InventoryModel.get_all()
 
     @staticmethod
-    def get_inventory_item(part_id):
+    def get(part_id):
         return InventoryModel.get_by_id(part_id)
 
     @staticmethod
@@ -16,20 +16,20 @@ class InventoryService:
         return InventoryModel.get_next_part_number()
 
     @staticmethod
-    def add_inventory(part):
-        InventoryModel.insert(part)
+    def add(record):
+        InventoryModel.insert(record)
 
     @staticmethod
-    def update_inventory(part):
-        InventoryModel.update(part)
+    def update(record):
+        InventoryModel.update(record)
 
     @staticmethod
-    def delete_inventory(part_id):
+    def delete(part_id):
         InventoryModel.delete(part_id)
 
     @staticmethod
-    def search_inventory(search_text):
-        return InventoryModel.search(search_text)
+    def search(text):
+        return InventoryModel.search(text)
 
     @staticmethod
     def get_low_stock_items():

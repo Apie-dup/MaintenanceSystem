@@ -1,32 +1,32 @@
 from app.models.asset_model import AssetModel
 
-
 class AssetService:
 
     @staticmethod
-    def get_assets():
+    def get_all():
         return AssetModel.get_all()
-
-    @staticmethod
-    def add_asset(asset):
-        AssetModel.insert(asset)
-
-    @staticmethod
-    def get_next_asset_number():
-        return AssetModel.get_next_asset_number()
     
     @staticmethod
-    def get_asset(asset_id):
+    def get(asset_id):
         return AssetModel.get_by_id(asset_id)
     
     @staticmethod
-    def update_asset(asset):
-        AssetModel.update(asset)
+    def add(record):
+        AssetModel.insert(record)
 
     @staticmethod
-    def delete_asset(asset_id):
+    def update(record):
+        AssetModel.update(record)
+
+    @staticmethod
+    def delete(asset_id):
         AssetModel.delete(asset_id)
 
     @staticmethod
-    def search_assets(search_text):
-        return AssetModel.search(search_text)
+    def searc(text):
+        return AssetModel.search(text)
+    
+    # Asset-specific business logic
+    @staticmethod
+    def get_next_asset_number():
+        return AssetModel.get_next_asset_number()

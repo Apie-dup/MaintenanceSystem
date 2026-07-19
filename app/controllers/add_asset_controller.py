@@ -1,7 +1,3 @@
-from PySide6.QtWidgets import (
-    QDialog,
-    QMessageBox
-)
 from PySide6.QtCore import QDate
 
 from app.ui.generated.ui_add_asset import Ui_AddAssetDialog
@@ -14,15 +10,15 @@ from app.constants import (
 )
 from app.utils.validators import Validator
 from app.core.signals import signals
+from app.core.crud_dialog import CrudDialog
+from app.core.lookup_manager import LookupManager
 
 
 
-class AddAssetController(QDialog):
+class AddAssetController(CrudDialog):
 
-    def __init__(self, asset_id=None):
-        super().__init__()
-
-        self.asset_id = asset_id
+    def __init__(self, record_id=None):
+        super().__init__(record_id)
 
         self.ui = Ui_AddAssetDialog()
         self.ui.setupUi(self)
@@ -36,18 +32,17 @@ class AddAssetController(QDialog):
         self.ui.dtPurchaseDate.setCalendarPopup(True)
         self.ui.dtWarrantyExpiry.setCalendarPopup(True)
 
-        if self.asset_id is None:
+        if self.is_add:
             # ADD MODE
             self.ui.txtAssetNumber.setText(
                 AssetService.get_next_asset_number()
             )
         else:
             # EDIT MODE
-            asset = AssetService.get_asset(self.asset_id)
+            asset = AssetService.get(self.record_id)
 
             if not asset:
-                QMessageBox.warning(
-                    self,
+                self.warning(
                     "Error",
                     "Asset not found."
                 )
@@ -97,31 +92,32 @@ class AddAssetController(QDialog):
         self.ui.buttonBox.accepted.connect(self.save_asset)
         self.ui.buttonBox.rejected.connect(self.reject)
 
-        if self.asset_id is None:
-            self.setWindowTitle("Add Asset")
-        else:
-            self.setWindowTitle("Edit Asset")
+        self.set_entity_name("Asset")
 
     def load_lookup_values(self):
-        self.ui.cmbCategory.clear()
-        category_rows = LookupService.get_lookup_values("Asset Categories")
-        if category_rows:
-            self.ui.cmbCategory.addItems([value for _, value in category_rows])
-        else:
-            self.ui.cmbCategory.addItems(ASSET_CATEGORIES)
 
-        self.ui.cmbLocation.clear()
-        location_rows = LookupService.get_lookup_values("Asset Locations")
-        if location_rows:
-            self.ui.cmbLocation.addItems([value for _, value in location_rows])
-        else:
-            self.ui.cmbLocation.addItems(ASSET_LOCATIONS)
+        LookupManager.load(
+            self.ui.cmbCategory,
+            "Asset Categories",
+            ASSET_CATEGORIES
+        )
 
-        self.ui.cmbStatus.clear()
-        self.ui.cmbStatus.addItems(ASSET_STATUSES)
+        LookupManager.load(
+            self.ui.cmbLocation,
+            "Asset Locations",
+            ASSET_LOCATIONS
+        )
 
+        LookupManager.load(
+            self.ui.cmbStatus,
+            "Statuses",
+            ASSET_STATUSES
 
-    def save_asset(self):
+        )
+
+    def save(self):
+
+        self.ui.buttonBox.accepted.connect(self.save)
 
         asset_name = self.ui.txtAssetName.text().strip()
 
@@ -148,12 +144,12 @@ class AddAssetController(QDialog):
             self.ui.cmbStatus.currentText()
         )
 
-        if self.asset_id is None:
-            AssetService.add_asset(asset)
+        if self.record_id is None:
+            AssetService.add(asset)
 
             signals.data_changed.emit("assets")
 
-            QMessageBox.information(
+            self.information(
                 self,
                 "Success",
                 "Asset added successfully."
@@ -172,15 +168,16 @@ class AddAssetController(QDialog):
                 self.ui.dtPurchaseDate.date().toString("yyyy-MM-dd"),
                 self.ui.dtWarrantyExpiry.date().toString("yyyy-MM-dd"),
                 self.ui.cmbStatus.currentText(),
-                self.asset_id
+                self.record_id
             )
-            AssetService.update_asset(update_asset)
+            AssetService.update(update_asset)
 
             signals.data_changed.emit("assets")
 
             
-            QMessageBox.information(
-                self,
+            self.information(
                 "Success",
                 "Asset updated successfully."
             )
+
+            self.accept()

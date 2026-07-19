@@ -4,28 +4,28 @@ from app.models.technician_model import TechnicianModel
 class TechnicianService:
 
     @staticmethod
-    def get_technicians():
+    def get_all():
         return TechnicianModel.get_all()
 
     @staticmethod
-    def get_technician(technician_id):
+    def get(technician_id):
         return TechnicianModel.get_by_id(technician_id)
 
     @staticmethod
-    def add_technician(technician):
-        TechnicianModel.insert(technician)
+    def add(record):
+        TechnicianModel.insert(record)
 
     @staticmethod
-    def update_technician(technician):
-        TechnicianModel.update(technician)
+    def update(record):
+        TechnicianModel.update(record)
 
     @staticmethod
-    def delete_technician(technician_id):
+    def delete(technician_id):
         TechnicianModel.delete(technician_id)
 
     @staticmethod
-    def search_technicians(search_text):
-        return TechnicianModel.search(search_text)
+    def search(text):
+        return TechnicianModel.search(text)
 
     @staticmethod
     def get_next_employee_number():
