@@ -11,6 +11,17 @@ class AssetsPage(BasePage):
     def __init__(self):
         super().__init__()
 
+    def load_assets(self):
+
+        assets = AssetService.get_assets()
+
+        self.populate_table(
+            self.ui.tblAssets,
+            assets,
+            self.ui.lblStatus,
+            "assets"
+        )
+
         self.ui = Ui_AssetsWindow()
         self.ui.setupUi(self)
 
@@ -30,9 +41,6 @@ class AssetsPage(BasePage):
         self.ui.tblAssets.doubleClicked.connect(self.edit_asset)
 
         
-    def refresh(self):
-        self.load_assets()
-
     def add_asset(self):
 
         dialog = AddAssetController()
@@ -102,13 +110,13 @@ class AssetsPage(BasePage):
             self.load_assets()
 
     def search_assets(self):
-        
+
         text = self.ui.txtSearch.text().strip()
-        
+
         if text:
             assets = AssetService.search_assets(text)
         else:
-            assets = AssetService.get_asset()
+            assets = AssetService.get_assets()
 
         self.populate_table(
             self.ui.tblAssets,

@@ -130,7 +130,7 @@ class Ui_InventoryWindow(object):
         self.lblSearch.setText(QCoreApplication.translate("InventoryWindow", u"Search:", None))
         self.txtSearch.setPlaceholderText(QCoreApplication.translate("InventoryWindow", u"Search by Part Number, Name, or Location...", None))
         ___qtablewidgetitem = self.tblInventory.horizontalHeaderItem(0)
-        ___qtablewidgetitem.setText(QCoreApplication.translate("InventoryWindow", u"New Column", None))
+        ___qtablewidgetitem.setText(QCoreApplication.translate("InventoryWindow", u"ID", None))
         ___qtablewidgetitem1 = self.tblInventory.horizontalHeaderItem(1)
         ___qtablewidgetitem1.setText(QCoreApplication.translate("InventoryWindow", u"Part Number", None))
         ___qtablewidgetitem2 = self.tblInventory.horizontalHeaderItem(2)

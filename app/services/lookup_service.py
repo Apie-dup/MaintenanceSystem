@@ -1,40 +1,28 @@
-from app.models.inventory_model import InventoryModel
+from app.models.lookup_model import LookupModel
 
 
-class InventoryService:
-
-    @staticmethod
-    def get_inventory():
-        return InventoryModel.get_all()
+class LookupService:
 
     @staticmethod
-    def get_item(part_id):
-        return InventoryModel.get(part_id)
+    def get_lookup_values(lookup_type):
+        return LookupModel.get_all(lookup_type)
 
     @staticmethod
-    def get_next_part_number():
-        return InventoryModel.get_next_part_number()
+    def load_combo(combo, lookup_type):
+
+        combo.clear()
+
+        for row in LookupModel.get_all(lookup_type):
+            combo.addItem(row[1], row[0])
 
     @staticmethod
-    def add_item(part):
-        InventoryModel.insert(part)
+    def add_lookup_value(lookup_type, value):
+        LookupModel.insert(lookup_type, value)
 
     @staticmethod
-    def update_item(part):
-        InventoryModel.update(part)
+    def update_lookup_value(lookup_type, lookup_id, value):
+        LookupModel.update(lookup_type, lookup_id, value)
 
     @staticmethod
-    def delete_item(part_id):
-        InventoryModel.delete(part_id)
-
-    @staticmethod
-    def search_items(search_text):
-        return InventoryModel.search(search_text)
-
-    @staticmethod
-    def get_low_stock_items():
-        return InventoryModel.get_low_stock()
-
-    @staticmethod
-    def get_total_stock_value():
-        return InventoryModel.get_total_stock_value()
+    def delete_lookup_value(lookup_type, lookup_id):
+        LookupModel.delete(lookup_type, lookup_id)
