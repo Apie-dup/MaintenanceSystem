@@ -69,7 +69,7 @@ class InventoryPage(BasePage):
 
     def load_inventory(self):
 
-        inventory = InventoryService.get_inventory()
+        inventory = InventoryService.get_all()
 
         self.populate_table(inventory)
 
@@ -106,7 +106,7 @@ class InventoryPage(BasePage):
         if text:
             items = InventoryService.search_items(text)
         else:
-            items = InventoryService.get_inventory()
+            items = InventoryService.get_all()
 
         self.populate_table(
             self.ui.tblInventory,
@@ -191,7 +191,7 @@ class InventoryPage(BasePage):
 
     def refresh(self):
 
-        items = InventoryService.get_inventory()
+        items = InventoryService.get_all()
 
         self.populate_table(
             self.ui.tblInventory,

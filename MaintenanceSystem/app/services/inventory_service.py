@@ -4,11 +4,11 @@ from app.models.inventory_model import InventoryModel
 class InventoryService:
 
     @staticmethod
-    def get_inventory():
+    def get_all():
         return InventoryModel.get_all()
 
     @staticmethod
-    def get_inventory_item(part_id):
+    def get(part_id):
         return InventoryModel.get_by_id(part_id)
 
     @staticmethod

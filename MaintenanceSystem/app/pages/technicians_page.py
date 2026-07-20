@@ -27,7 +27,7 @@ class TechniciansPage(QWidget):
         self.ui.txtSearch.textChanged.connect(self.search_technicians)
 
     def load_technicians(self):
-        technicians = TechnicianService.get_technicians()
+        technicians = TechnicianService.get_all()
         self.populate_table(technicians)
 
     def populate_table(self, technicians):
@@ -112,6 +112,6 @@ class TechniciansPage(QWidget):
         if search_text:
             technicians = TechnicianService.search_technicians(search_text)
         else:
-            technicians = TechnicianService.get_technicians()
+            technicians = TechnicianService.get_all()
 
         self.populate_table(technicians)

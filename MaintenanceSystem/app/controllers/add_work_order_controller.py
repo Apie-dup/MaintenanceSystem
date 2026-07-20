@@ -263,7 +263,7 @@ class AddWorkOrderController(QDialog):
         self.ui.cmbTechnician.clear()
         self.ui.cmbTechnician.addItem("Unassigned", None)
 
-        technicians = TechnicianService.get_technicians()
+        technicians = TechnicianService.get_all()
 
         for technician in technicians:
 

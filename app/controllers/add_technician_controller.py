@@ -1,16 +1,14 @@
-from PySide6.QtWidgets import QDialog, QMessageBox
-
 from app.ui.generated.ui_add_technician import Ui_AddTechnicianDialog
 from app.services.technician_service import TechnicianService
-from app.services.lookup_service import LookupService
+from app.core.lookup_manager import LookupManager
+from app.core.crud_dialog import CrudDialog
+from app.utils.validators import Validator
 
 
-class AddTechnicianController(QDialog):
+class AddTechnicianController(CrudDialog):
 
-    def __init__(self, technician_id=None):
-        super().__init__()
-
-        self.technician_id = technician_id
+    def __init__(self, record_id=None):
+        super().__init__(record_id)
 
         self.ui = Ui_AddTechnicianDialog()
         self.ui.setupUi(self)
@@ -18,27 +16,22 @@ class AddTechnicianController(QDialog):
         self.initialize_dialog()
 
     def initialize_dialog(self):
-        # Trades
-        self.ui.cmbTrade.clear()
-        LookupService.load_trades(self.ui.cmbTrade)
+        self.load_lookup_values()
 
-        # Departments (kept as a combo for convenience)
-        self.ui.cmbDepartment.clear()
-        LookupService.load_departments(self.ui.cmbDepartment)
-
-        # Status
-        self.ui.cmbStatus.clear()
-        LookupService.load_statuses(self.ui.cmbStatus)
-
-        if self.technician_id is None:
+        if self.is_add:
             self.ui.txtEmployeeNumber.setText(
                 TechnicianService.get_next_employee_number()
             )
-            self.setWindowTitle("Add Technician")
+        
         else:
-            technician = TechnicianService.get_technician(
-                self.technician_id
-            )
+            
+            technician = TechnicianService.get(self.record_id)
+
+        
+            if not technician:
+                self.warning("Error", "Technician not found.")
+                self.reject()
+                return
 
             (
                 _,
@@ -64,83 +57,82 @@ class AddTechnicianController(QDialog):
             self.ui.cmbDepartment.setCurrentText(department)
             self.ui.dsbHourlyRate.setValue(hourly_rate or 0)
             self.ui.cmbStatus.setCurrentText(status)
-            self.setWindowTitle("Edit Technician")
+            self.set_entity_name("Technician")
 
-        try:
-            self.ui.buttonBox.accepted.disconnect()
-            self.ui.buttonBox.rejected.disconnect()
-        except Exception:
-            pass
-
-        self.ui.buttonBox.accepted.connect(self.save_technician)
+        self.ui.buttonBox.accepted.connect(self.save)
         self.ui.buttonBox.rejected.connect(self.reject)
 
-    def save_technician(self):
+    def load_lookup_values(self):
 
-       employee_number = self.ui.txtEmployeeNumber.text().strip()
-       first_name = self.ui.txtFirstName.text().strip()
-       last_name = self.ui.txtLastName.text().strip()
-       phone = self.ui.txtPhone.text().strip()
-       email = self.ui.txtEmail.text().strip()
-       trade = self.ui.cmbTrade.currentText()
-       department = self.ui.cmbDepartment.currentText()
-       hourly_rate = self.ui.dsbHourlyRate.value()
-       status = self.ui.cmbStatus.currentText()
+        LookupManager.load(self.ui.cmbTrade, "Trades")
+        LookupManager.load(self.ui.cmbDepartment, "Departments")
+        LookupManager.load(self.ui.cmbStatus, "Statuses")
 
-       if not employee_number:
-         QMessageBox.warning(self, "Validation", "Employee Number is required.")
-         return
+    def save(self):
 
-       if not first_name:
-         QMessageBox.warning(self, "Validation", "First Name is required.")
-         return
+        employee_number = self.ui.txtEmployeeNumber.text().strip()
+        first_name = self.ui.txtFirstName.text().strip()
+        last_name = self.ui.txtLastName.text().strip()
+        phone = self.ui.txtPhone.text().strip()
+        email = self.ui.txtEmail.text().strip()
+        trade = self.ui.cmbTrade.currentText()
+        department = self.ui.cmbDepartment.currentText()
+        hourly_rate = self.ui.dsbHourlyRate.value()
+        status = self.ui.cmbStatus.currentText()
 
-       if not last_name:
-         QMessageBox.warning(self, "Validation", "Last Name is required.")
-         return
+        # -------------------------
+        # VALIDATION
+        # -------------------------
+        if not Validator.required(self, employee_number, "Employee Number"):
+            return
 
-       if self.technician_id is None:
+        if not Validator.required(self, first_name, "First Name"):
+            return
 
-        technician = (
-            employee_number,
-            first_name,
-            last_name,
-            phone,
-            email,
-            trade,
-            department,
-            hourly_rate,
-            status
-        )
+        if not Validator.required(self, last_name, "Last Name"):
+            return
 
-        TechnicianService.add_technician(technician)
+        # -------------------------
+        # ADD MODE
+        # -------------------------
+        if self.is_add:
 
-        QMessageBox.information(
-            self,
-            "Success",
-            "Technician added successfully."
-        )
+            technician = (
+                employee_number,
+                first_name,
+                last_name,
+                phone,
+                email,
+                trade,
+                department,
+                hourly_rate,
+                status
+            )
 
-       else:
+            TechnicianService.add(technician)
 
-        technician = (
-            first_name,
-            last_name,
-            phone,
-            email,
-            trade,
-            department,
-            hourly_rate,
-            status,
-            self.technician_id
-        )
+            self.information("Success", "Technician added successfully.")
 
-        TechnicianService.update_technician(technician)
+        # -------------------------
+        # UPDATE MODE
+        # -------------------------
+        else:
 
-        QMessageBox.information(
-            self,
-            "Success",
-            "Technician updated successfully."
-        )
+            technician = (
+                first_name,
+                last_name,
+                phone,
+                email,
+                trade,
+                department,
+                hourly_rate,
+                status,
+                self.record_id
+            )
 
-       self.accept()
+            TechnicianService.update(technician)
+
+            self.information("Success", "Technician updated successfully.")
+
+        self.accept()
+

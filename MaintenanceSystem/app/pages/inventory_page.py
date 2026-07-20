@@ -57,7 +57,7 @@ class InventoryPage(BasePage):
 
     def load_inventory(self):
 
-        inventory = InventoryService.get_inventory()
+        inventory = InventoryService.get_all()
 
         self.populate_table(inventory)
 

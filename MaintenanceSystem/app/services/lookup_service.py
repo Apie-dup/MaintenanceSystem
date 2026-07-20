@@ -4,8 +4,8 @@ from app.models.lookup_model import LookupModel
 class LookupService:
 
     @staticmethod
-    def get_lookup_values(lookup_type):
-        return LookupModel.get_all(lookup_type)
+    def get_all():
+        return LookupModel.get_all()
 
     @staticmethod
     def load_trades(combo):

@@ -1,22 +1,11 @@
-import sqlite3
+from app.database.connection import Database
 
-def get_assets():
-    conn = sqlite3.connect("database/maintenance.db")
-    cursor = conn.cursor()
+conn = Database.connect()
+cursor = conn.cursor()
 
-    query = """
-    SELECT id, asset_number, asset_name
-    FROM assets;
-    """
+cursor.execute("PRAGMA table_info(inventory)")
 
-    cursor.execute(query)
-    rows = cursor.fetchall()
+for column in cursor.fetchall():
+    print(column)
 
-    conn.close()
-    return rows
-
-
-# Example usage
-assets = get_assets()
-for asset in assets:
-    print(asset)
+conn.close()

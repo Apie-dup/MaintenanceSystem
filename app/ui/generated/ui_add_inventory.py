@@ -79,10 +79,10 @@ class Ui_AddInventoryDialog(object):
 
         self.horizontalLayout.addWidget(self.lblSupplier_2)
 
-        self.cmbSupplier_2 = QComboBox(AddInventoryDialog)
-        self.cmbSupplier_2.setObjectName(u"cmbSupplier_2")
+        self.cmbSupplier = QComboBox(AddInventoryDialog)
+        self.cmbSupplier.setObjectName(u"cmbSupplier")
 
-        self.horizontalLayout.addWidget(self.cmbSupplier_2)
+        self.horizontalLayout.addWidget(self.cmbSupplier)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout)

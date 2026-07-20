@@ -1,18 +1,19 @@
 from PySide6.QtCore import QDate
-from PySide6.QtWidgets import QDialog, QMessageBox
 
 from app.ui.generated.ui_add_work_order import Ui_AddWorkOrderDialog
 from app.services.work_order_service import WorkOrderService
 from app.services.asset_service import AssetService
 from app.services.technician_service import TechnicianService
-from app.services.lookup_service import LookupService
+from app.core.lookup_manager import LookupManager
+from app.utils.validators import Validator
+from app.core.crud_dialog import CrudDialog
 
-class AddWorkOrderController(QDialog):
+class AddWorkOrderController(CrudDialog):
     
-    def __init__(self, work_order_id=None):
-        super().__init__()
+    def __init__(self, record_id=None):
+        super().__init__(record_id)
 
-        self.work_order_id = work_order_id
+        
 
         self.ui = Ui_AddWorkOrderDialog()
         self.ui.setupUi(self)
@@ -23,9 +24,8 @@ class AddWorkOrderController(QDialog):
         self.initialize_dialog()
 
     def initialize_dialog(self):
-
-        self.load_priorities()
-        self.load_status()
+        self.load_lookup_values()
+        
         self.load_assets()
         self.load_technicians()
 
@@ -36,52 +36,38 @@ class AddWorkOrderController(QDialog):
         self.ui.dsbActualCost.setDecimals(2)
         self.ui.dsbLabourHours.setDecimals(2)
 
-        if self.work_order_id is None:
+        if self.is_add:
+            self.ui.txtWorkOrderNumber.setText(
+                WorkOrderService.get_next_work_order_number()
+            )
 
-           self.ui.txtWorkOrderNumber.setText(
-               WorkOrderService.get_next_work_order_number()
-           )
-
-           self.ui.txtWorkOrderNumber.setReadOnly(True)
-
-           self.ui.dtDateCreated.setDate(QDate.currentDate())
+            self.ui.dtDateCreated.get_next_work_order_number()
 
         else:
-
             self.load_work_order()
 
-        self.ui.buttonBox.accepted.connect(self.save_work_order)
+        self.ui.txtWorkOrderNumber.setReadOnly(True)
+
+        self.ui.buttonBox.accepted.connect(self.save)
         self.ui.buttonBox.rejected.connect(self.reject)
 
-    def load_priorities(self):
+    def load_lookup_values(self):
+        
+        LookupManager.load(
+            self.ui.cmbPriority,
+            "Priorities"
+        )
 
-        self.ui.cmbPriority.clear()
-
-        self.ui.cmbPriority.addItems([
-            "Low",
-            "Medium",
-            "High",
-            "Critical"
-        ])
-
-    def load_status(self):
-
-        self.ui.cmbStatus.clear()
-
-        self.ui.cmbStatus.addItems([
-            "Open",
-            "Assigned",
-            "In Progress",
-            "Waiting Parts",
-            "Completed",
-            "Cancelled"
-        ])
+        LookupManager.load(
+            self.ui.cmbStatus,
+            "Statuses"
+        )
 
     def load_assets(self):
 
         self.ui.cmbAsset.clear()
 
-        assets = AssetService.get_assets()
+        assets = AssetService.get_all()
 
         for asset in assets:
 
@@ -94,16 +80,15 @@ class AddWorkOrderController(QDialog):
                 asset_id
             )
 
-    def save_work_order(self):
+    def save(self):
 
         title = self.ui.txtTitle.text().strip()
 
-        if not title:
-            QMessageBox.warning(
-                self,
-                "Validation",
-                "Title is required."
-            )
+        if not Validator.required(
+            self,
+            title,
+            "Title"
+        ):
             return
         
         asset_id = self.ui.cmbAsset.currentData()
@@ -142,14 +127,13 @@ class AddWorkOrderController(QDialog):
 
         )
 
-        if self.work_order_id is None:
+        if self.is_add:
 
-            WorkOrderService.add_work_order(work_order)
+            WorkOrderService.add(work_order)
 
-            QMessageBox.information(
-                self,
+            self.information(
                 "Success",
-                "Work Order created successfuly."
+                "Work Order created successfully."
             )
         
         else:
@@ -182,14 +166,13 @@ class AddWorkOrderController(QDialog):
 
                 self.ui.teNotes.toPlainText().strip(),
 
-                self.work_order_id
+                self.record_id
 
             )
 
-            WorkOrderService.update_work_order(update_work_order)
+            WorkOrderService.update(update_work_order)
 
-            QMessageBox.information(
-                self,
+            self.information(
                 "Success",
                 "Work Order updated successfully."
             )
@@ -198,11 +181,10 @@ class AddWorkOrderController(QDialog):
 
     def load_work_order(self):
 
-        work_order = WorkOrderService.get_work_order(self.work_order_id)
+        work_order = WorkOrderService.get(self.record_id)
 
         if not work_order:
-            QMessageBox.warning(
-                self,
+            self.warning(
                 "Error",
                 "Work order not found."
             )
@@ -258,12 +240,14 @@ class AddWorkOrderController(QDialog):
         if index >= 0:
             self.ui.cmbTechnician.setCurrentIndex(index)
 
+            self.set_entity_name("Work Order")
+
     def load_technicians(self):
 
         self.ui.cmbTechnician.clear()
         self.ui.cmbTechnician.addItem("Unassigned", None)
 
-        technicians = TechnicianService.get_technicians()
+        technicians = TechnicianService.get_all()
 
         for technician in technicians:
 
@@ -284,13 +268,13 @@ class AddWorkOrderController(QDialog):
         if asset_id is None:
             return
 
-        asset = AssetService.get_asset(asset_id)
+        asset = AssetService.get(asset_id)
 
         if not asset:
             return
 
-        category = asset[3] if len(asset) > 3 else ""
-        location = asset[4] if len(asset) > 4 else ""
+        category = asset[4] if len(asset) > 4 else ""
+        location = asset[5] if len(asset) > 5 else ""
 
         category_widget = getattr(self.ui, "cmbCategory", None)
         if category_widget is not None and hasattr(category_widget, "setCurrentText"):

@@ -5,6 +5,7 @@ from app.ui.generated.ui_add_inventory import Ui_AddInventoryDialog
 from app.services.inventory_service import InventoryService
 from app.services.lookup_service import LookupService
 from app.utils.validators import Validator
+from app.core.lookup_manager import LookupManager
 
 
 class AddInventoryController(QDialog):
@@ -77,20 +78,29 @@ class AddInventoryController(QDialog):
 
     def load_lookup_values(self):
 
-        self.ui.cmbCategory.clear()
-        self.ui.cmbLocation.clear()
-        self.ui.cmbSupplier.clear()
-
-        self.ui.cmbCategory.addItems(
-            LookupService.get_categories()
+        LookupManager.load(
+            self.ui.cmbCategory,
+            "Inventory Categories"
         )
 
-        self.ui.cmbLocation.addItems(
-            LookupService.get_location()
+        LookupManager.load(
+            self.ui.cmbSupplier,
+            "Suppliers"
         )
 
-        self.ui.cmbSupplier.addItems(
-            LookupService.get_suppliers()
+        LookupManager.load(
+            self.ui.cmbLocation,
+            "Inventory Locations"
+        )
+
+        LookupManager.load(
+            self.ui.cmbUnit,
+            "Units"
+        )
+
+        LookupManager.load(
+            self.ui.cmbStatus,
+            "Statuses"
         )
 
     def save_item(self):

@@ -185,7 +185,7 @@ class AddInventoryController(QDialog):
 
         def load_inventory(self):
 
-            part = InventoryService.get_inventory_item(
+            part = InventoryService.get_item(
                 self.part_id
             )
 
