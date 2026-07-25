@@ -1,28 +1,27 @@
 from app.models.lookup_model import LookupModel
 
-
 class LookupService:
 
     @staticmethod
-    def get_lookup_values(lookup_type):
+    def get_all(lookup_type):
         return LookupModel.get_all(lookup_type)
+    
+    @staticmethod
+    def get(record_id):
+        return LookupModel.get(record_id)
+    
+    @staticmethod
+    def add(record):
+        LookupModel.insert(record)
 
     @staticmethod
-    def load_combo(combo, lookup_type):
-
-        combo.clear()
-
-        for row in LookupModel.get_all(lookup_type):
-            combo.addItem(row[1], row[0])
+    def update(record):
+        LookupModel.update(record)
 
     @staticmethod
-    def add_lookup_value(lookup_type, value):
-        LookupModel.insert(lookup_type, value)
+    def delete(recor_id):
+        LookupModel.delete(recor_id)
 
     @staticmethod
-    def update_lookup_value(lookup_type, lookup_id, value):
-        LookupModel.update(lookup_type, lookup_id, value)
-
-    @staticmethod
-    def delete_lookup_value(lookup_type, lookup_id):
-        LookupModel.delete(lookup_type, lookup_id)
+    def search(lookup_type, text):
+        return LookupModel.search(lookup_type, text)

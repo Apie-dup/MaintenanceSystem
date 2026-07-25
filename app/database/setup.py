@@ -1,24 +1,24 @@
 from app.database.connection import Database
-from app.database.schema import create_tables
-from app.database.seed import (
-    seed_default_admin,
-    seed_app_settings,
-    seed_lookup_tables,
-    seed_preventive_maintenance
-)
-from app.database.migrations import MigrationManager
+from app.database.schema import DatabaseSchema
+from app.database.seed import DatabaseSeeder
 
+class DatabaseSetup:
 
-def setup_database():
-    """Initialize the application database."""
-    
-    Database.initialize()
-    
-    create_tables()
-    
-    seed_default_admin()
-    seed_app_settings()
-    seed_lookup_tables()
-    seed_preventive_maintenance()
-    
-    MigrationManager.run()
+    @staticmethod
+    def initialize():
+
+        print("=" * 50)
+        print("Maintenance Management System")
+        print("Database Initializer")
+        print("=" * 50)
+
+        # Create database file if necessary
+        Database.connect().close()
+
+        # Create tables
+        DatabaseSchema.create_tables()
+
+        # Seed default data
+        DatabaseSeeder.seed()
+
+        print("Database initialized succssesfully.")

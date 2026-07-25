@@ -3,16 +3,20 @@ from app.database.connection import Database
 conn = Database.connect()
 cursor = conn.cursor()
 
+# Drop teh old table
+
 cursor.execute("DROP TABLE IF EXISTS inventory")
 
+# Create the correct inventory table
+
 cursor.execute("""
-CREATE TABLE inventory (
+    CREATE TABLE inventory(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     part_number TEXT NOT NULL,
     part_name TEXT NOT NULL,
     description TEXT,
     category TEXT,
-    supplier TEXT,
+    supplier_id INTEGER,
     unit TEXT,
     quantity INTEGER,
     minimum_quantity INTEGER,

@@ -8,8 +8,8 @@ class InventoryService:
         return InventoryModel.get_all()
 
     @staticmethod
-    def get(part_id):
-        return InventoryModel.get_by_id(part_id)
+    def get(record_id):
+        return InventoryModel.get_by_id(record_id)
 
     @staticmethod
     def get_next_part_number():
@@ -24,8 +24,8 @@ class InventoryService:
         InventoryModel.update(record)
 
     @staticmethod
-    def delete(part_id):
-        InventoryModel.delete(part_id)
+    def delete(record_id):
+        InventoryModel.delete(record_id)
 
     @staticmethod
     def search(text):

@@ -8,8 +8,8 @@ class TechnicianService:
         return TechnicianModel.get_all()
 
     @staticmethod
-    def get(technician_id):
-        return TechnicianModel.get_by_id(technician_id)
+    def get(record_id):
+        return TechnicianModel.get_by_id(record_id)
 
     @staticmethod
     def add(record):
@@ -20,8 +20,8 @@ class TechnicianService:
         TechnicianModel.update(record)
 
     @staticmethod
-    def delete(technician_id):
-        TechnicianModel.delete(technician_id)
+    def delete(record_id):
+        TechnicianModel.delete(record_id)
 
     @staticmethod
     def search(text):

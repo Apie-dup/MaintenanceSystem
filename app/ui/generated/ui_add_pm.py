@@ -90,15 +90,15 @@ class Ui_AddPMDialog(object):
 
         self.horizontalLayout_5 = QHBoxLayout()
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
-        self.lblFrequency = QLabel(AddPMDialog)
-        self.lblFrequency.setObjectName(u"lblFrequency")
+        self.lblFrequencyType = QLabel(AddPMDialog)
+        self.lblFrequencyType.setObjectName(u"lblFrequencyType")
 
-        self.horizontalLayout_5.addWidget(self.lblFrequency)
+        self.horizontalLayout_5.addWidget(self.lblFrequencyType)
 
-        self.cmbFrequency = QComboBox(AddPMDialog)
-        self.cmbFrequency.setObjectName(u"cmbFrequency")
+        self.cmbFrequencyType = QComboBox(AddPMDialog)
+        self.cmbFrequencyType.setObjectName(u"cmbFrequencyType")
 
-        self.horizontalLayout_5.addWidget(self.cmbFrequency)
+        self.horizontalLayout_5.addWidget(self.cmbFrequencyType)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout_5)
@@ -180,10 +180,10 @@ class Ui_AddPMDialog(object):
 
         self.horizontalLayout_11 = QHBoxLayout()
         self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
-        self.ldlEstimatedCost = QLabel(AddPMDialog)
-        self.ldlEstimatedCost.setObjectName(u"ldlEstimatedCost")
+        self.lblEstimatedCost = QLabel(AddPMDialog)
+        self.lblEstimatedCost.setObjectName(u"lblEstimatedCost")
 
-        self.horizontalLayout_11.addWidget(self.ldlEstimatedCost)
+        self.horizontalLayout_11.addWidget(self.lblEstimatedCost)
 
         self.dsbEstimatedCost = QDoubleSpinBox(AddPMDialog)
         self.dsbEstimatedCost.setObjectName(u"dsbEstimatedCost")
@@ -195,10 +195,10 @@ class Ui_AddPMDialog(object):
 
         self.horizontalLayout_12 = QHBoxLayout()
         self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
-        self.labStautus = QLabel(AddPMDialog)
-        self.labStautus.setObjectName(u"labStautus")
+        self.lblStautus = QLabel(AddPMDialog)
+        self.lblStautus.setObjectName(u"lblStautus")
 
-        self.horizontalLayout_12.addWidget(self.labStautus)
+        self.horizontalLayout_12.addWidget(self.lblStautus)
 
         self.chkActive = QCheckBox(AddPMDialog)
         self.chkActive.setObjectName(u"chkActive")
@@ -244,14 +244,14 @@ class Ui_AddPMDialog(object):
         self.lblAsset.setText(QCoreApplication.translate("AddPMDialog", u"Asset", None))
         self.lblTask.setText(QCoreApplication.translate("AddPMDialog", u"Task", None))
         self.lblDescription.setText(QCoreApplication.translate("AddPMDialog", u"Description", None))
-        self.lblFrequency.setText(QCoreApplication.translate("AddPMDialog", u"Frequency", None))
+        self.lblFrequencyType.setText(QCoreApplication.translate("AddPMDialog", u"Frequency Type", None))
         self.lblFrequencyValue.setText(QCoreApplication.translate("AddPMDialog", u"Frequency Value", None))
         self.lblLastService.setText(QCoreApplication.translate("AddPMDialog", u"Last Service", None))
         self.lblNextDue.setText(QCoreApplication.translate("AddPMDialog", u"Next Due", None))
         self.lblPriority.setText(QCoreApplication.translate("AddPMDialog", u"Priority", None))
         self.lblEstimatedHours.setText(QCoreApplication.translate("AddPMDialog", u"Estimated Hours", None))
-        self.ldlEstimatedCost.setText(QCoreApplication.translate("AddPMDialog", u"Estimated Cost", None))
-        self.labStautus.setText(QCoreApplication.translate("AddPMDialog", u"Status", None))
+        self.lblEstimatedCost.setText(QCoreApplication.translate("AddPMDialog", u"Estimated Cost", None))
+        self.lblStautus.setText(QCoreApplication.translate("AddPMDialog", u"Status", None))
         self.chkActive.setText("")
         self.lblNotes.setText(QCoreApplication.translate("AddPMDialog", u"Notes", None))
     # retranslateUi

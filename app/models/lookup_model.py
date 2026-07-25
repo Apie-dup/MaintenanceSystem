@@ -2,89 +2,130 @@ from app.database.connection import Database
 
 class LookupModel:
 
-    TABLES = {
-        "Trades": ("trades", "trade_name"),
-        "Departments": ("departments", "department_name"),
-        "Priorities": ("priorities", "priority_name"),
-        "Statuses": ("statuses", "status_name"),
 
-        "Asset Categories": ("asset_categories", "category_name"),
-        "Asset Locations": ("asset_locations", "location_name"),
-        "Manufacturers": ("manufacturers", "manufacturer_name"),
-
-        "Inventory Categories": ("inventory_categories", "category_name"),
-        "Units of Measure": ("units_of_measure", "unit_name")
-    }
 
     @staticmethod
     def get_all(lookup_type):
-        table, field = LookupModel.TABLES[lookup_type]
+
 
         conn = Database.connect()
         cursor = conn.cursor()
 
-        cursor.execute(f"""
+        cursor.execute("""
             SELECT
                 id,
-                {field}
-            FROM {table}
-            ORDER BY {field}
-        """)
-
+                lookup_value
+            FROM lookup_values
+            WHERE lookup_type = ?
+                AND active  = 1
+            ORDER BY
+                sort_order,
+                lookup_value
+            """, (lookup_type,))
+        
         rows = cursor.fetchall()
         conn.close()
 
         return rows
     
     @staticmethod
-    def insert(lookup_type, value):
-        table, field = LookupModel.TABLES[lookup_type]
+    def get(record_id):
 
         conn = Database.connect()
         cursor = conn.cursor()
 
-        cursor.execute(
-            f"INSERT INTO {table} ({field}) VALUES (?)",
-            (value,)
-        )
-
-        conn.commit()
-        conn.close()
-
-    @staticmethod
-    def update(lookup_type, lookup_id, value):
-        table, field = LookupModel.TABLES[lookup_type]
-
-        conn = Database.connect()
-        cursor = conn.cursor()
-
-        cursor.execute(
-            f"""
-            UPDATE {table}
-            SET {field} = ?
+        cursor.execute("""
+            SELECT
+                id,
+                lokup_type,
+                lookup_value,
+                sort_order,
+                active
+            FROM lookup_values
             WHERE id = ?
-            """,
-            (value, lookup_id)
-        )
+        """, (record_id,))
+
+        row = cursor.fetchone()
+        conn.close()
+
+        return row
+    
+    @staticmethod
+    def insert(record):
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            INSERT INTO looup_values
+            (
+                lookup_type,
+                lookup_value,
+                sort_order,
+                active
+            )
+            VALUES (?,?,?,?)
+        """, record)
 
         conn.commit()
         conn.close()
 
     @staticmethod
-    def delete(lookup_type, lookup_id):
-        table, _ = LookupModel.TABLES[lookup_type]
+    def update(record):
 
         conn = Database.connect()
         cursor = conn.cursor()
 
-        cursor.execute(
-            f"DELETE FROM {table} WHERE id = ?",
-            (lookup_id,)
-        )
+        cursor.execute("""
+            UPDATE lookup_values
+            SET
+                lookup_type = ?,
+                lookup_value = ?,
+                sort_order = ?,
+                active = ?
+            WHERE id = ?
+        """, record)
 
         conn.commit()
         conn.close()
 
+    @staticmethod
+    def delete(record_id):
 
+        conn = Database.connect()
+        cursor = conn.cursor()
 
-      
+        cursor.execute("""
+            DELETE
+            FROM lookup_values
+            WHERE id = ?
+        """, (record_id,))
+
+        conn.commit()
+        conn.close()
+
+    @staticmethod
+    def search(lookup_type, text):
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        search = f"%{text}%"
+
+        cursor.execute("""
+            SELECT
+                id,
+                lookup_value
+            FROM lookup_values
+            WHERE lookup_type = ?
+                AND lookup_value LIKE ?
+            ORDER BY
+                sort_order,
+                lookup_value
+        """, (lookup_type, search))
+
+        rows = cursor.fetchall()
+        conn.close()
+
+        return rows
+        

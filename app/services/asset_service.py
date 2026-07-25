@@ -7,8 +7,8 @@ class AssetService:
         return AssetModel.get_all()
     
     @staticmethod
-    def get(asset_id):
-        return AssetModel.get_by_id(asset_id)
+    def get(record_id):
+        return AssetModel.get_by_id(record_id)
     
     @staticmethod
     def add(record):
@@ -19,8 +19,8 @@ class AssetService:
         AssetModel.update(record)
 
     @staticmethod
-    def delete(asset_id):
-        AssetModel.delete(asset_id)
+    def delete(record_id):
+        AssetModel.delete(record_id)
 
     @staticmethod
     def searc(text):

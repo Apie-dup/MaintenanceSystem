@@ -24,7 +24,7 @@ class Ui_AssetsWindow(object):
     def setupUi(self, AssetsWindow):
         if not AssetsWindow.objectName():
             AssetsWindow.setObjectName(u"AssetsWindow")
-        AssetsWindow.resize(1300, 703)
+        AssetsWindow.resize(1226, 695)
         self.verticalLayout_2 = QVBoxLayout(AssetsWindow)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.lblTitle = QLabel(AssetsWindow)
@@ -54,8 +54,8 @@ class Ui_AssetsWindow(object):
         self.verticalLayout.addLayout(self.horizontalLayout)
 
         self.tblAssets = QTableWidget(AssetsWindow)
-        if (self.tblAssets.columnCount() < 11):
-            self.tblAssets.setColumnCount(11)
+        if (self.tblAssets.columnCount() < 12):
+            self.tblAssets.setColumnCount(12)
         __qtablewidgetitem = QTableWidgetItem()
         self.tblAssets.setHorizontalHeaderItem(0, __qtablewidgetitem)
         __qtablewidgetitem1 = QTableWidgetItem()
@@ -78,12 +78,14 @@ class Ui_AssetsWindow(object):
         self.tblAssets.setHorizontalHeaderItem(9, __qtablewidgetitem9)
         __qtablewidgetitem10 = QTableWidgetItem()
         self.tblAssets.setHorizontalHeaderItem(10, __qtablewidgetitem10)
+        __qtablewidgetitem11 = QTableWidgetItem()
+        self.tblAssets.setHorizontalHeaderItem(11, __qtablewidgetitem11)
         self.tblAssets.setObjectName(u"tblAssets")
         self.tblAssets.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.tblAssets.setAlternatingRowColors(True)
         self.tblAssets.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.tblAssets.setSortingEnabled(True)
-        self.tblAssets.setColumnCount(11)
+        self.tblAssets.setColumnCount(12)
 
         self.verticalLayout.addWidget(self.tblAssets)
 
@@ -161,7 +163,7 @@ class Ui_AssetsWindow(object):
         ___qtablewidgetitem = self.tblAssets.horizontalHeaderItem(0)
         ___qtablewidgetitem.setText(QCoreApplication.translate("AssetsWindow", u"ID", None))
         ___qtablewidgetitem1 = self.tblAssets.horizontalHeaderItem(1)
-        ___qtablewidgetitem1.setText(QCoreApplication.translate("AssetsWindow", u"Asset  Number", None))
+        ___qtablewidgetitem1.setText(QCoreApplication.translate("AssetsWindow", u"Asset Number", None))
         ___qtablewidgetitem2 = self.tblAssets.horizontalHeaderItem(2)
         ___qtablewidgetitem2.setText(QCoreApplication.translate("AssetsWindow", u"Asset Name", None))
         ___qtablewidgetitem3 = self.tblAssets.horizontalHeaderItem(3)
@@ -175,11 +177,13 @@ class Ui_AssetsWindow(object):
         ___qtablewidgetitem7 = self.tblAssets.horizontalHeaderItem(7)
         ___qtablewidgetitem7.setText(QCoreApplication.translate("AssetsWindow", u"Model", None))
         ___qtablewidgetitem8 = self.tblAssets.horizontalHeaderItem(8)
-        ___qtablewidgetitem8.setText(QCoreApplication.translate("AssetsWindow", u"Serial No.", None))
+        ___qtablewidgetitem8.setText(QCoreApplication.translate("AssetsWindow", u"Serial Number", None))
         ___qtablewidgetitem9 = self.tblAssets.horizontalHeaderItem(9)
-        ___qtablewidgetitem9.setText(QCoreApplication.translate("AssetsWindow", u"Status", None))
+        ___qtablewidgetitem9.setText(QCoreApplication.translate("AssetsWindow", u"Purchase Date", None))
         ___qtablewidgetitem10 = self.tblAssets.horizontalHeaderItem(10)
         ___qtablewidgetitem10.setText(QCoreApplication.translate("AssetsWindow", u"Warranty Expiry", None))
+        ___qtablewidgetitem11 = self.tblAssets.horizontalHeaderItem(11)
+        ___qtablewidgetitem11.setText(QCoreApplication.translate("AssetsWindow", u"Status", None))
         self.btnAdd.setText(QCoreApplication.translate("AssetsWindow", u"Add", None))
         self.btnEdit.setText(QCoreApplication.translate("AssetsWindow", u"Edit", None))
         self.btnDelete.setText(QCoreApplication.translate("AssetsWindow", u"Delete", None))

@@ -5,6 +5,7 @@ class PMModel:
 
     @staticmethod
     def get_all():
+
         conn = Database.connect()
         cursor = conn.cursor()
 
@@ -12,63 +13,59 @@ class PMModel:
             SELECT
                 pm.id,
                 pm.pm_number,
-                a.asset_number || ' - ' || a.asset_name AS asset,
+                a.asset_number,
+                a.asset_name,
                 pm.task,
+                pm.description,
                 pm.frequency_type,
+                pm.frequency_value,
+                pm.last_service_date,
                 pm.next_due_date,
+                pm.estimated_hours,
+                pm.estimated_cost,
                 pm.priority,
-                CASE
-                    WHEN pm.active = 1 THEN 'Active'
-                    ELSE 'Inactive'
-                END
+                pm.active,
+                pm.notes
             FROM preventive_maintenance pm
-
             LEFT JOIN assets a
-                ON pm.asset_id = a.id
-
-            ORDER BY pm.pm_number
+            ON pm.asset_id = a.id
+            ORDER BY pm.next_due_date
         """)
 
         rows = cursor.fetchall()
+
         conn.close()
+
         return rows
 
     @staticmethod
-    def get_by_id(pm_id):
+    def get(record_id):
+
         conn = Database.connect()
         cursor = conn.cursor()
 
         cursor.execute("""
-            SELECT
-                id,
-                pm_number,
-                asset_id,
-                task,
-                description,
-                frequency_type,
-                frequency_value,
-                last_service_date,
-                next_due_date,
-                estimated_hours,
-                estimated_cost,
-                priority,
-                active,
-                notes
+            SELECT *
             FROM preventive_maintenance
             WHERE id = ?
-        """, (pm_id,))
+        """, (record_id,))
 
         row = cursor.fetchone()
+
         conn.close()
+
         return row
+        
 
     @staticmethod
-    def insert(pm):
+    def insert(record):
+
         conn = Database.connect()
         cursor = conn.cursor()
 
         cursor.execute("""
-            INSERT INTO preventive_maintenance (
+            INSERT INTO preventive_maintenance
+            (
                 pm_number,
                 asset_id,
                 task,
@@ -83,18 +80,15 @@ class PMModel:
                 active,
                 notes
             )
-            VALUES (
-                ?,?,?,?,?,?,
-                ?,?,?,?,?,?,
-                ?
-            )
-        """, pm)
+            VALUES
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, record)
 
         conn.commit()
         conn.close()
 
     @staticmethod
-    def update(pm):
+    def update(record):
         conn = Database.connect()
         cursor = conn.cursor()
 
@@ -114,69 +108,61 @@ class PMModel:
                 active = ?,
                 notes = ?
             WHERE id = ?
-        """, pm)
+        """, record)
 
         conn.commit()
         conn.close()
 
     @staticmethod
-    def delete(pm_id):
+    def delete(record_id):
         conn = Database.connect()
         cursor = conn.cursor()
 
         cursor.execute("""
             DELETE FROM preventive_maintenance
             WHERE id = ?
-        """, (pm_id,))
+        """, (record_id,))
 
         conn.commit()
         conn.close()
 
     @staticmethod
-    def search(search_text):
+    def search(text):
+        
         conn = Database.connect()
         cursor = conn.cursor()
-
-        search = f"%{search_text}%"
 
         cursor.execute("""
             SELECT
                 pm.id,
                 pm.pm_number,
-                a.asset_number || ' - ' || a.asset_name AS asset,
+                a.asset_number,
+                a.asset_name,
                 pm.task,
                 pm.frequency_type,
                 pm.next_due_date,
                 pm.priority,
-                CASE
-                    WHEN pm.active = 1 THEN 'Active'
-                    ELSE 'Inactive'
-                END
+                pm.active
             FROM preventive_maintenance pm
-
             LEFT JOIN assets a
                 ON pm.asset_id = a.id
-
             WHERE
                 pm.pm_number LIKE ?
-                OR pm.task LIKE ?
-                OR pm.frequency_type LIKE ?
-                OR pm.priority LIKE ?
-                OR a.asset_name LIKE ?
                 OR a.asset_number LIKE ?
-
+                OR a.asset_name LIKE ?
+                OR pm.task LIKE ?
             ORDER BY pm.pm_number
         """, (
-            search,
-            search,
-            search,
-            search,
-            search,
-            search
+            f"%{text}%",
+            f"%{text}%",
+            f"%{text}%",
+            f"%{text}%"
         ))
 
         rows = cursor.fetchall()
+        
         conn.close()
+        
         return rows
 
     @staticmethod

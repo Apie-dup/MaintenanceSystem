@@ -2,7 +2,6 @@ from PySide6.QtCore import QDate
 
 from app.ui.generated.ui_add_asset import Ui_AddAssetDialog
 from app.services.asset_service import AssetService
-from app.services.lookup_service import LookupService
 from app.constants import (
     ASSET_CATEGORIES,
     ASSET_LOCATIONS,
@@ -144,7 +143,7 @@ class AddAssetController(CrudDialog):
             self.ui.cmbStatus.currentText()
         )
 
-        if self.record_id is None:
+        if self.is_add:
             AssetService.add(asset)
 
             signals.data_changed.emit("assets")

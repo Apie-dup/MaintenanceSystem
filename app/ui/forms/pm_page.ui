@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>827</width>
-    <height>700</height>
+    <height>523</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -65,7 +65,7 @@
      </column>
      <column>
       <property name="text">
-       <string>Asset</string>
+       <string>Asset Id</string>
       </property>
      </column>
      <column>
@@ -75,12 +75,37 @@
      </column>
      <column>
       <property name="text">
-       <string>Frequency</string>
+       <string>Description</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>Next Due</string>
+       <string>Frequency Type</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Frequency Value</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Last Service Date</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Next Due Date</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Estimated Hours</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Estimated Cost</string>
       </property>
      </column>
      <column>
@@ -90,7 +115,17 @@
      </column>
      <column>
       <property name="text">
-       <string>Status</string>
+       <string>Active</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Notes</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Created At</string>
       </property>
      </column>
     </widget>

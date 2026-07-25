@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>824</width>
-    <height>696</height>
+    <width>904</width>
+    <height>640</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -66,12 +66,12 @@
      </column>
      <column>
       <property name="text">
-       <string>Employee No.</string>
+       <string>Emplyee Number</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>Emplyee Name</string>
+       <string>First Name</string>
       </property>
      </column>
      <column>
@@ -81,22 +81,37 @@
      </column>
      <column>
       <property name="text">
-       <string>Trade</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Department</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
        <string>Phone</string>
       </property>
      </column>
      <column>
       <property name="text">
+       <string>Email</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Trade</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Deprtment</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Hourly Rate</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
        <string>Status</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Created At</string>
       </property>
      </column>
     </widget>

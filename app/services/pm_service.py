@@ -8,20 +8,20 @@ class PMService:
         return PMModel.get_all()
 
     @staticmethod
-    def get(pm_id):
-        return PMModel.get_by_id(pm_id)
+    def get(record_id):
+        return PMModel.get(record_id)
 
     @staticmethod
     def add(record):
-        PMModel.insert(record)
+        PMModel.add(record)
 
     @staticmethod
     def update(record):
         PMModel.update(record)
 
     @staticmethod
-    def delete(record):
-        PMModel.delete(record)
+    def delete(record_id):
+        PMModel.delete(record_id)
 
     @staticmethod
     def search(text):

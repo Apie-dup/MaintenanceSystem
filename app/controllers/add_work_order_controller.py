@@ -17,10 +17,7 @@ class AddWorkOrderController(CrudDialog):
 
         self.ui = Ui_AddWorkOrderDialog()
         self.ui.setupUi(self)
-        self.ui.cmbAsset.currentIndexChanged.connect(
-        self.load_asset_details
-    )
-
+        
         self.initialize_dialog()
 
     def initialize_dialog(self):

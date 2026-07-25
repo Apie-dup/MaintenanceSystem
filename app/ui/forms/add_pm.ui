@@ -77,14 +77,14 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_5">
      <item>
-      <widget class="QLabel" name="lblFrequency">
+      <widget class="QLabel" name="lblFrequencyType">
        <property name="text">
-        <string>Frequency</string>
+        <string>Frequency Type</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="cmbFrequency"/>
+      <widget class="QComboBox" name="cmbFrequencyType"/>
      </item>
     </layout>
    </item>
@@ -161,7 +161,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_11">
      <item>
-      <widget class="QLabel" name="ldlEstimatedCost">
+      <widget class="QLabel" name="lblEstimatedCost">
        <property name="text">
         <string>Estimated Cost</string>
        </property>
@@ -175,7 +175,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_12">
      <item>
-      <widget class="QLabel" name="labStautus">
+      <widget class="QLabel" name="lblStautus">
        <property name="text">
         <string>Status</string>
        </property>

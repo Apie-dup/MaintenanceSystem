@@ -8,15 +8,12 @@ class LookupManager:
 
         combo.clear()
 
-        rows = LookupService.get_lookup_values(
-            lookup_type
-        )
+        rows = LookupService.get_all(lookup_type)
 
         if rows:
+            
             for lookup_id, value in rows:
-                combo.addItem(str(value), lookup_id)
+                combo.addItem(value, lookup_id)
 
         elif defaults:
-
-            for value in defaults:
-                combo.addItem(str(value))
+            combo.addItems(defaults) 

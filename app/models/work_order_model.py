@@ -2,65 +2,71 @@ from app.database.connection import Database
 
 class WorkOrderModel:
 
+    # ---------------------------------------------------------
+    # Get all work orders
+    # ---------------------------------------------------------
+
     @staticmethod
     def get_all():
+        
         conn = Database.connect()
         cursor = conn.cursor()
 
         cursor.execute("""
             SELECT
-                wo.id,
-                wo.wo_number,
-                a.asset_number || ' - ' || a.asset_name AS asset,
-                wo.title,
-                wo.priority,
-                wo.status,
-                t.first_name || ' ' || t.last_name AS technician,
-                wo.due_date
-            FROM work_orders wo
-
-            LEFT JOIN assets a
-                ON wo.asset_id = a.id
-
-            LEFT JOIN technicians t
-                ON wo.technician_id = t.id
-
-            ORDER BY wo.wo_number;
+                id,
+                work_order_number,
+                asset_id,
+                title,
+                priority,
+                status,
+                technician_ id,
+                due_date
+            FROM work_orders
+            ORDER BY id DESC
         """)
 
         rows = cursor.fetchall()
+
         conn.close()
+
         return rows
     
+    # ---------------------------------------------------------
+    # Get one work order
+    # ---------------------------------------------------------
+    
     @staticmethod
-    def get_next_work_order_number():
+    def get(record_id):
+
         conn = Database.connect()
         cursor = conn.cursor()
 
         cursor.execute("""
-            SELECT wo_number
+            SELECT *
             FROM work_orders
-            ORDER BY id DESC
-            LIMIT 1
-        """)
+            WHERE id = ?
+        """, (record_id,))
 
         row = cursor.fetchone()
+
         conn.close()
 
-        if row is None:
-            return "WO-000001"
+        return row
 
-        number = int(row[0].split("-")[1]) + 1
-        return f"WO-{number:06d}"
+    # ---------------------------------------------------------
+    # Insert
+    # ---------------------------------------------------------
 
     @staticmethod
     def insert(work_order):
+
         conn = Database.connect()
         cursor = conn.cursor()
 
         cursor.execute("""
-            INSERT INTO work_orders (
-                wo_number,
+            INSERT INTO work_orders(
+                work_order_number,
                 asset_id,
                 title,
                 description,
@@ -68,25 +74,29 @@ class WorkOrderModel:
                 status,
                 technician_id,
                 requested_by,
-                date_created,
-                due_date,
+                date_due,
                 estimated_cost,
                 actual_cost,
                 labour_hours,
-                notes
+                notes)
             )
-            VALUES (
-                ?,?,?,?,?,?,
-                ?,?,?,?,?,?,
-                ?,?
+            VALUES(
+                ?, ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?, ?,
+                ?, ?
             )
         """, work_order)
 
         conn.commit()
         conn.close()
 
+    # ---------------------------------------------------------
+    # Update
+    # ---------------------------------------------------------
+
     @staticmethod
     def update(work_order):
+
         conn = Database.connect()
         cursor = conn.cursor()
 
@@ -96,97 +106,71 @@ class WorkOrderModel:
                 asset_id = ?,
                 title = ?,
                 description = ?,
-                priority = ?,
+                prioriy = ?,
                 status = ?,
                 technician_id = ?,
                 requested_by = ?,
-                date_created = ?,
-                due_date = ?,
+                date_due = ?,
                 estimated_cost = ?,
                 labour_hours = ?,
                 notes = ?
             WHERE id = ?
         """, work_order)
+        
+        conn.commit()
+        conn.close()
+
+    # ---------------------------------------------------------
+    # Delete
+    # ---------------------------------------------------------
+
+    @staticmethod
+    def delete(record_id):
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT FROM work_orders
+            WHERE id = ?
+        """, (record_id,))
 
         conn.commit()
         conn.close()
 
+    # ---------------------------------------------------------
+    # Search
+    # ---------------------------------------------------------
+
     @staticmethod
-    def get_by_id(work_order_id):
+    def search(text):
+
         conn = Database.connect()
         cursor = conn.cursor()
+
+        search = f"%{text}%"
 
         cursor.execute("""
             SELECT
                 id,
-                wo_number,
+                work_order_number,
                 asset_id,
                 title,
-                description,
                 priority,
                 status,
                 technician_id,
-                requested_by,
-                date_created,
-                due_date,
-                estimated_cost,
-                actual_cost,
-                labour_hours,
-                notes
+                due_date
             FROM work_orders
-            WHERE id = ?
-        """, (work_order_id,))
-
-        row = cursor.fetchone()
-        conn.close()
-        return row
-
-    @staticmethod
-    def delete(work_order_id):
-        conn = Database.connect()
-        cursor = conn.cursor()
-
-        cursor.execute("""
-            DELETE
-            FROM work_orders
-            WHERE id = ?
-        """, (work_order_id,))
-
-        conn.commit()
-        conn.close()
-
-    @staticmethod
-    def search(search_text):
-        conn = Database.connect()
-        cursor = conn.cursor()
-
-        search = f"%{search_text}%"
-
-        cursor.execute("""
-            SELECT
-                wo.id,
-                wo.wo_number,
-                a.asset_number || ' - ' || a.asset_name AS asset,
-                wo.title,
-                wo.priority,
-                wo.status,
-                t.first_name || ' ' || t.last_name AS technician,
-                wo.due_date
-            FROM work_orders wo
-                       
-            LEFT JOIN assets a
-                ON wo.asset_id = a.id
-                       
-            LEFT JOIN technicians t
-                ON wo.technician_id = t.id
-                       
             WHERE
-                wo.wo_number LIKE ?
-                OR wo.title LIKE ?
-                OR wo.priority LIKE ?
-                OR wo.status LIKE ?
-            ORDER BY wo.wo_number
+                work_order_number LIKE ?
+                OR title LIKR ?
+                OR priority LIKE ?
+                OR status LIKE ?
+                OR requested_by LIKE ?
+            ORDER BY id DESC
         """, (
+
+            search,
             search,
             search,
             search,
@@ -195,5 +179,35 @@ class WorkOrderModel:
 
         rows = cursor.fetchall()
         conn.close()
+
         return rows
+    
+    # ---------------------------------------------------------
+    # Next Work Order Number
+    # ---------------------------------------------------------
+
+    @staticmethod
+    def get_next_work_order_number():
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT work_order_number
+            FROM work_orders
+            ORDER BY id DESC
+            LIMIT 1
+        """)
+
+        row = cursor.fetchone()
+
+        conn.close()
+
+        if row is None:
+            return "WO-000001"
+        
+        number = int(row[0].split("-")[1]) + 1
+
+        return f"WO-{number:06d}"
+
 

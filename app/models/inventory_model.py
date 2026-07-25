@@ -3,6 +3,10 @@ from app.database.connection import Database
 
 class InventoryModel:
 
+    # -------------------------------------------------
+    # Get all inventory
+    # -------------------------------------------------
+
     @staticmethod
     def get_all():
 
@@ -14,12 +18,19 @@ class InventoryModel:
                 id,
                 part_number,
                 part_name,
+                description,
                 category,
+                supplier_id,
+                unit,
                 quantity,
                 minimum_quantity,
+                reorder_quantity,
+                unit_cost,
                 location,
+                barcode,
                 status,
-                unit_cost
+                notes,
+                created_at
             FROM inventory
             ORDER BY part_number
         """)
@@ -28,6 +39,164 @@ class InventoryModel:
         conn.close()
 
         return rows
+    
+    # -------------------------------------------------
+    # Get single item
+    # -------------------------------------------------
+    
+    @staticmethod
+    def get(record_id):
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT *
+            FROM inventory
+            WHERE id = ?
+        """, (record_id,))
+
+        row = cursor.fetchone()
+
+        conn.close()
+
+        return row
+    
+    # -------------------------------------------------
+    # Insert
+    # -------------------------------------------------
+
+    @staticmethod
+    def insert(record):
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            INSERT INTO inventory (
+                part_number,
+                part_name,
+                description,
+                category,
+                supplier_id,
+                unit,
+                quantity,
+                minimum_quantity,
+                reorder_quantity,
+                unit_cost,
+                location,
+                barcode,
+                status,
+                notes
+            )
+            VALUES (
+                ?,?,?,?,?,?,
+                ?,?,?,?,?,?,
+                ?,?
+            )
+        """, record)
+
+        conn.commit()
+        conn.close()
+
+    # -------------------------------------------------
+    # Update
+    # -------------------------------------------------
+
+    @staticmethod
+    def update(record):
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            UPDATE inventory
+            SET
+                part_name = ?,
+                description = ?,
+                category = ?,
+                supplier_id = ?,
+                unit = ?,
+                quantity = ?,
+                minimum_quantity = ?,
+                reorder_quantity = ?,
+                unit_cost = ?,
+                location = ?,
+                barcode = ?,
+                status = ?,
+                notes = ?
+            WHERE id = ?
+        """, record)
+
+        conn.commit()
+        conn.close()
+
+    # -------------------------------------------------
+    # Delete
+    # -------------------------------------------------
+
+    @staticmethod
+    def delete(record_id):
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            DELETE
+            FROM inventory
+            WHERE id = ?
+        """, (record_id,))
+
+        conn.commit()
+        conn.close()
+
+    # -------------------------------------------------
+    # Search
+    # -------------------------------------------------
+
+    @staticmethod
+    def search(search_text):
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        search = f"%{search_text}%"
+
+        cursor.execute("""
+            SELECT
+                id,
+                part_number,
+                part_name,
+                description,
+                category,
+                quantity,
+                unit_cost,
+                location,
+                status
+            FROM inventory
+            WHERE
+                part_number LIKE ?
+                OR part_name LIKE ?
+                OR description LIKE ?
+                OR category LIKE ?
+                OR location LIKE ?
+            ORDER BY part_number
+        """, (
+            search,
+            search,
+            search,
+            search,
+            search
+        ))
+
+        rows = cursor.fetchall()
+        conn.close()
+
+        return rows
+    
+    # -------------------------------------------------
+    # Next Part Number
+    # -------------------------------------------------
 
     @staticmethod
     def get_next_part_number():
@@ -51,151 +220,9 @@ class InventoryModel:
         number = int(row[0].split("-")[1]) + 1
         return f"PRT-{number:06d}"
 
-    @staticmethod
-    def insert(part):
-
-        conn = Database.connect()
-        cursor = conn.cursor()
-
-        cursor.execute("""
-            INSERT INTO inventory (
-                part_number,
-                part_name,
-                category,
-                supplier_id,
-                unit,
-                quantity,
-                minimum_quantity,
-                reorder_quantity,
-                unit_cost,
-                location,
-                barcode,
-                status,
-                notes
-            )
-            VALUES (
-                ?,?,?,?,?,?,
-                ?,?,?,?,?,?,
-                ?
-            )
-        """, part)
-
-        conn.commit()
-        conn.close()
-
-    @staticmethod
-    def update(part):
-
-        conn = Database.connect()
-        cursor = conn.cursor()
-
-        cursor.execute("""
-            UPDATE inventory
-            SET
-                part_number = ?,
-                part_name = ?,
-                category = ?,
-                supplier_id = ?,
-                unit = ?,
-                quantity = ?,
-                minimum_quantity = ?,
-                reorder_quantity = ?,
-                unit_cost = ?,
-                location = ?,
-                barcode = ?,
-                status = ?,
-                notes = ?
-            WHERE id = ?
-        """, part)
-
-        conn.commit()
-        conn.close()
-
-    @staticmethod
-    def get(part_id):
-
-        conn = Database.connect()
-        cursor = conn.cursor()
-
-        cursor.execute("""
-            SELECT
-                id,
-                part_number,
-                part_name,
-                category,
-                supplier_id,
-                unit,
-                quantity,
-                minimum_quantity,
-                reorder_quantity,
-                unit_cost,
-                location,
-                barcode,
-                status,
-                notes
-            FROM inventory
-            WHERE id = ?
-        """, (part_id,))
-
-        row = cursor.fetchone()
-        conn.close()
-
-        return row
-
-    @staticmethod
-    def delete(part_id):
-
-        conn = Database.connect()
-        cursor = conn.cursor()
-
-        cursor.execute("""
-            DELETE
-            FROM inventory
-            WHERE id = ?
-        """, (part_id,))
-
-        conn.commit()
-        conn.close()
-
-    @staticmethod
-    def search(search_text):
-
-        conn = Database.connect()
-        cursor = conn.cursor()
-
-        search = f"%{search_text}%"
-
-        cursor.execute("""
-            SELECT
-                id,
-                part_number,
-                part_name,
-                category,
-                quantity,
-                minimum_quantity,
-                location,
-                status,
-                unit_cost
-            FROM inventory
-            WHERE
-                part_number LIKE ?
-                OR part_name LIKE ?
-                OR category LIKE ?
-                OR location LIKE ?
-                OR status LIKE ?
-            ORDER BY part_number
-        """, (
-            search,
-            search,
-            search,
-            search,
-            search
-        ))
-
-        rows = cursor.fetchall()
-        conn.close()
-
-        return rows
+    # -------------------------------------------------
+    # Dashboard
+    # -------------------------------------------------
 
     @staticmethod
     def get_low_stock():
@@ -204,12 +231,7 @@ class InventoryModel:
         cursor = conn.cursor()
 
         cursor.execute("""
-            SELECT
-                id,
-                part_number,
-                part_name,
-                quantity,
-                minimum_quantity
+            SELECT *
             FROM inventory
             WHERE quantity <= minimum_quantity
             ORDER BY part_name
@@ -228,7 +250,10 @@ class InventoryModel:
 
         cursor.execute("""
             SELECT
-                SUM(quantity * unit_cost)
+                COALSCE(
+                    SUM(quantity * unit_cost)),
+                    0
+                )
             FROM inventory
         """)
 
@@ -236,4 +261,4 @@ class InventoryModel:
 
         conn.close()
 
-        return value or 0
+        return value

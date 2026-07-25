@@ -1,196 +1,364 @@
 import bcrypt
-
 from app.database.connection import Database
 
+class DatabaseSeeder:
 
-def seed_default_admin():
+    LOOKUPS = {
+        "Trades": [
+            "Electrician",
+            "Welder",
+            "Plumber",
+            "Mechanic"
+        ],
 
-    conn = Database.connect()
-    cursor = conn.cursor()
+        "Departments": [
+            "Maintenance",
+            "Production",
+            "Stores"
+        ],
 
-    password_hash = bcrypt.hashpw(
-        "admin123".encode(),
-        bcrypt.gensalt()
-    ).decode()
+        "Asset Categories": [
+            "Electrical",
+            "Mechanical",
+            "Building",
+            "Vehicle"
+        ],
 
-    cursor.execute("""
-        INSERT INTO users
-        (
-            username,
-            password_hash,
-            fullname,
-            role,
-            active
-        )
-        VALUES
-        (
-            ?,
-            ?,
-            ?,
-            ?,
-            ?
-        )
-        ON CONFLICT(username) DO UPDATE SET
-            password_hash = excluded.password_hash,
-            fullname = excluded.fullname,
-            role = excluded.role,
-            active = excluded.active
-    """, (
-        "admin",
-        password_hash,
-        "Administrator",
-        "Administrator",
-        1,
-    ))
+        "Asset Locations": [
+            "Workshop",
+            "Factory",
+            "Warehouse",
+            "Office"
+        ],
 
-    conn.commit()
-    conn.close()
+        "Statuses": [
+            "Active",
+            "Inactive"
+        ],
 
-def seed_app_settings():
+        "Priorities": [
+            "Low",
+            "Medium",
+            "High",
+            "Critical"
+        ],
 
-    conn = Database.connect()
-    cursor = conn.cursor()
+        "Frequency Types": [
+            "Dayly",
+            "Weekly",
+            "Monthly",
+            "Quarterly",
+            "Semi-Annual",
+            "Annual",
+            "Running Hours",
+            "Cycle"
 
-    cursor.execute("""
-        INSERT OR IGNORE INTO app_settings
-        (
-            key,
-            value
-        )
-        VALUES
-        (
-            'database_version',
-            '1'
-        )
-    """)
+        ]
 
-    conn.commit()
-    conn.close()
+    }
 
-def seed_preventive_maintenance():
-    pass
+    @staticmethod
+    def seed():
+        DatabaseSeeder.seed_admin_user()
+        DatabaseSeeder.seed_lookup_values()
+        DatabaseSeeder.seed_sample_assets()
+        DatabaseSeeder.seed_sample_technicians()
+        DatabaseSeeder.seed_sample_inventory()
+        DatabaseSeeder.seed_sample_suppliers()
 
-def seed_lookup_tables():
-    conn = Database.connect()
-    cursor = conn.cursor()
+    # ---------------------------------------------------------
+    # ADMIN USER
+    # ---------------------------------------------------------
+    @staticmethod
+    def seed_admin_user():
+        conn = Database.connect()
+        cursor = conn.cursor()
 
-    trades = [
-        "Electrician",
-        "Mechanic",
-        "Plumber",
-        "Welder",
-        "Carpenter",
-        "Painter",
-        "General Maintenance",
-        "HVAC Technician"
-    ]
+        cursor.execute("SELECT COUNT(*) FROM users")
 
-    for trade in trades:
-        cursor.execute("""
-            INSERT OR IGNORE INTO trades (trade_name)
-            VALUES (?)
-        """, (trade,))
+        if cursor.fetchone()[0] == 0:
+            password = bcrypt.hashpw("admin".encode(), bcrypt.gensalt()).decode()
 
-    departments = [
-        "Maintenance",
-        "Housekeeping",
-        "Reception",
-        "Kitchen",
-        "Laundry",
-        "Administration"
-    ]
+            cursor.execute("""
+                INSERT INTO users
+                (username, password_hash, fullname, role, active)
+                VALUES (?, ?, ?, ?, ?)
+            """, (
+                "admin",
+                password,
+                "System Administrator",
+                "Administrator",
+                1
+            ))
 
-    for department in departments:
-        cursor.execute("""
-            INSERT OR IGNORE INTO departments (department_name)
-            VALUES (?)
-        """, (department,))
+            conn.commit()
 
-    priorities = [
-        "Low",
-        "Medium",
-        "High",
-        "Critical"
-    ]
+        conn.close()
 
-    for priority in priorities:
-        cursor.execute("""
-            INSERT OR IGNORE INTO priorities (priority_name)
-            VALUES (?)
-        """, (priority,))
+    # ---------------------------------------------------------
+    # LOOKUPS
+    # ---------------------------------------------------------
+    @staticmethod
+    def seed_lookup_values():
+        conn = Database.connect()
+        cursor = conn.cursor()
 
-    statuses = [
-        "Active",
-        "Inactive",
-        "Open",
-        "In Progress",
-        "Completed",
-        "Cancelled"
-    ]
+        for lookup_type, values in DatabaseSeeder.LOOKUPS.items():
+            for value in values:
+                cursor.execute("""
+                    SELECT id FROM lookups
+                    WHERE lookup_type = ? AND value = ?
+                """, (lookup_type, value))
 
-    for status in statuses:
-        cursor.execute("""
-            INSERT OR IGNORE INTO statuses (status_name)
-            VALUES (?)
-        """, (status,))
-    
-    categories = [
-        "Electrical",
-        "Mechanical",
-        "HVAC",
-        "Plumbing",
-        "Building",
-        "Vehicles",
-        "IT Equipment"
-    ]
+                if cursor.fetchone() is None:
+                    cursor.execute("""
+                        INSERT INTO lookups (lookup_type, value)
+                        VALUES (?, ?)
+                    """, (lookup_type, value))
 
-    for category in categories:
-        cursor.execute("""
-            INSERT OR IGNORE INTO asset_categories(category_name)
-            VALUES(?)
-        """, (category,))
-    locations = [
-        "Workshop",
-        "Production",
-        "Warehouse",
-        "Office",
-        "Reception"
-    ]
+        conn.commit()
+        conn.close()
 
-    for location in locations:
-        cursor.execute("""
-            INSERT OR IGNORE INTO asset_locations(location_name)
-            VALUES(?)
-        """, (location,))
-    manufacturers = [
-        "Siemens",
-        "ABB",
-        "Schneider Electric",
-        "Bosch",
-        "Caterpillar",
-        "John Deere"
-    ]
+    # ---------------------------------------------------------
+    # ASSETS
+    # ---------------------------------------------------------
+    @staticmethod
+    def seed_sample_assets():
+        conn = Database.connect()
+        cursor = conn.cursor()
 
-    for manufacturer in manufacturers:
-        cursor.execute("""
-            INSERT OR IGNORE INTO manufacturers(manufacturer_name)
-            VALUES(?)
-        """, (manufacturer,))
-    units = [
-        "Each",
-        "Box",
-        "Pack",
-        "Metre",
-        "Kilogram",
-        "Litre"
-    ]
+        cursor.execute("SELECT COUNT(*) FROM assets")
 
-    for unit in units:
-        cursor.execute("""
-            INSERT OR IGNORE INTO units_of_measure(unit_name)
-            VALUES(?)
-        """, (unit,))
+        if cursor.fetchone()[0] == 0:
 
-    conn.commit()
-    conn.close()
+            assets = [
+                (
+                    "AST-000001",
+                    "Main Pump",
+                    "Water pump",
+                    "Mechanical",
+                    "Workshop",
+                    "Grundfos",
+                    "CR45",
+                    "SN0001",
+                    "2024-01-01",
+                    "2026-01-01",
+                    "Active"
+                ),
+                (
+                    "AST-000002",
+                    "Generator",
+                    "Backup Generator",
+                    "Electrical",
+                    "Factory",
+                    "Cummins",
+                    "C200",
+                    "SN1002",
+                    "2023-03-01",
+                    "2026-03-01",
+                    "Active"
+                )
+            ]
+
+            cursor.executemany("""
+                INSERT INTO assets
+                (
+                    asset_number,
+                    asset_name,
+                    description,
+                    category,
+                    location,
+                    manufacturer,
+                    model,
+                    serial_number,
+                    purchase_date,
+                    warranty_expiry,
+                    status
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, assets)
+
+        conn.commit()
+        conn.close()
+
+    # ---------------------------------------------------------
+    # TECHNICIANS
+    # ---------------------------------------------------------
+    @staticmethod
+    def seed_sample_technicians():
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT COUNT(*) FROM technicians")
+
+        if cursor.fetchone()[0] == 0:
+
+            technicians = [
+                (
+                    "EMP-000001",
+                    "John",
+                    "Doe",
+                    "612-55-0162",
+                    "jhondoe@example.com",
+                    "Welder",
+                    "Workshop",
+                    42.05,
+                    "Active"
+                ),
+                (
+                    "EMP-000002",
+                    "Jane",
+                    "Doe",
+                    "441-555-0144",
+                    "janedoe@example.com",
+                    "Receptionist",
+                    "Office",
+                    32.00,
+                    "Active"
+                )
+            ]
+
+            cursor.executemany("""
+                INSERT INTO technicians
+                (
+                    employee_number,
+                    first_name,
+                    last_name,
+                    phone,
+                    email,
+                    trade,
+                    department,
+                    hourly_rate,
+                    status
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, technicians)
+
+        conn.commit()
+        conn.close()
+
+    # ---------------------------------------------------------
+    # INVENTORY
+    # ---------------------------------------------------------
+    @staticmethod
+    def seed_sample_inventory():
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT COUNT(*) FROM inventory")
+
+        if cursor.fetchone()[0] == 0:
+
+            inventory = [
+                (
+                    "PRT-000001",
+                    "Bulb",
+                    "Light Bulb",
+                    "Electrical",
+                    "SUP-000001",
+                    "Box",
+                    20,
+                    10,
+                    5,
+                    50.00,
+                    "Store Room",
+                    "123456789",
+                    "Active",
+                    "Notes"
+                ),
+                (
+                    "PRT-000002",
+                    "Siliphos",
+                    "Water purification crystals",
+                    "Plumbing",
+                    "SUP-000002",
+                    "Bag",
+                    10,
+                    5,
+                    2,
+                    100.00,
+                    "Workshop",
+                    "987654321",
+                    "Active",
+                    "Notes"
+                )
+            ]
+
+            cursor.executemany("""
+                INSERT INTO inventory
+                (
+                    part_number,
+                    part_name,
+                    description,
+                    category,
+                    supplier,
+                    unit,
+                    quantity,
+                    minimum_quantity,
+                    reorder_quantity,
+                    unit_cost,
+                    location,
+                    barcode,
+                    status,
+                    notes
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, inventory)
+
+        conn.commit()
+        conn.close()
+
+    # ---------------------------------------------------------
+    # SUPPLIERS
+    # ---------------------------------------------------------
+    @staticmethod
+    def seed_sample_suppliers():
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT COUNT(*) FROM suppliers")
+
+        if cursor.fetchone()[0] == 0:
+
+            suppliers = [
+                (
+                    "SUP-000001",
+                    "Electrical Equipment cc",
+                    "John Doe",
+                    "444-220-1446",
+                    "jhondoe@example.com",
+                    "Mariental Portion 90",
+                    "Active",
+                    "Notes"
+                ),
+                (
+                    "SUP-000002",
+                    "Water Purification Suppliers",
+                    "Jane Doe",
+                    "333-251-789",
+                    "janedoe@example.com",
+                    "Windhoek Industrial 05",
+                    "Active",
+                    "Notes"
+                )
+            ]
+
+            cursor.executemany("""
+                INSERT INTO suppliers
+                (
+                    supplier_code,
+                    supplier_name,
+                    contact_person,
+                    phone,
+                    email,
+                    address,
+                    status,
+                    notes
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """, suppliers)
+
+        conn.commit()
+        conn.close()
+
     

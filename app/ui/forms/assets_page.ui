@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1124</width>
-    <height>703</height>
+    <width>1226</width>
+    <height>695</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -62,7 +62,7 @@
         <bool>true</bool>
        </property>
        <property name="columnCount">
-        <number>11</number>
+        <number>12</number>
        </property>
        <column>
         <property name="text">
@@ -71,7 +71,7 @@
        </column>
        <column>
         <property name="text">
-         <string>Asset  Number</string>
+         <string>Asset Number</string>
         </property>
        </column>
        <column>
@@ -106,17 +106,22 @@
        </column>
        <column>
         <property name="text">
-         <string>Serial No.</string>
+         <string>Serial Number</string>
         </property>
        </column>
        <column>
         <property name="text">
-         <string>Status</string>
+         <string>Purchase Date</string>
         </property>
        </column>
        <column>
         <property name="text">
          <string>Warranty Expiry</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Status</string>
         </property>
        </column>
       </widget>
