@@ -103,7 +103,6 @@ class WorkOrderModel:
                 date_created = ?,
                 due_date = ?,
                 estimated_cost = ?,
-                actual_cost = ?,
                 labour_hours = ?,
                 notes = ?
             WHERE id = ?

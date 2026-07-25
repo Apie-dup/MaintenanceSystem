@@ -11,8 +11,6 @@ class TechnicianModel:
                 employee_number,
                 first_name,
                 last_name,
-                trade,
-                department,
                 phone,
                 status
             FROM technicians

@@ -13,7 +13,6 @@ class LookupManager:
         )
 
         if rows:
-            
             for lookup_id, value in rows:
                 combo.addItem(str(value), lookup_id)
 
