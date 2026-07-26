@@ -249,13 +249,26 @@ class DatabaseSeeder:
 
         if cursor.fetchone()[0] == 0:
 
+            # Get supplier IDs
+            cursor.execute(
+                "SELECT id FROM suppliers WHERE supplier_code = ?",
+                ("SUP-000001",)
+            )
+            supplier1 = cursor.fetchone()[0]
+            
+            cursor.execute(
+                "SELECT id FROM suppliers WHERE supplier_code = ?",
+                ("SUP-000002",)
+            )
+            supplier2 = cursor.fetchone()[0]
+
             inventory = [
                 (
                     "PRT-000001",
                     "Bulb",
                     "Light Bulb",
                     "Electrical",
-                    "SUP-000001",
+                    "suplier1",
                     "Box",
                     20,
                     10,
@@ -271,7 +284,7 @@ class DatabaseSeeder:
                     "Siliphos",
                     "Water purification crystals",
                     "Plumbing",
-                    "SUP-000002",
+                    "supplier2",
                     "Bag",
                     10,
                     5,
@@ -291,7 +304,7 @@ class DatabaseSeeder:
                     part_name,
                     description,
                     category,
-                    supplier,
+                    supplier_id,
                     unit,
                     quantity,
                     minimum_quantity,

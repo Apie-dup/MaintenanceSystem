@@ -7,8 +7,14 @@ from app.controllers.login_controller import LoginController
 
 
 def main():
-    # Initialize the database
-    DatabaseSetup.initialize()
+
+    # Initialize or rebuild the database
+    REBUILD_DATABASE = False
+
+    if REBUILD_DATABASE:
+        DatabaseSetup.rebuild()
+    else:
+        DatabaseSetup.initialize()
 
     # Start Qt
     app = QApplication(sys.argv)
