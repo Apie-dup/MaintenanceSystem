@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SupplierDialog</class>
+ <widget class="QDialog" name="SupplierDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>680</width>
+    <height>522</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Supplier Details</string>
+  </property>
+  <layout class="QVBoxLayout" name="mainVerticalLayout">
+   <item>
+    <widget class="QGroupBox" name="groupSupplierDetails">
+     <property name="title">
+      <string>Supplier Details</string>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+     <layout class="QVBoxLayout" name="supplierDetailsLayout">
+      <item>
+       <widget class="QGroupBox" name="groupSupplierInformation">
+        <property name="title">
+         <string>Supplier Information</string>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
+        </property>
+        <layout class="QFormLayout" name="formSupplierInfo">
+         <item row="0" column="0">
+          <widget class="QLabel" name="labelSupplierCode">
+           <property name="text">
+            <string>Supplier Code:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="txtSupplierCode">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="labelSupplierName">
+           <property name="text">
+            <string>Supplier Name:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="txtSupplierName"/>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="labelContactPerson">
+           <property name="text">
+            <string>Contact Person:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="txtContacPerson"/>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="labelPhone">
+           <property name="text">
+            <string>Phone:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QLineEdit" name="txtPhone"/>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="labelEmail">
+           <property name="text">
+            <string>Email:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QLineEdit" name="txtEmail"/>
+         </item>
+         <item row="5" column="1">
+          <widget class="QPlainTextEdit" name="txtAddress">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>70</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="labelAddress">
+           <property name="text">
+            <string>Address:</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="groupStatus">
+        <property name="title">
+         <string>Status</string>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
+        </property>
+        <layout class="QHBoxLayout" name="statusLayout">
+         <item>
+          <widget class="QLabel" name="labelStatus">
+           <property name="text">
+            <string>Status:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="cmbStatus">
+           <item>
+            <property name="text">
+             <string>Active</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Inactive</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="groupNotes">
+        <property name="title">
+         <string>Notes</string>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
+        </property>
+        <layout class="QVBoxLayout" name="notesLayout"/>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPlainTextEdit" name="txtNotes">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>70</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDialogButtonBox" name="buttonBox">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="standardButtons">
+         <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Save</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,10 +1,21 @@
-from app.core.base_page import BasePage
+from app.base.base_page import BasePage
 
 
 class CrudPage(BasePage):
 
-    def __init__(self):
-        super().__init__()
+    PAGE_TITLE = []
+
+    # Table configuration
+    TABLE_COLUMNS = []
+
+    # Search configuration
+    SEARCH_FIELDS = []
+
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.selected_id = None
 
         self.service = None
         self.dialog = None

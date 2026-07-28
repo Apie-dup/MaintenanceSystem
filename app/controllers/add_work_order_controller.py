@@ -6,7 +6,7 @@ from app.services.asset_service import AssetService
 from app.services.technician_service import TechnicianService
 from app.core.lookup_manager import LookupManager
 from app.utils.validators import Validator
-from app.core.crud_dialog import CrudDialog
+from app.base.base_dialog import CrudDialog
 
 class AddWorkOrderController(CrudDialog):
     

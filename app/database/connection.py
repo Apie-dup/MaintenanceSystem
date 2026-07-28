@@ -2,16 +2,6 @@ import sqlite3
 from pathlib import Path
 
 
-DATABASE = Path("database") / "maintenance.db"
-
-# Ensure the database folder exists
-DATABASE.parent.mkdir(exist_ok=True)
-
-
-from pathlib import Path
-import sqlite3
-
-
 class Database:
     """
     Central database connection manager.

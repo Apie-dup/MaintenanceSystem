@@ -3,7 +3,7 @@ from app.services.asset_service import AssetService
 from app.ui.generated.ui_assets_page import Ui_AssetsWindow
 from app.controllers.add_asset_controller import AddAssetController
 from app.core.signals import signals
-from app.core.crud_page import CrudPage
+from app.base.crud_page import CrudPage
 
 class AssetsPage(CrudPage):
 

@@ -1,7 +1,7 @@
 from app.ui.generated.ui_add_technician import Ui_AddTechnicianDialog
 from app.services.technician_service import TechnicianService
 from app.core.lookup_manager import LookupManager
-from app.core.crud_dialog import CrudDialog
+from app.base.base_dialog import CrudDialog
 from app.utils.validators import Validator
 
 

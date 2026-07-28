@@ -2,7 +2,7 @@ from PySide6.QtCore import QDate
 
 
 from app.ui.generated.ui_add_pm import Ui_AddPMDialog
-from app.core.crud_dialog import CrudDialog
+from app.base.base_dialog import CrudDialog
 from app.core.lookup_manager import LookupManager
 from app.services.pm_service import PMService
 from app.services.asset_service import AssetService

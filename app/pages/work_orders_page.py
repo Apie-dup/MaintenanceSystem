@@ -10,7 +10,7 @@ from PySide6.QtWidgets import (
 from app.ui.generated.ui_work_orders_page import Ui_WorkOrdersWindow
 from app.services.work_order_service import WorkOrderService
 from app.controllers.add_work_order_controller import AddWorkOrderController
-from app.core.base_page import BasePage
+from app.base.base_page import BasePage
 
 
 

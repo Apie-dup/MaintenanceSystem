@@ -9,7 +9,7 @@ from PySide6.QtWidgets import (
 from app.ui.generated.ui_pm_page import Ui_PMWindow
 from app.services.pm_service import PMService
 from app.controllers.add_pm_controller import AddPMController
-from app.core.base_page import BasePage
+from app.base.base_page import BasePage
 
 
 class PMPage(BasePage):

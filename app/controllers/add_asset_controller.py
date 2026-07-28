@@ -9,7 +9,7 @@ from app.constants import (
 )
 from app.utils.validators import Validator
 from app.core.signals import signals
-from app.core.crud_dialog import CrudDialog
+from app.base.base_dialog import CrudDialog
 from app.core.lookup_manager import LookupManager
 
 

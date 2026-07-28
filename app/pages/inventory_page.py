@@ -9,7 +9,7 @@ from PySide6.QtWidgets import (
 from app.ui.generated.ui_inventory_page import Ui_InventoryWindow
 from app.services.inventory_service import InventoryService
 from app.controllers.add_inventory_controller import AddInventoryController
-from app.core.base_page import BasePage
+from app.base.base_page import BasePage
 
 
 class InventoryPage(BasePage):
