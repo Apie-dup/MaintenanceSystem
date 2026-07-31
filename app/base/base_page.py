@@ -9,8 +9,8 @@ from PySide6.QtWidgets import (
 
 class BasePage(QWidget):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent)
 
     # -------------------------------------------------
     # Configure Table

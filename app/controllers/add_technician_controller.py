@@ -1,11 +1,11 @@
 from app.ui.generated.ui_add_technician import Ui_AddTechnicianDialog
 from app.services.technician_service import TechnicianService
 from app.core.lookup_manager import LookupManager
-from app.base.base_dialog import CrudDialog
+from app.base.base_dialog import BaseDialog
 from app.utils.validators import Validator
 
 
-class AddTechnicianController(CrudDialog):
+class AddTechnicianController(BaseDialog):
 
     def __init__(self, record_id=None):
         super().__init__(record_id)
@@ -42,9 +42,9 @@ class AddTechnicianController(CrudDialog):
                 email,
                 trade,
                 department,
-                status,
                 hourly_rate,
-                created_at
+                status,
+                created_at,
             ) = technician
 
             self.ui.txtEmployeeNumber.setText(employee_number)
@@ -55,7 +55,7 @@ class AddTechnicianController(CrudDialog):
             self.ui.txtEmail.setText(email)
             self.ui.cmbTrade.setCurrentText(trade)
             self.ui.cmbDepartment.setCurrentText(department)
-            self.ui.dsbHourlyRate.setValue(hourly_rate or 0)
+            self.ui.dsbHourlyRate.setValue(float(hourly_rate or 0))
             self.ui.cmbStatus.setCurrentText(status)
             self.set_entity_name("Technician")
 

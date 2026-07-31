@@ -28,7 +28,8 @@ class DatabaseSeeder:
             "Workshop",
             "Factory",
             "Warehouse",
-            "Office"
+            "Office",
+            "Reception"
         ],
 
         "Statuses": [
@@ -63,8 +64,8 @@ class DatabaseSeeder:
         DatabaseSeeder.seed_lookup_values()
         DatabaseSeeder.seed_sample_assets()
         DatabaseSeeder.seed_sample_technicians()
-        DatabaseSeeder.seed_sample_inventory()
         DatabaseSeeder.seed_sample_suppliers()
+        DatabaseSeeder.seed_sample_inventory()
 
     # ---------------------------------------------------------
     # ADMIN USER
@@ -249,18 +250,19 @@ class DatabaseSeeder:
 
         if cursor.fetchone()[0] == 0:
 
-            # Get supplier IDs
             cursor.execute(
                 "SELECT id FROM suppliers WHERE supplier_code = ?",
                 ("SUP-000001",)
             )
-            supplier1 = cursor.fetchone()[0]
-            
+            supplier1_row = cursor.fetchone()
+            supplier1 = supplier1_row[0] if supplier1_row else None
+
             cursor.execute(
                 "SELECT id FROM suppliers WHERE supplier_code = ?",
                 ("SUP-000002",)
             )
-            supplier2 = cursor.fetchone()[0]
+            supplier2_row = cursor.fetchone()
+            supplier2 = supplier2_row[0] if supplier2_row else None
 
             inventory = [
                 (
@@ -268,7 +270,7 @@ class DatabaseSeeder:
                     "Bulb",
                     "Light Bulb",
                     "Electrical",
-                    "suplier1",
+                    supplier1,
                     "Box",
                     20,
                     10,
@@ -284,7 +286,7 @@ class DatabaseSeeder:
                     "Siliphos",
                     "Water purification crystals",
                     "Plumbing",
-                    "supplier2",
+                    supplier2,
                     "Bag",
                     10,
                     5,

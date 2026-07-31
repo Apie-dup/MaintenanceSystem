@@ -74,7 +74,7 @@
         <string>Dashboard</string>
        </property>
        <property name="checkable">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
       </widget>
       <widget class="QPushButton" name="btnAssets">
@@ -90,7 +90,7 @@
         <string>Assets</string>
        </property>
        <property name="checkable">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
       </widget>
       <widget class="QPushButton" name="btnWorkOrders">
@@ -106,7 +106,7 @@
         <string>Work Orders</string>
        </property>
        <property name="checkable">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
       </widget>
       <widget class="QPushButton" name="btnPM">
@@ -122,7 +122,7 @@
         <string>Preventive Maintenance</string>
        </property>
        <property name="checkable">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
       </widget>
       <widget class="QPushButton" name="btnTechnicians">
@@ -138,7 +138,7 @@
         <string>Technicians</string>
        </property>
        <property name="checkable">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
       </widget>
       <widget class="QPushButton" name="btnInventory">
@@ -154,7 +154,7 @@
         <string>Inventory</string>
        </property>
        <property name="checkable">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
       </widget>
       <widget class="QPushButton" name="btnSuppliers">
@@ -170,7 +170,7 @@
         <string>Suppliers</string>
        </property>
        <property name="checkable">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
       </widget>
       <widget class="QPushButton" name="btnReports">
@@ -186,7 +186,7 @@
         <string>Reports</string>
        </property>
        <property name="checkable">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
       </widget>
       <widget class="QPushButton" name="btnSettings">
@@ -202,7 +202,7 @@
         <string>Settings</string>
        </property>
        <property name="checkable">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
       </widget>
       <widget class="QPushButton" name="btnLogout">
@@ -218,7 +218,7 @@
         <string>Logout</string>
        </property>
        <property name="checkable">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
       </widget>
      </widget>

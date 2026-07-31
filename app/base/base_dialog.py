@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QDialog
+from PySide6.QtWidgets import QDialog, QWidget
 
 from app.services.message_service import MessageService
 
@@ -11,10 +11,14 @@ class BaseDialog(QDialog):
 
     ENTITY_NAME = ""
 
-    def __init__(self, parent=None):
+    def __init__(self, record_id=None, parent=None):
+        if parent is None and record_id is not None and isinstance(record_id, QWidget):
+            parent = record_id
+            record_id = None
+
         super().__init__(parent)
 
-        self.record_id = None
+        self.record_id = record_id
 
     # ---------------------------------------------------------
     # Properties
@@ -27,6 +31,9 @@ class BaseDialog(QDialog):
     @property
     def is_edit(self):
         return self.record_id is not None
+
+    def set_entity_name(self, entity_name):
+        self.ENTITY_NAME = entity_name
 
     # ---------------------------------------------------------
     # Public Methods
@@ -113,4 +120,25 @@ class BaseDialog(QDialog):
 
         raise NotImplementedError(
             "set_form_data() must be implemented"
+        )
+
+    def save_and_close(self):
+
+        if not self.validate():
+            return
+
+        try:
+            self.save()
+            self.accept()
+
+        except ValueError as error:
+            self.warning(
+                self.ENTITY_NAME,
+                str(error)
+        )
+
+        except Exception as error:
+            self.error(
+                self.ENTITY_NAME,
+                f"Unexpected error:\n\n{error}"
         )

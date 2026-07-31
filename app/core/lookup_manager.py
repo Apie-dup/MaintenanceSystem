@@ -11,9 +11,12 @@ class LookupManager:
         rows = LookupService.get_all(lookup_type)
 
         if rows:
-            
             for lookup_id, value in rows:
-                combo.addItem(value, lookup_id)
-
+                if value is None:
+                    continue
+                combo.addItem(str(value), lookup_id)
         elif defaults:
+            combo.addItems(defaults)
+
+        if combo.count() == 0 and defaults:
             combo.addItems(defaults) 

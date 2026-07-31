@@ -6,195 +6,234 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>483</width>
-    <height>580</height>
+    <width>685</width>
+    <height>676</height>
    </rect>
   </property>
-  <property name="windowTitle">
-   <string>Add Inventory Dialog</string>
+  <property name="maximumSize">
+   <size>
+    <width>16777215</width>
+    <height>676</height>
+   </size>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <property name="windowTitle">
+   <string>Add Inventory</string>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QLabel" name="lblPartNumber">
-       <property name="text">
-        <string>Part Number</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="txtPartNumber"/>
-     </item>
-    </layout>
+    <widget class="QGroupBox" name="groupPartInformation">
+     <property name="title">
+      <string>Part Information</string>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+     <layout class="QFormLayout" name="formPartInfo">
+      <item row="0" column="0">
+       <widget class="QLabel" name="lblPartNumber">
+        <property name="text">
+         <string>Part Number:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="txtPartNumber">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="lblPartName">
+        <property name="text">
+         <string>Part Name:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="txtPartName"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="lblDescription">
+        <property name="text">
+         <string>Description:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="txtDescription"/>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="lblCategory">
+        <property name="text">
+         <string>Category:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QComboBox" name="cmbCategory"/>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="lblSupplier">
+        <property name="text">
+         <string>Supplier:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QComboBox" name="cmbSupplier"/>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="lblUnit">
+        <property name="text">
+         <string>Unit:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QComboBox" name="cmbUnit"/>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
-     <item>
-      <widget class="QLabel" name="lblPartName">
-       <property name="text">
-        <string>Part Name</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="txtPartName"/>
-     </item>
-    </layout>
+    <widget class="QGroupBox" name="groupStockInformation">
+     <property name="title">
+      <string>Stock Information</string>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+     <layout class="QFormLayout" name="formStockInfo">
+      <item row="0" column="0">
+       <widget class="QLabel" name="lblQuantity">
+        <property name="text">
+         <string>Quantity:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QSpinBox" name="spnQuantity">
+        <property name="maximum">
+         <number>999999</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="lblMinQty">
+        <property name="text">
+         <string>Minimum Qty:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="spnMinimumQuantity">
+        <property name="maximum">
+         <number>999999</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="lblReorderQty">
+        <property name="text">
+         <string>Reorder Qty:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QSpinBox" name="spnReorderQuantity">
+        <property name="maximum">
+         <number>999999</number>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="lblUnitCost">
+        <property name="text">
+         <string>Unit Cost:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QDoubleSpinBox" name="dsbUnitCost">
+        <property name="decimals">
+         <number>2</number>
+        </property>
+        <property name="maximum">
+         <double>999999.989999999990687</double>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="lblLocation">
+        <property name="text">
+         <string>Location:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="lblBarcode">
+        <property name="text">
+         <string>Barcode:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QLineEdit" name="txtBarcode"/>
+      </item>
+      <item row="4" column="1">
+       <widget class="QComboBox" name="cmbLocation"/>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_4">
-     <item>
-      <widget class="QLabel" name="lblCategory">
-       <property name="text">
-        <string>Category</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="cmbCategory"/>
-     </item>
-    </layout>
+    <widget class="QGroupBox" name="groupStatus">
+     <property name="title">
+      <string>Status</string>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+     <layout class="QHBoxLayout" name="layoutStatus">
+      <item>
+       <widget class="QLabel" name="lblStatus">
+        <property name="text">
+         <string>Status:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="cmbStatus">
+        <item>
+         <property name="text">
+          <string>Active</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Inactive</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QLabel" name="lblSupplier_2">
-       <property name="text">
-        <string>Supplier</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="cmbSupplier"/>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_6">
-     <item>
-      <widget class="QLabel" name="lblUnit">
-       <property name="text">
-        <string>Unit</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="cmbUnit"/>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_9">
-     <item>
-      <widget class="QLabel" name="lblQuantity">
-       <property name="text">
-        <string>Quantity</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QSpinBox" name="spnQuantity"/>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_10">
-     <item>
-      <widget class="QLabel" name="lblMinimumQuantity">
-       <property name="text">
-        <string>Minimum Quantity</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QSpinBox" name="spnMinimumQuantity"/>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_8">
-     <item>
-      <widget class="QLabel" name="lblReorderQuantity">
-       <property name="text">
-        <string>Reorder Quantity</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QSpinBox" name="spnReorderQuantity"/>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_7">
-     <item>
-      <widget class="QLabel" name="lblUnitCost">
-       <property name="text">
-        <string>Unit Cost</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QDoubleSpinBox" name="dsbUnitCost"/>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_5">
-     <item>
-      <widget class="QLabel" name="lblLocation">
-       <property name="text">
-        <string>Location</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="cmbLocation"/>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_11">
-     <item>
-      <widget class="QLabel" name="lblBarcode">
-       <property name="text">
-        <string>Barcode</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="txtBarcode"/>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_12">
-     <item>
-      <widget class="QLabel" name="lblStatus">
-       <property name="text">
-        <string>Status</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="cmbStatus"/>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_13">
-     <item>
-      <widget class="QLabel" name="lblNotes">
-       <property name="text">
-        <string>Notes</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QTextEdit" name="textEdit"/>
-     </item>
-    </layout>
+    <widget class="QGroupBox" name="groupNotes">
+     <property name="title">
+      <string>Notes</string>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+     <layout class="QVBoxLayout" name="layoutNotes">
+      <item>
+       <widget class="QTextEdit" name="txtNotes"/>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
@@ -209,38 +248,5 @@
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>AddInventoryDialog</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>rejected()</signal>
-   <receiver>AddInventoryDialog</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>286</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

@@ -8,7 +8,7 @@ class WorkOrderService:
     
     @staticmethod
     def get(work_order_id):
-        return WorkOrderModel.get_by_id(work_order_id)
+        return WorkOrderModel.get(work_order_id)
     
     @staticmethod
     def add(record):

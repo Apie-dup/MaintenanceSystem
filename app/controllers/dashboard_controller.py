@@ -5,7 +5,7 @@ from PySide6.QtGui import QAction, QIcon, QPixmap
 from app.ui.generated.ui_dashboard import Ui_DashboardWindow
 from app.services.dashboard_service import DashboardService
 from app.pages.assets_page import AssetsPage
-from app.pages.work_orders_page import WorkOrderPage
+from app.pages.work_orders_page import WorkOrdersPage
 from app.controllers.lookup_controller import LookupController
 from app.pages.pm_page import PMPage
 from app.pages.technicians_page import TechniciansPage
@@ -19,42 +19,11 @@ class DashboardController(QMainWindow):
 
         super().__init__()
 
+        self.user = user
+
         self.ui = Ui_DashboardWindow()
 
         self.ui.setupUi(self)
-        stats = DashboardService.get_statistics()
-
-        self.load_statistics
-
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.update_status_bar)
-        self.timer. start(1000)  # Update every second
-
-        self.update_status_bar
-
-        pixmap = QPixmap("app/resources/logo.png")
-
-        self.ui.lblLogo.setPixmap(
-           pixmap.scale(
-              90,
-              90
-           )
-        )
-
-        self.user = user
-
-        self.setWindowTitle(f"Maintenance Management System - {user.get('fullname', '')}")
-        self.ui.btnAssets.clicked.connect(self.open_assets)
-        self.ui.btnWorkOrders.clicked.connect(self.open_work_orders)
-        self.ui.btnThecnicians.clicked.connect(self.open_technicians)
-        self.ui.btnLookups.clicked.connect(self.open_lookups)
-        self.ui.btnPM.clicked.connect(self.open_pm)
-        self.ui.btnHome.clickde.connect(self.load_statistics)
-        self.ui.btnInventory.clicked.connect(self.open_inventory)
-        self.ui.btnSuppliers.clicked.connect(self.open_suppliers)
-        self.ui.btnReports.clicked.connect(self.open_reports)
-        self.ui.btnSettings.clicked.connect(self.open_setting)
-        self.ui.btnLogout.clicked.connect(self.logout)
 
         self.lblUser = QLabel()
         self.lblDatabase = QLabel()
@@ -63,6 +32,37 @@ class DashboardController(QMainWindow):
         self.statusBar().addPermanentWidget(self.lblUser)
         self.statusBar().addPermanentWidget(self.lblDatabase)
         self.statusBar().addPermanentWidget(self.lblClock)
+
+        self.load_statistics()
+
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_status_bar)
+        self.timer.start(1000)  # Update every second
+
+        self.update_status_bar()
+
+        pixmap = QPixmap("app/resources/logo.png")
+
+        self.ui.lblLogo.setPixmap(
+            pixmap.scaled(
+                90,
+                90
+            )
+        )
+
+        self.setWindowTitle(f"Maintenance Management System - {user.get('fullname', '')}")
+        self.ui.btnAssets.clicked.connect(self.open_assets)
+        self.ui.btnWorkOrders.clicked.connect(self.open_work_orders)
+        self.ui.btnThecnicians.clicked.connect(self.open_technicians)
+        self.ui.btnLookups.clicked.connect(self.open_lookups)
+        self.ui.btnPM.clicked.connect(self.open_pm)
+        if hasattr(self.ui, "btnHome"):
+            self.ui.btnHome.clicked.connect(self.load_statistics)
+        self.ui.btnInventory.clicked.connect(self.open_inventory)
+        self.ui.btnSuppliers.clicked.connect(self.open_suppliers)
+        self.ui.btnReports.clicked.connect(self.open_reports)
+        self.ui.btnSettings.clicked.connect(self.open_setting)
+        self.ui.btnLogout.clicked.connect(self.logout)
 
         self.create_toolbar()
 
@@ -78,7 +78,7 @@ class DashboardController(QMainWindow):
 
     def open_work_orders(self):
 
-        self.work_order_window = WorkOrderPage()
+        self.work_order_window = WorkOrdersPage()
         self.work_order_window.show()
 
         self.work_order_window.destroyed.connect(
@@ -105,17 +105,30 @@ class DashboardController(QMainWindow):
         self.pm_window = PMPage()
         self.pm_window.show()
 
+    def open_inventory(self):
+        self.info("Inventory", "Inventory view is not available in this dashboard build.")
+
+    def open_suppliers(self):
+        self.info("Suppliers", "Suppliers view is not available in this dashboard build.")
+
+    def open_reports(self):
+        self.info("Reports", "Reports view is not available in this dashboard build.")
+
+    def open_setting(self):
+        self.info("Settings", "Settings view is not available in this dashboard build.")
+
+    def logout(self):
+        self.close()
+
     def load_statistics(self):
 
-        def load_statistics(self):
+        stats = DashboardService.get_statistics()
 
-         stats = DashboardService.get_statistics()
-
-         self.ui.lblAssetsValue.setText(str(stats["assets"]))
-         self.ui.lblOpenWorkOrdersValue.setText(str(stats["work_orders"]))
-         self.ui.lblPMDueValue.setText(str(stats["pm_due"]))
-         self.ui.lblLowStockValue.setText(str(stats["low_stock"]))
-         self.ui.lblTechniciansValue.setText(str(stats["technicians"]))
+        self.ui.lblAssetsValue.setText(str(stats["assets"]))
+        self.ui.lblOpenWorkOrdersValue.setText(str(stats["work_orders"]))
+        self.ui.lblPMDueValue.setText(str(stats["pm_due"]))
+        self.ui.lblLowStockValue.setText(str(stats["low_stock"]))
+        self.ui.lblTechniciansValue.setText(str(stats["technicians"]))
 
     def update_status_bar(self):
 
@@ -123,19 +136,19 @@ class DashboardController(QMainWindow):
             f"User: {self.user.get('fullname', '')}"
         )
 
-        if Database.is_connected():
+        if Database.database_exists():
 
-         self.lblDatabase.setText("Database: Connected")
-         self.lblDatabase.setStyleSheet(
-         "color: green; font-weight: bold;"
-        )
+            self.lblDatabase.setText("Database: Connected")
+            self.lblDatabase.setStyleSheet(
+                "color: green; font-weight: bold;"
+            )
 
         else:
 
-         self.lblDatabase.setText("Database: Disconnected")
-         self.lblDatabase.setStyleSheet(
-         "color: red; font-weight: bold;"
-        )
+            self.lblDatabase.setText("Database: Disconnected")
+            self.lblDatabase.setStyleSheet(
+                "color: red; font-weight: bold;"
+            )
 
         self.lblClock.setText(
             datetime.now().strftime("%d %b %Y %H:%M:%S")

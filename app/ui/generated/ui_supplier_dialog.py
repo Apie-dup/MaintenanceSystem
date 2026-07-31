@@ -63,10 +63,10 @@ class Ui_SupplierDialog(object):
 
         self.formSupplierInfo.setWidget(2, QFormLayout.ItemRole.LabelRole, self.labelContactPerson)
 
-        self.txtContacPerson = QLineEdit(self.groupSupplierInformation)
-        self.txtContacPerson.setObjectName(u"txtContacPerson")
+        self.txtContactPerson = QLineEdit(self.groupSupplierInformation)
+        self.txtContactPerson.setObjectName(u"txtContactPerson")
 
-        self.formSupplierInfo.setWidget(2, QFormLayout.ItemRole.FieldRole, self.txtContacPerson)
+        self.formSupplierInfo.setWidget(2, QFormLayout.ItemRole.FieldRole, self.txtContactPerson)
 
         self.labelPhone = QLabel(self.groupSupplierInformation)
         self.labelPhone.setObjectName(u"labelPhone")

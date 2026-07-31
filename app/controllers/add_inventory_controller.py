@@ -1,9 +1,7 @@
 from PySide6.QtWidgets import QDialog, QMessageBox
-from PySide6.QtCore import QDate
 
 from app.ui.generated.ui_add_inventory import Ui_AddInventoryDialog
 from app.services.inventory_service import InventoryService
-from app.services.lookup_service import LookupService
 from app.utils.validators import Validator
 from app.core.lookup_manager import LookupManager
 
@@ -26,52 +24,52 @@ class AddInventoryController(QDialog):
 
         if self.item_id is None:
             self.setWindowTitle("Add Inventory Item")
-
         else:
-            
             self.setWindowTitle("Edit Inventory")
-            item = InventoryService.get_item(self.item_id)
+            item = InventoryService.get(self.item_id)
 
-        if not item:
-            QMessageBox.warning(
-                self,
-                "Inventory",
-                "Inventory item not found."
-            )
+            if not item:
+                QMessageBox.warning(
+                    self,
+                    "Inventory",
+                    "Inventory item not found."
+                )
 
-            self.reject()
-            return
-        
-        (
+                self.reject()
+                return
 
-            _,
-            part_number,
-            part_name,
-            category,
-            supplier_id,
-            unit,
-            quantity,
-            minimum_quantity,
-            reorder_quantity,
-            unit_cost,
-            location,
-            barcode,
-            status,
-            notes
+            (
+                _,
+                part_number,
+                part_name,
+                description,
+                category,
+                supplier_id,
+                unit,
+                quantity,
+                minimum_quantity,
+                reorder_quantity,
+                unit_cost,
+                location,
+                barcode,
+                status,
+                notes,
+                created_at,
             ) = item
 
-        self.ui.txtPartNumber.setText(part_number)
-        self.ui.txtPartName.setText(part_name)
-        self.ui.cmbCategory.setCurrentText(category)
-        self.ui.cmbUnit.setCurrentText(unit)
-        self.ui.spnQuantity.setValue(quantity)
-        self.ui.spnMinimumQuantity.setValue(minimum_quantity)
-        self.ui.spnReorderQuantity.setValue(reorder_quantity)
-        self.ui.dsbUnitCost.setValue(unit_cost)
-        self.ui.cmbLocation.setCurrentText(location)
-        self.ui.txtBarcode.setText(barcode)
-        self.ui.cmbStatus.setCurrentText(status)
-        self.ui.teNotes.setPlainText(notes)
+            self.ui.txtPartNumber.setText(part_number or "")
+            self.ui.txtPartName.setText(part_name or "")
+            self.ui.cmbCategory.setCurrentText(category or "")
+            self.ui.cmbSupplier.setCurrentIndex(0)
+            self.ui.cmbUnit.setCurrentText(unit or "")
+            self.ui.spnQuantity.setValue(quantity or 0)
+            self.ui.spnMinimumQuantity.setValue(minimum_quantity or 0)
+            self.ui.spnReorderQuantity.setValue(reorder_quantity or 0)
+            self.ui.dsbUnitCost.setValue(unit_cost or 0)
+            self.ui.cmbLocation.setCurrentText(location or "")
+            self.ui.txtBarcode.setText(barcode or "")
+            self.ui.cmbStatus.setCurrentText(status or "")
+            self.ui.textEdit.setPlainText(notes or "")
 
         self.ui.buttonBox.accepted.connect(self.save_item)
         self.ui.buttonBox.rejected.connect(self.reject)
@@ -117,8 +115,9 @@ class AddInventoryController(QDialog):
         item = (
             self.ui.txtPartNumber.text().strip(),
             part_name,
+            "",
             self.ui.cmbCategory.currentText(),
-            self.ui.cmbSupplier.currentData(),      # supplier_id
+            self.ui.cmbSupplier.currentData(),
             self.ui.cmbUnit.currentText(),
             self.ui.spnQuantity.value(),
             self.ui.spnMinimumQuantity.value(),
@@ -127,13 +126,12 @@ class AddInventoryController(QDialog):
             self.ui.cmbLocation.currentText(),
             self.ui.txtBarcode.text().strip(),
             self.ui.cmbStatus.currentText(),
-            self.ui.teNotes.toPlainText().strip(),
+            self.ui.textEdit.toPlainText().strip(),
         )
-        
 
         if self.item_id is None:
 
-            InventoryService.add_item(item)
+            InventoryService.add(item)
 
             QMessageBox.information(
                 self,
@@ -145,7 +143,7 @@ class AddInventoryController(QDialog):
 
             update_item = item + (self.item_id,)
 
-            InventoryService.update_item(update_item)
+            InventoryService.update(update_item)
 
             QMessageBox.information(
                 self,

@@ -13,7 +13,6 @@ from app.controllers.add_work_order_controller import AddWorkOrderController
 from app.base.base_page import BasePage
 
 
-
 class WorkOrdersPage(BasePage):
 
 
@@ -133,12 +132,18 @@ class WorkOrdersPage(BasePage):
 
         if text:
 
-            work_orders = WorkOrderService.search_work_order(text)
+            work_orders = WorkOrderService.search(text)
 
         else:
 
-            work_orders = WorkOrderService.get_work_orders()
+            work_orders = WorkOrderService.get_all()
 
         self.populate_table(work_orders)
+
+
+class WorkOrderPage(WorkOrdersPage):
+    """Backward-compatible alias for earlier imports."""
+
+    pass
 
     

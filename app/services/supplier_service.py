@@ -39,75 +39,43 @@ class SupplierService:
         return SupplierModel.get_next_supplier_code()
 
     # ---------------------------------------------------------
-    # ADD SUPPLIER
+    # CREATE DATA
     # ---------------------------------------------------------
     @staticmethod
-    def add_supplier(
-        supplier_code,
-        supplier_name,
-        contact_person,
-        phone,
-        email,
-        address,
-        status,
-        notes
-    ):
+    def create(data):
 
-        if supplier_name.strip() == "":
+        if not data["supplier_name"].strip():
             raise ValueError("Supplier name is required.")
 
-        if SupplierModel.get_by_code(supplier_code):
+        if SupplierModel.get_by_code(data["supplier_code"]):
             raise ValueError("Supplier code already exists.")
 
-        SupplierModel.insert(
-            (
-                supplier_code,
-                supplier_name,
-                contact_person,
-                phone,
-                email,
-                address,
-                status,
-                notes
-            )
-        )
+        SupplierModel.insert(data)
+
 
     # ---------------------------------------------------------
     # UPDATE SUPPLIER
     # ---------------------------------------------------------
     @staticmethod
-    def update_supplier(
-        supplier_id,
-        supplier_code,
-        supplier_name,
-        contact_person,
-        phone,
-        email,
-        address,
-        status,
-        notes
-    ):
+    def update(supplier_id, data):
 
-        if supplier_name.strip() == "":
+        if not data["supplier_name"].strip():
             raise ValueError("Supplier name is required.")
 
         SupplierModel.update(
-            (
-                supplier_code,
-                supplier_name,
-                contact_person,
-                phone,
-                email,
-                address,
-                status,
-                notes,
-                supplier_id
-            )
+            supplier_id,
+            data
         )
 
     # ---------------------------------------------------------
     # DELETE SUPPLIER
     # ---------------------------------------------------------
     @staticmethod
-    def delete_supplier(supplier_id):
+    def delete(supplier_id):
+
         SupplierModel.delete(supplier_id)
+
+    @staticmethod
+    def delete_supplier(supplier_id):
+
+        SupplierService.delete(supplier_id)

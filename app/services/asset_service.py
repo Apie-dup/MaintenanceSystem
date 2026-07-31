@@ -23,8 +23,12 @@ class AssetService:
         AssetModel.delete(record_id)
 
     @staticmethod
-    def searc(text):
+    def search(text):
         return AssetModel.search(text)
+
+    @staticmethod
+    def searc(text):
+        return AssetService.search(text)
     
     # Asset-specific business logic
     @staticmethod

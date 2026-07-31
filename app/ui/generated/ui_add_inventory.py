@@ -16,241 +16,227 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractButton, QApplication, QComboBox, QDialog,
-    QDialogButtonBox, QDoubleSpinBox, QHBoxLayout, QLabel,
-    QLineEdit, QSizePolicy, QSpinBox, QTextEdit,
-    QVBoxLayout, QWidget)
+    QDialogButtonBox, QDoubleSpinBox, QFormLayout, QGroupBox,
+    QHBoxLayout, QLabel, QLineEdit, QSizePolicy,
+    QSpinBox, QTextEdit, QVBoxLayout, QWidget)
 
 class Ui_AddInventoryDialog(object):
     def setupUi(self, AddInventoryDialog):
         if not AddInventoryDialog.objectName():
             AddInventoryDialog.setObjectName(u"AddInventoryDialog")
-        AddInventoryDialog.resize(483, 580)
-        self.verticalLayout = QVBoxLayout(AddInventoryDialog)
-        self.verticalLayout.setObjectName(u"verticalLayout")
-        self.horizontalLayout_2 = QHBoxLayout()
-        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.lblPartNumber = QLabel(AddInventoryDialog)
+        AddInventoryDialog.resize(685, 676)
+        AddInventoryDialog.setMaximumSize(QSize(16777215, 676))
+        self.mainLayout = QVBoxLayout(AddInventoryDialog)
+        self.mainLayout.setObjectName(u"mainLayout")
+        self.groupPartInformation = QGroupBox(AddInventoryDialog)
+        self.groupPartInformation.setObjectName(u"groupPartInformation")
+        self.groupPartInformation.setFlat(True)
+        self.formPartInfo = QFormLayout(self.groupPartInformation)
+        self.formPartInfo.setObjectName(u"formPartInfo")
+        self.lblPartNumber = QLabel(self.groupPartInformation)
         self.lblPartNumber.setObjectName(u"lblPartNumber")
 
-        self.horizontalLayout_2.addWidget(self.lblPartNumber)
+        self.formPartInfo.setWidget(0, QFormLayout.ItemRole.LabelRole, self.lblPartNumber)
 
-        self.txtPartNumber = QLineEdit(AddInventoryDialog)
+        self.txtPartNumber = QLineEdit(self.groupPartInformation)
         self.txtPartNumber.setObjectName(u"txtPartNumber")
+        self.txtPartNumber.setReadOnly(True)
 
-        self.horizontalLayout_2.addWidget(self.txtPartNumber)
+        self.formPartInfo.setWidget(0, QFormLayout.ItemRole.FieldRole, self.txtPartNumber)
 
-
-        self.verticalLayout.addLayout(self.horizontalLayout_2)
-
-        self.horizontalLayout_3 = QHBoxLayout()
-        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.lblPartName = QLabel(AddInventoryDialog)
+        self.lblPartName = QLabel(self.groupPartInformation)
         self.lblPartName.setObjectName(u"lblPartName")
 
-        self.horizontalLayout_3.addWidget(self.lblPartName)
+        self.formPartInfo.setWidget(1, QFormLayout.ItemRole.LabelRole, self.lblPartName)
 
-        self.txtPartName = QLineEdit(AddInventoryDialog)
+        self.txtPartName = QLineEdit(self.groupPartInformation)
         self.txtPartName.setObjectName(u"txtPartName")
 
-        self.horizontalLayout_3.addWidget(self.txtPartName)
+        self.formPartInfo.setWidget(1, QFormLayout.ItemRole.FieldRole, self.txtPartName)
 
+        self.lblDescription = QLabel(self.groupPartInformation)
+        self.lblDescription.setObjectName(u"lblDescription")
 
-        self.verticalLayout.addLayout(self.horizontalLayout_3)
+        self.formPartInfo.setWidget(2, QFormLayout.ItemRole.LabelRole, self.lblDescription)
 
-        self.horizontalLayout_4 = QHBoxLayout()
-        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
-        self.lblCategory = QLabel(AddInventoryDialog)
+        self.txtDescription = QLineEdit(self.groupPartInformation)
+        self.txtDescription.setObjectName(u"txtDescription")
+
+        self.formPartInfo.setWidget(2, QFormLayout.ItemRole.FieldRole, self.txtDescription)
+
+        self.lblCategory = QLabel(self.groupPartInformation)
         self.lblCategory.setObjectName(u"lblCategory")
 
-        self.horizontalLayout_4.addWidget(self.lblCategory)
+        self.formPartInfo.setWidget(3, QFormLayout.ItemRole.LabelRole, self.lblCategory)
 
-        self.cmbCategory = QComboBox(AddInventoryDialog)
+        self.cmbCategory = QComboBox(self.groupPartInformation)
         self.cmbCategory.setObjectName(u"cmbCategory")
 
-        self.horizontalLayout_4.addWidget(self.cmbCategory)
+        self.formPartInfo.setWidget(3, QFormLayout.ItemRole.FieldRole, self.cmbCategory)
 
+        self.lblSupplier = QLabel(self.groupPartInformation)
+        self.lblSupplier.setObjectName(u"lblSupplier")
 
-        self.verticalLayout.addLayout(self.horizontalLayout_4)
+        self.formPartInfo.setWidget(4, QFormLayout.ItemRole.LabelRole, self.lblSupplier)
 
-        self.horizontalLayout = QHBoxLayout()
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.lblSupplier_2 = QLabel(AddInventoryDialog)
-        self.lblSupplier_2.setObjectName(u"lblSupplier_2")
-
-        self.horizontalLayout.addWidget(self.lblSupplier_2)
-
-        self.cmbSupplier = QComboBox(AddInventoryDialog)
+        self.cmbSupplier = QComboBox(self.groupPartInformation)
         self.cmbSupplier.setObjectName(u"cmbSupplier")
 
-        self.horizontalLayout.addWidget(self.cmbSupplier)
+        self.formPartInfo.setWidget(4, QFormLayout.ItemRole.FieldRole, self.cmbSupplier)
 
-
-        self.verticalLayout.addLayout(self.horizontalLayout)
-
-        self.horizontalLayout_6 = QHBoxLayout()
-        self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
-        self.lblUnit = QLabel(AddInventoryDialog)
+        self.lblUnit = QLabel(self.groupPartInformation)
         self.lblUnit.setObjectName(u"lblUnit")
 
-        self.horizontalLayout_6.addWidget(self.lblUnit)
+        self.formPartInfo.setWidget(5, QFormLayout.ItemRole.LabelRole, self.lblUnit)
 
-        self.cmbUnit = QComboBox(AddInventoryDialog)
+        self.cmbUnit = QComboBox(self.groupPartInformation)
         self.cmbUnit.setObjectName(u"cmbUnit")
 
-        self.horizontalLayout_6.addWidget(self.cmbUnit)
+        self.formPartInfo.setWidget(5, QFormLayout.ItemRole.FieldRole, self.cmbUnit)
 
 
-        self.verticalLayout.addLayout(self.horizontalLayout_6)
+        self.mainLayout.addWidget(self.groupPartInformation)
 
-        self.horizontalLayout_9 = QHBoxLayout()
-        self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
-        self.lblQuantity = QLabel(AddInventoryDialog)
+        self.groupStockInformation = QGroupBox(AddInventoryDialog)
+        self.groupStockInformation.setObjectName(u"groupStockInformation")
+        self.groupStockInformation.setFlat(True)
+        self.formStockInfo = QFormLayout(self.groupStockInformation)
+        self.formStockInfo.setObjectName(u"formStockInfo")
+        self.lblQuantity = QLabel(self.groupStockInformation)
         self.lblQuantity.setObjectName(u"lblQuantity")
 
-        self.horizontalLayout_9.addWidget(self.lblQuantity)
+        self.formStockInfo.setWidget(0, QFormLayout.ItemRole.LabelRole, self.lblQuantity)
 
-        self.spnQuantity = QSpinBox(AddInventoryDialog)
+        self.spnQuantity = QSpinBox(self.groupStockInformation)
         self.spnQuantity.setObjectName(u"spnQuantity")
+        self.spnQuantity.setMaximum(999999)
 
-        self.horizontalLayout_9.addWidget(self.spnQuantity)
+        self.formStockInfo.setWidget(0, QFormLayout.ItemRole.FieldRole, self.spnQuantity)
 
+        self.lblMinQty = QLabel(self.groupStockInformation)
+        self.lblMinQty.setObjectName(u"lblMinQty")
 
-        self.verticalLayout.addLayout(self.horizontalLayout_9)
+        self.formStockInfo.setWidget(1, QFormLayout.ItemRole.LabelRole, self.lblMinQty)
 
-        self.horizontalLayout_10 = QHBoxLayout()
-        self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
-        self.lblMinimumQuantity = QLabel(AddInventoryDialog)
-        self.lblMinimumQuantity.setObjectName(u"lblMinimumQuantity")
-
-        self.horizontalLayout_10.addWidget(self.lblMinimumQuantity)
-
-        self.spnMinimumQuantity = QSpinBox(AddInventoryDialog)
+        self.spnMinimumQuantity = QSpinBox(self.groupStockInformation)
         self.spnMinimumQuantity.setObjectName(u"spnMinimumQuantity")
+        self.spnMinimumQuantity.setMaximum(999999)
 
-        self.horizontalLayout_10.addWidget(self.spnMinimumQuantity)
+        self.formStockInfo.setWidget(1, QFormLayout.ItemRole.FieldRole, self.spnMinimumQuantity)
 
+        self.lblReorderQty = QLabel(self.groupStockInformation)
+        self.lblReorderQty.setObjectName(u"lblReorderQty")
 
-        self.verticalLayout.addLayout(self.horizontalLayout_10)
+        self.formStockInfo.setWidget(2, QFormLayout.ItemRole.LabelRole, self.lblReorderQty)
 
-        self.horizontalLayout_8 = QHBoxLayout()
-        self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
-        self.lblReorderQuantity = QLabel(AddInventoryDialog)
-        self.lblReorderQuantity.setObjectName(u"lblReorderQuantity")
-
-        self.horizontalLayout_8.addWidget(self.lblReorderQuantity)
-
-        self.spnReorderQuantity = QSpinBox(AddInventoryDialog)
+        self.spnReorderQuantity = QSpinBox(self.groupStockInformation)
         self.spnReorderQuantity.setObjectName(u"spnReorderQuantity")
+        self.spnReorderQuantity.setMaximum(999999)
 
-        self.horizontalLayout_8.addWidget(self.spnReorderQuantity)
+        self.formStockInfo.setWidget(2, QFormLayout.ItemRole.FieldRole, self.spnReorderQuantity)
 
-
-        self.verticalLayout.addLayout(self.horizontalLayout_8)
-
-        self.horizontalLayout_7 = QHBoxLayout()
-        self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
-        self.lblUnitCost = QLabel(AddInventoryDialog)
+        self.lblUnitCost = QLabel(self.groupStockInformation)
         self.lblUnitCost.setObjectName(u"lblUnitCost")
 
-        self.horizontalLayout_7.addWidget(self.lblUnitCost)
+        self.formStockInfo.setWidget(3, QFormLayout.ItemRole.LabelRole, self.lblUnitCost)
 
-        self.dsbUnitCost = QDoubleSpinBox(AddInventoryDialog)
+        self.dsbUnitCost = QDoubleSpinBox(self.groupStockInformation)
         self.dsbUnitCost.setObjectName(u"dsbUnitCost")
+        self.dsbUnitCost.setDecimals(2)
+        self.dsbUnitCost.setMaximum(999999.989999999990687)
 
-        self.horizontalLayout_7.addWidget(self.dsbUnitCost)
+        self.formStockInfo.setWidget(3, QFormLayout.ItemRole.FieldRole, self.dsbUnitCost)
 
-
-        self.verticalLayout.addLayout(self.horizontalLayout_7)
-
-        self.horizontalLayout_5 = QHBoxLayout()
-        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
-        self.lblLocation = QLabel(AddInventoryDialog)
+        self.lblLocation = QLabel(self.groupStockInformation)
         self.lblLocation.setObjectName(u"lblLocation")
 
-        self.horizontalLayout_5.addWidget(self.lblLocation)
+        self.formStockInfo.setWidget(4, QFormLayout.ItemRole.LabelRole, self.lblLocation)
 
-        self.cmbLocation = QComboBox(AddInventoryDialog)
-        self.cmbLocation.setObjectName(u"cmbLocation")
-
-        self.horizontalLayout_5.addWidget(self.cmbLocation)
-
-
-        self.verticalLayout.addLayout(self.horizontalLayout_5)
-
-        self.horizontalLayout_11 = QHBoxLayout()
-        self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
-        self.lblBarcode = QLabel(AddInventoryDialog)
+        self.lblBarcode = QLabel(self.groupStockInformation)
         self.lblBarcode.setObjectName(u"lblBarcode")
 
-        self.horizontalLayout_11.addWidget(self.lblBarcode)
+        self.formStockInfo.setWidget(6, QFormLayout.ItemRole.LabelRole, self.lblBarcode)
 
-        self.txtBarcode = QLineEdit(AddInventoryDialog)
+        self.txtBarcode = QLineEdit(self.groupStockInformation)
         self.txtBarcode.setObjectName(u"txtBarcode")
 
-        self.horizontalLayout_11.addWidget(self.txtBarcode)
+        self.formStockInfo.setWidget(6, QFormLayout.ItemRole.FieldRole, self.txtBarcode)
+
+        self.cmbLocation = QComboBox(self.groupStockInformation)
+        self.cmbLocation.setObjectName(u"cmbLocation")
+
+        self.formStockInfo.setWidget(4, QFormLayout.ItemRole.FieldRole, self.cmbLocation)
 
 
-        self.verticalLayout.addLayout(self.horizontalLayout_11)
+        self.mainLayout.addWidget(self.groupStockInformation)
 
-        self.horizontalLayout_12 = QHBoxLayout()
-        self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
-        self.lblStatus = QLabel(AddInventoryDialog)
+        self.groupStatus = QGroupBox(AddInventoryDialog)
+        self.groupStatus.setObjectName(u"groupStatus")
+        self.groupStatus.setFlat(True)
+        self.layoutStatus = QHBoxLayout(self.groupStatus)
+        self.layoutStatus.setObjectName(u"layoutStatus")
+        self.lblStatus = QLabel(self.groupStatus)
         self.lblStatus.setObjectName(u"lblStatus")
 
-        self.horizontalLayout_12.addWidget(self.lblStatus)
+        self.layoutStatus.addWidget(self.lblStatus)
 
-        self.cmbStatus = QComboBox(AddInventoryDialog)
+        self.cmbStatus = QComboBox(self.groupStatus)
+        self.cmbStatus.addItem("")
+        self.cmbStatus.addItem("")
         self.cmbStatus.setObjectName(u"cmbStatus")
 
-        self.horizontalLayout_12.addWidget(self.cmbStatus)
+        self.layoutStatus.addWidget(self.cmbStatus)
 
 
-        self.verticalLayout.addLayout(self.horizontalLayout_12)
+        self.mainLayout.addWidget(self.groupStatus)
 
-        self.horizontalLayout_13 = QHBoxLayout()
-        self.horizontalLayout_13.setObjectName(u"horizontalLayout_13")
-        self.lblNotes = QLabel(AddInventoryDialog)
-        self.lblNotes.setObjectName(u"lblNotes")
+        self.groupNotes = QGroupBox(AddInventoryDialog)
+        self.groupNotes.setObjectName(u"groupNotes")
+        self.groupNotes.setFlat(True)
+        self.layoutNotes = QVBoxLayout(self.groupNotes)
+        self.layoutNotes.setObjectName(u"layoutNotes")
+        self.txtNotes = QTextEdit(self.groupNotes)
+        self.txtNotes.setObjectName(u"txtNotes")
 
-        self.horizontalLayout_13.addWidget(self.lblNotes)
-
-        self.textEdit = QTextEdit(AddInventoryDialog)
-        self.textEdit.setObjectName(u"textEdit")
-
-        self.horizontalLayout_13.addWidget(self.textEdit)
+        self.layoutNotes.addWidget(self.txtNotes)
 
 
-        self.verticalLayout.addLayout(self.horizontalLayout_13)
+        self.mainLayout.addWidget(self.groupNotes)
 
         self.buttonBox = QDialogButtonBox(AddInventoryDialog)
         self.buttonBox.setObjectName(u"buttonBox")
         self.buttonBox.setOrientation(Qt.Orientation.Horizontal)
         self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Save)
 
-        self.verticalLayout.addWidget(self.buttonBox)
+        self.mainLayout.addWidget(self.buttonBox)
 
 
         self.retranslateUi(AddInventoryDialog)
-        self.buttonBox.accepted.connect(AddInventoryDialog.accept)
-        self.buttonBox.rejected.connect(AddInventoryDialog.reject)
 
         QMetaObject.connectSlotsByName(AddInventoryDialog)
     # setupUi
 
     def retranslateUi(self, AddInventoryDialog):
-        AddInventoryDialog.setWindowTitle(QCoreApplication.translate("AddInventoryDialog", u"Add Inventory Dialog", None))
-        self.lblPartNumber.setText(QCoreApplication.translate("AddInventoryDialog", u"Part Number", None))
-        self.lblPartName.setText(QCoreApplication.translate("AddInventoryDialog", u"Part Name", None))
-        self.lblCategory.setText(QCoreApplication.translate("AddInventoryDialog", u"Category", None))
-        self.lblSupplier_2.setText(QCoreApplication.translate("AddInventoryDialog", u"Supplier", None))
-        self.lblUnit.setText(QCoreApplication.translate("AddInventoryDialog", u"Unit", None))
-        self.lblQuantity.setText(QCoreApplication.translate("AddInventoryDialog", u"Quantity", None))
-        self.lblMinimumQuantity.setText(QCoreApplication.translate("AddInventoryDialog", u"Minimum Quantity", None))
-        self.lblReorderQuantity.setText(QCoreApplication.translate("AddInventoryDialog", u"Reorder Quantity", None))
-        self.lblUnitCost.setText(QCoreApplication.translate("AddInventoryDialog", u"Unit Cost", None))
-        self.lblLocation.setText(QCoreApplication.translate("AddInventoryDialog", u"Location", None))
-        self.lblBarcode.setText(QCoreApplication.translate("AddInventoryDialog", u"Barcode", None))
-        self.lblStatus.setText(QCoreApplication.translate("AddInventoryDialog", u"Status", None))
-        self.lblNotes.setText(QCoreApplication.translate("AddInventoryDialog", u"Notes", None))
+        AddInventoryDialog.setWindowTitle(QCoreApplication.translate("AddInventoryDialog", u"Add Inventory", None))
+        self.groupPartInformation.setTitle(QCoreApplication.translate("AddInventoryDialog", u"Part Information", None))
+        self.lblPartNumber.setText(QCoreApplication.translate("AddInventoryDialog", u"Part Number:", None))
+        self.lblPartName.setText(QCoreApplication.translate("AddInventoryDialog", u"Part Name:", None))
+        self.lblDescription.setText(QCoreApplication.translate("AddInventoryDialog", u"Description:", None))
+        self.lblCategory.setText(QCoreApplication.translate("AddInventoryDialog", u"Category:", None))
+        self.lblSupplier.setText(QCoreApplication.translate("AddInventoryDialog", u"Supplier:", None))
+        self.lblUnit.setText(QCoreApplication.translate("AddInventoryDialog", u"Unit:", None))
+        self.groupStockInformation.setTitle(QCoreApplication.translate("AddInventoryDialog", u"Stock Information", None))
+        self.lblQuantity.setText(QCoreApplication.translate("AddInventoryDialog", u"Quantity:", None))
+        self.lblMinQty.setText(QCoreApplication.translate("AddInventoryDialog", u"Minimum Qty:", None))
+        self.lblReorderQty.setText(QCoreApplication.translate("AddInventoryDialog", u"Reorder Qty:", None))
+        self.lblUnitCost.setText(QCoreApplication.translate("AddInventoryDialog", u"Unit Cost:", None))
+        self.lblLocation.setText(QCoreApplication.translate("AddInventoryDialog", u"Location:", None))
+        self.lblBarcode.setText(QCoreApplication.translate("AddInventoryDialog", u"Barcode:", None))
+        self.groupStatus.setTitle(QCoreApplication.translate("AddInventoryDialog", u"Status", None))
+        self.lblStatus.setText(QCoreApplication.translate("AddInventoryDialog", u"Status:", None))
+        self.cmbStatus.setItemText(0, QCoreApplication.translate("AddInventoryDialog", u"Active", None))
+        self.cmbStatus.setItemText(1, QCoreApplication.translate("AddInventoryDialog", u"Inactive", None))
+
+        self.groupNotes.setTitle(QCoreApplication.translate("AddInventoryDialog", u"Notes", None))
     # retranslateUi
 

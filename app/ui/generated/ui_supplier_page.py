@@ -103,15 +103,9 @@ class Ui_SuppliersWindow(object):
 
         self.horizontalLayout_2.addWidget(self.btnDelete)
 
-        self.horizontalSpacer = QSpacerItem(478, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_2.addItem(self.horizontalSpacer)
-
-        self.btnClose = QPushButton(SuppliersWindow)
-        self.btnClose.setObjectName(u"btnClose")
-        self.btnClose.setCheckable(True)
-
-        self.horizontalLayout_2.addWidget(self.btnClose)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout_2)
@@ -138,7 +132,7 @@ class Ui_SuppliersWindow(object):
         ___qtablewidgetitem4 = self.tblSuppliers.horizontalHeaderItem(4)
         ___qtablewidgetitem4.setText(QCoreApplication.translate("SuppliersWindow", u"Phone", None))
         ___qtablewidgetitem5 = self.tblSuppliers.horizontalHeaderItem(5)
-        ___qtablewidgetitem5.setText(QCoreApplication.translate("SuppliersWindow", u"New Column", None))
+        ___qtablewidgetitem5.setText(QCoreApplication.translate("SuppliersWindow", u"Email", None))
         ___qtablewidgetitem6 = self.tblSuppliers.horizontalHeaderItem(6)
         ___qtablewidgetitem6.setText(QCoreApplication.translate("SuppliersWindow", u"Address", None))
         ___qtablewidgetitem7 = self.tblSuppliers.horizontalHeaderItem(7)
@@ -149,6 +143,5 @@ class Ui_SuppliersWindow(object):
         self.btnEdit.setText(QCoreApplication.translate("SuppliersWindow", u"Edit", None))
         self.btnRefresh.setText(QCoreApplication.translate("SuppliersWindow", u"Refresh", None))
         self.btnDelete.setText(QCoreApplication.translate("SuppliersWindow", u"Delete", None))
-        self.btnClose.setText(QCoreApplication.translate("SuppliersWindow", u"Close", None))
     # retranslateUi
 

@@ -9,12 +9,12 @@ from app.constants import (
 )
 from app.utils.validators import Validator
 from app.core.signals import signals
-from app.base.base_dialog import CrudDialog
+from app.base.base_dialog import BaseDialog
 from app.core.lookup_manager import LookupManager
 
 
 
-class AddAssetController(CrudDialog):
+class AddAssetController(BaseDialog):
 
     def __init__(self, record_id=None):
         super().__init__(record_id)
@@ -88,7 +88,7 @@ class AddAssetController(CrudDialog):
             self.ui.txtAssetNumber.setReadOnly(True)
 
         # Connect dialog buttons
-        self.ui.buttonBox.accepted.connect(self.save_asset)
+        self.ui.buttonBox.accepted.connect(self.save)
         self.ui.buttonBox.rejected.connect(self.reject)
 
         self.set_entity_name("Asset")
@@ -107,6 +107,11 @@ class AddAssetController(CrudDialog):
             ASSET_LOCATIONS
         )
 
+        if self.ui.cmbLocation.count() == 0:
+            self.ui.cmbLocation.addItems(ASSET_LOCATIONS)
+        elif "Reception" not in [self.ui.cmbLocation.itemText(i) for i in range(self.ui.cmbLocation.count())]:
+            self.ui.cmbLocation.addItem("Reception")
+
         LookupManager.load(
             self.ui.cmbStatus,
             "Statuses",
@@ -115,8 +120,6 @@ class AddAssetController(CrudDialog):
         )
 
     def save(self):
-
-        self.ui.buttonBox.accepted.connect(self.save)
 
         asset_name = self.ui.txtAssetName.text().strip()
 
@@ -149,7 +152,6 @@ class AddAssetController(CrudDialog):
             signals.data_changed.emit("assets")
 
             self.information(
-                self,
                 "Success",
                 "Asset added successfully."
             )

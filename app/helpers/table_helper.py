@@ -1,69 +1,197 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-    QTableWidgetItem,
-    QHeaderView,
     QAbstractItemView,
+    QHeaderView,
+    QTableWidgetItem
 )
 
 
 class TableHelper:
 
+    # ---------------------------------------------------------
+    # SETUP TABLE
+    # ---------------------------------------------------------
     @staticmethod
     def setup(table, columns):
 
+        headers = [
+            header
+            for field_name, header in columns
+        ]
+
         table.setColumnCount(len(columns))
-        table.setHorizontalHeaderLabels(
-            [header for _, header in columns]
-        )
+        table.setHorizontalHeaderLabels(headers)
 
         table.setSelectionBehavior(
-            QAbstractItemView.SelectRows
+            QAbstractItemView.SelectionBehavior.SelectRows
         )
 
         table.setSelectionMode(
-            QAbstractItemView.SingleSelection
+            QAbstractItemView.SelectionMode.SingleSelection
         )
 
         table.setEditTriggers(
-            QAbstractItemView.NoEditTriggers
+            QAbstractItemView.EditTrigger.NoEditTriggers
         )
+
+        table.setAlternatingRowColors(True)
 
         table.verticalHeader().setVisible(False)
-        table.horizontalHeader().setStrechLastSection(True)
 
         table.horizontalHeader().setSectionResizeMode(
-            QHeaderView.ResizeToContants
+            QHeaderView.ResizeMode.ResizeToContents
         )
 
-    @staticmethod
-    def populate(table, rows, columns, id_field="id"):
+        table.horizontalHeader().setStretchLastSection(True)
 
+        table.setSortingEnabled(True)
+
+    @staticmethod
+    def setup_table(table, columns):
+
+        TableHelper.setup(table, columns)
+
+    # ---------------------------------------------------------
+    # POPULATE TABLE
+    # ---------------------------------------------------------
+    @staticmethod
+    def populate(table, records, columns, id_field="id"):
+
+        sorting_enabled = table.isSortingEnabled()
+
+        table.setSortingEnabled(False)
         table.setRowCount(0)
 
-        for record in rows:
+        for row_index, record in enumerate(records):
 
-            row = table.rowCount()
-            table.insertRow(row)
+            table.insertRow(row_index)
 
-            for column, (field, _) in enumerate(columns):
+            for column_index, column in enumerate(columns):
 
-                value = record[field]
+                field_name = column[0]
 
-                if value is None:
-                    value = ""
+                value = TableHelper.get_record_value(
+                    record,
+                    field_name
+                )
 
-                item = QTableWidgetItem(str(value))
+                display_value = (
+                    ""
+                    if value is None
+                    else str(value)
+                )
 
-                if column == 0:
+                item = QTableWidgetItem(display_value)
+
+                if column_index == 0:
+
+                    record_id = TableHelper.get_record_value(
+                        record,
+                        id_field
+                    )
+
                     item.setData(
-                        Qt.UserRole,
-                        record[id_field]
+                        Qt.ItemDataRole.UserRole,
+                        record_id
                     )
 
-                    table.setItem(
-                        row,
-                        column,
-                        item
-                    )
+                table.setItem(
+                    row_index,
+                    column_index,
+                    item
+                )
 
+        table.setSortingEnabled(sorting_enabled)
 
+        if sorting_enabled:
+            table.sortItems(
+            0,
+            Qt.SortOrder.AscendingOrder
+        )
+
+        if table.rowCount() > 0:
+            table.selectRow(0)
+
+    @staticmethod
+    def populate_table(table, records, columns, id_field="id"):
+
+        TableHelper.populate(
+            table,
+            records,
+            columns,
+            id_field
+        )
+
+    # ---------------------------------------------------------
+    # GET SELECTED RECORD ID
+    # ---------------------------------------------------------
+    @staticmethod
+    def selected_id(table):
+
+        if table is None:
+            return None
+
+        row = table.currentRow()
+
+        if row < 0:
+            return None
+
+        item = table.item(row, 0)
+
+        if item is None:
+            return None
+
+        return item.data(
+            Qt.ItemDataRole.UserRole
+        )
+
+    # ---------------------------------------------------------
+    # GET SELECTED ROW VALUES
+    # ---------------------------------------------------------
+    @staticmethod
+    def selected_row(table):
+
+        if table is None:
+            return None
+
+        row_index = table.currentRow()
+
+        if row_index < 0:
+            return None
+
+        row_values = []
+
+        for column_index in range(
+            table.columnCount()
+        ):
+
+            item = table.item(
+                row_index,
+                column_index
+            )
+
+            if item is None:
+                row_values.append("")
+            else:
+                row_values.append(item.text())
+
+        return row_values
+
+    # ---------------------------------------------------------
+    # GET VALUE FROM RECORD
+    # ---------------------------------------------------------
+    @staticmethod
+    def get_record_value(record, field_name):
+
+        if record is None:
+            return None
+
+        try:
+            return record[field_name]
+
+        except (KeyError, IndexError, TypeError):
+            return getattr(
+                record,
+                field_name,
+                None
+            )

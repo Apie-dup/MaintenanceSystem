@@ -19,14 +19,14 @@ from PySide6.QtWidgets import (QApplication, QHBoxLayout, QHeaderView, QLabel,
     QLineEdit, QPushButton, QSizePolicy, QSpacerItem,
     QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget)
 
-class Ui_InventoryWindow(object):
-    def setupUi(self, InventoryWindow):
-        if not InventoryWindow.objectName():
-            InventoryWindow.setObjectName(u"InventoryWindow")
-        InventoryWindow.resize(1359, 708)
-        self.verticalLayout = QVBoxLayout(InventoryWindow)
+class Ui_InventoryPage(object):
+    def setupUi(self, InventoryPage):
+        if not InventoryPage.objectName():
+            InventoryPage.setObjectName(u"InventoryPage")
+        InventoryPage.resize(1359, 520)
+        self.verticalLayout = QVBoxLayout(InventoryPage)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.lblTitle = QLabel(InventoryWindow)
+        self.lblTitle = QLabel(InventoryPage)
         self.lblTitle.setObjectName(u"lblTitle")
         font = QFont()
         font.setPointSize(20)
@@ -37,12 +37,12 @@ class Ui_InventoryWindow(object):
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.lblSearch = QLabel(InventoryWindow)
+        self.lblSearch = QLabel(InventoryPage)
         self.lblSearch.setObjectName(u"lblSearch")
 
         self.horizontalLayout.addWidget(self.lblSearch)
 
-        self.txtSearch = QLineEdit(InventoryWindow)
+        self.txtSearch = QLineEdit(InventoryPage)
         self.txtSearch.setObjectName(u"txtSearch")
 
         self.horizontalLayout.addWidget(self.txtSearch)
@@ -50,7 +50,7 @@ class Ui_InventoryWindow(object):
 
         self.verticalLayout.addLayout(self.horizontalLayout)
 
-        self.tblInventory = QTableWidget(InventoryWindow)
+        self.tblInventory = QTableWidget(InventoryPage)
         if (self.tblInventory.columnCount() < 13):
             self.tblInventory.setColumnCount(13)
         __qtablewidgetitem = QTableWidgetItem()
@@ -85,26 +85,26 @@ class Ui_InventoryWindow(object):
 
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.btnAdd = QPushButton(InventoryWindow)
+        self.btnAdd = QPushButton(InventoryPage)
         self.btnAdd.setObjectName(u"btnAdd")
-        self.btnAdd.setCheckable(True)
+        self.btnAdd.setCheckable(False)
 
         self.horizontalLayout_2.addWidget(self.btnAdd)
 
-        self.btnEdit = QPushButton(InventoryWindow)
+        self.btnEdit = QPushButton(InventoryPage)
         self.btnEdit.setObjectName(u"btnEdit")
 
         self.horizontalLayout_2.addWidget(self.btnEdit)
 
-        self.btnRefresh = QPushButton(InventoryWindow)
+        self.btnRefresh = QPushButton(InventoryPage)
         self.btnRefresh.setObjectName(u"btnRefresh")
-        self.btnRefresh.setCheckable(True)
+        self.btnRefresh.setCheckable(False)
 
         self.horizontalLayout_2.addWidget(self.btnRefresh)
 
-        self.btnDelete = QPushButton(InventoryWindow)
+        self.btnDelete = QPushButton(InventoryPage)
         self.btnDelete.setObjectName(u"btnDelete")
-        self.btnDelete.setCheckable(True)
+        self.btnDelete.setCheckable(False)
 
         self.horizontalLayout_2.addWidget(self.btnDelete)
 
@@ -112,62 +112,55 @@ class Ui_InventoryWindow(object):
 
         self.horizontalLayout_2.addItem(self.horizontalSpacer_2)
 
-        self.btnClose = QPushButton(InventoryWindow)
-        self.btnClose.setObjectName(u"btnClose")
-        self.btnClose.setCheckable(True)
-
-        self.horizontalLayout_2.addWidget(self.btnClose)
-
 
         self.verticalLayout.addLayout(self.horizontalLayout_2)
 
-        self.lblStatus = QLabel(InventoryWindow)
+        self.lblStatus = QLabel(InventoryPage)
         self.lblStatus.setObjectName(u"lblStatus")
 
         self.verticalLayout.addWidget(self.lblStatus)
 
 
-        self.retranslateUi(InventoryWindow)
+        self.retranslateUi(InventoryPage)
 
-        QMetaObject.connectSlotsByName(InventoryWindow)
+        QMetaObject.connectSlotsByName(InventoryPage)
     # setupUi
 
-    def retranslateUi(self, InventoryWindow):
-        InventoryWindow.setWindowTitle(QCoreApplication.translate("InventoryWindow", u"Inventory Window", None))
-        self.lblTitle.setText(QCoreApplication.translate("InventoryWindow", u"Inventory", None))
-        self.lblSearch.setText(QCoreApplication.translate("InventoryWindow", u"Search:", None))
-        self.txtSearch.setPlaceholderText(QCoreApplication.translate("InventoryWindow", u"Search by Part Number, Name, or Location...", None))
+    def retranslateUi(self, InventoryPage):
+        InventoryPage.setWindowTitle(QCoreApplication.translate("InventoryPage", u"Inventory Page", None))
+        self.lblTitle.setText(QCoreApplication.translate("InventoryPage", u"Inventory", None))
+        self.lblSearch.setText(QCoreApplication.translate("InventoryPage", u"Search:", None))
+        self.txtSearch.setPlaceholderText(QCoreApplication.translate("InventoryPage", u"Search by Part Number, Name, or Location...", None))
         ___qtablewidgetitem = self.tblInventory.horizontalHeaderItem(0)
-        ___qtablewidgetitem.setText(QCoreApplication.translate("InventoryWindow", u"ID", None))
+        ___qtablewidgetitem.setText(QCoreApplication.translate("InventoryPage", u"ID", None))
         ___qtablewidgetitem1 = self.tblInventory.horizontalHeaderItem(1)
-        ___qtablewidgetitem1.setText(QCoreApplication.translate("InventoryWindow", u"Part Number", None))
+        ___qtablewidgetitem1.setText(QCoreApplication.translate("InventoryPage", u"Part Number", None))
         ___qtablewidgetitem2 = self.tblInventory.horizontalHeaderItem(2)
-        ___qtablewidgetitem2.setText(QCoreApplication.translate("InventoryWindow", u"Part Name", None))
+        ___qtablewidgetitem2.setText(QCoreApplication.translate("InventoryPage", u"Part Name", None))
         ___qtablewidgetitem3 = self.tblInventory.horizontalHeaderItem(3)
-        ___qtablewidgetitem3.setText(QCoreApplication.translate("InventoryWindow", u"Description", None))
+        ___qtablewidgetitem3.setText(QCoreApplication.translate("InventoryPage", u"Description", None))
         ___qtablewidgetitem4 = self.tblInventory.horizontalHeaderItem(4)
-        ___qtablewidgetitem4.setText(QCoreApplication.translate("InventoryWindow", u"Category", None))
+        ___qtablewidgetitem4.setText(QCoreApplication.translate("InventoryPage", u"Category", None))
         ___qtablewidgetitem5 = self.tblInventory.horizontalHeaderItem(5)
-        ___qtablewidgetitem5.setText(QCoreApplication.translate("InventoryWindow", u"Supplier ID", None))
+        ___qtablewidgetitem5.setText(QCoreApplication.translate("InventoryPage", u"Supplier ID", None))
         ___qtablewidgetitem6 = self.tblInventory.horizontalHeaderItem(6)
-        ___qtablewidgetitem6.setText(QCoreApplication.translate("InventoryWindow", u"Unit", None))
+        ___qtablewidgetitem6.setText(QCoreApplication.translate("InventoryPage", u"Unit", None))
         ___qtablewidgetitem7 = self.tblInventory.horizontalHeaderItem(7)
-        ___qtablewidgetitem7.setText(QCoreApplication.translate("InventoryWindow", u"Quantity", None))
+        ___qtablewidgetitem7.setText(QCoreApplication.translate("InventoryPage", u"Quantity", None))
         ___qtablewidgetitem8 = self.tblInventory.horizontalHeaderItem(8)
-        ___qtablewidgetitem8.setText(QCoreApplication.translate("InventoryWindow", u"Minimum Quantity", None))
+        ___qtablewidgetitem8.setText(QCoreApplication.translate("InventoryPage", u"Minimum Quantity", None))
         ___qtablewidgetitem9 = self.tblInventory.horizontalHeaderItem(9)
-        ___qtablewidgetitem9.setText(QCoreApplication.translate("InventoryWindow", u"Reorder Quantity", None))
+        ___qtablewidgetitem9.setText(QCoreApplication.translate("InventoryPage", u"Reorder Quantity", None))
         ___qtablewidgetitem10 = self.tblInventory.horizontalHeaderItem(10)
-        ___qtablewidgetitem10.setText(QCoreApplication.translate("InventoryWindow", u"Unit Cost", None))
+        ___qtablewidgetitem10.setText(QCoreApplication.translate("InventoryPage", u"Unit Cost", None))
         ___qtablewidgetitem11 = self.tblInventory.horizontalHeaderItem(11)
-        ___qtablewidgetitem11.setText(QCoreApplication.translate("InventoryWindow", u"Location", None))
+        ___qtablewidgetitem11.setText(QCoreApplication.translate("InventoryPage", u"Location", None))
         ___qtablewidgetitem12 = self.tblInventory.horizontalHeaderItem(12)
-        ___qtablewidgetitem12.setText(QCoreApplication.translate("InventoryWindow", u"Notes", None))
-        self.btnAdd.setText(QCoreApplication.translate("InventoryWindow", u"Add", None))
-        self.btnEdit.setText(QCoreApplication.translate("InventoryWindow", u"Edit", None))
-        self.btnRefresh.setText(QCoreApplication.translate("InventoryWindow", u"Refresh", None))
-        self.btnDelete.setText(QCoreApplication.translate("InventoryWindow", u"Delete", None))
-        self.btnClose.setText(QCoreApplication.translate("InventoryWindow", u"Close", None))
-        self.lblStatus.setText(QCoreApplication.translate("InventoryWindow", u"Status", None))
+        ___qtablewidgetitem12.setText(QCoreApplication.translate("InventoryPage", u"Notes", None))
+        self.btnAdd.setText(QCoreApplication.translate("InventoryPage", u"Add", None))
+        self.btnEdit.setText(QCoreApplication.translate("InventoryPage", u"Edit", None))
+        self.btnRefresh.setText(QCoreApplication.translate("InventoryPage", u"Refresh", None))
+        self.btnDelete.setText(QCoreApplication.translate("InventoryPage", u"Delete", None))
+        self.lblStatus.setText(QCoreApplication.translate("InventoryPage", u"Status", None))
     # retranslateUi
 

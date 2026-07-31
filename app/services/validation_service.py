@@ -13,8 +13,9 @@ class ValidationService:
     def required(value, field_name):
 
         if value is None or str(value).strip() == "":
+            return False, f"{field_name} is required"
 
-            return False, f"{field_name} is requred"
+        return True, ""
 
     @staticmethod
     def max_length(value, length, field_name):
@@ -94,4 +95,6 @@ class ValidationService:
         if not valid:
             MessageService.warning(parent, "Validation", message)
 
-            return valid
+            return False
+
+        return True
