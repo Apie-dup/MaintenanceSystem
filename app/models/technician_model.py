@@ -1,6 +1,12 @@
 from app.database.connection import Database
+from app.helpers.code_generator import CodeGenerator
+
 
 class TechnicianModel:
+
+    # ---------------------------------------------------------
+    # Get all technicians
+    # ---------------------------------------------------------
 
     @staticmethod
     def get_all():
@@ -26,7 +32,12 @@ class TechnicianModel:
 
         rows = cursor.fetchall()
         conn.close()
+
         return rows
+
+    # ---------------------------------------------------------
+    # Get technician by ID
+    # ---------------------------------------------------------
 
     @staticmethod
     def get_by_id(record_id):
@@ -52,65 +63,12 @@ class TechnicianModel:
 
         row = cursor.fetchone()
         conn.close()
+
         return row
 
-    @staticmethod
-    def insert(record):
-        conn = Database.connect()
-        cursor = conn.cursor()
-
-        cursor.execute("""
-            INSERT INTO technicians (
-                employee_number,
-                first_name,
-                last_name,
-                phone,
-                email,
-                trade,
-                department,
-                hourly_rate,
-                status
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, record)
-
-        conn.commit()
-        conn.close()
-
-    @staticmethod
-    def update(record):
-        conn = Database.connect()
-        cursor = conn.cursor()
-
-        cursor.execute("""
-            UPDATE technicians
-            SET
-                first_name = ?,
-                last_name = ?,
-                phone = ?,
-                email = ?,
-                trade = ?,
-                department = ?,
-                hourly_rate = ?,
-                status = ?
-            WHERE id = ?
-        """, record)
-
-        conn.commit()
-        conn.close()
-
-    @staticmethod
-    def delete(record_id):
-        conn = Database.connect()
-        cursor = conn.cursor()
-
-        cursor.execute("""
-            DELETE FROM technicians
-            WHERE id = ?
-        """, (record_id,))
-
-        conn.commit()
-        conn.close()
+    # ---------------------------------------------------------
+    # Search
+    # ---------------------------------------------------------
 
     @staticmethod
     def search(search_text):
@@ -137,32 +95,193 @@ class TechnicianModel:
                 employee_number LIKE ?
                 OR first_name LIKE ?
                 OR last_name LIKE ?
+                OR phone LIKE ?
+                OR email LIKE ?
+                OR trade LIKE ?
                 OR department LIKE ?
                 OR status LIKE ?
             ORDER BY employee_number
-        """, (search, search, search, search, search))
+        """, (
+            search,
+            search,
+            search,
+            search,
+            search,
+            search,
+            search,
+            search,
+        ))
 
         rows = cursor.fetchall()
         conn.close()
+
         return rows
 
+    # ---------------------------------------------------------
+    # Insert
+    # ---------------------------------------------------------
+
     @staticmethod
-    def get_next_employee_number():
+    def insert(data):
         conn = Database.connect()
         cursor = conn.cursor()
 
         cursor.execute("""
-            SELECT employee_number
-            FROM technicians
-            ORDER BY id DESC
-            LIMIT 1
-        """)
+            INSERT INTO technicians
+            (
+                employee_number,
+                first_name,
+                last_name,
+                phone,
+                email,
+                trade,
+                department,
+                hourly_rate,
+                status
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            data["employee_number"],
+            data["first_name"],
+            data["last_name"],
+            data["phone"],
+            data["email"],
+            data["trade"],
+            data["department"],
+            data["hourly_rate"],
+            data["status"],
+        ))
 
-        row = cursor.fetchone()
+        conn.commit()
+
+        record_id = cursor.lastrowid
+
         conn.close()
 
-        if row is None:
-            return "EMP-000001"
+        return record_id
 
-        number = int(row[0].split("-")[1]) + 1
-        return f"EMP-{number:06d}"
+    # ---------------------------------------------------------
+    # Update
+    # ---------------------------------------------------------
+
+    @staticmethod
+    def update(record_id, data):
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            UPDATE technicians
+            SET
+                employee_number = ?,
+                first_name = ?,
+                last_name = ?,
+                phone = ?,
+                email = ?,
+                trade = ?,
+                department = ?,
+                hourly_rate = ?,
+                status = ?
+            WHERE id = ?
+        """, (
+            data["employee_number"],
+            data["first_name"],
+            data["last_name"],
+            data["phone"],
+            data["email"],
+            data["trade"],
+            data["department"],
+            data["hourly_rate"],
+            data["status"],
+            record_id,
+        ))
+
+        conn.commit()
+        conn.close()
+
+    # ---------------------------------------------------------
+    # Delete
+    # ---------------------------------------------------------
+
+    @staticmethod
+    def delete(record_id):
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            DELETE FROM technicians
+            WHERE id = ?
+        """, (record_id,))
+
+        conn.commit()
+        conn.close()
+
+    # ---------------------------------------------------------
+    # Duplicate employee-number check
+    # ---------------------------------------------------------
+
+    @staticmethod
+    def employee_number_exists(
+        employee_number,
+        exclude_id=None
+    ):
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        if exclude_id is None:
+            cursor.execute("""
+                SELECT 1
+                FROM technicians
+                WHERE employee_number = ?
+                LIMIT 1
+            """, (employee_number,))
+        else:
+            cursor.execute("""
+                SELECT 1
+                FROM technicians
+                WHERE employee_number = ?
+                  AND id <> ?
+                LIMIT 1
+            """, (
+                employee_number,
+                exclude_id,
+            ))
+
+        exists = cursor.fetchone() is not None
+
+        conn.close()
+
+        return exists
+
+    # ---------------------------------------------------------
+    # Next employee number
+    # ---------------------------------------------------------
+
+    @staticmethod
+    def get_next_employee_number():
+        return CodeGenerator.next_code(
+            table_name="technicians",
+            field_name="employee_number",
+            prefix="EMP",
+            digits=6,
+        )
+
+    @staticmethod
+    def get_active_technicians():
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT
+                id,
+                employee_number,
+                first_name,
+                last_name
+            FROM technicians
+            WHERE status = 'Active'
+            ORDER BY first_name, last_name
+        """)
+
+        rows = cursor.fetchall()
+        conn.close()
+
+        return rows

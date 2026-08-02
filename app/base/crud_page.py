@@ -179,9 +179,8 @@ class CrudPage(BasePage):
     # ---------------------------------------------------------
 
     def add_record(self):
-        dialog_cls = self.dialog_class or self.dialog
 
-        dialog = dialog_cls(self)
+        dialog = self.dialog_class (self)
 
         dialog.new_record()
 

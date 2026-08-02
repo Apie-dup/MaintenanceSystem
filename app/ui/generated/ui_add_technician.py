@@ -16,176 +16,156 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractButton, QApplication, QComboBox, QDialog,
-    QDialogButtonBox, QDoubleSpinBox, QHBoxLayout, QLabel,
-    QLineEdit, QSizePolicy, QVBoxLayout, QWidget)
+    QDialogButtonBox, QDoubleSpinBox, QFormLayout, QGroupBox,
+    QLabel, QLineEdit, QSizePolicy, QVBoxLayout,
+    QWidget)
 
 class Ui_AddTechnicianDialog(object):
     def setupUi(self, AddTechnicianDialog):
         if not AddTechnicianDialog.objectName():
             AddTechnicianDialog.setObjectName(u"AddTechnicianDialog")
-        AddTechnicianDialog.resize(876, 703)
-        self.verticalLayout = QVBoxLayout(AddTechnicianDialog)
-        self.verticalLayout.setObjectName(u"verticalLayout")
-        self.horizontalLayout = QHBoxLayout()
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.lblEmployeeNo = QLabel(AddTechnicianDialog)
-        self.lblEmployeeNo.setObjectName(u"lblEmployeeNo")
+        AddTechnicianDialog.resize(680, 520)
+        self.mainLayout = QVBoxLayout(AddTechnicianDialog)
+        self.mainLayout.setObjectName(u"mainLayout")
+        self.groupPersonalInfo = QGroupBox(AddTechnicianDialog)
+        self.groupPersonalInfo.setObjectName(u"groupPersonalInfo")
+        self.groupPersonalInfo.setFlat(True)
+        self.formPersonalInfo = QFormLayout(self.groupPersonalInfo)
+        self.formPersonalInfo.setObjectName(u"formPersonalInfo")
+        self.lblEmployeeNumber = QLabel(self.groupPersonalInfo)
+        self.lblEmployeeNumber.setObjectName(u"lblEmployeeNumber")
 
-        self.horizontalLayout.addWidget(self.lblEmployeeNo)
+        self.formPersonalInfo.setWidget(0, QFormLayout.ItemRole.LabelRole, self.lblEmployeeNumber)
 
-        self.txtEmployeeNumber = QLineEdit(AddTechnicianDialog)
+        self.txtEmployeeNumber = QLineEdit(self.groupPersonalInfo)
         self.txtEmployeeNumber.setObjectName(u"txtEmployeeNumber")
+        self.txtEmployeeNumber.setReadOnly(True)
 
-        self.horizontalLayout.addWidget(self.txtEmployeeNumber)
+        self.formPersonalInfo.setWidget(0, QFormLayout.ItemRole.FieldRole, self.txtEmployeeNumber)
 
-
-        self.verticalLayout.addLayout(self.horizontalLayout)
-
-        self.horizontalLayout_2 = QHBoxLayout()
-        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.lblFirstName = QLabel(AddTechnicianDialog)
+        self.lblFirstName = QLabel(self.groupPersonalInfo)
         self.lblFirstName.setObjectName(u"lblFirstName")
 
-        self.horizontalLayout_2.addWidget(self.lblFirstName)
+        self.formPersonalInfo.setWidget(1, QFormLayout.ItemRole.LabelRole, self.lblFirstName)
 
-        self.txtFirstName = QLineEdit(AddTechnicianDialog)
+        self.txtFirstName = QLineEdit(self.groupPersonalInfo)
         self.txtFirstName.setObjectName(u"txtFirstName")
 
-        self.horizontalLayout_2.addWidget(self.txtFirstName)
+        self.formPersonalInfo.setWidget(1, QFormLayout.ItemRole.FieldRole, self.txtFirstName)
 
-
-        self.verticalLayout.addLayout(self.horizontalLayout_2)
-
-        self.horizontalLayout_3 = QHBoxLayout()
-        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.lblLastName = QLabel(AddTechnicianDialog)
+        self.lblLastName = QLabel(self.groupPersonalInfo)
         self.lblLastName.setObjectName(u"lblLastName")
 
-        self.horizontalLayout_3.addWidget(self.lblLastName)
+        self.formPersonalInfo.setWidget(2, QFormLayout.ItemRole.LabelRole, self.lblLastName)
 
-        self.txtLastName = QLineEdit(AddTechnicianDialog)
+        self.txtLastName = QLineEdit(self.groupPersonalInfo)
         self.txtLastName.setObjectName(u"txtLastName")
 
-        self.horizontalLayout_3.addWidget(self.txtLastName)
+        self.formPersonalInfo.setWidget(2, QFormLayout.ItemRole.FieldRole, self.txtLastName)
 
-
-        self.verticalLayout.addLayout(self.horizontalLayout_3)
-
-        self.horizontalLayout_4 = QHBoxLayout()
-        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
-        self.lblPhone = QLabel(AddTechnicianDialog)
+        self.lblPhone = QLabel(self.groupPersonalInfo)
         self.lblPhone.setObjectName(u"lblPhone")
 
-        self.horizontalLayout_4.addWidget(self.lblPhone)
+        self.formPersonalInfo.setWidget(3, QFormLayout.ItemRole.LabelRole, self.lblPhone)
 
-        self.txtPhone = QLineEdit(AddTechnicianDialog)
+        self.txtPhone = QLineEdit(self.groupPersonalInfo)
         self.txtPhone.setObjectName(u"txtPhone")
 
-        self.horizontalLayout_4.addWidget(self.txtPhone)
+        self.formPersonalInfo.setWidget(3, QFormLayout.ItemRole.FieldRole, self.txtPhone)
 
-
-        self.verticalLayout.addLayout(self.horizontalLayout_4)
-
-        self.horizontalLayout_5 = QHBoxLayout()
-        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
-        self.lblEmail = QLabel(AddTechnicianDialog)
+        self.lblEmail = QLabel(self.groupPersonalInfo)
         self.lblEmail.setObjectName(u"lblEmail")
 
-        self.horizontalLayout_5.addWidget(self.lblEmail)
+        self.formPersonalInfo.setWidget(4, QFormLayout.ItemRole.LabelRole, self.lblEmail)
 
-        self.txtEmail = QLineEdit(AddTechnicianDialog)
+        self.txtEmail = QLineEdit(self.groupPersonalInfo)
         self.txtEmail.setObjectName(u"txtEmail")
 
-        self.horizontalLayout_5.addWidget(self.txtEmail)
+        self.formPersonalInfo.setWidget(4, QFormLayout.ItemRole.FieldRole, self.txtEmail)
 
 
-        self.verticalLayout.addLayout(self.horizontalLayout_5)
+        self.mainLayout.addWidget(self.groupPersonalInfo)
 
-        self.horizontalLayout_6 = QHBoxLayout()
-        self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
-        self.lblTrade = QLabel(AddTechnicianDialog)
+        self.groupEmploymentInfo = QGroupBox(AddTechnicianDialog)
+        self.groupEmploymentInfo.setObjectName(u"groupEmploymentInfo")
+        self.groupEmploymentInfo.setFlat(True)
+        self.formEmploymentInfo = QFormLayout(self.groupEmploymentInfo)
+        self.formEmploymentInfo.setObjectName(u"formEmploymentInfo")
+        self.lblTrade = QLabel(self.groupEmploymentInfo)
         self.lblTrade.setObjectName(u"lblTrade")
 
-        self.horizontalLayout_6.addWidget(self.lblTrade)
+        self.formEmploymentInfo.setWidget(0, QFormLayout.ItemRole.LabelRole, self.lblTrade)
 
-        self.cmbTrade = QComboBox(AddTechnicianDialog)
+        self.cmbTrade = QComboBox(self.groupEmploymentInfo)
         self.cmbTrade.setObjectName(u"cmbTrade")
 
-        self.horizontalLayout_6.addWidget(self.cmbTrade)
+        self.formEmploymentInfo.setWidget(0, QFormLayout.ItemRole.FieldRole, self.cmbTrade)
 
-
-        self.verticalLayout.addLayout(self.horizontalLayout_6)
-
-        self.horizontalLayout_7 = QHBoxLayout()
-        self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
-        self.lblDepartment = QLabel(AddTechnicianDialog)
+        self.lblDepartment = QLabel(self.groupEmploymentInfo)
         self.lblDepartment.setObjectName(u"lblDepartment")
 
-        self.horizontalLayout_7.addWidget(self.lblDepartment)
+        self.formEmploymentInfo.setWidget(1, QFormLayout.ItemRole.LabelRole, self.lblDepartment)
 
-        self.cmbDepartment = QComboBox(AddTechnicianDialog)
+        self.cmbDepartment = QComboBox(self.groupEmploymentInfo)
         self.cmbDepartment.setObjectName(u"cmbDepartment")
 
-        self.horizontalLayout_7.addWidget(self.cmbDepartment)
+        self.formEmploymentInfo.setWidget(1, QFormLayout.ItemRole.FieldRole, self.cmbDepartment)
 
-
-        self.verticalLayout.addLayout(self.horizontalLayout_7)
-
-        self.horizontalLayout_8 = QHBoxLayout()
-        self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
-        self.lblHourlyRate = QLabel(AddTechnicianDialog)
+        self.lblHourlyRate = QLabel(self.groupEmploymentInfo)
         self.lblHourlyRate.setObjectName(u"lblHourlyRate")
 
-        self.horizontalLayout_8.addWidget(self.lblHourlyRate)
+        self.formEmploymentInfo.setWidget(2, QFormLayout.ItemRole.LabelRole, self.lblHourlyRate)
 
-        self.dsbHourlyRate = QDoubleSpinBox(AddTechnicianDialog)
+        self.dsbHourlyRate = QDoubleSpinBox(self.groupEmploymentInfo)
         self.dsbHourlyRate.setObjectName(u"dsbHourlyRate")
+        self.dsbHourlyRate.setDecimals(2)
+        self.dsbHourlyRate.setMaximum(999999.989999999990687)
 
-        self.horizontalLayout_8.addWidget(self.dsbHourlyRate, 0, Qt.AlignmentFlag.AlignRight)
+        self.formEmploymentInfo.setWidget(2, QFormLayout.ItemRole.FieldRole, self.dsbHourlyRate)
 
-
-        self.verticalLayout.addLayout(self.horizontalLayout_8)
-
-        self.horizontalLayout_9 = QHBoxLayout()
-        self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
-        self.lblStatus = QLabel(AddTechnicianDialog)
+        self.lblStatus = QLabel(self.groupEmploymentInfo)
         self.lblStatus.setObjectName(u"lblStatus")
 
-        self.horizontalLayout_9.addWidget(self.lblStatus)
+        self.formEmploymentInfo.setWidget(3, QFormLayout.ItemRole.LabelRole, self.lblStatus)
 
-        self.cmbStatus = QComboBox(AddTechnicianDialog)
+        self.cmbStatus = QComboBox(self.groupEmploymentInfo)
+        self.cmbStatus.addItem("")
+        self.cmbStatus.addItem("")
         self.cmbStatus.setObjectName(u"cmbStatus")
 
-        self.horizontalLayout_9.addWidget(self.cmbStatus)
+        self.formEmploymentInfo.setWidget(3, QFormLayout.ItemRole.FieldRole, self.cmbStatus)
 
 
-        self.verticalLayout.addLayout(self.horizontalLayout_9)
+        self.mainLayout.addWidget(self.groupEmploymentInfo)
 
         self.buttonBox = QDialogButtonBox(AddTechnicianDialog)
         self.buttonBox.setObjectName(u"buttonBox")
-        self.buttonBox.setOrientation(Qt.Orientation.Horizontal)
         self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Save)
 
-        self.verticalLayout.addWidget(self.buttonBox)
+        self.mainLayout.addWidget(self.buttonBox)
 
 
         self.retranslateUi(AddTechnicianDialog)
-        self.buttonBox.accepted.connect(AddTechnicianDialog.accept)
-        self.buttonBox.rejected.connect(AddTechnicianDialog.reject)
 
         QMetaObject.connectSlotsByName(AddTechnicianDialog)
     # setupUi
 
     def retranslateUi(self, AddTechnicianDialog):
         AddTechnicianDialog.setWindowTitle(QCoreApplication.translate("AddTechnicianDialog", u"Add Technician", None))
-        self.lblEmployeeNo.setText(QCoreApplication.translate("AddTechnicianDialog", u"Employee No", None))
-        self.lblFirstName.setText(QCoreApplication.translate("AddTechnicianDialog", u"First Name", None))
-        self.lblLastName.setText(QCoreApplication.translate("AddTechnicianDialog", u"Last Name", None))
-        self.lblPhone.setText(QCoreApplication.translate("AddTechnicianDialog", u"Phone", None))
-        self.lblEmail.setText(QCoreApplication.translate("AddTechnicianDialog", u"Email", None))
-        self.lblTrade.setText(QCoreApplication.translate("AddTechnicianDialog", u"Trade", None))
-        self.lblDepartment.setText(QCoreApplication.translate("AddTechnicianDialog", u"Department", None))
-        self.lblHourlyRate.setText(QCoreApplication.translate("AddTechnicianDialog", u"Hourly Rate", None))
-        self.lblStatus.setText(QCoreApplication.translate("AddTechnicianDialog", u"Status", None))
+        self.groupPersonalInfo.setTitle(QCoreApplication.translate("AddTechnicianDialog", u"Personal Information", None))
+        self.lblEmployeeNumber.setText(QCoreApplication.translate("AddTechnicianDialog", u"Employee No:", None))
+        self.lblFirstName.setText(QCoreApplication.translate("AddTechnicianDialog", u"First Name:", None))
+        self.lblLastName.setText(QCoreApplication.translate("AddTechnicianDialog", u"Last Name:", None))
+        self.lblPhone.setText(QCoreApplication.translate("AddTechnicianDialog", u"Phone:", None))
+        self.lblEmail.setText(QCoreApplication.translate("AddTechnicianDialog", u"Email:", None))
+        self.groupEmploymentInfo.setTitle(QCoreApplication.translate("AddTechnicianDialog", u"Employment Information", None))
+        self.lblTrade.setText(QCoreApplication.translate("AddTechnicianDialog", u"Trade:", None))
+        self.lblDepartment.setText(QCoreApplication.translate("AddTechnicianDialog", u"Department:", None))
+        self.lblHourlyRate.setText(QCoreApplication.translate("AddTechnicianDialog", u"Hourly Rate:", None))
+        self.dsbHourlyRate.setPrefix("")
+        self.lblStatus.setText(QCoreApplication.translate("AddTechnicianDialog", u"Status:", None))
+        self.cmbStatus.setItemText(0, QCoreApplication.translate("AddTechnicianDialog", u"Active", None))
+        self.cmbStatus.setItemText(1, QCoreApplication.translate("AddTechnicianDialog", u"Inactive", None))
+
     # retranslateUi
 

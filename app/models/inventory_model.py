@@ -1,4 +1,5 @@
 from app.database.connection import Database
+from app.helpers.code_generator import CodeGenerator
 
 
 class InventoryModel:
@@ -267,27 +268,12 @@ class InventoryModel:
 
     @staticmethod
     def get_next_part_number():
-        conn = Database.connect()
-        cursor = conn.cursor()
-
-        cursor.execute("""
-            SELECT part_number
-            FROM inventory
-            ORDER BY id DESC
-            LIMIT 1
-        """)
-
-        row = cursor.fetchone()
-        conn.close()
-
-        if row is None or not row["part_number"]:
-            return "PRT-000001"
-
-        last_number = int(
-            row["part_number"].split("-")[1]
+        return CodeGenerator.next_code(
+            table_name="inventory",
+            field_name="part_number",
+            prefix="PRT",
+            digits=6
         )
-
-        return f"PRT-{last_number + 1:06d}"
 
     # ---------------------------------------------------------
     # Dashboard
@@ -335,3 +321,28 @@ class InventoryModel:
         conn.close()
 
         return row["total_stock_value"]
+
+    @staticmethod
+    def update_quantity(
+        inventory_id,
+        quantity,
+        connection=None
+    ):
+        owns_connection = connection is None
+
+        conn = connection or Database.connect()
+
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            UPDATE inventory
+            SET quantity = ?
+            WHERE id = ?
+        """, (
+            quantity,
+            inventory_id
+        ))
+
+        if owns_connection:
+            conn.commit()
+            conn.close()

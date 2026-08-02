@@ -1,120 +1,89 @@
-from PySide6.QtWidgets import QWidget, QMessageBox, QTableWidgetItem, QHeaderView
-
-from app.ui.generated.ui_technicians_page import Ui_TechniciansWindow
+from app.base.crud_page import CrudPage
+from app.dialogs.technician_dialog import TechnicianDialog
 from app.services.technician_service import TechnicianService
-from app.controllers.add_technician_controller import AddTechnicianController
+from app.ui.generated.ui_technicians_page import Ui_TechniciansWindow
 
 
-class TechniciansPage(QWidget):
+class TechniciansPage(CrudPage):
 
-    def __init__(self):
-        super().__init__()
+    PAGE_TITLE = "Technicians"
+
+    TABLE_COLUMNS = [
+        ("employee_number", "Employee Number"),
+        ("first_name", "First Name"),
+        ("last_name", "Last Name"),
+        ("phone", "Phone"),
+        ("email", "Email"),
+        ("trade", "Trade"),
+        ("department", "Department"),
+        ("hourly_rate", "Hourly Rate"),
+        ("status", "Status"),
+    ]
+
+    SEARCH_FIELDS = [
+        "employee_number",
+        "first_name",
+        "last_name",
+        "phone",
+        "email",
+        "trade",
+        "department",
+        "status",
+    ]
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
 
         self.ui = Ui_TechniciansWindow()
         self.ui.setupUi(self)
 
-        self.initialize_window()
+        # Shared CRUD framework configuration
+        self.service = TechnicianService
+        self.dialog_class = TechnicianDialog
+        self.table = self.ui.tblTechnicians
+        self.search_widget = self.ui.txtSearch
+        self.status_label = self.ui.lblStatus
 
-    def initialize_window(self):
-        self.load_technicians()
+        self.entity_name = "Technician"
+        self.record_name = "technicians"
 
-        self.ui.btnAdd.clicked.connect(self.add_technician)
-        self.ui.btnEdit.clicked.connect(self.edit_technician)
-        self.ui.btnDelete.clicked.connect(self.delete_technician)
-        self.ui.btnRefresh.clicked.connect(self.load_technicians)
-        self.ui.btnClose.clicked.connect(self.close)
+        self.setup_page()
 
-        self.ui.txtSearch.textChanged.connect(self.search_technicians)
+    # ---------------------------------------------------------
+    # Setup
+    # ---------------------------------------------------------
 
-    def load_technicians(self):
-        technicians = TechnicianService.get_all()
-        self.populate_table(technicians)
+    def setup_page(self):
+        self.validate_configuration()
+        self.setup_table()
+        self.connect_signals()
+        self.load_data()
 
-    def populate_table(self, technicians):
-        self.ui.tblTechnicians.setRowCount(len(technicians))
+    # ---------------------------------------------------------
+    # Signals
+    # ---------------------------------------------------------
 
-        for row, technician in enumerate(technicians):
-            for column, value in enumerate(technician):
-                item = QTableWidgetItem("" if value is None else str(value))
-                self.ui.tblTechnicians.setItem(
-                    row,
-                    column,
-                    item
-                )
-
-        self.ui.tblTechnicians.setColumnHidden(0, True)
-
-        header = self.ui.tblTechnicians.horizontalHeader()
-        header.setSectionResizeMode(QHeaderView.Stretch)
-
-        self.ui.tblTechnicians.setAlternatingRowColors(True)
-        self.ui.tblTechnicians.setSortingEnabled(True)
-
-        self.ui.lblStatus.setText(
-            f"Showing {len(technicians)} technicians"
+    def connect_signals(self):
+        self.ui.btnAdd.clicked.connect(
+            self.add_record
         )
 
-    def add_technician(self):
-        dialog = AddTechnicianController()
-
-        if dialog.exec():
-            self.load_technicians()
-
-    def edit_technician(self):
-        row = self.ui.tblTechnicians.currentRow()
-
-        if row < 0:
-            QMessageBox.warning(
-                self,
-                "Select Technician",
-                "Please select a technician."
-            )
-            return
-
-        technician_id = int(
-            self.ui.tblTechnicians.item(row, 0).text()
+        self.ui.btnEdit.clicked.connect(
+            self.edit_record
         )
 
-        dialog = AddTechnicianController(technician_id)
-
-        if dialog.exec():
-            self.load_technicians()
-
-    def delete_technician(self):
-        row = self.ui.tblTechnicians.currentRow()
-
-        if row < 0:
-            QMessageBox.warning(
-                self,
-                "Select Technician",
-                "Please select a technician."
-            )
-            return
-
-        technician_id = int(
-            self.ui.tblTechnicians.item(row, 0).text()
+        self.ui.btnDelete.clicked.connect(
+            self.delete_record
         )
 
-        reply = QMessageBox.question(
-            self,
-            "Delete Technician",
-            "Delete this technician?",
-            QMessageBox.Yes | QMessageBox.No
+        self.ui.btnRefresh.clicked.connect(
+            self.refresh
         )
 
-        if reply == QMessageBox.Yes:
-            TechnicianService.delete_technician(technician_id)
-            self.load_technicians()
+        self.ui.txtSearch.textChanged.connect(
+            self.search
+        )
 
-    def search_technicians(self, text):
-        search_text = text.strip()
-
-        if search_text:
-            technicians = TechnicianService.search_technicians(search_text)
-        else:
-            technicians = TechnicianService.get_all()
-
-        self.populate_table(technicians)
-
-    def refresh(self):
-        self.load_technicians()
+        self.ui.tblTechnicians.itemDoubleClicked.connect(
+            lambda _item: self.edit_record()
+        )

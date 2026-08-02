@@ -98,7 +98,7 @@ class Ui_AssetsWindow(object):
         font1.setFamilies([u"Segoe UI"])
         self.btnAdd.setFont(font1)
         self.btnAdd.setStyleSheet(u"")
-        self.btnAdd.setCheckable(True)
+        self.btnAdd.setCheckable(False)
 
         self.horizontalLayout_2.addWidget(self.btnAdd)
 
@@ -106,37 +106,29 @@ class Ui_AssetsWindow(object):
         self.btnEdit.setObjectName(u"btnEdit")
         self.btnEdit.setMinimumSize(QSize(90, 32))
         self.btnEdit.setStyleSheet(u"")
-        self.btnEdit.setCheckable(True)
+        self.btnEdit.setCheckable(False)
 
         self.horizontalLayout_2.addWidget(self.btnEdit)
-
-        self.btnDelete = QPushButton(AssetsWindow)
-        self.btnDelete.setObjectName(u"btnDelete")
-        self.btnDelete.setMinimumSize(QSize(90, 32))
-        self.btnDelete.setStyleSheet(u"")
-        self.btnDelete.setCheckable(True)
-
-        self.horizontalLayout_2.addWidget(self.btnDelete)
 
         self.btnRefresh = QPushButton(AssetsWindow)
         self.btnRefresh.setObjectName(u"btnRefresh")
         self.btnRefresh.setMinimumSize(QSize(90, 32))
         self.btnRefresh.setStyleSheet(u"")
-        self.btnRefresh.setCheckable(True)
+        self.btnRefresh.setCheckable(False)
 
         self.horizontalLayout_2.addWidget(self.btnRefresh)
+
+        self.btnDelete = QPushButton(AssetsWindow)
+        self.btnDelete.setObjectName(u"btnDelete")
+        self.btnDelete.setMinimumSize(QSize(90, 32))
+        self.btnDelete.setStyleSheet(u"")
+        self.btnDelete.setCheckable(False)
+
+        self.horizontalLayout_2.addWidget(self.btnDelete)
 
         self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_2.addItem(self.horizontalSpacer)
-
-        self.btnClose = QPushButton(AssetsWindow)
-        self.btnClose.setObjectName(u"btnClose")
-        self.btnClose.setMinimumSize(QSize(90, 32))
-        self.btnClose.setStyleSheet(u"")
-        self.btnClose.setCheckable(True)
-
-        self.horizontalLayout_2.addWidget(self.btnClose)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout_2)
@@ -186,9 +178,8 @@ class Ui_AssetsWindow(object):
         ___qtablewidgetitem11.setText(QCoreApplication.translate("AssetsWindow", u"Status", None))
         self.btnAdd.setText(QCoreApplication.translate("AssetsWindow", u"Add", None))
         self.btnEdit.setText(QCoreApplication.translate("AssetsWindow", u"Edit", None))
-        self.btnDelete.setText(QCoreApplication.translate("AssetsWindow", u"Delete", None))
         self.btnRefresh.setText(QCoreApplication.translate("AssetsWindow", u"Refresh", None))
-        self.btnClose.setText(QCoreApplication.translate("AssetsWindow", u"Close", None))
+        self.btnDelete.setText(QCoreApplication.translate("AssetsWindow", u"Delete", None))
         self.lblStatus.setText(QCoreApplication.translate("AssetsWindow", u"Status", None))
     # retranslateUi
 

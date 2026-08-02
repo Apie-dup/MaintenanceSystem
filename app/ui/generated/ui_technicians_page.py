@@ -90,7 +90,7 @@ class Ui_TechniciansWindow(object):
         self.btnAdd.setObjectName(u"btnAdd")
         self.btnAdd.setMinimumSize(QSize(90, 32))
         self.btnAdd.setStyleSheet(u"")
-        self.btnAdd.setCheckable(True)
+        self.btnAdd.setCheckable(False)
 
         self.horizontalLayout_2.addWidget(self.btnAdd)
 
@@ -98,7 +98,7 @@ class Ui_TechniciansWindow(object):
         self.btnEdit.setObjectName(u"btnEdit")
         self.btnEdit.setMinimumSize(QSize(90, 32))
         self.btnEdit.setStyleSheet(u"")
-        self.btnEdit.setCheckable(True)
+        self.btnEdit.setCheckable(False)
 
         self.horizontalLayout_2.addWidget(self.btnEdit)
 
@@ -111,21 +111,13 @@ class Ui_TechniciansWindow(object):
         self.btnDelete.setObjectName(u"btnDelete")
         self.btnDelete.setMinimumSize(QSize(90, 32))
         self.btnDelete.setStyleSheet(u"")
-        self.btnDelete.setCheckable(True)
+        self.btnDelete.setCheckable(False)
 
         self.horizontalLayout_2.addWidget(self.btnDelete)
 
         self.horizontalSpacer = QSpacerItem(1299, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_2.addItem(self.horizontalSpacer)
-
-        self.btnClose = QPushButton(TechniciansWindow)
-        self.btnClose.setObjectName(u"btnClose")
-        self.btnClose.setMinimumSize(QSize(90, 32))
-        self.btnClose.setStyleSheet(u"")
-        self.btnClose.setCheckable(True)
-
-        self.horizontalLayout_2.addWidget(self.btnClose)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout_2)
@@ -172,7 +164,6 @@ class Ui_TechniciansWindow(object):
         self.btnEdit.setText(QCoreApplication.translate("TechniciansWindow", u"Edit", None))
         self.btnRefresh.setText(QCoreApplication.translate("TechniciansWindow", u"Refresh", None))
         self.btnDelete.setText(QCoreApplication.translate("TechniciansWindow", u"Delete", None))
-        self.btnClose.setText(QCoreApplication.translate("TechniciansWindow", u"Close", None))
         self.lblStatus.setText(QCoreApplication.translate("TechniciansWindow", u"Status", None))
     # retranslateUi
 

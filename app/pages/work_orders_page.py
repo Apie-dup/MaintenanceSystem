@@ -1,149 +1,92 @@
-from PySide6.QtWidgets import (
-    QWidget,
-    QMessageBox,
-    QTableWidgetItem,
-    QHeaderView,
-    QAbstractItemView,
-
-)
-
-from app.ui.generated.ui_work_orders_page import Ui_WorkOrdersWindow
+from app.base.crud_page import CrudPage
+from app.dialogs.work_order_dialog import WorkOrderDialog
 from app.services.work_order_service import WorkOrderService
-from app.controllers.add_work_order_controller import AddWorkOrderController
-from app.base.base_page import BasePage
+from app.ui.generated.ui_work_orders_page import Ui_WorkOrdersPage
 
 
-class WorkOrdersPage(BasePage):
+class WorkOrdersPage(CrudPage):
 
+    PAGE_TITLE = "Work Orders"
 
-    def __init__(self):
-        super().__init__()
+    TABLE_COLUMNS = [
+        ("work_order_number", "Work Order"),
+        ("asset_number", "Asset Number"),
+        ("asset_name", "Asset"),
+        ("title", "Title"),
+        ("priority", "Priority"),
+        ("status", "Status"),
+        ("technician_display", "Technician"),
+        ("due_date", "Due Date"),
+        ("notes", "Notes"),
+    ]
 
-        self.ui = Ui_WorkOrdersWindow()
+    SEARCH_FIELDS = [
+        "work_order_number",
+        "asset_number",
+        "asset_name",
+        "title",
+        "description",
+        "priority",
+        "status",
+        "requested_by",
+        "employee_number",
+        "first_name",
+        "last_name",
+    ]
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.ui = Ui_WorkOrdersPage()
         self.ui.setupUi(self)
 
-        self.configure_table(
-            self.ui.tblWorkOrders
+        self.service = WorkOrderService
+        self.dialog_class = WorkOrderDialog
+        self.table = self.ui.tblWorkOrders
+        self.search_widget = self.ui.txtSearch
+        self.status_label = self.ui.lblStatus
+
+        self.entity_name = "Work Order"
+        self.record_name = "work orders"
+
+        self.setup_page()
+
+    # ---------------------------------------------------------
+    # Setup
+    # ---------------------------------------------------------
+
+    def setup_page(self):
+        self.validate_configuration()
+        self.setup_table()
+        self.connect_signals()
+        self.load_data()
+
+    # ---------------------------------------------------------
+    # Signals
+    # ---------------------------------------------------------
+
+    def connect_signals(self):
+        self.ui.txtSearch.textChanged.connect(
+            self.search
         )
 
-    def initialize_window(self):
-
-        self.load_work_orders()
-
-        self.ui.btnAdd.clicked.connect(self.add_work_order)
-        self.ui.btnEdit.clicked.connect(self.edit_work_order)
-        self.ui.btnDelete.clicked.connect(self.delete_work_order)
-        self.ui.btnRefresh.clicked.connect(self.load_work_orders)
-        self.ui.btnClose.clicked.connect(self.close)
-
-        self.ui.txtSearch.textChanged.connect(self.search_work_orders)
-
-    def refresh(self):
-        self.load_work_orders()
-
-    def populate_table(self, work_orders):
-
-        self.ui.tblWorkOrders.setRowCount(len(work_orders))
-
-        for row, work_order in enumerate(work_orders):
-
-            for column, value in enumerate(work_order):
-
-                self.ui.tblWorkOrders.setItem(
-                    row,
-                    column,
-                    QTableWidgetItem(str(value))
-                )
-
-        self.ui.tblWorkOrders.setColumnHidden(0, True)
-
-        header = self.ui.tblWorkOrders.horizontalHeader()
-        self.ui.tblWorkOrders.setSortingEnabled(True)
-        header.setSectionResizeMode(QHeaderView.Stretch)
-
-        self.ui.lblStatus.setText(
-            f"Showing {len(work_orders)} work orders"
+        self.ui.btnAdd.clicked.connect(
+            self.add_record
         )
 
-    def add_work_order(self):
-
-        dialog = AddWorkOrderController()
-
-        if dialog.exec():
-
-            self.load_work_orders()
-
-    def edit_work_order(self):
-
-        row = self.ui.tblWorkOrders.currentRow()
-
-        if row < 0:
-
-            QMessageBox.warning(
-                self,
-                "Select Work Order",
-                "Please select a work order."
-            )
-            return
-        
-        work_order_id = int(
-            self.ui.tblWorkOrders.item(row, 0).text()
+        self.ui.btnEdit.clicked.connect(
+            self.edit_record
         )
 
-        dialog = AddWorkOrderController(work_order_id)
-
-        if dialog.exec():
-
-            self.load_work_orders()
-
-    def delete_work_order(self):
-
-        row = self.ui.tblWorkOrders.currentRow()
-
-        if row < 0:
-
-            QMessageBox.warning(
-                self,
-                "Select Work Order",
-                "Please select a work order."
-            )
-            return
-        
-        work_order_id = int(
-            self.ui.tblWorkOrders.item(row, 0).text()
+        self.ui.btnDelete.clicked.connect(
+            self.delete_record
         )
 
-        reply = QMessageBox.question(
-            self,
-            "Delete",
-            "Delete this work order?",
-            QMessageBox.Yes | QMessageBox.No
+        self.ui.btnRefresh.clicked.connect(
+            self.refresh
         )
 
-        if reply == QMessageBox.Yes:
-
-            WorkOrderService.delete_work_order(work_order_id)
-
-            self.load_work_orders()
-
-    def search_work_orders(self):
-
-        text = self.ui.txtSearch.text()
-
-        if text:
-
-            work_orders = WorkOrderService.search(text)
-
-        else:
-
-            work_orders = WorkOrderService.get_all()
-
-        self.populate_table(work_orders)
-
-
-class WorkOrderPage(WorkOrdersPage):
-    """Backward-compatible alias for earlier imports."""
-
-    pass
-
+        self.ui.tblWorkOrders.itemDoubleClicked.connect(
+            lambda _item: self.edit_record()
+        )
     

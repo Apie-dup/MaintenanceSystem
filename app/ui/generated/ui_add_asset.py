@@ -16,213 +16,233 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractButton, QApplication, QComboBox, QDateEdit,
-    QDialog, QDialogButtonBox, QHBoxLayout, QLabel,
-    QLineEdit, QSizePolicy, QTextEdit, QVBoxLayout,
-    QWidget)
+    QDialog, QDialogButtonBox, QDoubleSpinBox, QFormLayout,
+    QGroupBox, QLabel, QLineEdit, QSizePolicy,
+    QTextEdit, QVBoxLayout, QWidget)
 
 class Ui_AddAssetDialog(object):
     def setupUi(self, AddAssetDialog):
         if not AddAssetDialog.objectName():
             AddAssetDialog.setObjectName(u"AddAssetDialog")
-        AddAssetDialog.resize(600, 694)
-        AddAssetDialog.setMinimumSize(QSize(600, 500))
-        self.verticalLayout = QVBoxLayout(AddAssetDialog)
-        self.verticalLayout.setObjectName(u"verticalLayout")
-        self.horizontalLayout = QHBoxLayout()
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.lblAssetNumber = QLabel(AddAssetDialog)
-        self.lblAssetNumber.setObjectName(u"lblAssetNumber")
+        AddAssetDialog.resize(649, 848)
+        self.mainLayout = QVBoxLayout(AddAssetDialog)
+        self.mainLayout.setObjectName(u"mainLayout")
+        self.groupGeneralInfo = QGroupBox(AddAssetDialog)
+        self.groupGeneralInfo.setObjectName(u"groupGeneralInfo")
+        self.groupGeneralInfo.setFlat(True)
+        self.formGeneralInfo = QFormLayout(self.groupGeneralInfo)
+        self.formGeneralInfo.setObjectName(u"formGeneralInfo")
+        self.lblAssetCode = QLabel(self.groupGeneralInfo)
+        self.lblAssetCode.setObjectName(u"lblAssetCode")
 
-        self.horizontalLayout.addWidget(self.lblAssetNumber)
+        self.formGeneralInfo.setWidget(0, QFormLayout.ItemRole.LabelRole, self.lblAssetCode)
 
-        self.txtAssetNumber = QLineEdit(AddAssetDialog)
-        self.txtAssetNumber.setObjectName(u"txtAssetNumber")
-        self.txtAssetNumber.setReadOnly(True)
+        self.txtAssetCode = QLineEdit(self.groupGeneralInfo)
+        self.txtAssetCode.setObjectName(u"txtAssetCode")
+        self.txtAssetCode.setReadOnly(True)
 
-        self.horizontalLayout.addWidget(self.txtAssetNumber)
+        self.formGeneralInfo.setWidget(0, QFormLayout.ItemRole.FieldRole, self.txtAssetCode)
 
-
-        self.verticalLayout.addLayout(self.horizontalLayout)
-
-        self.horizontalLayout_2 = QHBoxLayout()
-        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.lblAssetName = QLabel(AddAssetDialog)
+        self.lblAssetName = QLabel(self.groupGeneralInfo)
         self.lblAssetName.setObjectName(u"lblAssetName")
 
-        self.horizontalLayout_2.addWidget(self.lblAssetName)
+        self.formGeneralInfo.setWidget(1, QFormLayout.ItemRole.LabelRole, self.lblAssetName)
 
-        self.txtAssetName = QLineEdit(AddAssetDialog)
+        self.txtAssetName = QLineEdit(self.groupGeneralInfo)
         self.txtAssetName.setObjectName(u"txtAssetName")
 
-        self.horizontalLayout_2.addWidget(self.txtAssetName)
+        self.formGeneralInfo.setWidget(1, QFormLayout.ItemRole.FieldRole, self.txtAssetName)
 
-
-        self.verticalLayout.addLayout(self.horizontalLayout_2)
-
-        self.horizontalLayout_3 = QHBoxLayout()
-        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.lblDescription = QLabel(AddAssetDialog)
+        self.lblDescription = QLabel(self.groupGeneralInfo)
         self.lblDescription.setObjectName(u"lblDescription")
 
-        self.horizontalLayout_3.addWidget(self.lblDescription)
+        self.formGeneralInfo.setWidget(2, QFormLayout.ItemRole.LabelRole, self.lblDescription)
 
-        self.teDescription = QTextEdit(AddAssetDialog)
-        self.teDescription.setObjectName(u"teDescription")
+        self.txtDescription = QLineEdit(self.groupGeneralInfo)
+        self.txtDescription.setObjectName(u"txtDescription")
 
-        self.horizontalLayout_3.addWidget(self.teDescription)
+        self.formGeneralInfo.setWidget(2, QFormLayout.ItemRole.FieldRole, self.txtDescription)
 
-
-        self.verticalLayout.addLayout(self.horizontalLayout_3)
-
-        self.horizontalLayout_4 = QHBoxLayout()
-        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
-        self.lblCategory = QLabel(AddAssetDialog)
+        self.lblCategory = QLabel(self.groupGeneralInfo)
         self.lblCategory.setObjectName(u"lblCategory")
 
-        self.horizontalLayout_4.addWidget(self.lblCategory)
+        self.formGeneralInfo.setWidget(3, QFormLayout.ItemRole.LabelRole, self.lblCategory)
 
-        self.cmbCategory = QComboBox(AddAssetDialog)
+        self.cmbCategory = QComboBox(self.groupGeneralInfo)
         self.cmbCategory.setObjectName(u"cmbCategory")
 
-        self.horizontalLayout_4.addWidget(self.cmbCategory)
+        self.formGeneralInfo.setWidget(3, QFormLayout.ItemRole.FieldRole, self.cmbCategory)
+
+        self.lblStatus = QLabel(self.groupGeneralInfo)
+        self.lblStatus.setObjectName(u"lblStatus")
+
+        self.formGeneralInfo.setWidget(4, QFormLayout.ItemRole.LabelRole, self.lblStatus)
+
+        self.cmbStatus = QComboBox(self.groupGeneralInfo)
+        self.cmbStatus.addItem("")
+        self.cmbStatus.addItem("")
+        self.cmbStatus.setObjectName(u"cmbStatus")
+
+        self.formGeneralInfo.setWidget(4, QFormLayout.ItemRole.FieldRole, self.cmbStatus)
 
 
-        self.verticalLayout.addLayout(self.horizontalLayout_4)
+        self.mainLayout.addWidget(self.groupGeneralInfo)
 
-        self.horizontalLayout_5 = QHBoxLayout()
-        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
-        self.lblLocation = QLabel(AddAssetDialog)
+        self.groupLocation = QGroupBox(AddAssetDialog)
+        self.groupLocation.setObjectName(u"groupLocation")
+        self.groupLocation.setFlat(True)
+        self.formLocation = QFormLayout(self.groupLocation)
+        self.formLocation.setObjectName(u"formLocation")
+        self.lblDepartment = QLabel(self.groupLocation)
+        self.lblDepartment.setObjectName(u"lblDepartment")
+
+        self.formLocation.setWidget(0, QFormLayout.ItemRole.LabelRole, self.lblDepartment)
+
+        self.cmbDepartment = QComboBox(self.groupLocation)
+        self.cmbDepartment.setObjectName(u"cmbDepartment")
+
+        self.formLocation.setWidget(0, QFormLayout.ItemRole.FieldRole, self.cmbDepartment)
+
+        self.lblLocation = QLabel(self.groupLocation)
         self.lblLocation.setObjectName(u"lblLocation")
 
-        self.horizontalLayout_5.addWidget(self.lblLocation)
+        self.formLocation.setWidget(1, QFormLayout.ItemRole.LabelRole, self.lblLocation)
 
-        self.cmbLocation = QComboBox(AddAssetDialog)
+        self.cmbLocation = QComboBox(self.groupLocation)
         self.cmbLocation.setObjectName(u"cmbLocation")
 
-        self.horizontalLayout_5.addWidget(self.cmbLocation)
+        self.formLocation.setWidget(1, QFormLayout.ItemRole.FieldRole, self.cmbLocation)
 
 
-        self.verticalLayout.addLayout(self.horizontalLayout_5)
+        self.mainLayout.addWidget(self.groupLocation)
 
-        self.horizontalLayout_6 = QHBoxLayout()
-        self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
-        self.lblManufacturer = QLabel(AddAssetDialog)
+        self.groupManufacturer = QGroupBox(AddAssetDialog)
+        self.groupManufacturer.setObjectName(u"groupManufacturer")
+        self.groupManufacturer.setFlat(True)
+        self.formManufacturer = QFormLayout(self.groupManufacturer)
+        self.formManufacturer.setObjectName(u"formManufacturer")
+        self.lblManufacturer = QLabel(self.groupManufacturer)
         self.lblManufacturer.setObjectName(u"lblManufacturer")
 
-        self.horizontalLayout_6.addWidget(self.lblManufacturer)
+        self.formManufacturer.setWidget(0, QFormLayout.ItemRole.LabelRole, self.lblManufacturer)
 
-        self.txtManufacturer = QLineEdit(AddAssetDialog)
+        self.txtManufacturer = QLineEdit(self.groupManufacturer)
         self.txtManufacturer.setObjectName(u"txtManufacturer")
 
-        self.horizontalLayout_6.addWidget(self.txtManufacturer)
+        self.formManufacturer.setWidget(0, QFormLayout.ItemRole.FieldRole, self.txtManufacturer)
 
-
-        self.verticalLayout.addLayout(self.horizontalLayout_6)
-
-        self.horizontalLayout_7 = QHBoxLayout()
-        self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
-        self.lblModel = QLabel(AddAssetDialog)
+        self.lblModel = QLabel(self.groupManufacturer)
         self.lblModel.setObjectName(u"lblModel")
 
-        self.horizontalLayout_7.addWidget(self.lblModel)
+        self.formManufacturer.setWidget(1, QFormLayout.ItemRole.LabelRole, self.lblModel)
 
-        self.txtModel = QLineEdit(AddAssetDialog)
+        self.txtModel = QLineEdit(self.groupManufacturer)
         self.txtModel.setObjectName(u"txtModel")
 
-        self.horizontalLayout_7.addWidget(self.txtModel)
+        self.formManufacturer.setWidget(1, QFormLayout.ItemRole.FieldRole, self.txtModel)
 
-
-        self.verticalLayout.addLayout(self.horizontalLayout_7)
-
-        self.horizontalLayout_8 = QHBoxLayout()
-        self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
-        self.lblSerialNumber = QLabel(AddAssetDialog)
+        self.lblSerialNumber = QLabel(self.groupManufacturer)
         self.lblSerialNumber.setObjectName(u"lblSerialNumber")
 
-        self.horizontalLayout_8.addWidget(self.lblSerialNumber)
+        self.formManufacturer.setWidget(2, QFormLayout.ItemRole.LabelRole, self.lblSerialNumber)
 
-        self.txtSerialNumber = QLineEdit(AddAssetDialog)
+        self.txtSerialNumber = QLineEdit(self.groupManufacturer)
         self.txtSerialNumber.setObjectName(u"txtSerialNumber")
 
-        self.horizontalLayout_8.addWidget(self.txtSerialNumber)
+        self.formManufacturer.setWidget(2, QFormLayout.ItemRole.FieldRole, self.txtSerialNumber)
 
 
-        self.verticalLayout.addLayout(self.horizontalLayout_8)
+        self.mainLayout.addWidget(self.groupManufacturer)
 
-        self.horizontalLayout_9 = QHBoxLayout()
-        self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
-        self.lblPurchaseDate = QLabel(AddAssetDialog)
+        self.groupPurchaseInfo = QGroupBox(AddAssetDialog)
+        self.groupPurchaseInfo.setObjectName(u"groupPurchaseInfo")
+        self.groupPurchaseInfo.setFlat(True)
+        self.formPurchaseInfo = QFormLayout(self.groupPurchaseInfo)
+        self.formPurchaseInfo.setObjectName(u"formPurchaseInfo")
+        self.lblPurchaseDate = QLabel(self.groupPurchaseInfo)
         self.lblPurchaseDate.setObjectName(u"lblPurchaseDate")
 
-        self.horizontalLayout_9.addWidget(self.lblPurchaseDate)
+        self.formPurchaseInfo.setWidget(0, QFormLayout.ItemRole.LabelRole, self.lblPurchaseDate)
 
-        self.dtPurchaseDate = QDateEdit(AddAssetDialog)
+        self.dtPurchaseDate = QDateEdit(self.groupPurchaseInfo)
         self.dtPurchaseDate.setObjectName(u"dtPurchaseDate")
         self.dtPurchaseDate.setCalendarPopup(True)
 
-        self.horizontalLayout_9.addWidget(self.dtPurchaseDate)
+        self.formPurchaseInfo.setWidget(0, QFormLayout.ItemRole.FieldRole, self.dtPurchaseDate)
 
+        self.lblPurchaseCost = QLabel(self.groupPurchaseInfo)
+        self.lblPurchaseCost.setObjectName(u"lblPurchaseCost")
 
-        self.verticalLayout.addLayout(self.horizontalLayout_9)
+        self.formPurchaseInfo.setWidget(1, QFormLayout.ItemRole.LabelRole, self.lblPurchaseCost)
 
-        self.horizontalLayout_10 = QHBoxLayout()
-        self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
-        self.lblWarrantyExpiry = QLabel(AddAssetDialog)
+        self.spnPurchaseCost = QDoubleSpinBox(self.groupPurchaseInfo)
+        self.spnPurchaseCost.setObjectName(u"spnPurchaseCost")
+        self.spnPurchaseCost.setDecimals(2)
+        self.spnPurchaseCost.setMaximum(999999.989999999990687)
+
+        self.formPurchaseInfo.setWidget(1, QFormLayout.ItemRole.FieldRole, self.spnPurchaseCost)
+
+        self.lblWarrantyExpiry = QLabel(self.groupPurchaseInfo)
         self.lblWarrantyExpiry.setObjectName(u"lblWarrantyExpiry")
 
-        self.horizontalLayout_10.addWidget(self.lblWarrantyExpiry)
+        self.formPurchaseInfo.setWidget(2, QFormLayout.ItemRole.LabelRole, self.lblWarrantyExpiry)
 
-        self.dtWarrantyExpiry = QDateEdit(AddAssetDialog)
+        self.dtWarrantyExpiry = QDateEdit(self.groupPurchaseInfo)
         self.dtWarrantyExpiry.setObjectName(u"dtWarrantyExpiry")
         self.dtWarrantyExpiry.setCalendarPopup(True)
 
-        self.horizontalLayout_10.addWidget(self.dtWarrantyExpiry)
+        self.formPurchaseInfo.setWidget(2, QFormLayout.ItemRole.FieldRole, self.dtWarrantyExpiry)
 
 
-        self.verticalLayout.addLayout(self.horizontalLayout_10)
+        self.mainLayout.addWidget(self.groupPurchaseInfo)
 
-        self.horizontalLayout_11 = QHBoxLayout()
-        self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
-        self.lblStatus = QLabel(AddAssetDialog)
-        self.lblStatus.setObjectName(u"lblStatus")
+        self.groupNotes = QGroupBox(AddAssetDialog)
+        self.groupNotes.setObjectName(u"groupNotes")
+        self.groupNotes.setFlat(True)
+        self.layoutNotes = QVBoxLayout(self.groupNotes)
+        self.layoutNotes.setObjectName(u"layoutNotes")
+        self.txtNotes = QTextEdit(self.groupNotes)
+        self.txtNotes.setObjectName(u"txtNotes")
 
-        self.horizontalLayout_11.addWidget(self.lblStatus)
-
-        self.cmbStatus = QComboBox(AddAssetDialog)
-        self.cmbStatus.setObjectName(u"cmbStatus")
-
-        self.horizontalLayout_11.addWidget(self.cmbStatus)
+        self.layoutNotes.addWidget(self.txtNotes)
 
 
-        self.verticalLayout.addLayout(self.horizontalLayout_11)
+        self.mainLayout.addWidget(self.groupNotes)
 
         self.buttonBox = QDialogButtonBox(AddAssetDialog)
         self.buttonBox.setObjectName(u"buttonBox")
-        self.buttonBox.setOrientation(Qt.Orientation.Horizontal)
         self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Save)
 
-        self.verticalLayout.addWidget(self.buttonBox)
+        self.mainLayout.addWidget(self.buttonBox)
 
 
         self.retranslateUi(AddAssetDialog)
-        self.buttonBox.accepted.connect(AddAssetDialog.accept)
-        self.buttonBox.rejected.connect(AddAssetDialog.reject)
 
         QMetaObject.connectSlotsByName(AddAssetDialog)
     # setupUi
 
     def retranslateUi(self, AddAssetDialog):
         AddAssetDialog.setWindowTitle(QCoreApplication.translate("AddAssetDialog", u"Add Asset", None))
-        self.lblAssetNumber.setText(QCoreApplication.translate("AddAssetDialog", u"Asset Number", None))
-        self.lblAssetName.setText(QCoreApplication.translate("AddAssetDialog", u"Asset Name", None))
-        self.lblDescription.setText(QCoreApplication.translate("AddAssetDialog", u"Description", None))
-        self.lblCategory.setText(QCoreApplication.translate("AddAssetDialog", u"Category", None))
-        self.lblLocation.setText(QCoreApplication.translate("AddAssetDialog", u"Location", None))
-        self.lblManufacturer.setText(QCoreApplication.translate("AddAssetDialog", u"Manufacturer", None))
-        self.lblModel.setText(QCoreApplication.translate("AddAssetDialog", u"Model", None))
-        self.lblSerialNumber.setText(QCoreApplication.translate("AddAssetDialog", u"Serial Number", None))
-        self.lblPurchaseDate.setText(QCoreApplication.translate("AddAssetDialog", u"Purchase Date", None))
-        self.lblWarrantyExpiry.setText(QCoreApplication.translate("AddAssetDialog", u"Warranty Expiry", None))
-        self.lblStatus.setText(QCoreApplication.translate("AddAssetDialog", u"Status", None))
+        self.groupGeneralInfo.setTitle(QCoreApplication.translate("AddAssetDialog", u"General Information", None))
+        self.lblAssetCode.setText(QCoreApplication.translate("AddAssetDialog", u"Asset Code:", None))
+        self.lblAssetName.setText(QCoreApplication.translate("AddAssetDialog", u"Asset Name:", None))
+        self.lblDescription.setText(QCoreApplication.translate("AddAssetDialog", u"Description:", None))
+        self.lblCategory.setText(QCoreApplication.translate("AddAssetDialog", u"Category:", None))
+        self.lblStatus.setText(QCoreApplication.translate("AddAssetDialog", u"Status:", None))
+        self.cmbStatus.setItemText(0, QCoreApplication.translate("AddAssetDialog", u"Active", None))
+        self.cmbStatus.setItemText(1, QCoreApplication.translate("AddAssetDialog", u"Inactive", None))
+
+        self.groupLocation.setTitle(QCoreApplication.translate("AddAssetDialog", u"Location", None))
+        self.lblDepartment.setText(QCoreApplication.translate("AddAssetDialog", u"Department:", None))
+        self.lblLocation.setText(QCoreApplication.translate("AddAssetDialog", u"Location:", None))
+        self.groupManufacturer.setTitle(QCoreApplication.translate("AddAssetDialog", u"Manufacturer", None))
+        self.lblManufacturer.setText(QCoreApplication.translate("AddAssetDialog", u"Manufacturer:", None))
+        self.lblModel.setText(QCoreApplication.translate("AddAssetDialog", u"Model:", None))
+        self.lblSerialNumber.setText(QCoreApplication.translate("AddAssetDialog", u"Serial Number:", None))
+        self.groupPurchaseInfo.setTitle(QCoreApplication.translate("AddAssetDialog", u"Purchase Information", None))
+        self.lblPurchaseDate.setText(QCoreApplication.translate("AddAssetDialog", u"Purchase Date:", None))
+        self.lblPurchaseCost.setText(QCoreApplication.translate("AddAssetDialog", u"Purchase Cost:", None))
+        self.lblWarrantyExpiry.setText(QCoreApplication.translate("AddAssetDialog", u"Warranty Expiry:", None))
+        self.groupNotes.setTitle(QCoreApplication.translate("AddAssetDialog", u"Notes", None))
     # retranslateUi
 

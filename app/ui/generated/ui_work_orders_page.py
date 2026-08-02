@@ -19,14 +19,14 @@ from PySide6.QtWidgets import (QApplication, QHBoxLayout, QHeaderView, QLabel,
     QLineEdit, QPushButton, QSizePolicy, QSpacerItem,
     QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget)
 
-class Ui_WorkOrdersWindow(object):
-    def setupUi(self, WorkOrdersWindow):
-        if not WorkOrdersWindow.objectName():
-            WorkOrdersWindow.setObjectName(u"WorkOrdersWindow")
-        WorkOrdersWindow.resize(1205, 709)
-        self.verticalLayout = QVBoxLayout(WorkOrdersWindow)
+class Ui_WorkOrdersPage(object):
+    def setupUi(self, WorkOrdersPage):
+        if not WorkOrdersPage.objectName():
+            WorkOrdersPage.setObjectName(u"WorkOrdersPage")
+        WorkOrdersPage.resize(921, 709)
+        self.verticalLayout = QVBoxLayout(WorkOrdersPage)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.lblWorkOrders = QLabel(WorkOrdersWindow)
+        self.lblWorkOrders = QLabel(WorkOrdersPage)
         self.lblWorkOrders.setObjectName(u"lblWorkOrders")
         font = QFont()
         font.setPointSize(20)
@@ -37,12 +37,12 @@ class Ui_WorkOrdersWindow(object):
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.lblSearch = QLabel(WorkOrdersWindow)
+        self.lblSearch = QLabel(WorkOrdersPage)
         self.lblSearch.setObjectName(u"lblSearch")
 
         self.horizontalLayout.addWidget(self.lblSearch)
 
-        self.txtSearch = QLineEdit(WorkOrdersWindow)
+        self.txtSearch = QLineEdit(WorkOrdersPage)
         self.txtSearch.setObjectName(u"txtSearch")
 
         self.horizontalLayout.addWidget(self.txtSearch)
@@ -50,9 +50,9 @@ class Ui_WorkOrdersWindow(object):
 
         self.verticalLayout.addLayout(self.horizontalLayout)
 
-        self.tblWorkOrders = QTableWidget(WorkOrdersWindow)
-        if (self.tblWorkOrders.columnCount() < 8):
-            self.tblWorkOrders.setColumnCount(8)
+        self.tblWorkOrders = QTableWidget(WorkOrdersPage)
+        if (self.tblWorkOrders.columnCount() < 9):
+            self.tblWorkOrders.setColumnCount(9)
         __qtablewidgetitem = QTableWidgetItem()
         self.tblWorkOrders.setHorizontalHeaderItem(0, __qtablewidgetitem)
         __qtablewidgetitem1 = QTableWidgetItem()
@@ -69,34 +69,36 @@ class Ui_WorkOrdersWindow(object):
         self.tblWorkOrders.setHorizontalHeaderItem(6, __qtablewidgetitem6)
         __qtablewidgetitem7 = QTableWidgetItem()
         self.tblWorkOrders.setHorizontalHeaderItem(7, __qtablewidgetitem7)
+        __qtablewidgetitem8 = QTableWidgetItem()
+        self.tblWorkOrders.setHorizontalHeaderItem(8, __qtablewidgetitem8)
         self.tblWorkOrders.setObjectName(u"tblWorkOrders")
 
         self.verticalLayout.addWidget(self.tblWorkOrders)
 
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.btnAdd = QPushButton(WorkOrdersWindow)
+        self.btnAdd = QPushButton(WorkOrdersPage)
         self.btnAdd.setObjectName(u"btnAdd")
         self.btnAdd.setMinimumSize(QSize(90, 32))
         self.btnAdd.setStyleSheet(u"")
 
         self.horizontalLayout_2.addWidget(self.btnAdd)
 
-        self.btnEdit = QPushButton(WorkOrdersWindow)
+        self.btnEdit = QPushButton(WorkOrdersPage)
         self.btnEdit.setObjectName(u"btnEdit")
         self.btnEdit.setMinimumSize(QSize(90, 32))
         self.btnEdit.setStyleSheet(u"")
 
         self.horizontalLayout_2.addWidget(self.btnEdit)
 
-        self.btnRefresh = QPushButton(WorkOrdersWindow)
+        self.btnRefresh = QPushButton(WorkOrdersPage)
         self.btnRefresh.setObjectName(u"btnRefresh")
         self.btnRefresh.setMinimumSize(QSize(90, 32))
         self.btnRefresh.setStyleSheet(u"")
 
         self.horizontalLayout_2.addWidget(self.btnRefresh)
 
-        self.btnDelete = QPushButton(WorkOrdersWindow)
+        self.btnDelete = QPushButton(WorkOrdersPage)
         self.btnDelete.setObjectName(u"btnDelete")
         self.btnDelete.setMinimumSize(QSize(90, 32))
         self.btnDelete.setStyleSheet(u"")
@@ -107,53 +109,47 @@ class Ui_WorkOrdersWindow(object):
 
         self.horizontalLayout_2.addItem(self.horizontalSpacer)
 
-        self.btnClose = QPushButton(WorkOrdersWindow)
-        self.btnClose.setObjectName(u"btnClose")
-        self.btnClose.setMinimumSize(QSize(90, 32))
-        self.btnClose.setStyleSheet(u"")
-
-        self.horizontalLayout_2.addWidget(self.btnClose)
-
 
         self.verticalLayout.addLayout(self.horizontalLayout_2)
 
-        self.lblStatus = QLabel(WorkOrdersWindow)
+        self.lblStatus = QLabel(WorkOrdersPage)
         self.lblStatus.setObjectName(u"lblStatus")
 
         self.verticalLayout.addWidget(self.lblStatus)
 
 
-        self.retranslateUi(WorkOrdersWindow)
+        self.retranslateUi(WorkOrdersPage)
 
-        QMetaObject.connectSlotsByName(WorkOrdersWindow)
+        QMetaObject.connectSlotsByName(WorkOrdersPage)
     # setupUi
 
-    def retranslateUi(self, WorkOrdersWindow):
-        WorkOrdersWindow.setWindowTitle(QCoreApplication.translate("WorkOrdersWindow", u"Work Orders Window", None))
-        self.lblWorkOrders.setText(QCoreApplication.translate("WorkOrdersWindow", u"Work Orders", None))
-        self.lblSearch.setText(QCoreApplication.translate("WorkOrdersWindow", u"Search:", None))
-        self.txtSearch.setPlaceholderText(QCoreApplication.translate("WorkOrdersWindow", u"Search work orders....", None))
+    def retranslateUi(self, WorkOrdersPage):
+        WorkOrdersPage.setWindowTitle(QCoreApplication.translate("WorkOrdersPage", u"Work Orders Page", None))
+        self.lblWorkOrders.setText(QCoreApplication.translate("WorkOrdersPage", u"Work Orders", None))
+        self.lblSearch.setText(QCoreApplication.translate("WorkOrdersPage", u"Search:", None))
+        self.txtSearch.setPlaceholderText(QCoreApplication.translate("WorkOrdersPage", u"Search work orders....", None))
         ___qtablewidgetitem = self.tblWorkOrders.horizontalHeaderItem(0)
-        ___qtablewidgetitem.setText(QCoreApplication.translate("WorkOrdersWindow", u"ID", None))
+        ___qtablewidgetitem.setText(QCoreApplication.translate("WorkOrdersPage", u"ID", None))
         ___qtablewidgetitem1 = self.tblWorkOrders.horizontalHeaderItem(1)
-        ___qtablewidgetitem1.setText(QCoreApplication.translate("WorkOrdersWindow", u"WO Number", None))
+        ___qtablewidgetitem1.setText(QCoreApplication.translate("WorkOrdersPage", u"WO Number", None))
         ___qtablewidgetitem2 = self.tblWorkOrders.horizontalHeaderItem(2)
-        ___qtablewidgetitem2.setText(QCoreApplication.translate("WorkOrdersWindow", u"Asset", None))
+        ___qtablewidgetitem2.setText(QCoreApplication.translate("WorkOrdersPage", u"Asset", None))
         ___qtablewidgetitem3 = self.tblWorkOrders.horizontalHeaderItem(3)
-        ___qtablewidgetitem3.setText(QCoreApplication.translate("WorkOrdersWindow", u"Title", None))
+        ___qtablewidgetitem3.setText(QCoreApplication.translate("WorkOrdersPage", u"Title", None))
         ___qtablewidgetitem4 = self.tblWorkOrders.horizontalHeaderItem(4)
-        ___qtablewidgetitem4.setText(QCoreApplication.translate("WorkOrdersWindow", u"Priority", None))
+        ___qtablewidgetitem4.setText(QCoreApplication.translate("WorkOrdersPage", u"Priority", None))
         ___qtablewidgetitem5 = self.tblWorkOrders.horizontalHeaderItem(5)
-        ___qtablewidgetitem5.setText(QCoreApplication.translate("WorkOrdersWindow", u"Status", None))
+        ___qtablewidgetitem5.setText(QCoreApplication.translate("WorkOrdersPage", u"Status", None))
         ___qtablewidgetitem6 = self.tblWorkOrders.horizontalHeaderItem(6)
-        ___qtablewidgetitem6.setText(QCoreApplication.translate("WorkOrdersWindow", u"Technician", None))
+        ___qtablewidgetitem6.setText(QCoreApplication.translate("WorkOrdersPage", u"Technician", None))
         ___qtablewidgetitem7 = self.tblWorkOrders.horizontalHeaderItem(7)
-        ___qtablewidgetitem7.setText(QCoreApplication.translate("WorkOrdersWindow", u"Due Date", None))
-        self.btnAdd.setText(QCoreApplication.translate("WorkOrdersWindow", u"Add", None))
-        self.btnEdit.setText(QCoreApplication.translate("WorkOrdersWindow", u"Edit", None))
-        self.btnRefresh.setText(QCoreApplication.translate("WorkOrdersWindow", u"Refresh", None))
-        self.btnDelete.setText(QCoreApplication.translate("WorkOrdersWindow", u"Delete", None))
-        self.btnClose.setText(QCoreApplication.translate("WorkOrdersWindow", u"Close", None))
-        self.lblStatus.setText(QCoreApplication.translate("WorkOrdersWindow", u"Status", None))
+        ___qtablewidgetitem7.setText(QCoreApplication.translate("WorkOrdersPage", u"Due Date", None))
+        ___qtablewidgetitem8 = self.tblWorkOrders.horizontalHeaderItem(8)
+        ___qtablewidgetitem8.setText(QCoreApplication.translate("WorkOrdersPage", u"Notes", None))
+        self.btnAdd.setText(QCoreApplication.translate("WorkOrdersPage", u"Add", None))
+        self.btnEdit.setText(QCoreApplication.translate("WorkOrdersPage", u"Edit", None))
+        self.btnRefresh.setText(QCoreApplication.translate("WorkOrdersPage", u"Refresh", None))
+        self.btnDelete.setText(QCoreApplication.translate("WorkOrdersPage", u"Delete", None))
+        self.lblStatus.setText(QCoreApplication.translate("WorkOrdersPage", u"Status", None))
     # retranslateUi
 

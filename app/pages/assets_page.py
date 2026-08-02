@@ -1,36 +1,72 @@
-from PySide6.QtWidgets import QWidget, QAbstractItemView, QTableWidgetItem, QHeaderView, QMessageBox
+from app.base.crud_page import CrudPage
+from app.dialogs.asset_dialog import AssetDialog
 from app.services.asset_service import AssetService
 from app.ui.generated.ui_assets_page import Ui_AssetsWindow
-from app.controllers.add_asset_controller import AddAssetController
-from app.core.signals import signals
-from app.base.crud_page import CrudPage
+
 
 class AssetsPage(CrudPage):
 
+    PAGE_TITLE = "Assets"
 
-    def __init__(self):
-        super().__init__()
+    TABLE_COLUMNS = [
+        ("asset_number", "Asset Number"),
+        ("asset_name", "Asset Name"),
+        ("description", "Description"),
+        ("category", "Category"),
+        ("location", "Location"),
+        ("manufacturer", "Manufacturer"),
+        ("model", "Model"),
+        ("serial_number", "Serial Number"),
+        ("purchase_date", "Purchase Date"),
+        ("warranty_expiry", "Warranty Expiry"),
+        ("status", "Status"),
+    ]
+
+    SEARCH_FIELDS = [
+        "asset_number",
+        "asset_name",
+        "description",
+        "category",
+        "location",
+        "manufacturer",
+        "model",
+        "serial_number",
+        "status",
+    ]
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
 
         self.ui = Ui_AssetsWindow()
         self.ui.setupUi(self)
 
+        # Shared CRUD framework configuration
+        self.service = AssetService
+        self.dialog_class = AssetDialog
         self.table = self.ui.tblAssets
+        self.search_widget = self.ui.txtSearch
         self.status_label = self.ui.lblStatus
 
+        self.entity_name = "Asset"
         self.record_name = "assets"
 
-        self.service = AssetService
+        self.setup_page()
 
-        self.dialog = AddAssetController
+    # ---------------------------------------------------------
+    # Setup
+    # ---------------------------------------------------------
 
-        self.configure_table(self.table)
-
+    def setup_page(self):
+        self.validate_configuration()
+        self.setup_table()
+        self.connect_signals()
         self.load_data()
 
-        self.connect_signals()
+    # ---------------------------------------------------------
+    # Signals
+    # ---------------------------------------------------------
 
     def connect_signals(self):
-
         self.ui.btnRefresh.clicked.connect(
             self.refresh
         )
@@ -51,8 +87,6 @@ class AssetsPage(CrudPage):
             self.search
         )
 
-        self.table.doubleClicked.connect(
-            self.edit_record
+        self.table.itemDoubleClicked.connect(
+            lambda _item: self.edit_record()
         )
-
-    

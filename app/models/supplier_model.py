@@ -1,4 +1,5 @@
 from app.database.connection import Database
+from app.helpers.code_generator import CodeGenerator
 
 
 class SupplierModel:
@@ -219,26 +220,12 @@ class SupplierModel:
 
     @staticmethod
     def get_next_supplier_code():
-        conn = Database.connect()
-        cursor = conn.cursor()
-
-        cursor.execute(
-            """
-            SELECT supplier_code
-            FROM suppliers
-            ORDER BY id DESC
-            LIMIT 1
-            """
+        return CodeGenerator.next_code(
+            table_name="suppliers",
+            field_name="supplier_code",
+            prefix="SUP",
+            digits=6
         )
-
-        row = cursor.fetchone()
-        conn.close()
-
-        if row is None or not row[0]:
-            return "SUP-000001"
-
-        last_number = int(str(row[0]).split("-")[1])
-        return f"SUP-{last_number + 1:06d}"
 
     @staticmethod
     def get_active_suppliers():

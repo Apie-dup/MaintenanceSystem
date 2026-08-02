@@ -82,19 +82,19 @@ class Ui_SuppliersWindow(object):
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.btnAdd = QPushButton(SuppliersWindow)
         self.btnAdd.setObjectName(u"btnAdd")
-        self.btnAdd.setCheckable(True)
+        self.btnAdd.setCheckable(False)
 
         self.horizontalLayout_2.addWidget(self.btnAdd)
 
         self.btnEdit = QPushButton(SuppliersWindow)
         self.btnEdit.setObjectName(u"btnEdit")
-        self.btnEdit.setCheckable(True)
+        self.btnEdit.setCheckable(False)
 
         self.horizontalLayout_2.addWidget(self.btnEdit)
 
         self.btnRefresh = QPushButton(SuppliersWindow)
         self.btnRefresh.setObjectName(u"btnRefresh")
-        self.btnRefresh.setCheckable(True)
+        self.btnRefresh.setCheckable(False)
 
         self.horizontalLayout_2.addWidget(self.btnRefresh)
 
