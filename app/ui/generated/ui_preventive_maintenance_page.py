@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'pm_page.ui'
+## Form generated from reading UI file 'preventive_maintenance_page.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.11.1
 ##
@@ -111,6 +111,11 @@ class Ui_PMWindow(object):
 
         self.horizontalLayout_2.addWidget(self.btnRefresh)
 
+        self.btnGenerateWorkOrder = QPushButton(PMWindow)
+        self.btnGenerateWorkOrder.setObjectName(u"btnGenerateWorkOrder")
+
+        self.horizontalLayout_2.addWidget(self.btnGenerateWorkOrder)
+
         self.btnDelete = QPushButton(PMWindow)
         self.btnDelete.setObjectName(u"btnDelete")
         self.btnDelete.setMinimumSize(QSize(90, 30))
@@ -173,6 +178,7 @@ class Ui_PMWindow(object):
         self.btnAdd.setText(QCoreApplication.translate("PMWindow", u"Add", None))
         self.btnEdit.setText(QCoreApplication.translate("PMWindow", u"Edit", None))
         self.btnRefresh.setText(QCoreApplication.translate("PMWindow", u"Refresh", None))
+        self.btnGenerateWorkOrder.setText(QCoreApplication.translate("PMWindow", u"Generate Work Order", None))
         self.btnDelete.setText(QCoreApplication.translate("PMWindow", u"Delete", None))
         self.lblStatus.setText(QCoreApplication.translate("PMWindow", u"Status", None))
     # retranslateUi

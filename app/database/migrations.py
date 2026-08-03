@@ -1,4 +1,5 @@
 from app.database.connection import Database
+from app.core.logger import logger
 
 
 class MigrationManager:
@@ -40,15 +41,24 @@ class MigrationManager:
     @staticmethod
     def run():
 
-        print("Database file:", Database.database_path())
+        logger.info(
+            "Database file: %s",
+            Database.database_path()
+        )
 
         version = MigrationManager.get_database_version()
 
-        print("=" * 50)
-        print("Database Migration Manager")
-        print(f"Current Database Version : {version}")
-        print(f"Latest Database Version  : {MigrationManager.LATEST_VERSION}")
-        print("=" * 50)
+        logger.info("%s", "=" * 50)
+        logger.info("Database Migration Manager")
+        logger.info(
+            "Current Database Version : %s",
+            version
+        )
+        logger.info(
+            "Latest Database Version  : %s",
+            MigrationManager.LATEST_VERSION
+        )
+        logger.info("%s", "=" * 50)
 
         while version < MigrationManager.LATEST_VERSION:
 
@@ -63,7 +73,7 @@ class MigrationManager:
                 MigrationManager.set_database_version(version)
 
 
-        print("Database is up to date.")
+        logger.info("Database is up to date.")
 
     @staticmethod
     def migrate_to_v2():
@@ -71,7 +81,7 @@ class MigrationManager:
         conn = Database.connect()
         cursor = conn.cursor()
 
-        print("Migrating database to Version 2...")
+        logger.info("Migrating database to Version 2...")
 
         # Check existing columns
         cursor.execute("PRAGMA table_info(inventory)")
@@ -84,11 +94,11 @@ class MigrationManager:
                 ADD COLUMN created_at TEXT DEFAULT CURRENT_TIMESTAMP
             """)
 
-            print("✓ Added created_at column.")
+            logger.info("Added created_at column.")
 
         else:
 
-            print("✓ created_at column already exists.")
+            logger.info("created_at column already exists.")
 
         MigrationManager.set_database_version (2)
 

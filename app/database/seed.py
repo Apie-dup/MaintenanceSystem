@@ -45,7 +45,7 @@ class DatabaseSeeder:
         ],
 
         "Frequency Types": [
-            "Dayly",
+            "Daily",
             "Weekly",
             "Monthly",
             "Quarterly",

@@ -24,7 +24,7 @@ class Ui_SuppliersWindow(object):
     def setupUi(self, SuppliersWindow):
         if not SuppliersWindow.objectName():
             SuppliersWindow.setObjectName(u"SuppliersWindow")
-        SuppliersWindow.resize(911, 455)
+        SuppliersWindow.resize(911, 485)
         self.verticalLayout = QVBoxLayout(SuppliersWindow)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.lblSuppliers = QLabel(SuppliersWindow)
@@ -82,24 +82,28 @@ class Ui_SuppliersWindow(object):
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.btnAdd = QPushButton(SuppliersWindow)
         self.btnAdd.setObjectName(u"btnAdd")
+        self.btnAdd.setMinimumSize(QSize(90, 30))
         self.btnAdd.setCheckable(False)
 
         self.horizontalLayout_2.addWidget(self.btnAdd)
 
         self.btnEdit = QPushButton(SuppliersWindow)
         self.btnEdit.setObjectName(u"btnEdit")
+        self.btnEdit.setMinimumSize(QSize(90, 30))
         self.btnEdit.setCheckable(False)
 
         self.horizontalLayout_2.addWidget(self.btnEdit)
 
         self.btnRefresh = QPushButton(SuppliersWindow)
         self.btnRefresh.setObjectName(u"btnRefresh")
+        self.btnRefresh.setMinimumSize(QSize(90, 30))
         self.btnRefresh.setCheckable(False)
 
         self.horizontalLayout_2.addWidget(self.btnRefresh)
 
         self.btnDelete = QPushButton(SuppliersWindow)
         self.btnDelete.setObjectName(u"btnDelete")
+        self.btnDelete.setMinimumSize(QSize(90, 30))
 
         self.horizontalLayout_2.addWidget(self.btnDelete)
 
@@ -109,6 +113,11 @@ class Ui_SuppliersWindow(object):
 
 
         self.verticalLayout.addLayout(self.horizontalLayout_2)
+
+        self.lblStatus = QLabel(SuppliersWindow)
+        self.lblStatus.setObjectName(u"lblStatus")
+
+        self.verticalLayout.addWidget(self.lblStatus)
 
 
         self.retranslateUi(SuppliersWindow)
@@ -143,5 +152,6 @@ class Ui_SuppliersWindow(object):
         self.btnEdit.setText(QCoreApplication.translate("SuppliersWindow", u"Edit", None))
         self.btnRefresh.setText(QCoreApplication.translate("SuppliersWindow", u"Refresh", None))
         self.btnDelete.setText(QCoreApplication.translate("SuppliersWindow", u"Delete", None))
+        self.lblStatus.setText(QCoreApplication.translate("SuppliersWindow", u"Status", None))
     # retranslateUi
 

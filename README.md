@@ -1,67 +1,66 @@
 # Maintenance Management System (MMS)
 
-A professional desktop Maintenance Management System built with Python, PySide6 and SQLite.
+## Overview
 
-## Features
+The Maintenance Management System (MMS) is a desktop Computerized Maintenance
+Management System (CMMS) developed using Python, PySide6 and SQLite.
 
-- Login System
+The application is designed to manage company assets, inventory,
+suppliers, technicians, work orders and preventive maintenance.
+
+---
+
+## Current Features
+
+- User Login
 - Dashboard
 - Asset Management
-- Work Orders
-- Preventive Maintenance
-- Inventory
-- Technicians
-- Suppliers
-- Reports
+- Supplier Management
+- Inventory Management
+- Technician Management
+- Work Order Management
+- Issue / Remove Parts
+- Inventory Cost Tracking
+
+---
 
 ## Technologies
 
-- Python 3.11+
+- Python 3
 - PySide6
 - SQLite
 - Qt Designer
 
-## Project Structure
+---
 
-app/
-database/
-assets/
-docs/
+## Architecture
 
-## Installation
+The application follows a layered architecture.
 
-Create a virtual environment
-
-```bash
-python -m venv venv
-
+```
+UI
+ │
+ ▼
+Pages / Dialogs
+ │
+ ▼
+Services
+ │
+ ▼
+Models
+ │
+ ▼
+SQLite Database
+```
 
 ---
 
-# Step 3 - CHANGELOG.md
+## Documentation
 
-```markdown
-# Changelog
-
-## Version 0.1.0
-
-Initial Project
-
-- Login
-- SQLite Database
-- Migration Manager
-- Assets Module
-- Dashboard
-- QStackedWidget Navigation
-- BasePage
-- ModulePage
+See the **docs** folder for detailed documentation.
 
 ---
 
-## Upcoming
+## Current Version
 
-- PageManager
-- NavigationManager
-- Inventory Module
-- Work Orders
-- Preventive Maintenance
+Version 1.0.0

@@ -1,3 +1,5 @@
+from genericpath import exists
+
 from app.database.connection import Database
 from app.helpers.code_generator import CodeGenerator
 
@@ -299,7 +301,7 @@ class WorkOrderModel:
     # ---------------------------------------------------------
 
     @staticmethod
-    def number_exists(wo_number, exclude_id=None):
+    def number_exists(work_order_number, exclude_id=None):
         conn = Database.connect()
         cursor = conn.cursor()
 
@@ -309,7 +311,7 @@ class WorkOrderModel:
                 FROM work_orders
                 WHERE work_order_number = ?
                 LIMIT 1
-            """, (wo_number,))
+            """, (work_order_number,))
         else:
             cursor.execute("""
                 SELECT 1
@@ -318,7 +320,7 @@ class WorkOrderModel:
                   AND id <> ?
                 LIMIT 1
             """, (
-                wo_number,
+                work_order_number,
                 exclude_id,
             ))
 
@@ -365,3 +367,82 @@ class WorkOrderModel:
         if owns_connection:
             conn.commit()
             conn.close()
+
+    @staticmethod
+    def get_open_count():
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT COUNT(*) AS total
+            FROM work_orders
+            WHERE status NOT IN ('Completed', 'Closed', 'Cancelled')
+        """)
+
+        row = cursor.fetchone()
+        conn.close()
+
+        return int(row["total"] or 0)
+
+    @staticmethod
+    def get_urgent(limit=10):
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT
+                work_orders.id,
+                work_orders.work_order_number,
+                assets.asset_name,
+                work_orders.priority,
+                work_orders.status,
+                work_orders.due_date
+            FROM work_orders
+            LEFT JOIN assets
+                ON work_orders.asset_id = assets.id
+            WHERE work_orders.status NOT IN (
+                'Completed',
+                'Closed',
+                'Cancelled'
+            )
+            ORDER BY
+                CASE work_orders.priority
+                    WHEN 'Emergency' THEN 1
+                    WHEN 'High' THEN 2
+                    WHEN 'Medium' THEN 3
+                    WHEN 'Low' THEN 4
+                    ELSE 5
+                END,
+                work_orders.due_date
+            LIMIT ?
+        """, (limit,))
+
+        rows = cursor.fetchall()
+        conn.close()
+
+        return rows
+
+    @staticmethod
+    def open_pm_work_order_exists(pm_number):
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT 1
+            FROM work_orders
+            WHERE requested_by = ?
+            AND status NOT IN (
+                'Completed',
+                'Closed',
+                'Cancelled'
+            )
+            LIMIT 1
+        """, (
+            f"PM Schedule {pm_number}",
+        ))
+
+        exists = cursor.fetchone() is not None
+
+        conn.close()
+
+        return exists

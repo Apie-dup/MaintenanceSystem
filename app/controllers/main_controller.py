@@ -2,11 +2,10 @@ from PySide6.QtWidgets import QMainWindow
 
 from app.ui.generated.ui_main_window import Ui_MainWindow
 
-# Pages
 from app.pages.dashboard_page import DashboardPage
 from app.pages.assets_page import AssetsPage
 from app.pages.work_orders_page import WorkOrdersPage
-from app.pages.pm_page import PMPage
+from app.pages.preventive_maintenance_page import PreventiveMaintenancePage
 from app.pages.technicians_page import TechniciansPage
 from app.pages.inventory_page import InventoryPage
 from app.pages.suppliers_page import SuppliersPage
@@ -28,35 +27,33 @@ class MainController(QMainWindow):
         self.ui.setupUi(self)
 
         self.setWindowTitle(
-            f"Maintenance Management System - {user.get('fullname', '')}"
+            "Maintenance Management System - "
+            f"{user.get('fullname', '')}"
         )
 
-        # Core managers
         self.page_manager = PageManager()
-        self.navigation = NavigationManager(self.ui.stackedWidget)
+        self.navigation = NavigationManager(
+            self.ui.stackedWidget
+        )
 
-        # Build application
         self.create_pages()
         self.register_pages()
         self.register_navigation()
 
-        # Show dashboard
-        self.navigation.show(self.ui.pageDashboard)
+        self.show_dashboard()
 
     def create_pages(self):
-
-        self.dashboard_page = DashboardPage()
-        self.assets_page = AssetsPage()
-        self.work_orders_page = WorkOrdersPage()
-        self.pm_page = PMPage()
-        self.technicians_page = TechniciansPage()
-        self.inventory_page = InventoryPage()
-        self.suppliers_page = SuppliersPage()
-        self.reports_page = ReportsPage()
-        self.settings_page = SettingsPage()
+        self.dashboard_page = DashboardPage(self)
+        self.assets_page = AssetsPage(self)
+        self.work_orders_page = WorkOrdersPage(self)
+        self.pm_page = PreventiveMaintenancePage(self)
+        self.technicians_page = TechniciansPage(self)
+        self.inventory_page = InventoryPage(self)
+        self.suppliers_page = SuppliersPage(self)
+        self.reports_page = ReportsPage(self)
+        self.settings_page = SettingsPage(self)
 
     def register_pages(self):
-
         self.page_manager.add_page(
             self.ui.pageDashboard,
             self.dashboard_page
@@ -103,41 +100,88 @@ class MainController(QMainWindow):
         )
 
     def register_navigation(self):
-
         self.ui.btnDashboard.clicked.connect(
-            lambda: self.navigation.show(self.ui.pageDashboard)
+            self.show_dashboard
         )
 
         self.ui.btnAssets.clicked.connect(
-            lambda: self.navigation.show(self.ui.pageAssets)
+            self.show_assets
         )
 
         self.ui.btnWorkOrders.clicked.connect(
-            lambda: self.navigation.show(self.ui.pageWorkOrders)
+            self.show_work_orders
         )
 
         self.ui.btnPM.clicked.connect(
-            lambda: self.navigation.show(self.ui.pagePM)
+            self.show_pm
         )
 
         self.ui.btnTechnicians.clicked.connect(
-            lambda: self.navigation.show(self.ui.pageTechnicians)
+            self.show_technicians
         )
 
         self.ui.btnInventory.clicked.connect(
-            lambda: self.navigation.show(self.ui.pageInventory)
+            self.show_inventory
         )
 
         self.ui.btnSuppliers.clicked.connect(
-            lambda: self.navigation.show(self.ui.pageSuppliers)
+            self.show_suppliers
         )
 
         self.ui.btnReports.clicked.connect(
-            lambda: self.navigation.show(self.ui.pageReports)
+            lambda: self.navigation.show(
+                self.ui.pageReports
+            )
         )
 
         self.ui.btnSettings.clicked.connect(
-            lambda: self.navigation.show(self.ui.pageSettings)
+            lambda: self.navigation.show(
+                self.ui.pageSettings
+            )
         )
 
-        self.ui.btnLogout.clicked.connect(self.close)
+        self.ui.btnLogout.clicked.connect(
+            self.close
+        )
+
+    def show_dashboard(self):
+        self.dashboard_page.refresh_dashboard()
+        self.navigation.show(
+            self.ui.pageDashboard
+        )
+
+    def show_assets(self):
+        self.assets_page.load_data()
+        self.navigation.show(
+            self.ui.pageAssets
+        )
+
+    def show_work_orders(self):
+        self.work_orders_page.load_data()
+        self.navigation.show(
+            self.ui.pageWorkOrders
+        )
+
+    def show_pm(self):
+        self.pm_page.load_data()
+        self.navigation.show(
+            self.ui.pagePM
+        )
+
+    def show_technicians(self):
+        self.technicians_page.load_data()
+        self.navigation.show(
+            self.ui.pageTechnicians
+        )
+
+    def show_inventory(self):
+        self.inventory_page.load_data()
+        self.navigation.show(
+            self.ui.pageInventory
+        )
+
+    def show_suppliers(self):
+        self.suppliers_page.load_data()
+        self.navigation.show(
+            self.ui.pageSuppliers
+        )

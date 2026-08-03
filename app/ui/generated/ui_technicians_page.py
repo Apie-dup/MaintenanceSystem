@@ -81,6 +81,8 @@ class Ui_TechniciansWindow(object):
         self.tblTechnicians.setAlternatingRowColors(True)
         self.tblTechnicians.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.tblTechnicians.setSortingEnabled(True)
+        self.tblTechnicians.setWordWrap(False)
+        self.tblTechnicians.verticalHeader().setVisible(False)
 
         self.verticalLayout.addWidget(self.tblTechnicians)
 
@@ -88,7 +90,7 @@ class Ui_TechniciansWindow(object):
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.btnAdd = QPushButton(TechniciansWindow)
         self.btnAdd.setObjectName(u"btnAdd")
-        self.btnAdd.setMinimumSize(QSize(90, 32))
+        self.btnAdd.setMinimumSize(QSize(90, 30))
         self.btnAdd.setStyleSheet(u"")
         self.btnAdd.setCheckable(False)
 
@@ -96,7 +98,7 @@ class Ui_TechniciansWindow(object):
 
         self.btnEdit = QPushButton(TechniciansWindow)
         self.btnEdit.setObjectName(u"btnEdit")
-        self.btnEdit.setMinimumSize(QSize(90, 32))
+        self.btnEdit.setMinimumSize(QSize(90, 30))
         self.btnEdit.setStyleSheet(u"")
         self.btnEdit.setCheckable(False)
 
@@ -104,12 +106,13 @@ class Ui_TechniciansWindow(object):
 
         self.btnRefresh = QPushButton(TechniciansWindow)
         self.btnRefresh.setObjectName(u"btnRefresh")
+        self.btnRefresh.setMinimumSize(QSize(90, 30))
 
         self.horizontalLayout_2.addWidget(self.btnRefresh)
 
         self.btnDelete = QPushButton(TechniciansWindow)
         self.btnDelete.setObjectName(u"btnDelete")
-        self.btnDelete.setMinimumSize(QSize(90, 32))
+        self.btnDelete.setMinimumSize(QSize(90, 30))
         self.btnDelete.setStyleSheet(u"")
         self.btnDelete.setCheckable(False)
 

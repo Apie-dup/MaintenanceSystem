@@ -72,6 +72,9 @@ class Ui_WorkOrdersPage(object):
         __qtablewidgetitem8 = QTableWidgetItem()
         self.tblWorkOrders.setHorizontalHeaderItem(8, __qtablewidgetitem8)
         self.tblWorkOrders.setObjectName(u"tblWorkOrders")
+        self.tblWorkOrders.setAlternatingRowColors(True)
+        self.tblWorkOrders.setWordWrap(False)
+        self.tblWorkOrders.verticalHeader().setVisible(False)
 
         self.verticalLayout.addWidget(self.tblWorkOrders)
 
@@ -79,28 +82,28 @@ class Ui_WorkOrdersPage(object):
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.btnAdd = QPushButton(WorkOrdersPage)
         self.btnAdd.setObjectName(u"btnAdd")
-        self.btnAdd.setMinimumSize(QSize(90, 32))
+        self.btnAdd.setMinimumSize(QSize(90, 30))
         self.btnAdd.setStyleSheet(u"")
 
         self.horizontalLayout_2.addWidget(self.btnAdd)
 
         self.btnEdit = QPushButton(WorkOrdersPage)
         self.btnEdit.setObjectName(u"btnEdit")
-        self.btnEdit.setMinimumSize(QSize(90, 32))
+        self.btnEdit.setMinimumSize(QSize(90, 30))
         self.btnEdit.setStyleSheet(u"")
 
         self.horizontalLayout_2.addWidget(self.btnEdit)
 
         self.btnRefresh = QPushButton(WorkOrdersPage)
         self.btnRefresh.setObjectName(u"btnRefresh")
-        self.btnRefresh.setMinimumSize(QSize(90, 32))
+        self.btnRefresh.setMinimumSize(QSize(90, 30))
         self.btnRefresh.setStyleSheet(u"")
 
         self.horizontalLayout_2.addWidget(self.btnRefresh)
 
         self.btnDelete = QPushButton(WorkOrdersPage)
         self.btnDelete.setObjectName(u"btnDelete")
-        self.btnDelete.setMinimumSize(QSize(90, 32))
+        self.btnDelete.setMinimumSize(QSize(90, 30))
         self.btnDelete.setStyleSheet(u"")
 
         self.horizontalLayout_2.addWidget(self.btnDelete)

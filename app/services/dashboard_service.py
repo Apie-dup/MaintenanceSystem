@@ -1,68 +1,56 @@
-from app.database.connection import Database
+from app.services.asset_service import AssetService
+from app.services.inventory_service import InventoryService
+from app.services.preventive_maintenance_service import (
+    PreventiveMaintenanceService
+)
+from app.services.technician_service import TechnicianService
+from app.services.work_order_service import WorkOrderService
 
 
 class DashboardService:
 
     @staticmethod
-    def get_statistics():
+    def get_summary():
+        return {
+            "assets": len(
+                AssetService.get_all()
+            ),
 
-        conn = Database.connect()
-        cursor = conn.cursor()
+            "open_work_orders":
+                WorkOrderService.get_open_count(),
 
-        stats = {
-            "assets": 0,
-            "work_orders": 0,
-            "pm_due": 0,
-            "low_stock": 0,
-            "technicians": 0,
+            "pm_due_today":
+                PreventiveMaintenanceService
+                .get_due_today_count(),
+
+            "pm_overdue":
+                PreventiveMaintenanceService
+                .get_overdue_count(),
+
+            "pm_due_week":
+                PreventiveMaintenanceService
+                .get_due_this_week_count(),
+
+            "technicians": len(
+                TechnicianService.get_all()
+            ),
+
+            "inventory_value":
+                InventoryService.get_total_stock_value(),
+
+            "low_stock": len(
+                InventoryService.get_low_stock()
+            ),
         }
 
-        # Assets
-        try:
-            cursor.execute("SELECT COUNT(*) FROM assets")
-            stats["assets"] = cursor.fetchone()[0]
-        except Exception as e:
-            print(e)
+    @staticmethod
+    def get_urgent_work_orders():
+        return WorkOrderService.get_urgent(
+            limit=10
+        )
 
-        # Open Work Orders
-        try:
-            cursor.execute("""
-                SELECT COUNT(*)
-                FROM work_orders
-                WHERE status='Open'
-            """)
-            stats["work_orders"] = cursor.fetchone()[0]
-        except Exception as e:
-            print(e)
-
-        # PM Due
-        try:
-            cursor.execute("""
-                SELECT COUNT(*)
-                FROM preventive_maintenance
-            """)
-            stats["pm_due"] = cursor.fetchone()[0]
-        except Exception as e:
-            print (e)
-
-        # Technicians
-        try:
-            cursor.execute("SELECT COUNT(*) FROM technicians")
-            stats["technicians"] = cursor.fetchone()[0]
-        except Exception as e:
-            print(e)
-
-        # Low Stock
-        try:
-            cursor.execute("""
-                SELECT COUNT(*)
-                FROM inventory
-                WHERE quantity <= minimum_quantity
-            """)
-            stats["low_stock"] = cursor.fetchone()[0]
-        except Exception as e:
-            print(e)
-
-        conn.close()
-
-        return stats
+    @staticmethod
+    def get_pm_due_list():
+        return PreventiveMaintenanceService.get_due_list(
+            limit=10
+        )

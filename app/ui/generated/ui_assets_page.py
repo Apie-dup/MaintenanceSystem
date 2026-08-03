@@ -85,7 +85,9 @@ class Ui_AssetsWindow(object):
         self.tblAssets.setAlternatingRowColors(True)
         self.tblAssets.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.tblAssets.setSortingEnabled(True)
+        self.tblAssets.setWordWrap(False)
         self.tblAssets.setColumnCount(12)
+        self.tblAssets.verticalHeader().setVisible(False)
 
         self.verticalLayout.addWidget(self.tblAssets)
 
@@ -93,7 +95,7 @@ class Ui_AssetsWindow(object):
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.btnAdd = QPushButton(AssetsWindow)
         self.btnAdd.setObjectName(u"btnAdd")
-        self.btnAdd.setMinimumSize(QSize(90, 32))
+        self.btnAdd.setMinimumSize(QSize(90, 30))
         font1 = QFont()
         font1.setFamilies([u"Segoe UI"])
         self.btnAdd.setFont(font1)
@@ -104,7 +106,7 @@ class Ui_AssetsWindow(object):
 
         self.btnEdit = QPushButton(AssetsWindow)
         self.btnEdit.setObjectName(u"btnEdit")
-        self.btnEdit.setMinimumSize(QSize(90, 32))
+        self.btnEdit.setMinimumSize(QSize(90, 30))
         self.btnEdit.setStyleSheet(u"")
         self.btnEdit.setCheckable(False)
 
@@ -112,7 +114,7 @@ class Ui_AssetsWindow(object):
 
         self.btnRefresh = QPushButton(AssetsWindow)
         self.btnRefresh.setObjectName(u"btnRefresh")
-        self.btnRefresh.setMinimumSize(QSize(90, 32))
+        self.btnRefresh.setMinimumSize(QSize(90, 30))
         self.btnRefresh.setStyleSheet(u"")
         self.btnRefresh.setCheckable(False)
 
@@ -120,7 +122,7 @@ class Ui_AssetsWindow(object):
 
         self.btnDelete = QPushButton(AssetsWindow)
         self.btnDelete.setObjectName(u"btnDelete")
-        self.btnDelete.setMinimumSize(QSize(90, 32))
+        self.btnDelete.setMinimumSize(QSize(90, 30))
         self.btnDelete.setStyleSheet(u"")
         self.btnDelete.setCheckable(False)
 
@@ -151,7 +153,7 @@ class Ui_AssetsWindow(object):
         AssetsWindow.setWindowTitle(QCoreApplication.translate("AssetsWindow", u"Assets Window", None))
         self.lblTitle.setText(QCoreApplication.translate("AssetsWindow", u"Assets", None))
         self.lblSearch.setText(QCoreApplication.translate("AssetsWindow", u"Search:", None))
-        self.txtSearch.setPlaceholderText(QCoreApplication.translate("AssetsWindow", u"Search by asset number, name, category, location....", None))
+        self.txtSearch.setPlaceholderText(QCoreApplication.translate("AssetsWindow", u"Search by asset number, name, category, location or status", None))
         ___qtablewidgetitem = self.tblAssets.horizontalHeaderItem(0)
         ___qtablewidgetitem.setText(QCoreApplication.translate("AssetsWindow", u"ID", None))
         ___qtablewidgetitem1 = self.tblAssets.horizontalHeaderItem(1)

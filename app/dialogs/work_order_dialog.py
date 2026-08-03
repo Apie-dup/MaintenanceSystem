@@ -8,6 +8,7 @@ from app.ui.generated.ui_add_work_order import Ui_AddWorkOrderDialog
 from app.services.work_order_parts_service import WorkOrderPartService
 from app.helpers.table_helper import TableHelper
 from app.dialogs.issue_part_dialog import IssuePartDialog
+from app.helpers.format_helper import FormatHelper
 
 
 class WorkOrderDialog(BaseDialog):
@@ -226,7 +227,15 @@ class WorkOrderDialog(BaseDialog):
         )
 
         self.ui.lblMaterialTotal.setText(
-            f"N$ {total:,.2f}"
+            FormatHelper.currency(total)
+        )
+
+        unit_cost = WorkOrderPartService.get_total_unit_cost(
+            self.record_id
+        )
+
+        self.ui.lblMaterialUnitCost.setText(
+            FormatHelper.currency(unit_cost)
         )
 
     # ---------------------------------------------------------

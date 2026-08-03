@@ -4,26 +4,43 @@ from PySide6.QtWidgets import QApplication
 
 from app.database.setup import DatabaseSetup
 from app.controllers.login_controller import LoginController
+from app.core.logger import logger
 
 
 def main():
 
-    # Initialize or rebuild the database
-    REBUILD_DATABASE = False
+    try:
+        logger.info("Starting Maintenance System application.")
 
-    if REBUILD_DATABASE:
-        DatabaseSetup.rebuild()
-    else:
-        DatabaseSetup.initialize()
+        # Initialize or rebuild the database
+        REBUILD_DATABASE = False
 
-    # Start Qt
-    app = QApplication(sys.argv)
+        if REBUILD_DATABASE:
+            DatabaseSetup.rebuild()
+        else:
+            DatabaseSetup.initialize()
 
-    window = LoginController()
-    window.show()
+        # Start Qt
+        app = QApplication(sys.argv)
 
-    sys.exit(app.exec())
+        login_window = LoginController()
+        login_window.show()
 
+        exit_code = app.exec()
+
+        logger.info(
+            "Application exited with code: %s", 
+            exit_code
+        )
+
+        sys.exit(exit_code)
+
+    except Exception:
+        logger.exception(
+            "Unhandled error occurred during application startup."
+        )
+
+        raise
 
 if __name__ == "__main__":
     main()

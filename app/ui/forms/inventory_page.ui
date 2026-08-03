@@ -47,6 +47,15 @@
    </item>
    <item>
     <widget class="QTableWidget" name="tblInventory">
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
+     <property name="wordWrap">
+      <bool>false</bool>
+     </property>
+     <attribute name="verticalHeaderHighlightSections">
+      <bool>false</bool>
+     </attribute>
      <column>
       <property name="text">
        <string>ID</string>
@@ -118,6 +127,12 @@
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <widget class="QPushButton" name="btnAdd">
+       <property name="minimumSize">
+        <size>
+         <width>90</width>
+         <height>30</height>
+        </size>
+       </property>
        <property name="text">
         <string>Add</string>
        </property>
@@ -128,6 +143,12 @@
      </item>
      <item>
       <widget class="QPushButton" name="btnEdit">
+       <property name="minimumSize">
+        <size>
+         <width>90</width>
+         <height>30</height>
+        </size>
+       </property>
        <property name="text">
         <string>Edit</string>
        </property>
@@ -135,6 +156,12 @@
      </item>
      <item>
       <widget class="QPushButton" name="btnRefresh">
+       <property name="minimumSize">
+        <size>
+         <width>90</width>
+         <height>30</height>
+        </size>
+       </property>
        <property name="text">
         <string>Refresh</string>
        </property>
@@ -145,6 +172,12 @@
      </item>
      <item>
       <widget class="QPushButton" name="btnDelete">
+       <property name="minimumSize">
+        <size>
+         <width>90</width>
+         <height>30</height>
+        </size>
+       </property>
        <property name="text">
         <string>Delete</string>
        </property>

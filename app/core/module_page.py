@@ -1,4 +1,4 @@
-from app.core.base_page import BasePage
+from app.base.base_page import BasePage
 
 
 class ModulePage(BasePage):
@@ -21,7 +21,7 @@ class ModulePage(BasePage):
         self.status_label = status_label
         self.record_name = record_name
 
-        self.configure_table(table)
+        self.setup_table(table)
 
     def show_records(self, records):
 

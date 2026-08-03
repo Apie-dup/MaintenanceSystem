@@ -41,7 +41,7 @@
        <item>
         <widget class="QLineEdit" name="txtSearch">
          <property name="placeholderText">
-          <string>Search by asset number, name, category, location....</string>
+          <string>Search by asset number, name, category, location or status</string>
          </property>
         </widget>
        </item>
@@ -61,9 +61,15 @@
        <property name="sortingEnabled">
         <bool>true</bool>
        </property>
+       <property name="wordWrap">
+        <bool>false</bool>
+       </property>
        <property name="columnCount">
         <number>12</number>
        </property>
+       <attribute name="verticalHeaderVisible">
+        <bool>false</bool>
+       </attribute>
        <column>
         <property name="text">
          <string>ID</string>
@@ -133,7 +139,7 @@
          <property name="minimumSize">
           <size>
            <width>90</width>
-           <height>32</height>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -157,7 +163,7 @@
          <property name="minimumSize">
           <size>
            <width>90</width>
-           <height>32</height>
+           <height>30</height>
           </size>
          </property>
          <property name="styleSheet">
@@ -176,7 +182,7 @@
          <property name="minimumSize">
           <size>
            <width>90</width>
-           <height>32</height>
+           <height>30</height>
           </size>
          </property>
          <property name="styleSheet">
@@ -195,7 +201,7 @@
          <property name="minimumSize">
           <size>
            <width>90</width>
-           <height>32</height>
+           <height>30</height>
           </size>
          </property>
          <property name="styleSheet">

@@ -7,8 +7,8 @@ from PySide6.QtWidgets import (
 )
 
 from app.ui.generated.ui_pm_page import Ui_PMWindow
-from app.services.pm_service import PMService
-from app.controllers.add_pm_controller import AddPMController
+from app.services.preventive_maintenance_service import PreventiveMaintenanceService
+from app.dialogs.preventive_maintenance_dialog import PreventiveMaintenanceDialog
 from app.base.base_page import BasePage
 
 
@@ -24,14 +24,14 @@ class PMPage(BasePage):
             "Preventive Maintenance"
         )
 
-        self.configure_table(
+        self.setup_table(
             self.ui.tblPM
         )
 
 
     def load_pm(self):
 
-        schedules = PMService.get_pm_schedules()
+        schedules = PreventiveMaintenanceService.get_pm_schedules()
 
         self.populate_table(
             schedules
@@ -75,7 +75,7 @@ class PMPage(BasePage):
 
     def add_pm(self):
 
-        dialog = AddPMController()
+        dialog = PreventiveMaintenanceDialog()
 
         if dialog.exec():
 
@@ -100,7 +100,7 @@ class PMPage(BasePage):
             self.ui.tblPM.item(row, 0).text()
         )
 
-        dialog = AddPMController(
+        dialog = PreventiveMaintenanceDialog(
             pm_id
         )
 
@@ -139,7 +139,7 @@ class PMPage(BasePage):
 
         if reply == QMessageBox.StandardButton.Yes:
 
-            PMService.delete_pm(
+            PreventiveMaintenanceService.delete_pm(
                 pm_id
             )
 
@@ -152,13 +152,13 @@ class PMPage(BasePage):
 
         if text:
 
-            schedules = PMService.search_pm(
+            schedules = PreventiveMaintenanceService.search_pm(
                 text
             )
 
         else:
 
-            schedules = PMService.get_pm_schedules()
+            schedules = PreventiveMaintenanceService.get_pm_schedules()
 
 
         self.populate_table(

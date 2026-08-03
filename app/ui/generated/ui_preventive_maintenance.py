@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'pm_page.ui'
+## Form generated from reading UI file 'preventive_maintenance.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.11.1
 ##
@@ -16,17 +16,20 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QHBoxLayout, QHeaderView, QLabel,
-    QLineEdit, QPushButton, QSizePolicy, QSpacerItem,
-    QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget)
+    QLineEdit, QMainWindow, QMenuBar, QPushButton,
+    QSizePolicy, QSpacerItem, QStatusBar, QTableWidget,
+    QTableWidgetItem, QVBoxLayout, QWidget)
 
 class Ui_PMWindow(object):
     def setupUi(self, PMWindow):
         if not PMWindow.objectName():
             PMWindow.setObjectName(u"PMWindow")
-        PMWindow.resize(827, 523)
-        self.verticalLayout = QVBoxLayout(PMWindow)
+        PMWindow.resize(824, 600)
+        self.centralwidget = QWidget(PMWindow)
+        self.centralwidget.setObjectName(u"centralwidget")
+        self.verticalLayout = QVBoxLayout(self.centralwidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.lblPMTitle = QLabel(PMWindow)
+        self.lblPMTitle = QLabel(self.centralwidget)
         self.lblPMTitle.setObjectName(u"lblPMTitle")
         font = QFont()
         font.setPointSize(18)
@@ -37,12 +40,12 @@ class Ui_PMWindow(object):
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.lblSearch = QLabel(PMWindow)
+        self.lblSearch = QLabel(self.centralwidget)
         self.lblSearch.setObjectName(u"lblSearch")
 
         self.horizontalLayout.addWidget(self.lblSearch)
 
-        self.txtSearch = QLineEdit(PMWindow)
+        self.txtSearch = QLineEdit(self.centralwidget)
         self.txtSearch.setObjectName(u"txtSearch")
 
         self.horizontalLayout.addWidget(self.txtSearch)
@@ -50,9 +53,9 @@ class Ui_PMWindow(object):
 
         self.verticalLayout.addLayout(self.horizontalLayout)
 
-        self.tblPM = QTableWidget(PMWindow)
-        if (self.tblPM.columnCount() < 15):
-            self.tblPM.setColumnCount(15)
+        self.tblPM = QTableWidget(self.centralwidget)
+        if (self.tblPM.columnCount() < 8):
+            self.tblPM.setColumnCount(8)
         __qtablewidgetitem = QTableWidgetItem()
         self.tblPM.setHorizontalHeaderItem(0, __qtablewidgetitem)
         __qtablewidgetitem1 = QTableWidgetItem()
@@ -69,66 +72,59 @@ class Ui_PMWindow(object):
         self.tblPM.setHorizontalHeaderItem(6, __qtablewidgetitem6)
         __qtablewidgetitem7 = QTableWidgetItem()
         self.tblPM.setHorizontalHeaderItem(7, __qtablewidgetitem7)
-        __qtablewidgetitem8 = QTableWidgetItem()
-        self.tblPM.setHorizontalHeaderItem(8, __qtablewidgetitem8)
-        __qtablewidgetitem9 = QTableWidgetItem()
-        self.tblPM.setHorizontalHeaderItem(9, __qtablewidgetitem9)
-        __qtablewidgetitem10 = QTableWidgetItem()
-        self.tblPM.setHorizontalHeaderItem(10, __qtablewidgetitem10)
-        __qtablewidgetitem11 = QTableWidgetItem()
-        self.tblPM.setHorizontalHeaderItem(11, __qtablewidgetitem11)
-        __qtablewidgetitem12 = QTableWidgetItem()
-        self.tblPM.setHorizontalHeaderItem(12, __qtablewidgetitem12)
-        __qtablewidgetitem13 = QTableWidgetItem()
-        self.tblPM.setHorizontalHeaderItem(13, __qtablewidgetitem13)
-        __qtablewidgetitem14 = QTableWidgetItem()
-        self.tblPM.setHorizontalHeaderItem(14, __qtablewidgetitem14)
         self.tblPM.setObjectName(u"tblPM")
         self.tblPM.setAlternatingRowColors(True)
         self.tblPM.setSortingEnabled(True)
-        self.tblPM.setWordWrap(False)
-        self.tblPM.verticalHeader().setVisible(False)
 
         self.verticalLayout.addWidget(self.tblPM)
 
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.btnAdd = QPushButton(PMWindow)
+        self.btnAdd = QPushButton(self.centralwidget)
         self.btnAdd.setObjectName(u"btnAdd")
-        self.btnAdd.setMinimumSize(QSize(90, 30))
 
         self.horizontalLayout_2.addWidget(self.btnAdd)
 
-        self.btnEdit = QPushButton(PMWindow)
+        self.btnEdit = QPushButton(self.centralwidget)
         self.btnEdit.setObjectName(u"btnEdit")
-        self.btnEdit.setMinimumSize(QSize(90, 30))
 
         self.horizontalLayout_2.addWidget(self.btnEdit)
 
-        self.btnRefresh = QPushButton(PMWindow)
-        self.btnRefresh.setObjectName(u"btnRefresh")
-        self.btnRefresh.setMinimumSize(QSize(90, 30))
-
-        self.horizontalLayout_2.addWidget(self.btnRefresh)
-
-        self.btnDelete = QPushButton(PMWindow)
+        self.btnDelete = QPushButton(self.centralwidget)
         self.btnDelete.setObjectName(u"btnDelete")
-        self.btnDelete.setMinimumSize(QSize(90, 30))
 
         self.horizontalLayout_2.addWidget(self.btnDelete)
 
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        self.btnRefresh = QPushButton(self.centralwidget)
+        self.btnRefresh.setObjectName(u"btnRefresh")
+
+        self.horizontalLayout_2.addWidget(self.btnRefresh)
+
+        self.horizontalSpacer = QSpacerItem(1125, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_2.addItem(self.horizontalSpacer)
+
+        self.btnClose = QPushButton(self.centralwidget)
+        self.btnClose.setObjectName(u"btnClose")
+
+        self.horizontalLayout_2.addWidget(self.btnClose)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout_2)
 
-        self.lblStatus = QLabel(PMWindow)
+        self.lblStatus = QLabel(self.centralwidget)
         self.lblStatus.setObjectName(u"lblStatus")
 
         self.verticalLayout.addWidget(self.lblStatus)
 
+        PMWindow.setCentralWidget(self.centralwidget)
+        self.menubar = QMenuBar(PMWindow)
+        self.menubar.setObjectName(u"menubar")
+        self.menubar.setGeometry(QRect(0, 0, 824, 33))
+        PMWindow.setMenuBar(self.menubar)
+        self.statusbar = QStatusBar(PMWindow)
+        self.statusbar.setObjectName(u"statusbar")
+        PMWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(PMWindow)
 
@@ -136,7 +132,7 @@ class Ui_PMWindow(object):
     # setupUi
 
     def retranslateUi(self, PMWindow):
-        PMWindow.setWindowTitle(QCoreApplication.translate("PMWindow", u"Preventive Maintenance Window", None))
+        PMWindow.setWindowTitle(QCoreApplication.translate("PMWindow", u"Preventive Maintenance", None))
         self.lblPMTitle.setText(QCoreApplication.translate("PMWindow", u"Preventive Maintenance", None))
         self.lblSearch.setText(QCoreApplication.translate("PMWindow", u"Search:", None))
         self.txtSearch.setPlaceholderText(QCoreApplication.translate("PMWindow", u"Search preventive maintenance.....", None))
@@ -145,35 +141,22 @@ class Ui_PMWindow(object):
         ___qtablewidgetitem1 = self.tblPM.horizontalHeaderItem(1)
         ___qtablewidgetitem1.setText(QCoreApplication.translate("PMWindow", u"PM Number", None))
         ___qtablewidgetitem2 = self.tblPM.horizontalHeaderItem(2)
-        ___qtablewidgetitem2.setText(QCoreApplication.translate("PMWindow", u"Asset Id", None))
+        ___qtablewidgetitem2.setText(QCoreApplication.translate("PMWindow", u"Asset", None))
         ___qtablewidgetitem3 = self.tblPM.horizontalHeaderItem(3)
         ___qtablewidgetitem3.setText(QCoreApplication.translate("PMWindow", u"Task", None))
         ___qtablewidgetitem4 = self.tblPM.horizontalHeaderItem(4)
-        ___qtablewidgetitem4.setText(QCoreApplication.translate("PMWindow", u"Description", None))
+        ___qtablewidgetitem4.setText(QCoreApplication.translate("PMWindow", u"Frequency", None))
         ___qtablewidgetitem5 = self.tblPM.horizontalHeaderItem(5)
-        ___qtablewidgetitem5.setText(QCoreApplication.translate("PMWindow", u"Frequency Type", None))
+        ___qtablewidgetitem5.setText(QCoreApplication.translate("PMWindow", u"Next Due", None))
         ___qtablewidgetitem6 = self.tblPM.horizontalHeaderItem(6)
-        ___qtablewidgetitem6.setText(QCoreApplication.translate("PMWindow", u"Frequency Value", None))
+        ___qtablewidgetitem6.setText(QCoreApplication.translate("PMWindow", u"Priority", None))
         ___qtablewidgetitem7 = self.tblPM.horizontalHeaderItem(7)
-        ___qtablewidgetitem7.setText(QCoreApplication.translate("PMWindow", u"Last Service Date", None))
-        ___qtablewidgetitem8 = self.tblPM.horizontalHeaderItem(8)
-        ___qtablewidgetitem8.setText(QCoreApplication.translate("PMWindow", u"Next Due Date", None))
-        ___qtablewidgetitem9 = self.tblPM.horizontalHeaderItem(9)
-        ___qtablewidgetitem9.setText(QCoreApplication.translate("PMWindow", u"Estimated Hours", None))
-        ___qtablewidgetitem10 = self.tblPM.horizontalHeaderItem(10)
-        ___qtablewidgetitem10.setText(QCoreApplication.translate("PMWindow", u"Estimated Cost", None))
-        ___qtablewidgetitem11 = self.tblPM.horizontalHeaderItem(11)
-        ___qtablewidgetitem11.setText(QCoreApplication.translate("PMWindow", u"Priority", None))
-        ___qtablewidgetitem12 = self.tblPM.horizontalHeaderItem(12)
-        ___qtablewidgetitem12.setText(QCoreApplication.translate("PMWindow", u"Active", None))
-        ___qtablewidgetitem13 = self.tblPM.horizontalHeaderItem(13)
-        ___qtablewidgetitem13.setText(QCoreApplication.translate("PMWindow", u"Notes", None))
-        ___qtablewidgetitem14 = self.tblPM.horizontalHeaderItem(14)
-        ___qtablewidgetitem14.setText(QCoreApplication.translate("PMWindow", u"Created At", None))
+        ___qtablewidgetitem7.setText(QCoreApplication.translate("PMWindow", u"Status", None))
         self.btnAdd.setText(QCoreApplication.translate("PMWindow", u"Add", None))
         self.btnEdit.setText(QCoreApplication.translate("PMWindow", u"Edit", None))
-        self.btnRefresh.setText(QCoreApplication.translate("PMWindow", u"Refresh", None))
         self.btnDelete.setText(QCoreApplication.translate("PMWindow", u"Delete", None))
+        self.btnRefresh.setText(QCoreApplication.translate("PMWindow", u"Refresh", None))
+        self.btnClose.setText(QCoreApplication.translate("PMWindow", u"Close", None))
         self.lblStatus.setText(QCoreApplication.translate("PMWindow", u"Status", None))
     # retranslateUi
 

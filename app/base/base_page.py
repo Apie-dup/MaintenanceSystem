@@ -40,6 +40,11 @@ class BasePage(QWidget):
             QHeaderView.Stretch
         )
 
+    def setup_table(self, table):
+
+        # Compatibility alias for pages that use the newer setup naming.
+        self.configure_table(table)
+
     # -------------------------------------------------
     # Populate Table
     # -------------------------------------------------

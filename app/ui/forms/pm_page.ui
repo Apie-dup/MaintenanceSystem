@@ -53,6 +53,12 @@
      <property name="sortingEnabled">
       <bool>true</bool>
      </property>
+     <property name="wordWrap">
+      <bool>false</bool>
+     </property>
+     <attribute name="verticalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
      <column>
       <property name="text">
        <string>ID</string>
@@ -134,6 +140,12 @@
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <widget class="QPushButton" name="btnAdd">
+       <property name="minimumSize">
+        <size>
+         <width>90</width>
+         <height>30</height>
+        </size>
+       </property>
        <property name="text">
         <string>Add</string>
        </property>
@@ -141,6 +153,12 @@
      </item>
      <item>
       <widget class="QPushButton" name="btnEdit">
+       <property name="minimumSize">
+        <size>
+         <width>90</width>
+         <height>30</height>
+        </size>
+       </property>
        <property name="text">
         <string>Edit</string>
        </property>
@@ -148,6 +166,12 @@
      </item>
      <item>
       <widget class="QPushButton" name="btnRefresh">
+       <property name="minimumSize">
+        <size>
+         <width>90</width>
+         <height>30</height>
+        </size>
+       </property>
        <property name="text">
         <string>Refresh</string>
        </property>
@@ -155,6 +179,12 @@
      </item>
      <item>
       <widget class="QPushButton" name="btnDelete">
+       <property name="minimumSize">
+        <size>
+         <width>90</width>
+         <height>30</height>
+        </size>
+       </property>
        <property name="text">
         <string>Delete</string>
        </property>
@@ -172,16 +202,6 @@
         </size>
        </property>
       </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="btnClose">
-       <property name="text">
-        <string>Close</string>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-      </widget>
      </item>
     </layout>
    </item>

@@ -39,12 +39,10 @@ class SuppliersPage(CrudPage):
         self.dialog_class = SupplierDialog
         self.table = self.ui.tblSuppliers
         self.search_widget = self.ui.txtSearch
+        self.status_label = self.ui.lblStatus
 
         self.entity_name = "Supplier"
         self.record_name = "suppliers"
-
-        # Assign this only if you created a record-count label.
-        # self.status_label = self.ui.lblRecordCount
 
         self.setup_page()
 

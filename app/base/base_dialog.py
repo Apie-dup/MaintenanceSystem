@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QDialog, QWidget
 
 from app.services.message_service import MessageService
+from app.core.logger import logger
 
 
 class BaseDialog(QDialog):
@@ -129,16 +130,45 @@ class BaseDialog(QDialog):
 
         try:
             self.save()
+
+            logger.info(
+                "%s saved successfully. Record ID: %s",
+                self.ENTITY_NAME,
+                self.record_id
+            )
+
             self.accept()
 
         except ValueError as error:
+            logger.warning(
+                "Validation or business-rule error while saving %s: %s",
+                self.ENTITY_NAME,
+                error
+            )
+
             self.warning(
                 self.ENTITY_NAME,
                 str(error)
-        )
+            )
 
         except Exception as error:
+            logger.exception(
+                "Unexpected error while saving %s.",
+                self.ENTITY_NAME
+            )
+
             self.error(
                 self.ENTITY_NAME,
                 f"Unexpected error:\n\n{error}"
-        )
+            )
+
+    def set_read_only(self, *widgets):
+
+        for widget in widgets:
+            widget.setReadOnly(True)
+
+    def set_focus(self, widget):
+        widget.setFocus()
+
+        if hasattr(widget, "selectAll"):
+            widget.selectAll()

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>911</width>
-    <height>455</height>
+    <height>485</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -104,6 +104,12 @@
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <widget class="QPushButton" name="btnAdd">
+       <property name="minimumSize">
+        <size>
+         <width>90</width>
+         <height>30</height>
+        </size>
+       </property>
        <property name="text">
         <string>Add</string>
        </property>
@@ -114,6 +120,12 @@
      </item>
      <item>
       <widget class="QPushButton" name="btnEdit">
+       <property name="minimumSize">
+        <size>
+         <width>90</width>
+         <height>30</height>
+        </size>
+       </property>
        <property name="text">
         <string>Edit</string>
        </property>
@@ -124,6 +136,12 @@
      </item>
      <item>
       <widget class="QPushButton" name="btnRefresh">
+       <property name="minimumSize">
+        <size>
+         <width>90</width>
+         <height>30</height>
+        </size>
+       </property>
        <property name="text">
         <string>Refresh</string>
        </property>
@@ -134,6 +152,12 @@
      </item>
      <item>
       <widget class="QPushButton" name="btnDelete">
+       <property name="minimumSize">
+        <size>
+         <width>90</width>
+         <height>30</height>
+        </size>
+       </property>
        <property name="text">
         <string>Delete</string>
        </property>
@@ -153,6 +177,13 @@
       </spacer>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="lblStatus">
+     <property name="text">
+      <string>Staus</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

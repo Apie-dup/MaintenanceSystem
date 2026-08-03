@@ -80,6 +80,9 @@ class Ui_InventoryPage(object):
         __qtablewidgetitem12 = QTableWidgetItem()
         self.tblInventory.setHorizontalHeaderItem(12, __qtablewidgetitem12)
         self.tblInventory.setObjectName(u"tblInventory")
+        self.tblInventory.setAlternatingRowColors(True)
+        self.tblInventory.setWordWrap(False)
+        self.tblInventory.verticalHeader().setHighlightSections(False)
 
         self.verticalLayout.addWidget(self.tblInventory)
 
@@ -87,23 +90,27 @@ class Ui_InventoryPage(object):
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.btnAdd = QPushButton(InventoryPage)
         self.btnAdd.setObjectName(u"btnAdd")
+        self.btnAdd.setMinimumSize(QSize(90, 30))
         self.btnAdd.setCheckable(False)
 
         self.horizontalLayout_2.addWidget(self.btnAdd)
 
         self.btnEdit = QPushButton(InventoryPage)
         self.btnEdit.setObjectName(u"btnEdit")
+        self.btnEdit.setMinimumSize(QSize(90, 30))
 
         self.horizontalLayout_2.addWidget(self.btnEdit)
 
         self.btnRefresh = QPushButton(InventoryPage)
         self.btnRefresh.setObjectName(u"btnRefresh")
+        self.btnRefresh.setMinimumSize(QSize(90, 30))
         self.btnRefresh.setCheckable(False)
 
         self.horizontalLayout_2.addWidget(self.btnRefresh)
 
         self.btnDelete = QPushButton(InventoryPage)
         self.btnDelete.setObjectName(u"btnDelete")
+        self.btnDelete.setMinimumSize(QSize(90, 30))
         self.btnDelete.setCheckable(False)
 
         self.horizontalLayout_2.addWidget(self.btnDelete)

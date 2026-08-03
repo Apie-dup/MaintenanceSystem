@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'add_pm.ui'
+## Form generated from reading UI file 'add_pm_dialog.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.11.1
 ##

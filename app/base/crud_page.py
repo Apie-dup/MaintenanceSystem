@@ -1,7 +1,9 @@
 from PySide6.QtCore import Qt
+import sqlite3
 
 from app.base.base_page import BasePage
 from app.helpers.table_helper import TableHelper
+from app.core.logger import logger
 
 
 class CrudPage(BasePage):
@@ -221,24 +223,62 @@ class CrudPage(BasePage):
         record_id = self.require_selection()
 
         if record_id is None:
-
-            self.warning(
-                "Delete",
-                f"Please select a {self.entity_name.lower()}."
-            )
-
             return
 
         if not self.confirm_delete(
-            "Delete",
-            f"Delete selected {self.entity_name.lower()}?"
+            f"Delete {self.entity_name}",
+            (
+                f"Are you sure you want to delete the selected "
+                f"{self.entity_name.lower()}?"
+            )
         ):
             return
 
-        self.service.delete(record_id)
+        try:
+            self.service.delete(record_id)
+
+            logger.info(
+                "%s deleted successfully. Record ID: %s",
+                self.entity_name,
+                record_id
+            )
+
+        except sqlite3.IntegrityError:
+            logger.warning(
+                "Deletion blocked for %s record ID %s because "
+                "it is referenced by other records.",
+                self.entity_name,
+                record_id
+            )
+
+            self.warning(
+                f"Delete {self.entity_name}",
+                (
+                    f"This {self.entity_name.lower()} cannot be deleted "
+                    "because it is referenced by other records.\n\n"
+                    "Change its status to Inactive instead."
+                )
+            )
+            return
+
+        except Exception as error:
+            logger.exception(
+                "Could not delete %s record ID %s.",
+                self.entity_name,
+                record_id
+            )
+
+            self.error(
+                f"Delete {self.entity_name}",
+                (
+                    f"Could not delete the "
+                    f"{self.entity_name.lower()}.\n\n{error}"
+                )
+            )
+            return
 
         self.information(
-            "Delete",
+            f"Delete {self.entity_name}",
             f"{self.entity_name} deleted successfully."
         )
 

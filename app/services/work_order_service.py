@@ -157,3 +157,17 @@ class WorkOrderService:
             raise ValueError(
                 "Labour Hours cannot be negative."
             )
+
+    @staticmethod
+    def get_open_count():
+        return WorkOrderModel.get_open_count()
+
+    @staticmethod
+    def get_urgent(limit=10):
+        return WorkOrderModel.get_urgent(limit)
+
+    @staticmethod
+    def open_pm_work_order_exists(pm_number):
+        return WorkOrderModel.open_pm_work_order_exists(
+            pm_number
+        )
