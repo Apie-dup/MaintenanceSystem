@@ -4,7 +4,7 @@ from app.core.logger import logger
 
 class MigrationManager:
 
-    LATEST_VERSION = 2
+    LATEST_VERSION = 3
 
     @staticmethod
     def get_database_version():
