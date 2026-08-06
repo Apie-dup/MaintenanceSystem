@@ -2,25 +2,34 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QHeaderView,
-    QTableWidgetItem
+    QTableWidgetItem,
 )
 
 
 class TableHelper:
+    """
+    Shared setup and population logic for QTableWidget controls.
+    """
+
+    ROW_HEIGHT = 32
 
     # ---------------------------------------------------------
-    # SETUP TABLE
+    # Setup
     # ---------------------------------------------------------
-    @staticmethod
-    def setup(table, columns):
 
-        headers = [
-            header
-            for field_name, header in columns
-        ]
-
+    @classmethod
+    def setup(
+        cls,
+        table,
+        columns,
+        stretch_last=True,
+        sorting=True,
+    ):
         table.setColumnCount(len(columns))
-        table.setHorizontalHeaderLabels(headers)
+
+        table.setHorizontalHeaderLabels(
+            [heading for _field, heading in columns]
+        )
 
         table.setSelectionBehavior(
             QAbstractItemView.SelectionBehavior.SelectRows
@@ -35,102 +44,76 @@ class TableHelper:
         )
 
         table.setAlternatingRowColors(True)
+        table.setSortingEnabled(sorting)
+        table.setWordWrap(False)
 
         table.verticalHeader().setVisible(False)
-
-        table.horizontalHeader().setSectionResizeMode(
-            QHeaderView.ResizeMode.ResizeToContents
+        table.verticalHeader().setDefaultSectionSize(
+            cls.ROW_HEIGHT
         )
 
-        table.horizontalHeader().setStretchLastSection(True)
+        header = table.horizontalHeader()
 
-        table.setSortingEnabled(True)
+        header.setSectionsClickable(True)
+        header.setStretchLastSection(stretch_last)
 
-    @staticmethod
-    def setup_table(table, columns):
+        for column in range(len(columns)):
+            header.setSectionResizeMode(
+                column,
+                QHeaderView.ResizeMode.ResizeToContents
+            )
 
-        TableHelper.setup(table, columns)
+        if stretch_last and columns:
+            header.setSectionResizeMode(
+                len(columns) - 1,
+                QHeaderView.ResizeMode.Stretch
+            )
 
     # ---------------------------------------------------------
-    # POPULATE TABLE
+    # Populate
     # ---------------------------------------------------------
-    @staticmethod
-    def populate(table, records, columns, id_field="id"):
 
+    @staticmethod
+    def populate(table, records, columns):
         sorting_enabled = table.isSortingEnabled()
 
         table.setSortingEnabled(False)
         table.setRowCount(0)
 
-        for row_index, record in enumerate(records):
+        for record in records:
+            row = table.rowCount()
+            table.insertRow(row)
 
-            table.insertRow(row_index)
+            record_id = record["id"]
 
-            for column_index, column in enumerate(columns):
+            for column, (field_name, _heading) in enumerate(columns):
+                value = record[field_name]
 
-                field_name = column[0]
-
-                value = TableHelper.get_record_value(
-                    record,
-                    field_name
+                item = QTableWidgetItem(
+                    "" if value is None else str(value)
                 )
 
-                display_value = (
-                    ""
-                    if value is None
-                    else str(value)
-                )
-
-                item = QTableWidgetItem(display_value)
-
-                if column_index == 0:
-
-                    record_id = TableHelper.get_record_value(
-                        record,
-                        id_field
-                    )
-
+                if column == 0:
                     item.setData(
                         Qt.ItemDataRole.UserRole,
                         record_id
                     )
 
                 table.setItem(
-                    row_index,
-                    column_index,
+                    row,
+                    column,
                     item
                 )
 
         table.setSortingEnabled(sorting_enabled)
-
-        if sorting_enabled:
-            table.sortItems(
-            0,
-            Qt.SortOrder.AscendingOrder
-        )
-
-        if table.rowCount() > 0:
-            table.selectRow(0)
-
-    @staticmethod
-    def populate_table(table, records, columns, id_field="id"):
-
-        TableHelper.populate(
-            table,
-            records,
-            columns,
-            id_field
-        )
+        table.clearSelection()
 
     # ---------------------------------------------------------
-    # GET SELECTED RECORD ID
+    # Selected ID
     # ---------------------------------------------------------
+
     @staticmethod
     def selected_id(table):
-
-        if table is None:
-            return None
-
         row = table.currentRow()
 
         if row < 0:
@@ -146,52 +129,28 @@ class TableHelper:
         )
 
     # ---------------------------------------------------------
-    # GET SELECTED ROW VALUES
+    # Selected row
     # ---------------------------------------------------------
+
     @staticmethod
     def selected_row(table):
+        row = table.currentRow()
 
-        if table is None:
+        if row < 0:
             return None
 
-        row_index = table.currentRow()
-
-        if row_index < 0:
-            return None
-
-        row_values = []
-
-        for column_index in range(
-            table.columnCount()
-        ):
-
-            item = table.item(
-                row_index,
-                column_index
-            )
-
-            if item is None:
-                row_values.append("")
-            else:
-                row_values.append(item.text())
-
-        return row_values
+        return [
+            table.item(row, column).text()
+            if table.item(row, column) is not None
+            else ""
+            for column in range(table.columnCount())
+        ]
 
     # ---------------------------------------------------------
-    # GET VALUE FROM RECORD
+    # Clear
     # ---------------------------------------------------------
+
     @staticmethod
-    def get_record_value(record, field_name):
-
-        if record is None:
-            return None
-
-        try:
-            return record[field_name]
-
-        except (KeyError, IndexError, TypeError):
-            return getattr(
-                record,
-                field_name,
-                None
-            )
+    def clear(table):
+        table.setRowCount(0)
+        table.clearSelection()

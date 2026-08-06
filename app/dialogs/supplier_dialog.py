@@ -3,6 +3,7 @@ from app.services.supplier_service import SupplierService
 from app.services.validation_service import ValidationService
 from app.helpers.lookup_helper import LookupHelper
 from app.ui.generated.ui_supplier_dialog import Ui_SupplierDialog
+from app.helpers.form_helper import FormHelper
 
 
 class SupplierDialog(BaseDialog):
@@ -15,6 +16,7 @@ class SupplierDialog(BaseDialog):
         self.ui = Ui_SupplierDialog()
         self.ui.setupUi(self)
 
+        self.apply_form_standards()
         self.setup_dialog()
 
     # ---------------------------------------------------------
@@ -26,7 +28,7 @@ class SupplierDialog(BaseDialog):
         self.connect_signals()
 
         self.ui.txtSupplierCode.setReadOnly(True)
-
+        
     def setup_combos(self):
         LookupHelper.fill_combo(
             self.ui.cmbStatus,
@@ -62,8 +64,6 @@ class SupplierDialog(BaseDialog):
         self.ui.txtNotes.clear()
 
         self.ui.cmbStatus.setCurrentText("Active")
-
-        self.ui.txtSupplierName.setFocus()
 
     # ---------------------------------------------------------
     # Form data
@@ -162,7 +162,6 @@ class SupplierDialog(BaseDialog):
                 "Supplier Name"
             )
         ):
-            self.ui.txtSupplierName.setFocus()
             return False
 
         if not ValidationService.check(
@@ -171,7 +170,6 @@ class SupplierDialog(BaseDialog):
                 data["email"]
             )
         ):
-            self.ui.txtEmail.setFocus()
             return False
 
         if not ValidationService.check(
@@ -180,7 +178,6 @@ class SupplierDialog(BaseDialog):
                 data["phone"]
             )
         ):
-            self.ui.txtPhone.setFocus()
             return False
 
         return True

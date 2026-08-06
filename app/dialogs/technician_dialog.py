@@ -3,6 +3,7 @@ from app.core.lookup_manager import LookupManager
 from app.services.technician_service import TechnicianService
 from app.services.validation_service import ValidationService
 from app.ui.generated.ui_add_technician import Ui_AddTechnicianDialog
+from app.helpers.form_helper import FormHelper
 
 
 class TechnicianDialog(BaseDialog):
@@ -15,6 +16,7 @@ class TechnicianDialog(BaseDialog):
         self.ui = Ui_AddTechnicianDialog()
         self.ui.setupUi(self)
 
+        self.apply_form_standards()
         self.setup_dialog()
 
     # ---------------------------------------------------------
@@ -26,7 +28,7 @@ class TechnicianDialog(BaseDialog):
         self.connect_signals()
 
         self.ui.txtEmployeeNumber.setReadOnly(True)
-
+        
     def connect_signals(self):
         self.ui.buttonBox.accepted.connect(
             self.save_and_close
@@ -75,8 +77,6 @@ class TechnicianDialog(BaseDialog):
         self.ui.cmbStatus.setCurrentText("Active")
 
         self.ui.dsbHourlyRate.setValue(0.00)
-
-        self.ui.txtFirstName.setFocus()
 
     # ---------------------------------------------------------
     # Form data
@@ -191,7 +191,6 @@ class TechnicianDialog(BaseDialog):
                 "First Name"
             )
         ):
-            self.ui.txtFirstName.setFocus()
             return False
 
         if not ValidationService.check(
@@ -201,7 +200,6 @@ class TechnicianDialog(BaseDialog):
                 "Last Name"
             )
         ):
-            self.ui.txtLastName.setFocus()
             return False
 
         if not ValidationService.check(
@@ -210,7 +208,6 @@ class TechnicianDialog(BaseDialog):
                 data["email"]
             )
         ):
-            self.ui.txtEmail.setFocus()
             return False
 
         if not ValidationService.check(
@@ -219,7 +216,6 @@ class TechnicianDialog(BaseDialog):
                 data["phone"]
             )
         ):
-            self.ui.txtPhone.setFocus()
             return False
 
         if not ValidationService.check(
@@ -229,7 +225,6 @@ class TechnicianDialog(BaseDialog):
                 "Hourly Rate"
             )
         ):
-            self.ui.dsbHourlyRate.setFocus()
             return False
 
         return True

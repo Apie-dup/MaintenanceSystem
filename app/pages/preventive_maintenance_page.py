@@ -1,3 +1,4 @@
+from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor
 from app.base.crud_page import CrudPage
 from app.dialogs.preventive_maintenance_dialog import (
@@ -12,6 +13,10 @@ from app.ui.generated.ui_preventive_maintenance_page import Ui_PMWindow
 class PreventiveMaintenancePage(CrudPage):
 
     PAGE_TITLE = "Preventive Maintenance"
+
+    ENTITY_NAME = "PM Schedule"
+
+    RECORD_NAME = "preventive maintenance schedules"
 
     TABLE_COLUMNS = [
         ("pm_number", "PM Number"),
@@ -49,9 +54,6 @@ class PreventiveMaintenancePage(CrudPage):
         self.search_widget = self.ui.txtSearch
         self.status_label = self.ui.lblStatus
 
-        self.entity_name = "PM Schedule"
-        self.record_name = "PM schedules"
-
         self.setup_page()
 
     # ---------------------------------------------------------
@@ -62,6 +64,7 @@ class PreventiveMaintenancePage(CrudPage):
         self.validate_configuration()
         self.setup_table()
         self.connect_signals()
+        self.load_data()
 
     def load_data(self):
         super().load_data()
@@ -101,8 +104,33 @@ class PreventiveMaintenancePage(CrudPage):
         )
 
         self.ui.tblPM.itemDoubleClicked.connect(
-            lambda _item: self.edit_record()
+            self.edit_record_from_item
         )
+
+    def edit_record_from_item(self, item):
+        row = item.row()
+
+        if row < 0:
+            return
+
+        self.table.selectRow(row)
+
+        id_item = self.table.item(row, 0)
+
+        if id_item is not None:
+            record_id = id_item.data(Qt.ItemDataRole.UserRole)
+
+            if record_id is not None:
+                dialog = self.dialog_class(self)
+                dialog.edit_record(record_id)
+
+                if dialog.exec():
+                    self.load_data()
+
+                return
+
+        # Fallback to shared CRUD behavior when metadata is unavailable.
+        self.edit_record()
 
     def apply_due_highlighting(self):
         status_column = next(
@@ -155,14 +183,7 @@ class PreventiveMaintenancePage(CrudPage):
 
             else:
                 tooltip = ""
-
-            for column in range(
-                self.table.columnCount()
-            ):
-                item = self.table.item(row, column)
-
-                if item is not None:
-                    item.setBackground(background)
+                background = QColor(255, 255, 255)
 
             for column in range(
                 self.table.columnCount()

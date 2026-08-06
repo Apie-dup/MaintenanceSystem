@@ -8,6 +8,10 @@ class InventoryPage(CrudPage):
 
     PAGE_TITLE = "Inventory"
 
+    ENTITY_NAME = "Inventory Item"
+
+    RECORD_NAME = "inventory items"
+
     TABLE_COLUMNS = [
         ("part_number", "Part Number"),
         ("part_name", "Part Name"),
@@ -44,9 +48,6 @@ class InventoryPage(CrudPage):
         self.table = self.ui.tblInventory
         self.search_widget = self.ui.txtSearch
         self.status_label = self.ui.lblStatus
-
-        self.entity_name = "Inventory Item"
-        self.record_name = "inventory items"
 
         self.setup_page()
 

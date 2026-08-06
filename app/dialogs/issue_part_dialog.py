@@ -2,6 +2,7 @@ from app.base.base_dialog import BaseDialog
 from app.services.work_order_parts_service import WorkOrderPartService
 from app.services.validation_service import ValidationService
 from app.ui.generated.ui_issue_part import Ui_IssuePartDialog
+from app.helpers.form_helper import FormHelper
 
 
 class IssuePartDialog(BaseDialog):
@@ -15,6 +16,8 @@ class IssuePartDialog(BaseDialog):
 
         self.ui = Ui_IssuePartDialog()
         self.ui.setupUi(self)
+
+        self.apply_form_standards()
 
         self.parts = []
 
@@ -37,7 +40,7 @@ class IssuePartDialog(BaseDialog):
         self.ui.spnQuantity.setMaximum(999999.00)
         self.ui.spnQuantity.setValue(1.00)
 
-        self.update_part_details()
+        self.update_part_details() 
 
     def connect_signals(self):
         self.ui.cmbPart.currentIndexChanged.connect(
@@ -197,7 +200,6 @@ class IssuePartDialog(BaseDialog):
                 "Validation",
                 "Please select an inventory item."
             )
-            self.ui.cmbPart.setFocus()
             return False
 
         if not ValidationService.check(
@@ -207,7 +209,6 @@ class IssuePartDialog(BaseDialog):
                 "Quantity"
             )
         ):
-            self.ui.spnQuantity.setFocus()
             return False
 
         part = self.selected_part()
@@ -226,7 +227,6 @@ class IssuePartDialog(BaseDialog):
                 "Validation",
                 f"Only {available:g} is available."
             )
-            self.ui.spnQuantity.setFocus()
             return False
 
         return True

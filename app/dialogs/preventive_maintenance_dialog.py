@@ -1,4 +1,7 @@
-from PySide6.QtCore import QDate
+from tkinter import dialog
+
+from PySide6.QtCore import QDate, Qt
+from PySide6.QtGui import QColor
 
 from app.base.base_dialog import BaseDialog
 from app.core.lookup_manager import LookupManager
@@ -10,11 +13,24 @@ from app.services.validation_service import ValidationService
 from app.ui.generated.ui_add_pm_dialog import (
     Ui_PreventiveMaintenanceDialog
 )
+from app.helpers.table_helper import TableHelper
+from app.services.work_order_service import WorkOrderService
+from app.helpers.form_helper import FormHelper
 
 
 class PreventiveMaintenanceDialog(BaseDialog):
 
     ENTITY_NAME = "Preventive Maintenance"
+
+    HISTORY_COLUMNS = [
+        ("work_order_number", "Work Order"),
+        ("date_created", "Created"),
+        ("due_date", "Due Date"),
+        ("status", "Status"),
+        ("technician_display", "Technician"),
+        ("labour_hours", "Hours"),
+        ("actual_cost", "Actual Cost"),
+    ]
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -22,6 +38,7 @@ class PreventiveMaintenanceDialog(BaseDialog):
         self.ui = Ui_PreventiveMaintenanceDialog()
         self.ui.setupUi(self)
 
+        self.apply_form_standards()
         self.setup_dialog()
 
     # ---------------------------------------------------------
@@ -33,6 +50,13 @@ class PreventiveMaintenanceDialog(BaseDialog):
         self.load_assets()
         self.configure_widgets()
         self.connect_signals()
+
+        TableHelper.setup(
+            self.ui.tblHistory,
+            self.HISTORY_COLUMNS
+        )
+
+        self.ui.tblHistory.setEnabled(False)
 
     def configure_widgets(self):
         self.ui.txtPMNumber.setReadOnly(True)
@@ -73,6 +97,10 @@ class PreventiveMaintenanceDialog(BaseDialog):
 
         self.ui.dtLastService.dateChanged.connect(
             self.calculate_next_due
+        )
+
+        self.ui.tblHistory.itemDoubleClicked.connect(
+            self.open_history_work_order
         )
 
     # ---------------------------------------------------------
@@ -142,8 +170,6 @@ class PreventiveMaintenanceDialog(BaseDialog):
         self.ui.chkActive.setChecked(True)
 
         self.calculate_next_due()
-
-        self.ui.txtTask.setFocus()
 
     # ---------------------------------------------------------
     # Form data
@@ -287,6 +313,81 @@ class PreventiveMaintenanceDialog(BaseDialog):
 
         self.set_form_data(pm)
 
+        self.ui.groupHistory.setEnabled(True)
+        self.ui.tblHistory.setEnabled(True)
+        self.load_history()
+
+    def load_history(self):
+        if self.record_id is None:
+            return
+
+        records = WorkOrderService.get_by_pm_id(self.record_id)
+
+        TableHelper.populate(
+            self.ui.tblHistory,
+            records,
+            self.HISTORY_COLUMNS
+        )
+
+        self.format_history_values()
+
+        self.apply_history_highlighting()
+        self.ui.tblHistory.clearSelection()
+
+    def format_history_values(self):
+        from app.helpers.format_helper import FormatHelper
+        cost_column = next(
+            (
+                index
+                for index, (field, _heading)
+                in enumerate(self.HISTORY_COLUMNS)
+                if field == "actual_cost"
+            ),
+            None
+        )
+
+        hours_column = next(
+            (
+                index
+                for index, (field, _heading)
+                in enumerate(self.HISTORY_COLUMNS)
+                if field == "labour_hours"
+            ),
+            None
+        )
+
+        for row in range(self.ui.tblHistory.rowCount()):
+            if cost_column is not None:
+                item = self.ui.tblHistory.item(
+                    row,
+                    cost_column
+                )
+
+                if item is not None:
+                    try:
+                        item.setText(
+                            FormatHelper.currency(
+                                float(item.text() or 0)
+                            )
+                        )
+                    except ValueError:
+                        pass
+
+            if hours_column is not None:
+                item = self.ui.tblHistory.item(
+                    row,
+                    hours_column
+                )
+                if item is not None:
+                    try:
+                        item.setText(
+                            FormatHelper.quantity(
+                                float(item.text() or 0)
+                            )
+                        )
+                    except ValueError:
+                        pass
+
     # ---------------------------------------------------------
     # Next due calculation
     # ---------------------------------------------------------
@@ -345,7 +446,6 @@ class PreventiveMaintenanceDialog(BaseDialog):
                 "Validation",
                 "Please select an asset."
             )
-            self.ui.cmbAsset.setFocus()
             return False
 
         if not ValidationService.check(
@@ -355,7 +455,6 @@ class PreventiveMaintenanceDialog(BaseDialog):
                 "Task"
             )
         ):
-            self.ui.txtTask.setFocus()
             return False
 
         if not ValidationService.check(
@@ -365,7 +464,6 @@ class PreventiveMaintenanceDialog(BaseDialog):
                 "Frequency Type"
             )
         ):
-            self.ui.cmbFrequencyType.setFocus()
             return False
 
         if data["frequency_value"] <= 0:
@@ -373,7 +471,6 @@ class PreventiveMaintenanceDialog(BaseDialog):
                 "Validation",
                 "Frequency Value must be greater than zero."
             )
-            self.ui.spnFrequencyValue.setFocus()
             return False
 
         if not ValidationService.check(
@@ -383,7 +480,6 @@ class PreventiveMaintenanceDialog(BaseDialog):
                 "Priority"
             )
         ):
-            self.ui.cmbPriority.setFocus()
             return False
 
         return True
@@ -404,3 +500,93 @@ class PreventiveMaintenanceDialog(BaseDialog):
                 self.record_id,
                 data
             )
+
+    def open_history_work_order(self, item):
+        row = item.row()
+
+        if row < 0:
+            return
+
+        self.ui.tblHistory.selectRow(row)
+
+        id_item = self.ui.tblHistory.item(row, 0)
+
+        if id_item is None:
+            return
+
+        work_order_id = id_item.data(Qt.ItemDataRole.UserRole)
+
+        if work_order_id is None:
+            return
+
+        from app.dialogs.work_order_dialog import (
+            WorkOrderDialog
+        )
+
+        dialog = WorkOrderDialog(self)
+        dialog.edit_record(work_order_id)
+
+        if dialog.exec():
+            self.load_history()
+
+    def apply_history_highlighting(self):
+        status_column = next(
+            (
+                index
+                for index, (field, _heading)
+                in enumerate(self.HISTORY_COLUMNS)
+                if field == "status"
+            ),
+            None
+        )
+
+        if status_column is None:
+            return
+
+        for row in range(self.ui.tblHistory.rowCount()):
+            status_item = self.ui.tblHistory.item(
+                row,
+                status_column
+            )
+
+            if status_item is None:
+                continue
+
+            status = status_item.text().strip()
+
+            if status in {"Completed", "Closed"}:
+                background = QColor(220, 245, 225)
+                tooltip = "Maintenance work completed."
+
+            elif status == "In Progress":
+                background = QColor(220, 235, 255)
+                tooltip = "Maintenance work is in progress."
+
+            elif status == "On Hold":
+                background = QColor(255, 240, 205)
+                tooltip = "Maintenance work is currently on hold."
+
+            elif status == "Cancelled":
+                background = QColor(235, 235, 235)
+                tooltip = "This work order was cancelled."
+
+            else:
+                continue
+
+            for column in range(
+                self.ui.tblHistory.columnCount()
+            ):
+                item = self.ui.tblHistory.item(row, column)
+
+                if item is not None:
+                    item.setBackground(background)
+                    item.setToolTip(tooltip)
+
+        for column in range(
+            self.ui.tblHistory.columnCount()
+        ):
+            item = self.ui.tblHistory.item(row, column)
+
+            if item is not None:
+                item.setBackground(background)
+                item.setToolTip(tooltip)

@@ -26,9 +26,9 @@ class Ui_AddWorkOrderDialog(object):
     def setupUi(self, AddWorkOrderDialog):
         if not AddWorkOrderDialog.objectName():
             AddWorkOrderDialog.setObjectName(u"AddWorkOrderDialog")
-        AddWorkOrderDialog.resize(800, 780)
-        self.mainLayout = QVBoxLayout(AddWorkOrderDialog)
-        self.mainLayout.setObjectName(u"mainLayout")
+        AddWorkOrderDialog.resize(800, 650)
+        self.verticalLayout = QVBoxLayout(AddWorkOrderDialog)
+        self.verticalLayout.setObjectName(u"verticalLayout")
         self.groupGeneralInfo = QGroupBox(AddWorkOrderDialog)
         self.groupGeneralInfo.setObjectName(u"groupGeneralInfo")
         self.groupGeneralInfo.setFlat(True)
@@ -92,7 +92,7 @@ class Ui_AddWorkOrderDialog(object):
         self.formGeneralInfo.setWidget(4, QFormLayout.ItemRole.FieldRole, self.cmbStatus)
 
 
-        self.mainLayout.addWidget(self.groupGeneralInfo)
+        self.verticalLayout.addWidget(self.groupGeneralInfo)
 
         self.groupAssignment = QGroupBox(AddWorkOrderDialog)
         self.groupAssignment.setObjectName(u"groupAssignment")
@@ -130,7 +130,7 @@ class Ui_AddWorkOrderDialog(object):
         self.formAssignment.setWidget(2, QFormLayout.ItemRole.FieldRole, self.txtRequestedBy)
 
 
-        self.mainLayout.addWidget(self.groupAssignment)
+        self.verticalLayout.addWidget(self.groupAssignment)
 
         self.groupDatesCosts = QGroupBox(AddWorkOrderDialog)
         self.groupDatesCosts.setObjectName(u"groupDatesCosts")
@@ -196,7 +196,7 @@ class Ui_AddWorkOrderDialog(object):
         self.gridDatesCosts.addWidget(self.dsbLabourHours, 2, 1, 1, 1)
 
 
-        self.mainLayout.addWidget(self.groupDatesCosts)
+        self.verticalLayout.addWidget(self.groupDatesCosts)
 
         self.groupNotes = QGroupBox(AddWorkOrderDialog)
         self.groupNotes.setObjectName(u"groupNotes")
@@ -209,7 +209,7 @@ class Ui_AddWorkOrderDialog(object):
         self.layoutNotes.addWidget(self.teNotes)
 
 
-        self.mainLayout.addWidget(self.groupNotes)
+        self.verticalLayout.addWidget(self.groupNotes)
 
         self.groupMaterials = QGroupBox(AddWorkOrderDialog)
         self.groupMaterials.setObjectName(u"groupMaterials")
@@ -259,13 +259,13 @@ class Ui_AddWorkOrderDialog(object):
         self.layoutMaterials.addLayout(self.layoutMaterialButtons)
 
 
-        self.mainLayout.addWidget(self.groupMaterials)
+        self.verticalLayout.addWidget(self.groupMaterials)
 
         self.buttonBox = QDialogButtonBox(AddWorkOrderDialog)
         self.buttonBox.setObjectName(u"buttonBox")
         self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Save)
 
-        self.mainLayout.addWidget(self.buttonBox)
+        self.verticalLayout.addWidget(self.buttonBox)
 
 
         self.retranslateUi(AddWorkOrderDialog)

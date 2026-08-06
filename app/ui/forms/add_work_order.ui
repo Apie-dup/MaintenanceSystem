@@ -7,13 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>780</height>
+    <height>650</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Add Work Order</string>
   </property>
-  <layout class="QVBoxLayout" name="mainLayout">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QGroupBox" name="groupGeneralInfo">
      <property name="title">

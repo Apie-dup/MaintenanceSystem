@@ -1,22 +1,14 @@
-from PySide6.QtCore import Qt
-import sqlite3
-
 from app.base.base_page import BasePage
 from app.helpers.table_helper import TableHelper
-from app.core.logger import logger
 
 
 class CrudPage(BasePage):
+    """
+    Generic page for standard CRUD modules.
+    """
 
     PAGE_TITLE = ""
-
-    # Example:
-    # [
-    #     ("supplier_code", "Code"),
-    #     ("supplier_name", "Supplier Name"),
-    # ]
     TABLE_COLUMNS = []
-
     SEARCH_FIELDS = []
 
     def __init__(self, parent=None):
@@ -24,125 +16,96 @@ class CrudPage(BasePage):
 
         self.service = None
         self.dialog_class = None
-        self.dialog = None
         self.table = None
         self.search_widget = None
         self.status_label = None
 
-        # Use singular and plural names separately.
-        self.entity_name = "Record"
-        self.record_name = "records"
+        self.entity_name = getattr(
+            self,
+            "ENTITY_NAME",
+        ) or "Record"
 
-    # -------------------------------------------------
-    # Validate page configuration
-    # -------------------------------------------------
+        self.record_name = getattr(
+            self,
+            "RECORD_NAME",
+        ) or "records"
+
+    # ---------------------------------------------------------
+    # Configuration
+    # ---------------------------------------------------------
 
     def validate_configuration(self):
-
         if self.service is None:
-            raise RuntimeError(
+            raise ValueError(
                 f"{self.__class__.__name__}: service is not configured."
             )
 
-        if self.dialog_class is None and self.dialog is None:
-            raise RuntimeError(
-                f"{self.__class__.__name__}: dialog class is not configured."
+        if self.dialog_class is None:
+            raise ValueError(
+                f"{self.__class__.__name__}: dialog_class is not configured."
             )
 
         if self.table is None:
-            raise RuntimeError(
+            raise ValueError(
                 f"{self.__class__.__name__}: table is not configured."
             )
+
+        if not self.TABLE_COLUMNS:
+            raise ValueError(
+                f"{self.__class__.__name__}: TABLE_COLUMNS is empty."
+            )
+
     # ---------------------------------------------------------
-    # Table setup
+    # Table
     # ---------------------------------------------------------
 
     def setup_table(self):
-
         TableHelper.setup(
             self.table,
             self.TABLE_COLUMNS
         )
 
-    # ---------------------------------------------------------
-    # Load data
-    # ---------------------------------------------------------
-
-    def load_data(self):
-
-        records = self.service.get_all()
-
-        self.populate_table(records)
-
     def populate_table(self, records):
-
-        TableHelper.populate_table(
+        TableHelper.populate(
             self.table,
             records,
             self.TABLE_COLUMNS
         )
 
-        if self.status_label is not None:
-
-            count = len(records)
-
-            if count == 1:
-                text = f"1 {self.entity_name.lower()}"
-            else:
-                text = f"{count} {self.record_name}"
-
-            self.status_label.setText(text)
-            
-
-    # ---------------------------------------------------------
-    # Status label
-    # ---------------------------------------------------------
-
-    def update_status_label(self, record_count):
-        if self.status_label is None:
-            return
-
-        label = self.record_name
-
-        if record_count == 1:
-            label = self.entity_name.lower()
-
-        self.status_label.setText(
-            f"{record_count} {label}"
+        self.update_status_label(
+            len(records)
         )
 
     # ---------------------------------------------------------
-    # Refresh
+    # Status
     # ---------------------------------------------------------
 
-    def refresh(self):
-        if self.search_widget is not None:
+    def update_status_label(self, count):
+        if self.status_label is None:
+            return
 
-            if self.search_widget.text().strip():
-
-               self.search_widget.clear()
-
-            else:
-               self.load_data()
-
+        if count == 1:
+            text = self.entity_name.lower()
         else:
+            text = self.record_name.lower()
 
-            self.load_data()
+        self.status_label.setText(
+            f"{count} {text}"
+        )
+
+    # ---------------------------------------------------------
+    # Load
+    # ---------------------------------------------------------
+
+    def load_data(self):
+        records = self.service.get_all()
+        self.populate_table(records)
 
     # ---------------------------------------------------------
     # Search
     # ---------------------------------------------------------
 
-    def search(self, text=None):
-
-        if text is None:
-
-            if self.search_widget is not None:
-                text = self.search_widget.text()
-
-            else:
-                text = ""
-
+    def search(self, text):
         text = text.strip()
 
         if text:
@@ -153,37 +116,46 @@ class CrudPage(BasePage):
         self.populate_table(records)
 
     # ---------------------------------------------------------
+    # Refresh
+    # ---------------------------------------------------------
+
+    def refresh(self):
+        if self.search_widget is not None:
+            self.search_widget.clear()
+
+        self.load_data()
+
+    # ---------------------------------------------------------
     # Selection
     # ---------------------------------------------------------
 
     def selected_id(self):
-
-        return TableHelper.selected_id(self.table)
-
-    def selected_row(self):
-
-        return TableHelper.selected_row(self.table)
+        return TableHelper.selected_id(
+            self.table
+        )
 
     def require_selection(self):
         record_id = self.selected_id()
 
-        if record_id is None:
-            self.warning(
-                self.PAGE_TITLE or self.entity_name,
-                f"Please select a {self.entity_name.lower()}."
-            )
-            return None
+        if record_id is not None:
+            return record_id
 
-        return record_id
+        self.warning(
+            self.entity_name,
+            (
+                f"Please select a "
+                f"{self.entity_name.lower()}."
+            )
+        )
+
+        return None
 
     # ---------------------------------------------------------
     # Add
     # ---------------------------------------------------------
 
     def add_record(self):
-
-        dialog = self.dialog_class (self)
-
+        dialog = self.dialog_class(self)
         dialog.new_record()
 
         if dialog.exec():
@@ -194,21 +166,12 @@ class CrudPage(BasePage):
     # ---------------------------------------------------------
 
     def edit_record(self):
-
-        record_id = self.selected_id()
+        record_id = self.require_selection()
 
         if record_id is None:
-
-            self.warning(
-                "Edit",
-                f"Please select a {self.entity_name.lower()}."
-            )
             return
 
-        dialog_cls = self.dialog_class or self.dialog
-
-        dialog = dialog_cls(self)
-
+        dialog = self.dialog_class(self)
         dialog.edit_record(record_id)
 
         if dialog.exec():
@@ -219,16 +182,15 @@ class CrudPage(BasePage):
     # ---------------------------------------------------------
 
     def delete_record(self):
-
         record_id = self.require_selection()
 
         if record_id is None:
             return
 
-        if not self.confirm_delete(
+        if not self.confirm(
             f"Delete {self.entity_name}",
             (
-                f"Are you sure you want to delete the selected "
+                f"Are you sure you want to delete this "
                 f"{self.entity_name.lower()}?"
             )
         ):
@@ -237,49 +199,23 @@ class CrudPage(BasePage):
         try:
             self.service.delete(record_id)
 
-            logger.info(
-                "%s deleted successfully. Record ID: %s",
-                self.entity_name,
-                record_id
-            )
-
-        except sqlite3.IntegrityError:
-            logger.warning(
-                "Deletion blocked for %s record ID %s because "
-                "it is referenced by other records.",
-                self.entity_name,
-                record_id
-            )
-
-            self.warning(
-                f"Delete {self.entity_name}",
-                (
-                    f"This {self.entity_name.lower()} cannot be deleted "
-                    "because it is referenced by other records.\n\n"
-                    "Change its status to Inactive instead."
-                )
-            )
-            return
-
         except Exception as error:
-            logger.exception(
-                "Could not delete %s record ID %s.",
-                self.entity_name,
-                record_id
-            )
-
             self.error(
                 f"Delete {self.entity_name}",
                 (
                     f"Could not delete the "
-                    f"{self.entity_name.lower()}.\n\n{error}"
+                    f"{self.entity_name.lower()}.\n\n"
+                    f"{error}"
                 )
             )
             return
 
         self.information(
             f"Delete {self.entity_name}",
-            f"{self.entity_name} deleted successfully."
+            (
+                f"{self.entity_name} deleted "
+                "successfully."
+            )
         )
 
         self.load_data()

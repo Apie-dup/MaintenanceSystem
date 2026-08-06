@@ -73,8 +73,6 @@ class Ui_PMWindow(object):
         __qtablewidgetitem7 = QTableWidgetItem()
         self.tblPM.setHorizontalHeaderItem(7, __qtablewidgetitem7)
         self.tblPM.setObjectName(u"tblPM")
-        self.tblPM.setAlternatingRowColors(True)
-        self.tblPM.setSortingEnabled(True)
 
         self.verticalLayout.addWidget(self.tblPM)
 

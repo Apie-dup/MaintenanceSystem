@@ -72,7 +72,6 @@ class Ui_WorkOrdersPage(object):
         __qtablewidgetitem8 = QTableWidgetItem()
         self.tblWorkOrders.setHorizontalHeaderItem(8, __qtablewidgetitem8)
         self.tblWorkOrders.setObjectName(u"tblWorkOrders")
-        self.tblWorkOrders.setAlternatingRowColors(True)
         self.tblWorkOrders.setWordWrap(False)
         self.tblWorkOrders.verticalHeader().setVisible(False)
 

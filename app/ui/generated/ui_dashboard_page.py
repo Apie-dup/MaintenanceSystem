@@ -32,18 +32,18 @@ class Ui_DashboardPage(object):
         self.frameContent.setFrameShadow(QFrame.Shadow.Raised)
         self.gridLayout_2 = QGridLayout(self.frameContent)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
-        self.labelOverview = QLabel(self.frameContent)
-        self.labelOverview.setObjectName(u"labelOverview")
-        self.labelOverview.setStyleSheet(u"font-size: 16px;")
+        self.dashboardSubtitle = QLabel(self.frameContent)
+        self.dashboardSubtitle.setObjectName(u"dashboardSubtitle")
+        self.dashboardSubtitle.setStyleSheet(u"font-size: 16px;")
 
-        self.gridLayout_2.addWidget(self.labelOverview, 2, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.dashboardSubtitle, 2, 0, 1, 1)
 
-        self.groupPMDue = QGroupBox(self.frameContent)
-        self.groupPMDue.setObjectName(u"groupPMDue")
-        self.groupPMDue.setFlat(True)
-        self.gridLayout_4 = QGridLayout(self.groupPMDue)
+        self.dashboardSection_2 = QGroupBox(self.frameContent)
+        self.dashboardSection_2.setObjectName(u"dashboardSection_2")
+        self.dashboardSection_2.setFlat(True)
+        self.gridLayout_4 = QGridLayout(self.dashboardSection_2)
         self.gridLayout_4.setObjectName(u"gridLayout_4")
-        self.tblPMDue = QTableWidget(self.groupPMDue)
+        self.tblPMDue = QTableWidget(self.dashboardSection_2)
         if (self.tblPMDue.columnCount() < 5):
             self.tblPMDue.setColumnCount(5)
         __qtablewidgetitem = QTableWidgetItem()
@@ -61,14 +61,14 @@ class Ui_DashboardPage(object):
         self.gridLayout_4.addWidget(self.tblPMDue, 0, 0, 1, 1)
 
 
-        self.gridLayout_2.addWidget(self.groupPMDue, 5, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.dashboardSection_2, 5, 0, 1, 1)
 
-        self.groupUrgentWorkOrders = QGroupBox(self.frameContent)
-        self.groupUrgentWorkOrders.setObjectName(u"groupUrgentWorkOrders")
-        self.groupUrgentWorkOrders.setFlat(True)
-        self.gridLayout_3 = QGridLayout(self.groupUrgentWorkOrders)
+        self.dashboardSection = QGroupBox(self.frameContent)
+        self.dashboardSection.setObjectName(u"dashboardSection")
+        self.dashboardSection.setFlat(True)
+        self.gridLayout_3 = QGridLayout(self.dashboardSection)
         self.gridLayout_3.setObjectName(u"gridLayout_3")
-        self.tblUrgentWorkOrders = QTableWidget(self.groupUrgentWorkOrders)
+        self.tblUrgentWorkOrders = QTableWidget(self.dashboardSection)
         if (self.tblUrgentWorkOrders.columnCount() < 5):
             self.tblUrgentWorkOrders.setColumnCount(5)
         __qtablewidgetitem5 = QTableWidgetItem()
@@ -86,7 +86,7 @@ class Ui_DashboardPage(object):
         self.gridLayout_3.addWidget(self.tblUrgentWorkOrders, 0, 0, 1, 1)
 
 
-        self.gridLayout_2.addWidget(self.groupUrgentWorkOrders, 4, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.dashboardSection, 4, 0, 1, 1)
 
         self.overviewCardsLayout = QGridLayout()
         self.overviewCardsLayout.setObjectName(u"overviewCardsLayout")
@@ -176,10 +176,10 @@ class Ui_DashboardPage(object):
         self.cardPMOverdue.setFrameShape(QFrame.Shape.StyledPanel)
         self._4 = QVBoxLayout(self.cardPMOverdue)
         self._4.setObjectName(u"_4")
-        self.lblPMOverdueTitle = QLabel(self.cardPMOverdue)
-        self.lblPMOverdueTitle.setObjectName(u"lblPMOverdueTitle")
+        self.dashboardCard_4 = QLabel(self.cardPMOverdue)
+        self.dashboardCard_4.setObjectName(u"dashboardCard_4")
 
-        self._4.addWidget(self.lblPMOverdueTitle)
+        self._4.addWidget(self.dashboardCard_4)
 
         self.lblPMOverdueValue = QLabel(self.cardPMOverdue)
         self.lblPMOverdueValue.setObjectName(u"lblPMOverdueValue")
@@ -202,22 +202,22 @@ class Ui_DashboardPage(object):
         self.cardNext7Days.setFrameShape(QFrame.Shape.StyledPanel)
         self._5 = QVBoxLayout(self.cardNext7Days)
         self._5.setObjectName(u"_5")
-        self.labelNext7DaysTitle = QLabel(self.cardNext7Days)
-        self.labelNext7DaysTitle.setObjectName(u"labelNext7DaysTitle")
+        self.lblPMDueWeekTitle_2 = QLabel(self.cardNext7Days)
+        self.lblPMDueWeekTitle_2.setObjectName(u"lblPMDueWeekTitle_2")
 
-        self._5.addWidget(self.labelNext7DaysTitle)
+        self._5.addWidget(self.lblPMDueWeekTitle_2)
 
-        self.lblNext7DaysValue = QLabel(self.cardNext7Days)
-        self.lblNext7DaysValue.setObjectName(u"lblNext7DaysValue")
-        self.lblNext7DaysValue.setFont(font)
-        self.lblNext7DaysValue.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.lblPMDueWeekValue_2 = QLabel(self.cardNext7Days)
+        self.lblPMDueWeekValue_2.setObjectName(u"lblPMDueWeekValue_2")
+        self.lblPMDueWeekValue_2.setFont(font)
+        self.lblPMDueWeekValue_2.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self._5.addWidget(self.lblNext7DaysValue)
+        self._5.addWidget(self.lblPMDueWeekValue_2)
 
-        self.labelNext7DaysValue = QLabel(self.cardNext7Days)
-        self.labelNext7DaysValue.setObjectName(u"labelNext7DaysValue")
+        self.lblPMDueWeekHint_2 = QLabel(self.cardNext7Days)
+        self.lblPMDueWeekHint_2.setObjectName(u"lblPMDueWeekHint_2")
 
-        self._5.addWidget(self.labelNext7DaysValue)
+        self._5.addWidget(self.lblPMDueWeekHint_2)
 
 
         self.overviewCardsLayout.addWidget(self.cardNext7Days, 1, 0, 1, 1)
@@ -302,11 +302,11 @@ class Ui_DashboardPage(object):
 
         self.gridLayout_2.addLayout(self.overviewCardsLayout, 3, 0, 1, 1)
 
-        self.labelDashboardTitle = QLabel(self.frameContent)
-        self.labelDashboardTitle.setObjectName(u"labelDashboardTitle")
-        self.labelDashboardTitle.setStyleSheet(u"font-size: 22px; font-weight: bold;")
+        self.dashboardTitle = QLabel(self.frameContent)
+        self.dashboardTitle.setObjectName(u"dashboardTitle")
+        self.dashboardTitle.setStyleSheet(u"font-size: 22px; font-weight: bold;")
 
-        self.gridLayout_2.addWidget(self.labelDashboardTitle, 1, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.dashboardTitle, 1, 0, 1, 1)
 
 
         self.verticalLayout.addWidget(self.frameContent)
@@ -319,8 +319,8 @@ class Ui_DashboardPage(object):
 
     def retranslateUi(self, DashboardPage):
         DashboardPage.setWindowTitle(QCoreApplication.translate("DashboardPage", u"Dash Board Page", None))
-        self.labelOverview.setText(QCoreApplication.translate("DashboardPage", u"Maintenance overview for 02 August 2026", None))
-        self.groupPMDue.setTitle(QCoreApplication.translate("DashboardPage", u"PM Due", None))
+        self.dashboardSubtitle.setText(QCoreApplication.translate("DashboardPage", u"Maintenance overview for 02 August 2026", None))
+        self.dashboardSection_2.setTitle(QCoreApplication.translate("DashboardPage", u"PM Due", None))
         ___qtablewidgetitem = self.tblPMDue.horizontalHeaderItem(0)
         ___qtablewidgetitem.setText(QCoreApplication.translate("DashboardPage", u"PM Number", None))
         ___qtablewidgetitem1 = self.tblPMDue.horizontalHeaderItem(1)
@@ -331,7 +331,7 @@ class Ui_DashboardPage(object):
         ___qtablewidgetitem3.setText(QCoreApplication.translate("DashboardPage", u"Next Due", None))
         ___qtablewidgetitem4 = self.tblPMDue.horizontalHeaderItem(4)
         ___qtablewidgetitem4.setText(QCoreApplication.translate("DashboardPage", u"Status", None))
-        self.groupUrgentWorkOrders.setTitle(QCoreApplication.translate("DashboardPage", u"Urgent Work Orders", None))
+        self.dashboardSection.setTitle(QCoreApplication.translate("DashboardPage", u"Urgent Work Orders", None))
         ___qtablewidgetitem5 = self.tblUrgentWorkOrders.horizontalHeaderItem(0)
         ___qtablewidgetitem5.setText(QCoreApplication.translate("DashboardPage", u"Work Order", None))
         ___qtablewidgetitem6 = self.tblUrgentWorkOrders.horizontalHeaderItem(1)
@@ -347,25 +347,25 @@ class Ui_DashboardPage(object):
         self.lblAssetsHint.setText(QCoreApplication.translate("DashboardPage", u"Registered", None))
         self.lblOpenWorkOrdersTitle.setText(QCoreApplication.translate("DashboardPage", u"Open WOs", None))
         self.lblOpenWorkOrdersValue.setText(QCoreApplication.translate("DashboardPage", u"123", None))
-        self.lblOpenWorkOrdersHint.setText(QCoreApplication.translate("DashboardPage", u"Registered", None))
+        self.lblOpenWorkOrdersHint.setText(QCoreApplication.translate("DashboardPage", u"Currently open", None))
         self.lblPMDueWeekTitle.setText(QCoreApplication.translate("DashboardPage", u"PM Due Today", None))
         self.lblPMDueWeekValue.setText(QCoreApplication.translate("DashboardPage", u"123", None))
-        self.lblPMDueWeekHint.setText(QCoreApplication.translate("DashboardPage", u"03 August 2026", None))
-        self.lblPMOverdueTitle.setText(QCoreApplication.translate("DashboardPage", u"PM Overdue", None))
+        self.lblPMDueWeekHint.setText(QCoreApplication.translate("DashboardPage", u"Due today", None))
+        self.dashboardCard_4.setText(QCoreApplication.translate("DashboardPage", u"PM Overdue", None))
         self.lblPMOverdueValue.setText(QCoreApplication.translate("DashboardPage", u"123", None))
         self.lblPMOverDueHint.setText(QCoreApplication.translate("DashboardPage", u"Past due date", None))
-        self.labelNext7DaysTitle.setText(QCoreApplication.translate("DashboardPage", u"Next 7 Days", None))
-        self.lblNext7DaysValue.setText(QCoreApplication.translate("DashboardPage", u"123", None))
-        self.labelNext7DaysValue.setText(QCoreApplication.translate("DashboardPage", u"Registered", None))
+        self.lblPMDueWeekTitle_2.setText(QCoreApplication.translate("DashboardPage", u"Next 7 Days", None))
+        self.lblPMDueWeekValue_2.setText(QCoreApplication.translate("DashboardPage", u"123", None))
+        self.lblPMDueWeekHint_2.setText(QCoreApplication.translate("DashboardPage", u"Upcomming PM", None))
         self.lbLowStockTitle.setText(QCoreApplication.translate("DashboardPage", u"Low Stock", None))
         self.lblLowStockValue.setText(QCoreApplication.translate("DashboardPage", u"123", None))
         self.lblLowStockHint.setText(QCoreApplication.translate("DashboardPage", u"Stock running low", None))
         self.lblTechniciansTitle.setText(QCoreApplication.translate("DashboardPage", u"Technicians", None))
         self.lblTechniciansValue.setText(QCoreApplication.translate("DashboardPage", u"123", None))
-        self.lblTechniciansHint.setText(QCoreApplication.translate("DashboardPage", u"Registered", None))
+        self.lblTechniciansHint.setText(QCoreApplication.translate("DashboardPage", u"Active technicians", None))
         self.lblInventoryValueTitle.setText(QCoreApplication.translate("DashboardPage", u"Inventory Value", None))
         self.lblInventoryValueValue.setText(QCoreApplication.translate("DashboardPage", u"N$ 248,500.00", None))
-        self.lblInvetoryValueHint.setText(QCoreApplication.translate("DashboardPage", u"Over Budget", None))
-        self.labelDashboardTitle.setText(QCoreApplication.translate("DashboardPage", u"Dashboard", None))
+        self.lblInvetoryValueHint.setText(QCoreApplication.translate("DashboardPage", u"Current stock value", None))
+        self.dashboardTitle.setText(QCoreApplication.translate("DashboardPage", u"Dashboard", None))
     # retranslateUi
 

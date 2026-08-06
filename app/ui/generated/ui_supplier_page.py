@@ -73,8 +73,6 @@ class Ui_SuppliersWindow(object):
         __qtablewidgetitem8 = QTableWidgetItem()
         self.tblSuppliers.setHorizontalHeaderItem(8, __qtablewidgetitem8)
         self.tblSuppliers.setObjectName(u"tblSuppliers")
-        self.tblSuppliers.setAlternatingRowColors(True)
-        self.tblSuppliers.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
 
         self.verticalLayout.addWidget(self.tblSuppliers)
 

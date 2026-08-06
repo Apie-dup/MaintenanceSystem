@@ -25,6 +25,19 @@ class DashboardController(QMainWindow):
 
         self.ui.setupUi(self)
 
+        self.ui.btnDashboard.setChecked(True)
+        self.ui.btnAssets.setChecked(True)
+        self.ui.btnWorkOrders.setChecked(True)
+        self.ui.btnTechnicians.setChecked(True)
+        self.ui.btnLookups.setChecked(True)
+        self.ui.btnPM.setChecked(True)
+        self.ui.btnInventory.setChecked(True)
+        self.ui.btnSuppliers.setChecked(True)
+        self.ui.btnReports.setChecked(True)
+        self.ui.btnSettings.setChecked(True)
+        self.ui.btnLogout.setChecked(True)
+
+
         self.lblUser = QLabel()
         self.lblDatabase = QLabel()
         self.lblClock = QLabel()
@@ -53,7 +66,7 @@ class DashboardController(QMainWindow):
         self.setWindowTitle(f"Maintenance Management System - {user.get('fullname', '')}")
         self.ui.btnAssets.clicked.connect(self.open_assets)
         self.ui.btnWorkOrders.clicked.connect(self.open_work_orders)
-        self.ui.btnThecnicians.clicked.connect(self.open_technicians)
+        self.ui.btnTechnicians.clicked.connect(self.open_technicians)
         self.ui.btnLookups.clicked.connect(self.open_lookups)
         self.ui.btnPM.clicked.connect(self.open_pm)
         if hasattr(self.ui, "btnHome"):

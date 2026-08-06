@@ -7,6 +7,7 @@ from app.services.dashboard_service import DashboardService
 from app.ui.generated.ui_dashboard_page import Ui_DashboardPage
 
 from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QHeaderView
 
 COLOR_OVERDUE = QColor(255, 200, 200)     # light red
 COLOR_DUE_TODAY = QColor(255, 230, 200)   # light orange
@@ -41,7 +42,26 @@ class DashboardPage(BasePage):
         self.setup_page()
 
     def setup_page(self):
+        if hasattr(self.ui, "dashboardTitle"):
+            self.ui.dashboardTitle.setStyleSheet("")
+
+        if hasattr(self.ui, "dashboardSubtitle"):
+            self.ui.dashboardSubtitle.setStyleSheet("")
+
         self.setup_tables()
+
+        header = self.ui.tblUrgentWorkOrders.horizontalHeader()
+        header.setSectionResizeMode(
+            1,
+            QHeaderView.ResizeMode.Stretch
+        )
+
+        header = self.ui.tblPMDue.horizontalHeader()
+        header.setSectionResizeMode(
+            2,
+            QHeaderView.ResizeMode.Stretch
+        )
+
         self.refresh_dashboard()
 
     def setup_tables(self):
@@ -78,6 +98,10 @@ class DashboardPage(BasePage):
             summary["pm_due_today"]
         )
 
+        pm_due_week_text = FormatHelper.integer(
+            summary["pm_due_week"]
+        )
+
         if hasattr(self.ui, "lblPMDueTodayValue"):
             self.ui.lblPMDueTodayValue.setText(
                 pm_due_today_text
@@ -87,15 +111,18 @@ class DashboardPage(BasePage):
                 pm_due_today_text
             )
 
+        if hasattr(self.ui, "lblPMDueWeekValue_2"):
+            self.ui.lblPMDueWeekValue_2.setText(
+                pm_due_week_text
+            )
+        elif hasattr(self.ui, "lblPMDueTodayValue"):
+            self.ui.lblPMDueWeekValue.setText(
+                pm_due_week_text
+            )
+
         self.ui.lblPMOverdueValue.setText(
             FormatHelper.integer(
                 summary["pm_overdue"]
-            )
-        )
-
-        self.ui.lblPMDueWeekValue.setText(
-            FormatHelper.integer(
-                summary["pm_due_week"]
             )
         )
 

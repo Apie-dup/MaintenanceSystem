@@ -1,4 +1,5 @@
-from PySide6.QtCore import QDate
+from PySide6.QtCore import QDate, Qt
+from PySide6.QtWidgets import QFormLayout, QSizePolicy
 
 from app.base.base_dialog import BaseDialog
 from app.constants import (
@@ -22,19 +23,58 @@ class AssetDialog(BaseDialog):
         self.ui = Ui_AddAssetDialog()
         self.ui.setupUi(self)
 
+        self.apply_form_standards()
         self.setup_dialog()
 
-    def setup_dialog(self):
+    # ---------------------------------------------------------
+    # Setup
+    # ---------------------------------------------------------
 
+    def setup_dialog(self):
         self.load_lookup_values()
         self.connect_signals()
+        self.configure_layout()
 
-        self.ui.txtAssetCode.setReadOnly(True)
-        self.ui.dtPurchaseDate.setCalendarPopup(True)
-        self.ui.dtWarrantyExpiry.setCalendarPopup(True)
+        self.set_read_only(
+            self.ui.txtAssetCode
+        )
+
+    def configure_layout(self):
+        self.setWindowFlag(
+            Qt.WindowType.WindowMaximizeButtonHint,
+            True,
+        )
+
+        self.setSizeGripEnabled(True)
+
+        self.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Expanding,
+        )
+
+        for layout_name in (
+            "formGeneralInfo",
+            "formLocation",
+            "formManufacturer",
+            "formPurchaseInfo",
+        ):
+            form_layout = getattr(
+                self.ui,
+                layout_name,
+                None,
+            )
+
+            if form_layout is not None:
+                form_layout.setFieldGrowthPolicy(
+                    QFormLayout.FieldGrowthPolicy
+                    .AllNonFixedFieldsGrow
+                )
+
+    # ---------------------------------------------------------
+    # Lookups
+    # ---------------------------------------------------------
 
     def load_lookup_values(self):
-
         LookupManager.load(
             self.ui.cmbCategory,
             "Asset Categories",
@@ -53,15 +93,11 @@ class AssetDialog(BaseDialog):
             ASSET_STATUSES,
         )
 
-        # Department is optional in data model but present in UI.
-        LookupManager.load(
-            self.ui.cmbDepartment,
-            "Departments",
-            [],
-        )
+    # ---------------------------------------------------------
+    # Signals
+    # ---------------------------------------------------------
 
     def connect_signals(self):
-
         self.ui.buttonBox.accepted.connect(
             self.save_and_close
         )
@@ -70,8 +106,11 @@ class AssetDialog(BaseDialog):
             self.reject
         )
 
-    def clear_fields(self):
+    # ---------------------------------------------------------
+    # Clear
+    # ---------------------------------------------------------
 
+    def clear_fields(self):
         self.ui.txtAssetCode.setText(
             AssetService.get_next_asset_number()
         )
@@ -81,47 +120,114 @@ class AssetDialog(BaseDialog):
         self.ui.txtManufacturer.clear()
         self.ui.txtModel.clear()
         self.ui.txtSerialNumber.clear()
-        self.ui.txtNotes.clear()
 
-        self.ui.cmbCategory.setCurrentIndex(0)
-        self.ui.cmbDepartment.setCurrentIndex(0)
-        self.ui.cmbLocation.setCurrentIndex(0)
-        self.ui.cmbStatus.setCurrentText("Active")
+        if self.ui.cmbCategory.count() > 0:
+            self.ui.cmbCategory.setCurrentIndex(0)
+
+        if self.ui.cmbLocation.count() > 0:
+            self.ui.cmbLocation.setCurrentIndex(0)
+
+        self.ui.cmbStatus.setCurrentText(
+            "Active"
+        )
+
+        self.ui.txtNotes.clear()
 
         today = QDate.currentDate()
 
         self.ui.dtPurchaseDate.setDate(today)
         self.ui.dtWarrantyExpiry.setDate(today)
 
-        self.ui.txtAssetName.setFocus()
+        self.set_focus(
+            self.ui.txtAssetName
+        )
 
+    # ---------------------------------------------------------
+    # Data mapping
+    # ---------------------------------------------------------
     def get_form_data(self):
-
         return {
-            "asset_number": self.ui.txtAssetCode.text().strip(),
-            "asset_name": self.ui.txtAssetName.text().strip(),
-            "description": self.ui.txtDescription.text().strip(),
-            "category": self.ui.cmbCategory.currentText().strip(),
-            "location": self.ui.cmbLocation.currentText().strip(),
-            "manufacturer": self.ui.txtManufacturer.text().strip(),
-            "model": self.ui.txtModel.text().strip(),
-            "serial_number": self.ui.txtSerialNumber.text().strip(),
-            "purchase_date": self.ui.dtPurchaseDate.date().toString("yyyy-MM-dd"),
-            "warranty_expiry": self.ui.dtWarrantyExpiry.date().toString("yyyy-MM-dd"),
-            "status": self.ui.cmbStatus.currentText().strip(),
+            "asset_number":
+                self.ui.txtAssetCode.text().strip(),
+
+            "asset_name":
+                self.ui.txtAssetName.text().strip(),
+
+            "description":
+                self.ui.txtDescription.text().strip(),
+
+            "category":
+                self.ui.cmbCategory.currentText().strip(),
+
+            "location":
+                self.ui.cmbLocation.currentText().strip(),
+
+            "manufacturer":
+                self.ui.txtManufacturer.text().strip(),
+
+            "model":
+                self.ui.txtModel.text().strip(),
+
+            "serial_number":
+                self.ui.txtSerialNumber.text().strip(),
+
+            "purchase_date":
+                self.ui.dtPurchaseDate.date().toString(
+                    "yyyy-MM-dd"
+                ),
+
+            "warranty_expiry":
+                self.ui.dtWarrantyExpiry.date().toString(
+                    "yyyy-MM-dd"
+                ),
+
+            "status":
+                self.ui.cmbStatus.currentText().strip(),
+
+            "notes":
+                self.ui.txtNotes.toPlainText().strip(),
         }
 
     def set_form_data(self, asset):
+        self.ui.txtAssetCode.setText(
+            asset["asset_number"] or ""
+        )
 
-        self.ui.txtAssetCode.setText(asset["asset_number"])
-        self.ui.txtAssetName.setText(asset["asset_name"])
-        self.ui.txtDescription.setText(asset["description"] or "")
-        self.ui.cmbCategory.setCurrentText(asset["category"] or "")
-        self.ui.cmbLocation.setCurrentText(asset["location"] or "")
-        self.ui.txtManufacturer.setText(asset["manufacturer"] or "")
-        self.ui.txtModel.setText(asset["model"] or "")
-        self.ui.txtSerialNumber.setText(asset["serial_number"] or "")
-        self.ui.cmbStatus.setCurrentText(asset["status"] or "Active")
+        self.ui.txtAssetName.setText(
+            asset["asset_name"] or ""
+        )
+
+        self.ui.txtDescription.setText(
+            asset["description"] or ""
+        )
+
+        self.ui.cmbCategory.setCurrentText(
+            asset["category"] or ""
+        )
+
+        self.ui.cmbLocation.setCurrentText(
+            asset["location"] or ""
+        )
+
+        self.ui.txtManufacturer.setText(
+            asset["manufacturer"] or ""
+        )
+
+        self.ui.txtModel.setText(
+            asset["model"] or ""
+        )
+
+        self.ui.txtSerialNumber.setText(
+            asset["serial_number"] or ""
+        )
+
+        self.ui.cmbStatus.setCurrentText(
+            asset["status"] or "Active"
+        )
+
+        self.ui.txtNotes.setPlainText(
+            asset["notes"] or ""
+        )
 
         self.set_date_value(
             self.ui.dtPurchaseDate,
@@ -135,7 +241,6 @@ class AssetDialog(BaseDialog):
 
     @staticmethod
     def set_date_value(date_widget, value):
-
         if not value:
             return
 
@@ -147,9 +252,14 @@ class AssetDialog(BaseDialog):
         if date_value.isValid():
             date_widget.setDate(date_value)
 
-    def load_record(self, record_id):
+    # ---------------------------------------------------------
+    # Load
+    # ---------------------------------------------------------
 
-        asset = AssetService.get_by_id(record_id)
+    def load_record(self, record_id):
+        asset = AssetService.get_by_id(
+            record_id
+        )
 
         if asset is None:
             self.error(
@@ -161,8 +271,11 @@ class AssetDialog(BaseDialog):
 
         self.set_form_data(asset)
 
-    def validate(self):
+    # ---------------------------------------------------------
+    # Validation
+    # ---------------------------------------------------------
 
+    def validate(self):
         data = self.get_form_data()
 
         if not ValidationService.check(
@@ -172,7 +285,9 @@ class AssetDialog(BaseDialog):
                 "Asset Name",
             ),
         ):
-            self.ui.txtAssetName.setFocus()
+            self.set_focus(
+                self.ui.txtAssetName
+            )
             return False
 
         if not ValidationService.check(
@@ -195,22 +310,32 @@ class AssetDialog(BaseDialog):
             self.ui.cmbStatus.setFocus()
             return False
 
-        if self.ui.dtWarrantyExpiry.date() < self.ui.dtPurchaseDate.date():
+        if (
+            self.ui.dtWarrantyExpiry.date()
+            < self.ui.dtPurchaseDate.date()
+        ):
             self.warning(
                 "Validation",
-                "Warranty Expiry cannot be earlier than Purchase Date.",
+                (
+                    "Warranty Expiry cannot be earlier "
+                    "than Purchase Date."
+                ),
             )
+
             self.ui.dtWarrantyExpiry.setFocus()
             return False
 
         return True
 
-    def save(self):
+    # ---------------------------------------------------------
+    # Save
+    # ---------------------------------------------------------
 
+    def save(self):
         data = self.get_form_data()
 
         if self.is_add:
-            AssetService.create(data)
+            self.record_id = AssetService.create(data)
         else:
             AssetService.update(
                 self.record_id,

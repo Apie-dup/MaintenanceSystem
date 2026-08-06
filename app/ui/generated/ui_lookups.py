@@ -67,11 +67,6 @@ class Ui_LookupWindow(object):
         __qtablewidgetitem1 = QTableWidgetItem()
         self.tblLookup.setHorizontalHeaderItem(1, __qtablewidgetitem1)
         self.tblLookup.setObjectName(u"tblLookup")
-        self.tblLookup.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.tblLookup.setAlternatingRowColors(True)
-        self.tblLookup.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
-        self.tblLookup.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        self.tblLookup.setSortingEnabled(True)
         self.tblLookup.setColumnCount(2)
 
         self.verticalLayout.addWidget(self.tblLookup)

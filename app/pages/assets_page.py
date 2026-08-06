@@ -7,6 +7,8 @@ from app.ui.generated.ui_assets_page import Ui_AssetsWindow
 class AssetsPage(CrudPage):
 
     PAGE_TITLE = "Assets"
+    ENTITY_NAME = "Asset"
+    RECORD_NAME = "assets"
 
     TABLE_COLUMNS = [
         ("asset_number", "Asset Number"),
@@ -20,6 +22,7 @@ class AssetsPage(CrudPage):
         ("purchase_date", "Purchase Date"),
         ("warranty_expiry", "Warranty Expiry"),
         ("status", "Status"),
+        ("notes", "Notes"),
     ]
 
     SEARCH_FIELDS = [
@@ -32,6 +35,7 @@ class AssetsPage(CrudPage):
         "model",
         "serial_number",
         "status",
+        "notes",
     ]
 
     def __init__(self, parent=None):
@@ -40,31 +44,19 @@ class AssetsPage(CrudPage):
         self.ui = Ui_AssetsWindow()
         self.ui.setupUi(self)
 
-        # Shared CRUD framework configuration
         self.service = AssetService
         self.dialog_class = AssetDialog
         self.table = self.ui.tblAssets
         self.search_widget = self.ui.txtSearch
         self.status_label = self.ui.lblStatus
 
-        self.entity_name = "Asset"
-        self.record_name = "assets"
-
         self.setup_page()
-
-    # ---------------------------------------------------------
-    # Setup
-    # ---------------------------------------------------------
 
     def setup_page(self):
         self.validate_configuration()
         self.setup_table()
         self.connect_signals()
         self.load_data()
-
-    # ---------------------------------------------------------
-    # Signals
-    # ---------------------------------------------------------
 
     def connect_signals(self):
         self.ui.btnRefresh.clicked.connect(
@@ -83,7 +75,7 @@ class AssetsPage(CrudPage):
             self.delete_record
         )
 
-        self.ui.txtSearch.textChanged.connect(
+        self.search_widget.textChanged.connect(
             self.search
         )
 

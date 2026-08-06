@@ -1,4 +1,5 @@
-from PySide6.QtCore import QDate
+from PySide6.QtCore import QDate, Qt
+from PySide6.QtWidgets import QFormLayout, QSizePolicy
 
 from app.base.base_dialog import BaseDialog
 from app.core.lookup_manager import LookupManager
@@ -9,6 +10,7 @@ from app.services.work_order_parts_service import WorkOrderPartService
 from app.helpers.table_helper import TableHelper
 from app.dialogs.issue_part_dialog import IssuePartDialog
 from app.helpers.format_helper import FormatHelper
+from app.helpers.form_helper import FormHelper
 
 
 class WorkOrderDialog(BaseDialog):
@@ -29,7 +31,7 @@ class WorkOrderDialog(BaseDialog):
 
         self.ui = Ui_AddWorkOrderDialog()
         self.ui.setupUi(self)
-
+        self.apply_form_standards()
         self.setup_dialog()
 
         # Add mode has no persisted work order yet, so material actions
@@ -41,6 +43,16 @@ class WorkOrderDialog(BaseDialog):
     # ---------------------------------------------------------
 
     def setup_dialog(self):
+        self.setWindowFlag(
+            Qt.WindowType.WindowMaximizeButtonHint,
+            True,
+        )
+        self.setSizeGripEnabled(True)
+        self.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Expanding,
+        )
+
         self.load_lookup_values()
         self.load_assets()
         self.load_technicians()
@@ -59,10 +71,25 @@ class WorkOrderDialog(BaseDialog):
         self.ui.dsbActualCost.setMinimum(0)
         self.ui.dsbLabourHours.setMinimum(0)
 
+        for layout_name in (
+            "formGeneralInfo",
+            "formAssignment",
+        ):
+            form_layout = getattr(self.ui, layout_name, None)
+            if form_layout is not None:
+                form_layout.setFieldGrowthPolicy(
+                    QFormLayout.FieldGrowthPolicy.AllNonFixedFieldsGrow
+                )
+
+        if hasattr(self.ui, "gridDatesCosts"):
+            self.ui.gridDatesCosts.setColumnStretch(1, 1)
+            self.ui.gridDatesCosts.setColumnStretch(3, 1)
+
         TableHelper.setup(
             self.ui.tblParts,
             self.PART_COLUMNS
         )
+        
 
     def connect_signals(self):
         self.ui.buttonBox.accepted.connect(
@@ -170,12 +197,27 @@ class WorkOrderDialog(BaseDialog):
     def load_lookup_values(self):
         LookupManager.load(
             self.ui.cmbPriority,
-            "Priorities"
+            "Priorities",
+            [
+                "Low",
+                "Medium",
+                "High",
+                "Critical"
+            ]
         )
 
         LookupManager.load(
             self.ui.cmbStatus,
-            "Statuses"
+            "Work Order Statuses",
+            [
+                "Open",
+                "Assigned",
+                "In Progress",
+                "On Hold",
+                "Completed",
+                "Closed",
+                "Cancelled"
+            ]
         )
 
     def load_assets(self):
@@ -230,14 +272,6 @@ class WorkOrderDialog(BaseDialog):
             FormatHelper.currency(total)
         )
 
-        unit_cost = WorkOrderPartService.get_total_unit_cost(
-            self.record_id
-        )
-
-        self.ui.lblMaterialUnitCost.setText(
-            FormatHelper.currency(unit_cost)
-        )
-
     # ---------------------------------------------------------
     # Clear fields
     # ---------------------------------------------------------
@@ -273,8 +307,6 @@ class WorkOrderDialog(BaseDialog):
         self.ui.dsbEstimatedCost.setValue(0.00)
         self.ui.dsbActualCost.setValue(0.00)
         self.ui.dsbLabourHours.setValue(0.00)
-
-        self.ui.txtTitle.setFocus()
 
     # ---------------------------------------------------------
     # Form data
@@ -451,7 +483,6 @@ class WorkOrderDialog(BaseDialog):
                 "Validation",
                 "Asset is required."
             )
-            self.ui.cmbAsset.setFocus()
             return False
 
         if not ValidationService.check(
@@ -461,7 +492,6 @@ class WorkOrderDialog(BaseDialog):
                 "Title"
             )
         ):
-            self.ui.txtTitle.setFocus()
             return False
 
         if not ValidationService.check(
@@ -471,7 +501,6 @@ class WorkOrderDialog(BaseDialog):
                 "Priority"
             )
         ):
-            self.ui.cmbPriority.setFocus()
             return False
 
         if not ValidationService.check(
@@ -481,7 +510,6 @@ class WorkOrderDialog(BaseDialog):
                 "Status"
             )
         ):
-            self.ui.cmbStatus.setFocus()
             return False
 
         if (
@@ -493,7 +521,6 @@ class WorkOrderDialog(BaseDialog):
                 "Due Date cannot be earlier than "
                 "Date Created."
             )
-            self.ui.dtDueDate.setFocus()
             return False
 
         return True

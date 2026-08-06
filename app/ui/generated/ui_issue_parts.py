@@ -68,11 +68,6 @@ class Ui_IssuePartsDialog(object):
         __qtablewidgetitem5 = QTableWidgetItem()
         self.tblInventory.setHorizontalHeaderItem(5, __qtablewidgetitem5)
         self.tblInventory.setObjectName(u"tblInventory")
-        self.tblInventory.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.tblInventory.setAlternatingRowColors(True)
-        self.tblInventory.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
-        self.tblInventory.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        self.tblInventory.setSortingEnabled(True)
 
         self.verticalLayout.addWidget(self.tblInventory)
 

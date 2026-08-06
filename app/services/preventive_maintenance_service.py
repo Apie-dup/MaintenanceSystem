@@ -190,6 +190,7 @@ class PreventiveMaintenanceService:
 
     @staticmethod
     def generate_work_order(pm_id):
+
         pm = PreventiveMaintenanceModel.get_by_id(pm_id)
 
         if pm is None:
@@ -255,6 +256,44 @@ class PreventiveMaintenanceService:
                     "Generated from Preventive Maintenance "
                     f'{pm["pm_number"]}.'
                 ),
+
+            "pm_id":
+                pm["id"]
         }
 
         return WorkOrderService.create(data)
+
+    @staticmethod
+    def complete_schedule(
+        pm_id,
+        completion_date=None
+    ):
+
+        pm = PreventiveMaintenanceModel.get_by_id(pm_id)
+
+        if pm is None:
+            raise ValueError(
+                "Preventive Maintenance schedule not found."
+            )
+
+        if completion_date is None:
+            completion_date = DateHelper.today()
+
+        elif isinstance(completion_date, str):
+            completion_date = DateHelper.from_string(
+                completion_date
+            )
+
+        next_due_date = (
+            DateHelper.calculate_next_due_date(
+                completion_date,
+                pm["frequency_type"],
+                int(pm["frequency_value"]),
+            )
+        )
+
+        PreventiveMaintenanceModel.update_service_dates(
+            pm_id,
+            DateHelper.to_string(completion_date),
+            DateHelper.to_string(next_due_date)
+        )

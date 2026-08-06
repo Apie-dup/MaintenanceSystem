@@ -80,7 +80,6 @@ class Ui_InventoryPage(object):
         __qtablewidgetitem12 = QTableWidgetItem()
         self.tblInventory.setHorizontalHeaderItem(12, __qtablewidgetitem12)
         self.tblInventory.setObjectName(u"tblInventory")
-        self.tblInventory.setAlternatingRowColors(True)
         self.tblInventory.setWordWrap(False)
         self.tblInventory.verticalHeader().setHighlightSections(False)
 

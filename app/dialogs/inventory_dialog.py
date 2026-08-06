@@ -5,6 +5,7 @@ from app.services.inventory_service import InventoryService
 from app.services.supplier_service import SupplierService
 from app.services.validation_service import ValidationService
 from app.ui.generated.ui_add_inventory import Ui_AddInventoryDialog
+from app.helpers.form_helper import FormHelper
 
 
 class InventoryDialog(BaseDialog):
@@ -16,6 +17,8 @@ class InventoryDialog(BaseDialog):
 
         self.ui = Ui_AddInventoryDialog()
         self.ui.setupUi(self)
+
+        self.apply_form_standards()
 
         self.setup_dialog()
 
@@ -129,8 +132,6 @@ class InventoryDialog(BaseDialog):
         self.ui.spnMinimumQuantity.setValue(0)
         self.ui.spnReorderQuantity.setValue(0)
         self.ui.dsbUnitCost.setValue(0.00)
-
-        self.ui.txtPartName.setFocus()
 
     # ---------------------------------------------------------
     # Form data
@@ -278,7 +279,6 @@ class InventoryDialog(BaseDialog):
                 "Part Name"
             )
         ):
-            self.ui.txtPartName.setFocus()
             return False
 
         if not ValidationService.check(
@@ -288,7 +288,6 @@ class InventoryDialog(BaseDialog):
                 "Category"
             )
         ):
-            self.ui.cmbCategory.setFocus()
             return False
 
         if not ValidationService.check(
@@ -298,7 +297,6 @@ class InventoryDialog(BaseDialog):
                 "Unit"
             )
         ):
-            self.ui.cmbUnit.setFocus()
             return False
 
         if data["minimum_quantity"] > data["quantity"]:

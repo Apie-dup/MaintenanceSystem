@@ -43,7 +43,8 @@ class WorkOrderModel:
                 work_orders.estimated_cost,
                 work_orders.actual_cost,
                 work_orders.labour_hours,
-                work_orders.notes
+                work_orders.notes,
+                work_orders.pm_id
             FROM work_orders
             LEFT JOIN assets
                 ON work_orders.asset_id = assets.id
@@ -87,7 +88,8 @@ class WorkOrderModel:
                 work_orders.estimated_cost,
                 work_orders.actual_cost,
                 work_orders.labour_hours,
-                work_orders.notes
+                work_orders.notes,
+                work_orders.pm_id
             FROM work_orders
             LEFT JOIN assets
                 ON work_orders.asset_id = assets.id
@@ -140,7 +142,8 @@ class WorkOrderModel:
                 work_orders.estimated_cost,
                 work_orders.actual_cost,
                 work_orders.labour_hours,
-                work_orders.notes
+                work_orders.notes,
+                work_orders.pm_id
             FROM work_orders
             LEFT JOIN assets
                 ON work_orders.asset_id = assets.id
@@ -203,9 +206,10 @@ class WorkOrderModel:
                 estimated_cost,
                 actual_cost,
                 labour_hours,
-                notes
+                notes,
+                pm_id
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             data["work_order_number"],
             data["asset_id"],
@@ -221,6 +225,7 @@ class WorkOrderModel:
             data["actual_cost"],
             data["labour_hours"],
             data["notes"],
+            data["pm_id"],
         ))
 
         conn.commit()
@@ -256,7 +261,8 @@ class WorkOrderModel:
                 estimated_cost = ?,
                 actual_cost = ?,
                 labour_hours = ?,
-                notes = ?
+                notes = ?,
+                pm_id = ?
             WHERE id = ?
         """, (
             data["work_order_number"],
@@ -273,6 +279,7 @@ class WorkOrderModel:
             data["actual_cost"],
             data["labour_hours"],
             data["notes"],
+            data["pm_id"],
             record_id,
         ))
 
@@ -446,3 +453,47 @@ class WorkOrderModel:
         conn.close()
 
         return exists
+
+    @staticmethod
+    def get_pm_history(pm_id):
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT
+                work_orders.id,
+                work_orders.work_order_number,
+                work_orders.date_created,
+                work_orders.due_date,
+                work_orders.status,
+                work_orders.technician_id,
+                CASE
+                WHEN technicians.id IS NULL
+                    THEN 'Unassigned'
+                ELSE technicians.employee_number
+                     || ' - '
+                     || technicians.first_name
+                     || ' '
+                     || technicians.last_name
+                END AS technician_display,
+
+                work_orders.labour_hours,
+                work_orders.actual_cost,
+                work_orders.notes
+
+            FROM work_orders
+
+            LEFT JOIN technicians
+                ON work_orders.technician_id = technicians.id
+
+            WHERE work_orders.pm_id = ?
+
+            ORDER BY
+                work_orders.date_created DESC,
+                work_orders.id DESC
+        """, (pm_id,))
+
+        rows = cursor.fetchall()
+        conn.close()
+
+        return rows

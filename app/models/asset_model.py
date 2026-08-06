@@ -26,7 +26,8 @@ class AssetModel:
                 serial_number,
                 purchase_date,
                 warranty_expiry,
-                status
+                status,
+                notes
             FROM assets
             ORDER BY asset_number
         """)
@@ -58,7 +59,8 @@ class AssetModel:
                 serial_number,
                 purchase_date,
                 warranty_expiry,
-                status
+                status,
+                notes   
             FROM assets
             WHERE id = ?
         """, (record_id,))
@@ -92,7 +94,8 @@ class AssetModel:
                 serial_number,
                 purchase_date,
                 warranty_expiry,
-                status
+                status,
+                notes
             FROM assets
             WHERE
                 asset_number LIKE ?
@@ -104,6 +107,7 @@ class AssetModel:
                 OR model LIKE ?
                 OR serial_number LIKE ?
                 OR status LIKE ?
+                OR notes LIKE ?
             ORDER BY asset_number
         """, (
             search,
@@ -115,6 +119,7 @@ class AssetModel:
             search,
             search,
             search,
+            search
         ))
 
         rows = cursor.fetchall()
@@ -131,43 +136,48 @@ class AssetModel:
         conn = Database.connect()
         cursor = conn.cursor()
 
-        cursor.execute("""
-            INSERT INTO assets
-            (
-                asset_number,
-                asset_name,
-                description,
-                category,
-                location,
-                manufacturer,
-                model,
-                serial_number,
-                purchase_date,
-                warranty_expiry,
-                status
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            data["asset_number"],
-            data["asset_name"],
-            data["description"],
-            data["category"],
-            data["location"],
-            data["manufacturer"],
-            data["model"],
-            data["serial_number"],
-            data["purchase_date"],
-            data["warranty_expiry"],
-            data["status"],
-        ))
+        try:
+            cursor.execute("""
+                INSERT INTO assets (
+                    asset_number,
+                    asset_name,
+                    description,
+                    category,
+                    location,
+                    manufacturer,
+                    model,
+                    serial_number,
+                    purchase_date,
+                    warranty_expiry,
+                    status,
+                    notes
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                data["asset_number"],
+                data["asset_name"],
+                data["description"],
+                data["category"],
+                data["location"],
+                data["manufacturer"],
+                data["model"],
+                data["serial_number"],
+                data["purchase_date"],
+                data["warranty_expiry"],
+                data["status"],
+                data["notes"]
+            ))
 
-        conn.commit()
+            record_id = cursor.lastrowid
 
-        record_id = cursor.lastrowid
+            conn.commit()
+            return record_id
 
-        conn.close()
+        except Exception:
+            conn.rollback()
+            raise
 
-        return record_id
+        finally:
+            conn.close()
 
     # ---------------------------------------------------------
     # Update
@@ -191,7 +201,8 @@ class AssetModel:
                 serial_number = ?,
                 purchase_date = ?,
                 warranty_expiry = ?,
-                status = ?
+                status = ?,
+                notes = ?   
             WHERE id = ?
         """, (
             data["asset_number"],
@@ -205,6 +216,7 @@ class AssetModel:
             data["purchase_date"],
             data["warranty_expiry"],
             data["status"],
+            data["notes"],  
             record_id,
         ))
 
@@ -238,7 +250,7 @@ class AssetModel:
             table_name="assets",
             field_name="asset_number",
             prefix="AST",
-            digits=4
+            digits=6
         )
 
     @staticmethod

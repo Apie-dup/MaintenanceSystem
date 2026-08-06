@@ -8,6 +8,10 @@ class WorkOrdersPage(CrudPage):
 
     PAGE_TITLE = "Work Orders"
 
+    ENTITY_NAME = "Work Order"
+
+    RECORD_NAME = "work orders"
+
     TABLE_COLUMNS = [
         ("work_order_number", "Work Order"),
         ("asset_number", "Asset Number"),
@@ -45,9 +49,6 @@ class WorkOrdersPage(CrudPage):
         self.table = self.ui.tblWorkOrders
         self.search_widget = self.ui.txtSearch
         self.status_label = self.ui.lblStatus
-
-        self.entity_name = "Work Order"
-        self.record_name = "work orders"
 
         self.setup_page()
 

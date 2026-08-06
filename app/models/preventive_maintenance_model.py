@@ -487,3 +487,27 @@ class PreventiveMaintenanceModel:
         conn.close()
 
         return rows
+
+    @staticmethod
+    def update_service_dates(
+        pm_id,
+        last_service_date,
+        next_due_date
+    ):
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            UPDATE preventive_maintenance
+            SET
+                last_service_date = ?,
+                next_due_date = ?
+            WHERE id = ?
+        """, (
+            last_service_date,
+            next_due_date,
+            pm_id,
+        ))
+
+        conn.commit()
+        conn.close()

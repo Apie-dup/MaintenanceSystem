@@ -17,65 +17,48 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractButton, QApplication, QCheckBox, QComboBox,
     QDateEdit, QDialog, QDialogButtonBox, QDoubleSpinBox,
-    QFormLayout, QGridLayout, QGroupBox, QLabel,
-    QLineEdit, QSizePolicy, QSpinBox, QTextEdit,
-    QVBoxLayout, QWidget)
+    QFormLayout, QGridLayout, QGroupBox, QHeaderView,
+    QLabel, QLineEdit, QSizePolicy, QSpinBox,
+    QTableWidget, QTableWidgetItem, QTextEdit, QVBoxLayout,
+    QWidget)
 
 class Ui_PreventiveMaintenanceDialog(object):
     def setupUi(self, PreventiveMaintenanceDialog):
         if not PreventiveMaintenanceDialog.objectName():
             PreventiveMaintenanceDialog.setObjectName(u"PreventiveMaintenanceDialog")
-        PreventiveMaintenanceDialog.resize(637, 878)
-        self.mainLayout = QVBoxLayout(PreventiveMaintenanceDialog)
-        self.mainLayout.setObjectName(u"mainLayout")
+        PreventiveMaintenanceDialog.resize(637, 558)
+        self.verticalLayout_3 = QVBoxLayout(PreventiveMaintenanceDialog)
+        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.groupGeneralInfo = QGroupBox(PreventiveMaintenanceDialog)
         self.groupGeneralInfo.setObjectName(u"groupGeneralInfo")
         self.groupGeneralInfo.setFlat(True)
-        self.formGeneralInfo = QFormLayout(self.groupGeneralInfo)
-        self.formGeneralInfo.setObjectName(u"formGeneralInfo")
         self.lblPMNumber = QLabel(self.groupGeneralInfo)
         self.lblPMNumber.setObjectName(u"lblPMNumber")
-
-        self.formGeneralInfo.setWidget(0, QFormLayout.ItemRole.LabelRole, self.lblPMNumber)
-
+        self.lblPMNumber.setGeometry(QRect(11, 27, 68, 16))
         self.txtPMNumber = QLineEdit(self.groupGeneralInfo)
         self.txtPMNumber.setObjectName(u"txtPMNumber")
+        self.txtPMNumber.setGeometry(QRect(85, 27, 93, 26))
         self.txtPMNumber.setReadOnly(True)
-
-        self.formGeneralInfo.setWidget(0, QFormLayout.ItemRole.FieldRole, self.txtPMNumber)
-
         self.lblAsset = QLabel(self.groupGeneralInfo)
         self.lblAsset.setObjectName(u"lblAsset")
-
-        self.formGeneralInfo.setWidget(1, QFormLayout.ItemRole.LabelRole, self.lblAsset)
-
+        self.lblAsset.setGeometry(QRect(11, 59, 31, 16))
         self.cmbAsset = QComboBox(self.groupGeneralInfo)
         self.cmbAsset.setObjectName(u"cmbAsset")
-
-        self.formGeneralInfo.setWidget(1, QFormLayout.ItemRole.FieldRole, self.cmbAsset)
-
+        self.cmbAsset.setGeometry(QRect(85, 59, 82, 26))
         self.lblTask = QLabel(self.groupGeneralInfo)
         self.lblTask.setObjectName(u"lblTask")
-
-        self.formGeneralInfo.setWidget(2, QFormLayout.ItemRole.LabelRole, self.lblTask)
-
+        self.lblTask.setGeometry(QRect(11, 91, 26, 16))
         self.txtTask = QLineEdit(self.groupGeneralInfo)
         self.txtTask.setObjectName(u"txtTask")
-
-        self.formGeneralInfo.setWidget(2, QFormLayout.ItemRole.FieldRole, self.txtTask)
-
+        self.txtTask.setGeometry(QRect(85, 91, 93, 26))
         self.lblDescription = QLabel(self.groupGeneralInfo)
         self.lblDescription.setObjectName(u"lblDescription")
-
-        self.formGeneralInfo.setWidget(3, QFormLayout.ItemRole.LabelRole, self.lblDescription)
-
+        self.lblDescription.setGeometry(QRect(11, 123, 63, 16))
         self.teDescription = QTextEdit(self.groupGeneralInfo)
         self.teDescription.setObjectName(u"teDescription")
+        self.teDescription.setGeometry(QRect(85, 123, 256, 192))
 
-        self.formGeneralInfo.setWidget(3, QFormLayout.ItemRole.FieldRole, self.teDescription)
-
-
-        self.mainLayout.addWidget(self.groupGeneralInfo)
+        self.verticalLayout_3.addWidget(self.groupGeneralInfo)
 
         self.groupSchedule = QGroupBox(PreventiveMaintenanceDialog)
         self.groupSchedule.setObjectName(u"groupSchedule")
@@ -131,7 +114,7 @@ class Ui_PreventiveMaintenanceDialog(object):
         self.gridSchedule.addWidget(self.dtNextDue, 1, 3, 1, 1)
 
 
-        self.mainLayout.addWidget(self.groupSchedule)
+        self.verticalLayout_3.addWidget(self.groupSchedule)
 
         self.groupPlanning = QGroupBox(PreventiveMaintenanceDialog)
         self.groupPlanning.setObjectName(u"groupPlanning")
@@ -186,26 +169,44 @@ class Ui_PreventiveMaintenanceDialog(object):
         self.formPlanning.setWidget(3, QFormLayout.ItemRole.FieldRole, self.chkActive)
 
 
-        self.mainLayout.addWidget(self.groupPlanning)
+        self.verticalLayout_3.addWidget(self.groupPlanning)
 
         self.groupNotes = QGroupBox(PreventiveMaintenanceDialog)
         self.groupNotes.setObjectName(u"groupNotes")
         self.groupNotes.setFlat(True)
-        self.layoutNotes = QVBoxLayout(self.groupNotes)
-        self.layoutNotes.setObjectName(u"layoutNotes")
+        self.verticalLayout_2 = QVBoxLayout(self.groupNotes)
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.teNotes = QTextEdit(self.groupNotes)
         self.teNotes.setObjectName(u"teNotes")
 
-        self.layoutNotes.addWidget(self.teNotes)
+        self.verticalLayout_2.addWidget(self.teNotes)
 
 
-        self.mainLayout.addWidget(self.groupNotes)
+        self.verticalLayout_3.addWidget(self.groupNotes)
+
+        self.groupHistory = QGroupBox(PreventiveMaintenanceDialog)
+        self.groupHistory.setObjectName(u"groupHistory")
+        self.groupHistory.setFlat(True)
+        self.verticalLayout = QVBoxLayout(self.groupHistory)
+        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.tblHistory = QTableWidget(self.groupHistory)
+        self.tblHistory.setObjectName(u"tblHistory")
+
+        self.verticalLayout.addWidget(self.tblHistory)
+
+        self.lblHistoryCount = QLabel(self.groupHistory)
+        self.lblHistoryCount.setObjectName(u"lblHistoryCount")
+
+        self.verticalLayout.addWidget(self.lblHistoryCount)
+
+
+        self.verticalLayout_3.addWidget(self.groupHistory)
 
         self.buttonBox = QDialogButtonBox(PreventiveMaintenanceDialog)
         self.buttonBox.setObjectName(u"buttonBox")
         self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Save)
 
-        self.mainLayout.addWidget(self.buttonBox)
+        self.verticalLayout_3.addWidget(self.buttonBox)
 
 
         self.retranslateUi(PreventiveMaintenanceDialog)
@@ -240,5 +241,7 @@ class Ui_PreventiveMaintenanceDialog(object):
         self.lblEstimatedCost.setText(QCoreApplication.translate("PreventiveMaintenanceDialog", u"Estimated Cost:", None))
         self.lblActive.setText(QCoreApplication.translate("PreventiveMaintenanceDialog", u"Active:", None))
         self.groupNotes.setTitle(QCoreApplication.translate("PreventiveMaintenanceDialog", u"Notes", None))
+        self.groupHistory.setTitle(QCoreApplication.translate("PreventiveMaintenanceDialog", u"Maintenance Work Order History", None))
+        self.lblHistoryCount.setText(QCoreApplication.translate("PreventiveMaintenanceDialog", u"0 Work Ordes", None))
     # retranslateUi
 

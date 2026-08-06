@@ -1,10 +1,12 @@
 import sys
 
 from PySide6.QtWidgets import QApplication
+from PySide6.QtGui import QColor, QPalette
 
 from app.database.setup import DatabaseSetup
 from app.controllers.login_controller import LoginController
 from app.core.logger import logger
+from app.core.theme import AppTheme
 
 
 def main():
@@ -22,6 +24,60 @@ def main():
 
         # Start Qt
         app = QApplication(sys.argv)
+
+        def apply_light_palette(app):
+            palette = QPalette()
+
+            palette.setColor(
+                QPalette.ColorRole.Window,
+                QColor("#f7f7f7")
+            )
+
+            palette.setColor(
+                QPalette.ColorRole.WindowText,
+                QColor("#1f1f1f")
+            )
+
+            palette.setColor(
+                QPalette.ColorRole.Base,
+                QColor("#ffffff")
+            )
+
+            palette.setColor(
+                QPalette.ColorRole.AlternateBase,
+                QColor("#fafafa")
+            )
+
+            palette.setColor(
+                QPalette.ColorRole.Text,
+                QColor("#1f1f1f")
+            )
+
+            palette.setColor(
+                QPalette.ColorRole.Button,
+                QColor("#ffffff")
+            )
+
+            palette.setColor(
+                QPalette.ColorRole.ButtonText,
+                QColor("#1f1f1f")
+            )
+
+            palette.setColor(
+                QPalette.ColorRole.Highlight,
+                QColor("#cfe8ff")
+            )
+
+            palette.setColor(
+                QPalette.ColorRole.HighlightedText,
+                QColor("#1f1f1f")
+            )
+            app.setPalette(palette)
+
+        # Start in light mode
+        AppTheme.apply(app, AppTheme.MODE_DARK)
+
+        app.setStyle("Fusion")
 
         login_window = LoginController()
         login_window.show()

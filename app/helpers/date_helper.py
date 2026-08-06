@@ -154,37 +154,52 @@ class DateHelper:
                 "Frequency Value must be greater than zero."
             )
 
-        if frequency_type == "Daily":
+        normalized_type = (
+            (frequency_type or "")
+            .strip()
+            .lower()
+            .replace("_", " ")
+        )
+
+        # Operational intervals still use calendar dates in this app.
+        if normalized_type in {"running hours", "cycle"}:
+            normalized_type = "daily"
+
+        if normalized_type == "daily":
             return DateHelper.add_days(
                 start_date,
                 frequency_value
             )
 
-        if frequency_type == "Weekly":
+        if normalized_type == "weekly":
             return DateHelper.add_weeks(
                 start_date,
                 frequency_value
             )
 
-        if frequency_type == "Monthly":
+        if normalized_type == "monthly":
             return DateHelper.add_months(
                 start_date,
                 frequency_value
             )
 
-        if frequency_type == "Quarterly":
+        if normalized_type == "quarterly":
             return DateHelper.add_months(
                 start_date,
                 3 * frequency_value
             )
 
-        if frequency_type == "Half Yearly":
+        if normalized_type in {
+            "half yearly",
+            "semi-annual",
+            "semi annual",
+        }:
             return DateHelper.add_months(
                 start_date,
                 6 * frequency_value
             )
 
-        if frequency_type == "Yearly":
+        if normalized_type in {"yearly", "annual"}:
             return DateHelper.add_years(
                 start_date,
                 frequency_value

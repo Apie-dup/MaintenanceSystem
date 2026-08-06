@@ -64,7 +64,7 @@ class LookupController(QMainWindow):
     def load_lookup(self):
         lookup_type = self.ui.cmbLookupType.currentText()
 
-        rows = LookupService.get_lookup_values(
+        rows = LookupService.get_all(
             lookup_type
         )
 
@@ -85,8 +85,6 @@ class LookupController(QMainWindow):
 
         header = self.ui.tblLookup.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.Stretch)
-
-        self.ui.tblLookup.setAlternatingRowColors(True)
 
         self.ui.lblStatus.setText(
             f"Showing {len(rows)} records"

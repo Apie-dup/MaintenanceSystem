@@ -24,7 +24,7 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="2" column="0">
-       <widget class="QLabel" name="labelOverview">
+       <widget class="QLabel" name="dashboardSubtitle">
         <property name="styleSheet">
          <string notr="true">font-size: 16px;</string>
         </property>
@@ -34,7 +34,7 @@
        </widget>
       </item>
       <item row="5" column="0">
-       <widget class="QGroupBox" name="groupPMDue">
+       <widget class="QGroupBox" name="dashboardSection_2">
         <property name="title">
          <string>PM Due</string>
         </property>
@@ -75,7 +75,7 @@
        </widget>
       </item>
       <item row="4" column="0">
-       <widget class="QGroupBox" name="groupUrgentWorkOrders">
+       <widget class="QGroupBox" name="dashboardSection">
         <property name="title">
          <string>Urgent Work Orders</string>
         </property>
@@ -262,7 +262,7 @@
           </property>
           <layout class="QVBoxLayout" name="_4">
            <item>
-            <widget class="QLabel" name="lblPMOverdueTitle">
+            <widget class="QLabel" name="dashboardCard_4">
              <property name="text">
               <string>PM Overdue</string>
              </property>
@@ -469,7 +469,7 @@
        </layout>
       </item>
       <item row="1" column="0">
-       <widget class="QLabel" name="labelDashboardTitle">
+       <widget class="QLabel" name="dashboardTitle">
         <property name="styleSheet">
          <string notr="true">font-size: 22px; font-weight: bold;</string>
         </property>

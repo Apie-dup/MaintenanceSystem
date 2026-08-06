@@ -8,6 +8,10 @@ class SuppliersPage(CrudPage):
 
     PAGE_TITLE = "Suppliers"
 
+    ENTITY_NAME = "Supplier"
+
+    RECORD_NAME = "suppliers"
+
     TABLE_COLUMNS = [
         ("supplier_code", "Code"),
         ("supplier_name", "Supplier Name"),
@@ -40,9 +44,6 @@ class SuppliersPage(CrudPage):
         self.table = self.ui.tblSuppliers
         self.search_widget = self.ui.txtSearch
         self.status_label = self.ui.lblStatus
-
-        self.entity_name = "Supplier"
-        self.record_name = "suppliers"
 
         self.setup_page()
 

@@ -93,25 +93,15 @@ class Ui_AddAssetDialog(object):
         self.groupLocation.setFlat(True)
         self.formLocation = QFormLayout(self.groupLocation)
         self.formLocation.setObjectName(u"formLocation")
-        self.lblDepartment = QLabel(self.groupLocation)
-        self.lblDepartment.setObjectName(u"lblDepartment")
-
-        self.formLocation.setWidget(0, QFormLayout.ItemRole.LabelRole, self.lblDepartment)
-
-        self.cmbDepartment = QComboBox(self.groupLocation)
-        self.cmbDepartment.setObjectName(u"cmbDepartment")
-
-        self.formLocation.setWidget(0, QFormLayout.ItemRole.FieldRole, self.cmbDepartment)
-
         self.lblLocation = QLabel(self.groupLocation)
         self.lblLocation.setObjectName(u"lblLocation")
 
-        self.formLocation.setWidget(1, QFormLayout.ItemRole.LabelRole, self.lblLocation)
+        self.formLocation.setWidget(0, QFormLayout.ItemRole.LabelRole, self.lblLocation)
 
         self.cmbLocation = QComboBox(self.groupLocation)
         self.cmbLocation.setObjectName(u"cmbLocation")
 
-        self.formLocation.setWidget(1, QFormLayout.ItemRole.FieldRole, self.cmbLocation)
+        self.formLocation.setWidget(0, QFormLayout.ItemRole.FieldRole, self.cmbLocation)
 
 
         self.mainLayout.addWidget(self.groupLocation)
@@ -233,7 +223,6 @@ class Ui_AddAssetDialog(object):
         self.cmbStatus.setItemText(1, QCoreApplication.translate("AddAssetDialog", u"Inactive", None))
 
         self.groupLocation.setTitle(QCoreApplication.translate("AddAssetDialog", u"Location", None))
-        self.lblDepartment.setText(QCoreApplication.translate("AddAssetDialog", u"Department:", None))
         self.lblLocation.setText(QCoreApplication.translate("AddAssetDialog", u"Location:", None))
         self.groupManufacturer.setTitle(QCoreApplication.translate("AddAssetDialog", u"Manufacturer", None))
         self.lblManufacturer.setText(QCoreApplication.translate("AddAssetDialog", u"Manufacturer:", None))

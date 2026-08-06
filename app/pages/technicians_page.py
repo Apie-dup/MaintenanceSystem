@@ -8,6 +8,10 @@ class TechniciansPage(CrudPage):
 
     PAGE_TITLE = "Technicians"
 
+    ENTITY_NAME = "Technician"
+
+    RECORD_NAME = "technicians"
+
     TABLE_COLUMNS = [
         ("employee_number", "Employee Number"),
         ("first_name", "First Name"),
@@ -43,9 +47,6 @@ class TechniciansPage(CrudPage):
         self.table = self.ui.tblTechnicians
         self.search_widget = self.ui.txtSearch
         self.status_label = self.ui.lblStatus
-
-        self.entity_name = "Technician"
-        self.record_name = "technicians"
 
         self.setup_page()
 

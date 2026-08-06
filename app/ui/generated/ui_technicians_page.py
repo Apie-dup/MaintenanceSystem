@@ -77,10 +77,6 @@ class Ui_TechniciansWindow(object):
         __qtablewidgetitem10 = QTableWidgetItem()
         self.tblTechnicians.setHorizontalHeaderItem(10, __qtablewidgetitem10)
         self.tblTechnicians.setObjectName(u"tblTechnicians")
-        self.tblTechnicians.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.tblTechnicians.setAlternatingRowColors(True)
-        self.tblTechnicians.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        self.tblTechnicians.setSortingEnabled(True)
         self.tblTechnicians.setWordWrap(False)
         self.tblTechnicians.verticalHeader().setVisible(False)
 

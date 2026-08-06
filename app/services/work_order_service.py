@@ -3,6 +3,7 @@ from app.services.asset_service import AssetService
 from app.services.technician_service import TechnicianService
 
 
+
 class WorkOrderService:
 
     # ---------------------------------------------------------
@@ -60,6 +61,10 @@ class WorkOrderService:
     @staticmethod
     def create(data):
 
+        # Allow forms that do not include PM linkage.
+        if "pm_id" not in data:
+            data["pm_id"] = None
+
         WorkOrderService.validate_data(data)
 
         if WorkOrderModel.number_exists(
@@ -78,6 +83,11 @@ class WorkOrderService:
     @staticmethod
     def update(record_id, data):
 
+        existing = WorkOrderModel.get_by_id(record_id)
+
+        if existing is None:
+            raise ValueError("Work Order not found.")
+
         WorkOrderService.validate_data(data)
 
         if WorkOrderModel.number_exists(
@@ -88,10 +98,42 @@ class WorkOrderService:
                 "Work Order Number already exists."
             )
 
+        # Preserve the PM relationship
+
+        data["pm_id"] = existing["pm_id"]
+
         WorkOrderModel.update(
             record_id,
             data
         )
+
+        completed_statuses = {
+            
+            "Completed",
+            "Closed",
+        }
+
+        was_completed = (
+            existing["status"] in completed_statuses
+        )
+
+        is_completed = (
+            data["status"] in completed_statuses
+        )
+
+        if (
+            not was_completed
+            and is_completed
+            and existing["pm_id"] is not None
+        ):
+
+            from app.services.preventive_maintenance_service import (
+                PreventiveMaintenanceService
+            )
+
+            PreventiveMaintenanceService.complete_schedule(
+                existing["pm_id"]
+            )
 
     # ---------------------------------------------------------
     # Delete
@@ -171,3 +213,12 @@ class WorkOrderService:
         return WorkOrderModel.open_pm_work_order_exists(
             pm_number
         )
+    @staticmethod
+    def get_pm_history(pm_id):
+        return WorkOrderModel.get_pm_history(pm_id)
+
+    @staticmethod
+    def get_by_pm_id(pm_id):
+        # Backward-compatible alias used by PM dialog history loading.
+        return WorkOrderModel.get_pm_history(pm_id)
+    
