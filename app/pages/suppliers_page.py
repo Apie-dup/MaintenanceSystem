@@ -7,9 +7,7 @@ from app.ui.generated.ui_supplier_page import Ui_SuppliersWindow
 class SuppliersPage(CrudPage):
 
     PAGE_TITLE = "Suppliers"
-
     ENTITY_NAME = "Supplier"
-
     RECORD_NAME = "suppliers"
 
     TABLE_COLUMNS = [
@@ -30,6 +28,8 @@ class SuppliersPage(CrudPage):
         "phone",
         "email",
         "address",
+        "status",
+        "notes",
     ]
 
     def __init__(self, parent=None):
@@ -38,7 +38,6 @@ class SuppliersPage(CrudPage):
         self.ui = Ui_SuppliersWindow()
         self.ui.setupUi(self)
 
-        # Configure the shared CRUD framework
         self.service = SupplierService
         self.dialog_class = SupplierDialog
         self.table = self.ui.tblSuppliers
@@ -47,29 +46,33 @@ class SuppliersPage(CrudPage):
 
         self.setup_page()
 
-    # ---------------------------------------------------------
-    # Setup
-    # ---------------------------------------------------------
-
     def setup_page(self):
         self.validate_configuration()
         self.setup_table()
         self.connect_signals()
         self.load_data()
 
-    # ---------------------------------------------------------
-    # Signals
-    # ---------------------------------------------------------
-
     def connect_signals(self):
-        self.ui.txtSearch.textChanged.connect(self.search)
+        self.search_widget.textChanged.connect(
+            self.search
+        )
 
-        self.ui.btnAdd.clicked.connect(self.add_record)
-        self.ui.btnEdit.clicked.connect(self.edit_record)
-        self.ui.btnDelete.clicked.connect(self.delete_record)
-        self.ui.btnRefresh.clicked.connect(self.refresh)
+        self.ui.btnAdd.clicked.connect(
+            self.add_record
+        )
 
-        # Optional: double-click a supplier to edit it.
-        self.ui.tblSuppliers.itemDoubleClicked.connect(
+        self.ui.btnEdit.clicked.connect(
+            self.edit_record
+        )
+
+        self.ui.btnDelete.clicked.connect(
+            self.delete_record
+        )
+
+        self.ui.btnRefresh.clicked.connect(
+            self.refresh
+        )
+
+        self.table.itemDoubleClicked.connect(
             lambda _item: self.edit_record()
         )

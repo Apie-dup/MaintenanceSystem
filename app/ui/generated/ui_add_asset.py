@@ -17,8 +17,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractButton, QApplication, QComboBox, QDateEdit,
     QDialog, QDialogButtonBox, QDoubleSpinBox, QFormLayout,
-    QGroupBox, QLabel, QLineEdit, QSizePolicy,
-    QTextEdit, QVBoxLayout, QWidget)
+    QGridLayout, QGroupBox, QLabel, QLineEdit,
+    QSizePolicy, QTextEdit, QVBoxLayout, QWidget)
 
 class Ui_AddAssetDialog(object):
     def setupUi(self, AddAssetDialog):
@@ -147,41 +147,41 @@ class Ui_AddAssetDialog(object):
         self.groupPurchaseInfo = QGroupBox(AddAssetDialog)
         self.groupPurchaseInfo.setObjectName(u"groupPurchaseInfo")
         self.groupPurchaseInfo.setFlat(True)
-        self.formPurchaseInfo = QFormLayout(self.groupPurchaseInfo)
-        self.formPurchaseInfo.setObjectName(u"formPurchaseInfo")
+        self.gridLayout = QGridLayout(self.groupPurchaseInfo)
+        self.gridLayout.setObjectName(u"gridLayout")
         self.lblPurchaseDate = QLabel(self.groupPurchaseInfo)
         self.lblPurchaseDate.setObjectName(u"lblPurchaseDate")
 
-        self.formPurchaseInfo.setWidget(0, QFormLayout.ItemRole.LabelRole, self.lblPurchaseDate)
+        self.gridLayout.addWidget(self.lblPurchaseDate, 0, 0, 1, 1)
 
         self.dtPurchaseDate = QDateEdit(self.groupPurchaseInfo)
         self.dtPurchaseDate.setObjectName(u"dtPurchaseDate")
         self.dtPurchaseDate.setCalendarPopup(True)
 
-        self.formPurchaseInfo.setWidget(0, QFormLayout.ItemRole.FieldRole, self.dtPurchaseDate)
+        self.gridLayout.addWidget(self.dtPurchaseDate, 0, 1, 1, 1)
 
         self.lblPurchaseCost = QLabel(self.groupPurchaseInfo)
         self.lblPurchaseCost.setObjectName(u"lblPurchaseCost")
 
-        self.formPurchaseInfo.setWidget(1, QFormLayout.ItemRole.LabelRole, self.lblPurchaseCost)
+        self.gridLayout.addWidget(self.lblPurchaseCost, 0, 2, 1, 1)
 
-        self.spnPurchaseCost = QDoubleSpinBox(self.groupPurchaseInfo)
-        self.spnPurchaseCost.setObjectName(u"spnPurchaseCost")
-        self.spnPurchaseCost.setDecimals(2)
-        self.spnPurchaseCost.setMaximum(999999.989999999990687)
+        self.dsbPurchaseCost = QDoubleSpinBox(self.groupPurchaseInfo)
+        self.dsbPurchaseCost.setObjectName(u"dsbPurchaseCost")
+        self.dsbPurchaseCost.setMaximum(999999.989999999990687)
+        self.dsbPurchaseCost.setSingleStep(100.000000000000000)
 
-        self.formPurchaseInfo.setWidget(1, QFormLayout.ItemRole.FieldRole, self.spnPurchaseCost)
+        self.gridLayout.addWidget(self.dsbPurchaseCost, 0, 3, 1, 1)
 
         self.lblWarrantyExpiry = QLabel(self.groupPurchaseInfo)
         self.lblWarrantyExpiry.setObjectName(u"lblWarrantyExpiry")
 
-        self.formPurchaseInfo.setWidget(2, QFormLayout.ItemRole.LabelRole, self.lblWarrantyExpiry)
+        self.gridLayout.addWidget(self.lblWarrantyExpiry, 1, 0, 1, 1)
 
         self.dtWarrantyExpiry = QDateEdit(self.groupPurchaseInfo)
         self.dtWarrantyExpiry.setObjectName(u"dtWarrantyExpiry")
         self.dtWarrantyExpiry.setCalendarPopup(True)
 
-        self.formPurchaseInfo.setWidget(2, QFormLayout.ItemRole.FieldRole, self.dtWarrantyExpiry)
+        self.gridLayout.addWidget(self.dtWarrantyExpiry, 1, 1, 1, 1)
 
 
         self.mainLayout.addWidget(self.groupPurchaseInfo)
@@ -231,6 +231,7 @@ class Ui_AddAssetDialog(object):
         self.groupPurchaseInfo.setTitle(QCoreApplication.translate("AddAssetDialog", u"Purchase Information", None))
         self.lblPurchaseDate.setText(QCoreApplication.translate("AddAssetDialog", u"Purchase Date:", None))
         self.lblPurchaseCost.setText(QCoreApplication.translate("AddAssetDialog", u"Purchase Cost:", None))
+        self.dsbPurchaseCost.setPrefix(QCoreApplication.translate("AddAssetDialog", u"N$ ", None))
         self.lblWarrantyExpiry.setText(QCoreApplication.translate("AddAssetDialog", u"Warranty Expiry:", None))
         self.groupNotes.setTitle(QCoreApplication.translate("AddAssetDialog", u"Notes", None))
     # retranslateUi

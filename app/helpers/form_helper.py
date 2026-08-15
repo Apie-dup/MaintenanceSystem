@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
     QSpinBox,
     QTextEdit,
     QWidget,
+    QSizePolicy,
 )
 
 
@@ -20,7 +21,7 @@ class FormHelper:
 
     LABEL_WIDTH = 130
     CONTROL_HEIGHT = 34
-    TEXT_AREA_MIN_HEIGHT = 110
+    TEXT_AREA_MIN_HEIGHT = 60   # reduced from 110
 
     @classmethod
     def apply(cls, form: QWidget):
@@ -48,8 +49,16 @@ class FormHelper:
             if not text.endswith(":"):
                 continue
 
-            label.setMinimumWidth(cls.LABEL_WIDTH)
+            # Allow labels to shrink when needed
+            label.setMinimumWidth(0)
             label.setMaximumWidth(cls.LABEL_WIDTH)
+
+            # Prevent vertical compression (bold effect)
+            label.setSizePolicy(
+                QSizePolicy.Preferred,
+                QSizePolicy.Fixed
+            )
+
             label.setAlignment(
                 Qt.AlignmentFlag.AlignRight
                 | Qt.AlignmentFlag.AlignVCenter
@@ -112,11 +121,15 @@ class FormHelper:
         )
 
         for control in text_areas:
-            # Do not force small description boxes to become very tall.
-            if control.minimumHeight() < cls.TEXT_AREA_MIN_HEIGHT:
-                control.setMinimumHeight(
-                    cls.TEXT_AREA_MIN_HEIGHT
-                )
+            # Only apply minimum height if the UI didn't already set one.
+            if control.minimumHeight() < 40:
+                control.setMinimumHeight(cls.TEXT_AREA_MIN_HEIGHT)
+
+            # Allow notes section to expand naturally
+            control.setSizePolicy(
+                QSizePolicy.Expanding,
+                QSizePolicy.Expanding
+            )
 
     # ---------------------------------------------------------
     # Focus
@@ -142,3 +155,19 @@ class FormHelper:
                 widget.selectAll()
 
             return
+
+    # ---------------------------------------------------------
+    # Dialog sizing
+    # ---------------------------------------------------------
+
+    @staticmethod
+    def apply_standard_dialog(dialog):
+        # Allow Qt to size naturally
+        dialog.setMinimumSize(0, 0)
+        dialog.resize(760, 720)
+
+    @staticmethod
+    def apply_large_dialog(dialog):
+        # Allow Qt to size naturally
+        dialog.setMinimumSize(0, 0)
+        dialog.resize(1000, 760)

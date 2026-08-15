@@ -4,7 +4,7 @@ from app.core.logger import logger
 
 class MigrationManager:
 
-    LATEST_VERSION = 4
+    LATEST_VERSION = 7
 
     # ---------------------------------------------------------
     # Database version
@@ -78,6 +78,18 @@ class MigrationManager:
                 MigrationManager.migrate_to_v4()
                 version = 4
 
+            elif version == 4:
+                MigrationManager.migrate_to_v5()
+                version = 5
+
+            elif version == 5:
+                MigrationManager.migrate_to_v6()
+                version = 6
+
+            elif version == 6:
+                MigrationManager.migrate_to_v7()
+                version = 7
+
             else:
                 raise RuntimeError(
                     f"No migration path exists from version {version}."
@@ -87,7 +99,9 @@ class MigrationManager:
                 version
             )
 
-        logger.info("Database is up to date.")
+            logger.info("Database is up to date.")
+
+        
 
     # ---------------------------------------------------------
     # Version 2
@@ -236,3 +250,138 @@ class MigrationManager:
             column["name"] == column_name
             for column in columns
         )
+
+    # -----------------------------------------------------
+    # Version 5
+    # Work Order completion tracking
+    # -----------------------------------------------------
+
+    @staticmethod
+    def migrate_to_v5():
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        logger.info(
+            "Migrating database to Version 5..."
+        )
+
+        cursor.execute(
+            "PRAGMA table_info(work_orders)"
+        )
+
+        columns = [
+            row["name"]
+            for row in cursor.fetchall()
+        ]
+
+        if "completed_date" not in columns:
+
+            cursor.execute("""
+                ALTER TABLE work_orders
+                ADD COLUMN completed_date TEXT
+            """)
+
+            logger.info(
+                "completed_date column added."
+            )
+
+        else:
+
+            logger.info(
+                "completed_date already exists."
+            )
+
+        if "closed_date" not in columns:
+
+            cursor.execute("""
+                ALTER TABLE work_orders
+                ADD COLUMN closed_date TEXT
+            """)
+
+            logger.info(
+                "closed_date column added."
+            )
+
+        else:
+
+            logger.info(
+                "closed_date already exists."
+            )
+
+        conn.commit()
+        conn.close()
+
+    @staticmethod
+    def migrate_to_v6():
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        logger.info(
+            "Migrating database to Version 6..."
+        )
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS work_order_history
+            (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+                work_order_id INTEGER NOT NULL,
+
+                action TEXT NOT NULL,
+
+                field_name TEXT,
+
+                old_value TEXT,
+
+                new_value TEXT,
+
+                notes TEXT,
+
+                created_at TEXT
+                    DEFAULT CURRENT_TIMESTAMP,
+
+                FOREIGN KEY(work_order_id)
+                    REFERENCES work_orders(id)
+                    ON DELETE CASCADE
+            )
+        """)
+
+    @staticmethod
+    def migrate_to_v7():
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        logger.info(
+            "Migrating database to Version 7..."
+        )
+
+        cursor.execute(
+            "PRAGMA table_info(assets)"
+        )
+
+        columns = [
+            row["name"]
+            for row in cursor.fetchall()
+        ]
+
+        if "purchase_cost" not in columns:
+
+            cursor.execute("""
+                ALTER TABLE assets
+                ADD COLUMN purchase_cost REAL DEFAULT 0
+            """)
+
+            logger.info(
+                "Added purchase_cost column to assets."
+            )
+
+        else:
+            logger.info(
+                "purchase_cost column already exists in assets."
+            )
+
+        conn.commit()
+        conn.close()

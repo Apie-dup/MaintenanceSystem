@@ -23,6 +23,13 @@ class AssetDialog(BaseDialog):
         self.ui = Ui_AddAssetDialog()
         self.ui.setupUi(self)
 
+        self.setSizeGripEnabled(True)
+        
+        self.setSizePolicy(
+        QSizePolicy.Policy.Expanding,
+        QSizePolicy.Policy.Expanding,
+        )
+
         self.apply_form_standards()
         self.setup_dialog()
 
@@ -45,12 +52,7 @@ class AssetDialog(BaseDialog):
             True,
         )
 
-        self.setSizeGripEnabled(True)
-
-        self.setSizePolicy(
-            QSizePolicy.Policy.Expanding,
-            QSizePolicy.Policy.Expanding,
-        )
+        
 
         for layout_name in (
             "formGeneralInfo",
@@ -138,6 +140,10 @@ class AssetDialog(BaseDialog):
         self.ui.dtPurchaseDate.setDate(today)
         self.ui.dtWarrantyExpiry.setDate(today)
 
+        self.ui.dsbPurchaseCost.setValue(
+            0.00
+        )
+
         self.set_focus(
             self.ui.txtAssetName
         )
@@ -175,6 +181,9 @@ class AssetDialog(BaseDialog):
                 self.ui.dtPurchaseDate.date().toString(
                     "yyyy-MM-dd"
                 ),
+
+            "purchase_cost":
+                self.ui.dsbPurchaseCost.value(),
 
             "warranty_expiry":
                 self.ui.dtWarrantyExpiry.date().toString(
@@ -232,6 +241,13 @@ class AssetDialog(BaseDialog):
         self.set_date_value(
             self.ui.dtPurchaseDate,
             asset["purchase_date"],
+        )
+
+        self.ui.dsbPurchaseCost.setValue(
+            float(
+                asset["purchase_cost"]
+                or 0
+            )
         )
 
         self.set_date_value(

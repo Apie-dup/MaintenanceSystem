@@ -1,5 +1,3 @@
-from genericpath import exists
-
 from app.database.connection import Database
 from app.helpers.code_generator import CodeGenerator
 
@@ -44,7 +42,10 @@ class WorkOrderModel:
                 work_orders.actual_cost,
                 work_orders.labour_hours,
                 work_orders.notes,
-                work_orders.pm_id
+                work_orders.pm_id,
+                work_orders.created_at,
+                work_orders.completed_date,
+                work_orders.closed_date
             FROM work_orders
             LEFT JOIN assets
                 ON work_orders.asset_id = assets.id
@@ -89,7 +90,10 @@ class WorkOrderModel:
                 work_orders.actual_cost,
                 work_orders.labour_hours,
                 work_orders.notes,
-                work_orders.pm_id
+                work_orders.pm_id,
+                work_orders.created_at,
+                work_orders.completed_date,
+                work_orders.closed_date
             FROM work_orders
             LEFT JOIN assets
                 ON work_orders.asset_id = assets.id
@@ -143,7 +147,10 @@ class WorkOrderModel:
                 work_orders.actual_cost,
                 work_orders.labour_hours,
                 work_orders.notes,
-                work_orders.pm_id
+                work_orders.pm_id,
+                work_orders.created_at,
+                work_orders.completed_date,
+                work_orders.closed_date
             FROM work_orders
             LEFT JOIN assets
                 ON work_orders.asset_id = assets.id
@@ -161,7 +168,8 @@ class WorkOrderModel:
                 OR technicians.employee_number LIKE ?
                 OR technicians.first_name LIKE ?
                 OR technicians.last_name LIKE ?
-            ORDER BY work_orders.id DESC
+            ORDER BY work_orders.created_at DESC,
+                     work_orders.id DESC
         """, (
             search,
             search,
@@ -190,51 +198,58 @@ class WorkOrderModel:
         conn = Database.connect()
         cursor = conn.cursor()
 
-        cursor.execute("""
-            INSERT INTO work_orders
-            (
-                work_order_number,
-                asset_id,
-                title,
-                description,
-                priority,
-                status,
-                technician_id,
-                requested_by,
-                date_created,
-                due_date,
-                estimated_cost,
-                actual_cost,
-                labour_hours,
-                notes,
-                pm_id
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            data["work_order_number"],
-            data["asset_id"],
-            data["title"],
-            data["description"],
-            data["priority"],
-            data["status"],
-            data["technician_id"],
-            data["requested_by"],
-            data["date_created"],
-            data["due_date"],
-            data["estimated_cost"],
-            data["actual_cost"],
-            data["labour_hours"],
-            data["notes"],
-            data["pm_id"],
-        ))
+        try:
 
-        conn.commit()
+            cursor.execute("""
+                INSERT INTO work_orders
+                (
+                    work_order_number,
+                    asset_id,
+                    title,
+                    description,
+                    priority,
+                    status,
+                    technician_id,
+                    requested_by,
+                    date_created,
+                    due_date,
+                    estimated_cost,
+                    actual_cost,
+                    labour_hours,
+                    notes,
+                    pm_id
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                data["work_order_number"],
+                data["asset_id"],
+                data["title"],
+                data["description"],
+                data["priority"],
+                data["status"],
+                data["technician_id"],
+                data["requested_by"],
+                data["date_created"],
+                data["due_date"],
+                data["estimated_cost"],
+                data["actual_cost"],
+                data["labour_hours"],
+                data["notes"],
+                data.get("pm_id"),
+            ))
 
-        record_id = cursor.lastrowid
+            record_id = cursor.lastrowid
 
-        conn.close()
+            conn.commit()
 
-        return record_id
+            return record_id
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()
 
     # ---------------------------------------------------------
     # Update
@@ -245,46 +260,58 @@ class WorkOrderModel:
         conn = Database.connect()
         cursor = conn.cursor()
 
-        cursor.execute("""
-            UPDATE work_orders
-            SET
-                work_order_number = ?,
-                asset_id = ?,
-                title = ?,
-                description = ?,
-                priority = ?,
-                status = ?,
-                technician_id = ?,
-                requested_by = ?,
-                date_created = ?,
-                due_date = ?,
-                estimated_cost = ?,
-                actual_cost = ?,
-                labour_hours = ?,
-                notes = ?,
-                pm_id = ?
-            WHERE id = ?
-        """, (
-            data["work_order_number"],
-            data["asset_id"],
-            data["title"],
-            data["description"],
-            data["priority"],
-            data["status"],
-            data["technician_id"],
-            data["requested_by"],
-            data["date_created"],
-            data["due_date"],
-            data["estimated_cost"],
-            data["actual_cost"],
-            data["labour_hours"],
-            data["notes"],
-            data["pm_id"],
-            record_id,
-        ))
+        try:
+            cursor.execute("""
+                UPDATE work_orders
+                SET
+                    work_order_number = ?,
+                    asset_id = ?,
+                    title = ?,
+                    description = ?,
+                    priority = ?,
+                    status = ?,
+                    technician_id = ?,
+                    requested_by = ?,
+                    date_created = ?,
+                    due_date = ?,
+                    estimated_cost = ?,
+                    actual_cost = ?,
+                    labour_hours = ?,
+                    notes = ?,
+                    pm_id = ?
+                WHERE id = ?
+            """, (
+                data["work_order_number"],
+                data["asset_id"],
+                data["title"],
+                data["description"],
+                data["priority"],
+                data["status"],
+                data["technician_id"],
+                data["requested_by"],
+                data["date_created"],
+                data["due_date"],
+                data["estimated_cost"],
+                data["actual_cost"],
+                data["labour_hours"],
+                data["notes"],
+                data.get("pm_id"),
+                record_id,
+            ))
 
-        conn.commit()
-        conn.close()
+            if cursor.rowcount == 0:
+                raise ValueError(
+                    "Work Order not found."
+                )
+
+            conn.commit()
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()
 
     # ---------------------------------------------------------
     # Delete
@@ -295,13 +322,24 @@ class WorkOrderModel:
         conn = Database.connect()
         cursor = conn.cursor()
 
-        cursor.execute("""
-            DELETE FROM work_orders
-            WHERE id = ?
-        """, (record_id,))
+        try:
+            cursor.execute("""
+                DELETE FROM work_orders
+                WHERE id = ?
+            """, (record_id,))
 
-        conn.commit()
-        conn.close()
+            record_id = cursor.lastrowid
+
+            conn.commit()
+
+            return record_id
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()
 
     # ---------------------------------------------------------
     # Duplicate number check
@@ -414,11 +452,12 @@ class WorkOrderModel:
             )
             ORDER BY
                 CASE work_orders.priority
-                    WHEN 'Emergency' THEN 1
-                    WHEN 'High' THEN 2
-                    WHEN 'Medium' THEN 3
-                    WHEN 'Low' THEN 4
-                    ELSE 5
+                    WHEN 'Critical' THEN 1
+                    WHEN 'Emergency' THEN 2
+                    WHEN 'High' THEN 3
+                    WHEN 'Medium' THEN 4
+                    WHEN 'Low' THEN 5
+                    ELSE 6
                 END,
                 work_orders.due_date
             LIMIT ?
@@ -430,23 +469,21 @@ class WorkOrderModel:
         return rows
 
     @staticmethod
-    def open_pm_work_order_exists(pm_number):
+    def open_pm_work_order_exists(pm_id):
         conn = Database.connect()
         cursor = conn.cursor()
 
         cursor.execute("""
             SELECT 1
             FROM work_orders
-            WHERE requested_by = ?
+            WHERE pm_id = ?
             AND status NOT IN (
                 'Completed',
                 'Closed',
                 'Cancelled'
             )
             LIMIT 1
-        """, (
-            f"PM Schedule {pm_number}",
-        ))
+        """, (pm_id,))
 
         exists = cursor.fetchone() is not None
 
@@ -497,3 +534,145 @@ class WorkOrderModel:
         conn.close()
 
         return rows
+
+    @staticmethod
+    def complete(record_id, completed_date):
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute("""
+                UPDATE work_orders
+                SET
+                    status = 'Completed',
+                    completed_date = ?
+                WHERE id = ?
+            """, (
+                completed_date,
+                record_id,
+            ))
+
+            if cursor.rowcount == 0:
+                raise ValueError(
+                    "Work Order not found."
+                )
+
+            conn.commit()
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()
+
+
+    @staticmethod
+    def close(record_id, closed_date):
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute("""
+                UPDATE work_orders
+                SET
+                    status = 'Closed',
+                    closed_date = ?
+                WHERE id = ?
+            """, (
+                closed_date,
+                record_id,
+            ))
+
+            if cursor.rowcount == 0:
+                raise ValueError(
+                    "Work Order not found."
+                )
+
+            conn.commit()
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()
+
+    @staticmethod
+    def calculate_actual_cost(
+        work_order_id,
+        connection=None
+    ):
+
+        owns_connection = (
+            connection is None
+        )
+
+        conn = (
+            connection
+            or Database.connect()
+        )
+
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT
+                work_orders.labour_hours,
+                technicians.hourly_rate
+            FROM work_orders
+
+            LEFT JOIN technicians
+                ON work_orders.technician_id
+                = technicians.id
+
+            WHERE work_orders.id = ?
+        """, (
+            work_order_id,
+        ))
+
+        work_order = cursor.fetchone()
+
+        if work_order is None:
+            if owns_connection:
+                conn.close()
+
+                return 0.00
+
+            labour_cost = (
+                float(
+                    work_order["labour_hours"] or 0
+                )
+                *
+                float(
+                    work_order["hourly_rate"] or 0
+                )
+            )
+
+            cursor.execute("""
+                SELECT COALESCE(
+                    SUM(total_cost),
+                    0
+                ) AS material_cost
+                FROM work_order_parts
+                WHERE work_order_id = ?
+            """, (
+                work_order_id,
+            ))
+
+            material_row = cursor.fetchone()
+
+            material_cost = float(
+                material_row["material_cost"] or 0
+            )
+
+            total = (
+                labour_cost
+                + material_cost
+            )
+
+            if owns_connection:
+                conn.close()
+
+            return total

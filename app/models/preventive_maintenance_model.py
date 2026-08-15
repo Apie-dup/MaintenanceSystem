@@ -134,6 +134,26 @@ class PreventiveMaintenanceModel:
                 preventive_maintenance.frequency_value,
                 preventive_maintenance.last_service_date,
                 preventive_maintenance.next_due_date,
+
+                CASE
+                    WHEN preventive_maintenance.active = 0
+                        THEN 'Inactive'
+                
+                    WHEN preventive_maintenance.next_due_date < DATE('now')
+                        THEN 'Overdue'
+                
+                    WHEN preventive_maintenance.next_due_date = DATE('now')
+                        THEN 'Due Today'
+                
+                    WHEN preventive_maintenance.next_due_date <= DATE(
+                        'now',
+                        '+7 days'
+                    )
+                    THEN 'Due Soon'
+                
+                    ELSE 'Scheduled'
+                    END AS due_status,
+                
                 preventive_maintenance.estimated_hours,
                 preventive_maintenance.estimated_cost,
                 preventive_maintenance.priority,
@@ -159,24 +179,6 @@ class PreventiveMaintenanceModel:
                 OR preventive_maintenance.priority LIKE ?
             ORDER BY
                 preventive_maintenance.next_due_date,
-                CASE
-                WHEN preventive_maintenance.active = 0
-                    THEN 'Inactive'
-
-                WHEN preventive_maintenance.next_due_date < DATE('now')
-                THEN 'Overdue'
-
-                WHEN preventive_maintenance.next_due_date = DATE('now')
-                THEN 'Due Today'
-
-                WHEN preventive_maintenance.next_due_date <= DATE(
-                    'now',
-                    '+7 days'
-    )
-                    THEN 'Due Soon'
-
-                    ELSE 'Scheduled'
-                END AS due_status,
                 preventive_maintenance.pm_number
         """, (
             search,
@@ -202,7 +204,8 @@ class PreventiveMaintenanceModel:
         conn = Database.connect()
         cursor = conn.cursor()
 
-        cursor.execute("""
+        try:
+            cursor.execute("""
             INSERT INTO preventive_maintenance
             (
                 pm_number,
@@ -236,13 +239,18 @@ class PreventiveMaintenanceModel:
             data["notes"],
         ))
 
-        conn.commit()
+            record_id = cursor.lastrowid
 
-        record_id = cursor.lastrowid
+            conn.commit()
 
-        conn.close()
+            return record_id
 
-        return record_id
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()
 
     # ---------------------------------------------------------
     # Update PM plan
@@ -253,7 +261,8 @@ class PreventiveMaintenanceModel:
         conn = Database.connect()
         cursor = conn.cursor()
 
-        cursor.execute("""
+        try:
+            cursor.execute("""
             UPDATE preventive_maintenance
             SET
                 pm_number = ?,
@@ -287,8 +296,18 @@ class PreventiveMaintenanceModel:
             record_id,
         ))
 
-        conn.commit()
-        conn.close()
+            record_id = cursor.lastrowid
+
+            conn.commit()
+
+            return record_id
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()
 
     # ---------------------------------------------------------
     # Delete PM plan
@@ -299,13 +318,24 @@ class PreventiveMaintenanceModel:
         conn = Database.connect()
         cursor = conn.cursor()
 
-        cursor.execute("""
-            DELETE FROM preventive_maintenance
-            WHERE id = ?
-        """, (record_id,))
+        try:
+            cursor.execute("""
+                DELETE FROM preventive_maintenance
+                WHERE id = ?
+            """, (record_id,))
 
-        conn.commit()
-        conn.close()
+            record_id = cursor.lastrowid
+
+            conn.commit()
+
+            return record_id
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()
 
     # ---------------------------------------------------------
     # Check duplicate PM number

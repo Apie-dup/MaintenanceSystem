@@ -1,38 +1,94 @@
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication, QGraphicsBlurEffect
 
 
 class AppTheme:
     """
-    Clean Fluent-inspired theme for PySide6.
+    Enhanced Fluent-inspired theme for PySide6.
+    Includes:
+    - Light mode
+    - Dark mode
+    - High-contrast accessibility mode
+    - Dynamic accent color
+    - Acrylic blur support
     """
 
     MODE_LIGHT = "light"
     MODE_DARK = "dark"
+    MODE_HIGH_CONTRAST = "high_contrast"
 
     current_mode = MODE_LIGHT
 
     FONT_FAMILY = "Segoe UI"
     FONT_SIZE = 13
 
+    # Accent color can be changed dynamically
+    ACCENT_COLOR = "#0f6cbd"
+    ACCENT_COLOR_HOVER = "#115ea3"
+
+    # Light theme colors
     LIGHT_BG = "#f7f7f7"
     LIGHT_SURFACE = "#ffffff"
     LIGHT_SURFACE_ALT = "#f3f3f3"
     LIGHT_TEXT = "#1f1f1f"
     LIGHT_SUBTEXT = "#616161"
     LIGHT_BORDER = "#e1e1e1"
-    LIGHT_ACCENT = "#0f6cbd"
-    LIGHT_ACCENT_HOVER = "#115ea3"
     LIGHT_SELECTION = "#cfe8ff"
 
+    # Dark theme colors
     DARK_BG = "#202020"
     DARK_SURFACE = "#2b2b2b"
     DARK_SURFACE_ALT = "#323232"
     DARK_TEXT = "#ffffff"
     DARK_SUBTEXT = "#c8c8c8"
     DARK_BORDER = "#444444"
-    DARK_ACCENT = "#60a5fa"
-    DARK_ACCENT_HOVER = "#79b8ff"
     DARK_SELECTION = "#264f78"
+
+    # High contrast theme
+    HC_BG = "#000000"
+    HC_SURFACE = "#000000"
+    HC_TEXT = "#ffffff"
+    HC_BORDER = "#ffffff"
+    HC_SELECTION = "#ffff00"
+
+    # ---------------------------------------------------------
+    # Acrylic blur helper
+    # ---------------------------------------------------------
+
+    @staticmethod
+    def apply_acrylic(widget, radius=20):
+        effect = QGraphicsBlurEffect()
+        effect.setBlurRadius(radius)
+        widget.setGraphicsEffect(effect)
+
+    # ---------------------------------------------------------
+    # Apply theme
+    # ---------------------------------------------------------
+
+    @classmethod
+    def apply(cls, app: QApplication, mode=None):
+        if mode is not None:
+            cls.current_mode = mode
+
+        if cls.current_mode == cls.MODE_DARK:
+            app.setStyleSheet(cls.dark_qss())
+
+        elif cls.current_mode == cls.MODE_HIGH_CONTRAST:
+            app.setStyleSheet(cls.high_contrast_qss())
+
+        else:
+            app.setStyleSheet(cls.light_qss())
+
+    @classmethod
+    def toggle_mode(cls, app: QApplication):
+        if cls.current_mode == cls.MODE_LIGHT:
+            cls.current_mode = cls.MODE_DARK
+        elif cls.current_mode == cls.MODE_DARK:
+            cls.current_mode = cls.MODE_HIGH_CONTRAST
+        else:
+            cls.current_mode = cls.MODE_LIGHT
+
+        cls.apply(app)
+
 
     @classmethod
     def light_qss(cls):
@@ -115,7 +171,7 @@ class AppTheme:
         #navigationFrame QPushButton:checked,
         #frameNavigation QPushButton:checked {{
             background-color: #333333;
-            border-left: 3px solid {cls.LIGHT_ACCENT};
+            border-left: 3px solid {cls.ACCENT_COLOR};
             font-weight: 600;
         }}
 
@@ -128,8 +184,8 @@ class AppTheme:
             color: {cls.LIGHT_TEXT};
             border: 1px solid {cls.LIGHT_BORDER};
             border-radius: 4px;
-            padding: 6px 14px;
-            min-height: 28px;
+            padding: 8px 16px;
+            min-height: 30px;
         }}
 
         QPushButton:hover {{
@@ -148,13 +204,13 @@ class AppTheme:
         }}
 
         QPushButton[accent="true"] {{
-            background-color: {cls.LIGHT_ACCENT};
+            background-color: {cls.ACCENT_COLOR};
             color: white;
             border: none;
         }}
 
         QPushButton[accent="true"]:hover {{
-            background-color: {cls.LIGHT_ACCENT_HOVER};
+            background-color: {cls.ACCENT_COLOR_HOVER};
         }}
 
         /* --------------------------------
@@ -172,38 +228,8 @@ class AppTheme:
             color: {cls.LIGHT_TEXT};
             border: 1px solid #cfcfcf;
             border-radius: 4px;
-            padding: 5px 8px;
+            padding: 6px 10px;
             selection-background-color: {cls.LIGHT_SELECTION};
-        }}
-
-        QComboBox QAbstractItemView {{
-            background-color: {cls.LIGHT_SURFACE};
-            color: {cls.LIGHT_TEXT};
-            border: 1px solid {cls.LIGHT_BORDER};
-            border-radius: 4px;
-
-            selection-background-color: {cls.LIGHT_SELECTION};
-            selection-color: {cls.LIGHT_TEXT};
-
-            outline: none;
-            padding: 4px;
-        }}
-
-        QComboBox QAbstractItemView::item {{
-            min-height: 28px;
-            padding: 4px 8px;
-            color: {cls.LIGHT_TEXT};
-            background-color: {cls.LIGHT_SURFACE};
-        }}
-
-        QComboBox QAbstractItemView::item:hover {{
-            background-color: #e8f2fc;
-            color: {cls.LIGHT_TEXT};
-        }}
-
-        QComboBox QAbstractItemView::item:selected {{
-            background-color: {cls.LIGHT_SELECTION};
-            color: {cls.LIGHT_TEXT};
         }}
 
         QLineEdit:focus,
@@ -213,7 +239,7 @@ class AppTheme:
         QDateEdit:focus,
         QTextEdit:focus,
         QPlainTextEdit:focus {{
-            border: 1px solid {cls.LIGHT_ACCENT};
+            border: 1px solid {cls.ACCENT_COLOR};
         }}
 
         QLineEdit:read-only {{
@@ -221,10 +247,28 @@ class AppTheme:
             color: #5f5f5f;
         }}
 
-        QComboBox::drop-down,
-        QDateEdit::drop-down {{
-            border: none;
-            width: 24px;
+        QComboBox QAbstractItemView {{
+            background-color: {cls.LIGHT_SURFACE};
+            color: {cls.LIGHT_TEXT};
+            border: 1px solid {cls.LIGHT_BORDER};
+            border-radius: 4px;
+            selection-background-color: {cls.LIGHT_SELECTION};
+            selection-color: {cls.LIGHT_TEXT};
+            outline: none;
+            padding: 4px;
+        }}
+
+        QComboBox QAbstractItemView::item {{
+            min-height: 28px;
+            padding: 4px 8px;
+        }}
+
+        QComboBox QAbstractItemView::item:hover {{
+            background-color: #e8f2fc;
+        }}
+
+        QComboBox QAbstractItemView::item:selected {{
+            background-color: {cls.LIGHT_SELECTION};
         }}
 
         /* --------------------------------
@@ -243,31 +287,25 @@ class AppTheme:
         QGroupBox::title {{
             subcontrol-origin: margin;
             subcontrol-position: top left;
-            padding: 0 6px 0 0;
+            padding: 0 6px;
             color: {cls.LIGHT_TEXT};
             background-color: {cls.LIGHT_BG};
         }}
 
         /* --------------------------------
-           Cards
+           Cards (fixed)
         -------------------------------- */
 
         QFrame[card="true"],
-        .dashboardCard {{
-            QFrame#cardAssets,
-            QFrame#cardOpenWOs,
-            QFrame#cardPMDueToday,
-            QFrame#cardPMOverdue,
-            QFrame#cardNext7Days,
-            QFrame#cardLowStock,
-            QFrame#cardTechnicians,
-            QFrame#cardInventoryValue {{
-            background-color: {cls.LIGHT_SURFACE};
-            border: 1px solid {cls.LIGHT_BORDER};
-            border-radius: 6px;
-        }}
-
-        QFrame[section="true"] {{
+        .dashboardCard,
+        QFrame#cardAssets,
+        QFrame#cardOpenWOs,
+        QFrame#cardPMDueToday,
+        QFrame#cardPMOverdue,
+        QFrame#cardNext7Days,
+        QFrame#cardLowStock,
+        QFrame#cardTechnicians,
+        QFrame#cardInventoryValue {{
             background-color: {cls.LIGHT_SURFACE};
             border: 1px solid {cls.LIGHT_BORDER};
             border-radius: 6px;
@@ -286,7 +324,6 @@ class AppTheme:
             border-radius: 4px;
             gridline-color: #ededed;
             selection-background-color: {cls.LIGHT_SELECTION};
-            selection-color: {cls.LIGHT_TEXT};
         }}
 
         QHeaderView::section {{
@@ -294,7 +331,7 @@ class AppTheme:
             color: {cls.LIGHT_TEXT};
             border: none;
             border-bottom: 1px solid {cls.LIGHT_BORDER};
-            padding: 7px 8px;
+            padding: 8px 10px;
             font-weight: 600;
         }}
 
@@ -311,7 +348,6 @@ class AppTheme:
         QScrollBar:vertical {{
             background: transparent;
             width: 12px;
-            margin: 0;
         }}
 
         QScrollBar::handle:vertical {{
@@ -398,6 +434,10 @@ class AppTheme:
             font-weight: 600;
         }}
 
+        /* --------------------------------
+           Sidebar
+        -------------------------------- */
+
         #sidebar,
         #navigationFrame,
         #frameNavigation {{
@@ -426,17 +466,21 @@ class AppTheme:
         #navigationFrame QPushButton:checked,
         #frameNavigation QPushButton:checked {{
             background-color: #313131;
-            border-left: 3px solid {cls.DARK_ACCENT};
+            border-left: 3px solid {cls.ACCENT_COLOR};
             font-weight: 600;
         }}
+
+        /* --------------------------------
+           Buttons
+        -------------------------------- */
 
         QPushButton {{
             background-color: {cls.DARK_SURFACE_ALT};
             color: {cls.DARK_TEXT};
             border: 1px solid {cls.DARK_BORDER};
             border-radius: 4px;
-            padding: 6px 14px;
-            min-height: 28px;
+            padding: 8px 16px;
+            min-height: 30px;
         }}
 
         QPushButton:hover {{
@@ -444,10 +488,14 @@ class AppTheme:
         }}
 
         QPushButton[accent="true"] {{
-            background-color: {cls.DARK_ACCENT};
+            background-color: {cls.ACCENT_COLOR};
             color: #101010;
             border: none;
         }}
+
+        /* --------------------------------
+           Inputs
+        -------------------------------- */
 
         QLineEdit,
         QComboBox,
@@ -460,37 +508,8 @@ class AppTheme:
             color: {cls.DARK_TEXT};
             border: 1px solid {cls.DARK_BORDER};
             border-radius: 4px;
-            padding: 5px 8px;
+            padding: 6px 10px;
             selection-background-color: {cls.DARK_SELECTION};
-        }}
-
-        QComboBox QAbstractItemView {{
-            background-color: {cls.DARK_SURFACE};
-            color: {cls.DARK_TEXT};
-            border: 1px solid {cls.DARK_BORDER};
-
-            selection-background-color: {cls.DARK_SELECTION};
-            selection-color: {cls.DARK_TEXT};
-
-            outline: none;
-            padding: 4px;
-        }}
-
-        QComboBox QAbstractItemView::item {{
-            min-height: 28px;
-            padding: 4px 8px;
-            background-color: {cls.DARK_SURFACE};
-            color: {cls.DARK_TEXT};
-        }}
-
-        QComboBox QAbstractItemView::item:hover {{
-            background-color: #3a3a3a;
-            color: {cls.DARK_TEXT};
-        }}
-
-        QComboBox QAbstractItemView::item:selected {{
-            background-color: {cls.DARK_SELECTION};
-            color: {cls.DARK_TEXT};
         }}
 
         QLineEdit:focus,
@@ -499,8 +518,12 @@ class AppTheme:
         QDoubleSpinBox:focus,
         QDateEdit:focus,
         QTextEdit:focus {{
-            border: 1px solid {cls.DARK_ACCENT};
+            border: 1px solid {cls.ACCENT_COLOR};
         }}
+
+        /* --------------------------------
+           Group boxes
+        -------------------------------- */
 
         QGroupBox {{
             background: transparent;
@@ -514,24 +537,32 @@ class AppTheme:
         QGroupBox::title {{
             subcontrol-origin: margin;
             subcontrol-position: top left;
-            padding: 0 6px 0 0;
+            padding: 0 6px;
             background-color: {cls.DARK_BG};
         }}
 
+        /* --------------------------------
+           Cards (fixed)
+        -------------------------------- */
+
         QFrame[card="true"],
         .dashboardCard,
-            QFrame#cardAssets,
-            QFrame#cardOpenWOs,
-            QFrame#cardPMDueToday,
-            QFrame#cardPMOverdue,
-            QFrame#cardNext7Days,
-            QFrame#cardLowStock,
-            QFrame#cardTechnicians,
-            QFrame#cardInventoryValue {{
+        QFrame#cardAssets,
+        QFrame#cardOpenWOs,
+        QFrame#cardPMDueToday,
+        QFrame#cardPMOverdue,
+        QFrame#cardNext7Days,
+        QFrame#cardLowStock,
+        QFrame#cardTechnicians,
+        QFrame#cardInventoryValue {{
             background-color: {cls.DARK_SURFACE};
             border: 1px solid {cls.DARK_BORDER};
             border-radius: 6px;
         }}
+
+        /* --------------------------------
+           Tables
+        -------------------------------- */
 
         QTableWidget,
         QTableView {{
@@ -549,27 +580,8 @@ class AppTheme:
             color: {cls.DARK_TEXT};
             border: none;
             border-bottom: 1px solid {cls.DARK_BORDER};
-            padding: 7px 8px;
+            padding: 8px 10px;
             font-weight: 600;
         }}
         """
 
-    @classmethod
-    def apply(cls, app: QApplication, mode=None):
-        if mode is not None:
-            cls.current_mode = mode
-
-        if cls.current_mode == cls.MODE_DARK:
-            app.setStyleSheet(cls.dark_qss())
-        else:
-            app.setStyleSheet(cls.light_qss())
-
-    @classmethod
-    def toggle_mode(cls, app: QApplication):
-        cls.current_mode = (
-            cls.MODE_DARK
-            if cls.current_mode == cls.MODE_LIGHT
-            else cls.MODE_LIGHT
-        )
-
-        cls.apply(app)

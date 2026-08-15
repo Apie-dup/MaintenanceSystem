@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>PreventiveMaintenanceDialog</class>
- <widget class="QDialog" name="PreventiveMaintenanceDialog">
+ <class>PreventiveMaintenaceDialog</class>
+ <widget class="QDialog" name="PreventiveMaintenaceDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Add Pm</string>
+   <string>PM Schedule</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -250,7 +250,7 @@
           <item>
            <widget class="QLabel" name="lblHistoryCount">
             <property name="text">
-             <string>History Count</string>
+             <string>0 Work Orders</string>
             </property>
            </widget>
           </item>
@@ -278,7 +278,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>PreventiveMaintenanceDialog</receiver>
+   <receiver>PreventiveMaintenaceDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -294,7 +294,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>PreventiveMaintenanceDialog</receiver>
+   <receiver>PreventiveMaintenaceDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

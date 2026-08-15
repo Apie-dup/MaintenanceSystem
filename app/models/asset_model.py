@@ -25,6 +25,7 @@ class AssetModel:
                 model,
                 serial_number,
                 purchase_date,
+                purchase_cost,
                 warranty_expiry,
                 status,
                 notes
@@ -58,6 +59,7 @@ class AssetModel:
                 model,
                 serial_number,
                 purchase_date,
+                purchase_cost,
                 warranty_expiry,
                 status,
                 notes   
@@ -93,6 +95,7 @@ class AssetModel:
                 model,
                 serial_number,
                 purchase_date,
+                purchase_cost,
                 warranty_expiry,
                 status,
                 notes
@@ -148,10 +151,11 @@ class AssetModel:
                     model,
                     serial_number,
                     purchase_date,
+                    purchase_cost,
                     warranty_expiry,
                     status,
                     notes
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 data["asset_number"],
                 data["asset_name"],
@@ -162,6 +166,7 @@ class AssetModel:
                 data["model"],
                 data["serial_number"],
                 data["purchase_date"],
+                data["purchase_cost"],  
                 data["warranty_expiry"],
                 data["status"],
                 data["notes"]
@@ -200,6 +205,7 @@ class AssetModel:
                 model = ?,
                 serial_number = ?,
                 purchase_date = ?,
+                purchase_cost = ?,
                 warranty_expiry = ?,
                 status = ?,
                 notes = ?   
@@ -214,6 +220,7 @@ class AssetModel:
             data["model"],
             data["serial_number"],
             data["purchase_date"],
+            data["purchase_cost"],
             data["warranty_expiry"],
             data["status"],
             data["notes"],  
@@ -271,8 +278,10 @@ class AssetModel:
                 model,
                 serial_number,
                 purchase_date,
+                purchase_cost,
                 warranty_expiry,
-                status
+                status,
+                notes
             FROM assets
             WHERE asset_number = ?
         """, (asset_number,))

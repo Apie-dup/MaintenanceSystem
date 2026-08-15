@@ -1,9 +1,8 @@
 from app.base.base_dialog import BaseDialog
+from app.core.lookup_manager import LookupManager
 from app.services.supplier_service import SupplierService
 from app.services.validation_service import ValidationService
-from app.helpers.lookup_helper import LookupHelper
 from app.ui.generated.ui_supplier_dialog import Ui_SupplierDialog
-from app.helpers.form_helper import FormHelper
 
 
 class SupplierDialog(BaseDialog):
@@ -24,18 +23,21 @@ class SupplierDialog(BaseDialog):
     # ---------------------------------------------------------
 
     def setup_dialog(self):
-        self.setup_combos()
+        self.load_lookup_values()
         self.connect_signals()
 
-        self.ui.txtSupplierCode.setReadOnly(True)
-        
-    def setup_combos(self):
-        LookupHelper.fill_combo(
+        self.set_read_only(
+            self.ui.txtSupplierCode
+        )
+
+    def load_lookup_values(self):
+        LookupManager.load(
             self.ui.cmbStatus,
+            "Statuses",
             [
                 "Active",
                 "Inactive",
-            ]
+            ],
         )
 
     def connect_signals(self):
@@ -48,7 +50,7 @@ class SupplierDialog(BaseDialog):
         )
 
     # ---------------------------------------------------------
-    # Clear fields
+    # Clear
     # ---------------------------------------------------------
 
     def clear_fields(self):
@@ -63,10 +65,16 @@ class SupplierDialog(BaseDialog):
         self.ui.txtAddress.clear()
         self.ui.txtNotes.clear()
 
-        self.ui.cmbStatus.setCurrentText("Active")
+        self.ui.cmbStatus.setCurrentText(
+            "Active"
+        )
+
+        self.set_focus(
+            self.ui.txtSupplierName
+        )
 
     # ---------------------------------------------------------
-    # Form data
+    # Data mapping
     # ---------------------------------------------------------
 
     def get_form_data(self):
@@ -90,7 +98,7 @@ class SupplierDialog(BaseDialog):
                 self.ui.txtAddress.toPlainText().strip(),
 
             "status":
-                self.ui.cmbStatus.currentText(),
+                self.ui.cmbStatus.currentText().strip(),
 
             "notes":
                 self.ui.txtNotes.toPlainText().strip(),
@@ -98,11 +106,11 @@ class SupplierDialog(BaseDialog):
 
     def set_form_data(self, supplier):
         self.ui.txtSupplierCode.setText(
-            supplier["supplier_code"]
+            supplier["supplier_code"] or ""
         )
 
         self.ui.txtSupplierName.setText(
-            supplier["supplier_name"]
+            supplier["supplier_name"] or ""
         )
 
         self.ui.txtContactPerson.setText(
@@ -141,7 +149,7 @@ class SupplierDialog(BaseDialog):
         if supplier is None:
             self.error(
                 "Supplier",
-                "Supplier not found."
+                "Supplier not found.",
             )
             self.reject()
             return
@@ -159,25 +167,34 @@ class SupplierDialog(BaseDialog):
             self,
             ValidationService.required(
                 data["supplier_name"],
-                "Supplier Name"
-            )
+                "Supplier Name",
+            ),
         ):
+            self.set_focus(
+                self.ui.txtSupplierName
+            )
             return False
 
         if not ValidationService.check(
             self,
             ValidationService.email(
                 data["email"]
-            )
+            ),
         ):
+            self.set_focus(
+                self.ui.txtEmail
+            )
             return False
 
         if not ValidationService.check(
             self,
             ValidationService.phone(
                 data["phone"]
-            )
+            ),
         ):
+            self.set_focus(
+                self.ui.txtPhone
+            )
             return False
 
         return True
@@ -190,7 +207,9 @@ class SupplierDialog(BaseDialog):
         data = self.get_form_data()
 
         if self.is_add:
-            SupplierService.create(data)
+            self.record_id = SupplierService.create(
+                data
+            )
         else:
             SupplierService.update(
                 self.record_id,

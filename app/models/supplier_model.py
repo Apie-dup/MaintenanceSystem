@@ -1,3 +1,5 @@
+from genericpath import exists
+
 from app.database.connection import Database
 from app.helpers.code_generator import CodeGenerator
 
@@ -107,6 +109,7 @@ class SupplierModel:
                 phone,
                 email,
                 address,
+                status,
                 notes,
                 created_at
             FROM suppliers
@@ -116,9 +119,10 @@ class SupplierModel:
                 OR contact_person LIKE ?
                 OR phone LIKE ?
                 OR email LIKE ?
+                OR status LIKE ?
             ORDER BY supplier_code
             """,
-            (search, search, search, search, search),
+            (search, search, search, search, search, search),
         )
 
         rows = cursor.fetchall()
@@ -248,3 +252,38 @@ class SupplierModel:
         conn.close()
 
         return rows
+
+    @staticmethod
+    def code_exists(
+        supplier_code,
+        exclude_id=None
+    ):
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        if exclude_id is None:
+            cursor.execute("""
+                SELECT 1
+                FROM suppliers
+                WHERE supplier_code = ?
+                LIMIT 1
+            """, (
+                supplier_code,
+            ))
+        else:
+            cursor.execute("""
+                SELECT 1
+                FROM suppliers
+                WHERE supplier_code = ?
+                AND id <> ?
+                LIMIT 1
+            """, (
+                supplier_code,
+                exclude_id,
+            ))
+
+        exists = cursor.fetchone() is not None
+
+        conn.close()
+
+        return exists

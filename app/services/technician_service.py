@@ -4,31 +4,31 @@ from app.models.technician_model import TechnicianModel
 class TechnicianService:
 
     # ---------------------------------------------------------
-    # Get all technicians
+    # Read
     # ---------------------------------------------------------
 
     @staticmethod
     def get_all():
         return TechnicianModel.get_all()
 
-    # ---------------------------------------------------------
-    # Get technician by ID
-    # ---------------------------------------------------------
-
     @staticmethod
     def get_by_id(record_id):
-        return TechnicianModel.get_by_id(record_id)
-
-    # ---------------------------------------------------------
-    # Search
-    # ---------------------------------------------------------
+        return TechnicianModel.get_by_id(
+            record_id
+        )
 
     @staticmethod
     def search(search_text):
-        return TechnicianModel.search(search_text)
+        return TechnicianModel.search(
+            search_text
+        )
+
+    @staticmethod
+    def get_active_technicians():
+        return TechnicianModel.get_active_technicians()
 
     # ---------------------------------------------------------
-    # Next employee number
+    # Helpers
     # ---------------------------------------------------------
 
     @staticmethod
@@ -36,11 +36,16 @@ class TechnicianService:
         return TechnicianModel.get_next_employee_number()
 
     # ---------------------------------------------------------
-    # Create
+    # Validation
     # ---------------------------------------------------------
 
     @staticmethod
-    def create(data):
+    def validate(data):
+
+        if not data["employee_number"].strip():
+            raise ValueError(
+                "Employee Number is required."
+            )
 
         if not data["first_name"].strip():
             raise ValueError(
@@ -52,10 +57,19 @@ class TechnicianService:
                 "Last Name is required."
             )
 
-        if not data["employee_number"].strip():
+        if data["hourly_rate"] < 0:
             raise ValueError(
-                "Employee Number is required."
+                "Hourly Rate cannot be negative."
             )
+
+    # ---------------------------------------------------------
+    # Create
+    # ---------------------------------------------------------
+
+    @staticmethod
+    def create(data):
+
+        TechnicianService.validate(data)
 
         if TechnicianModel.employee_number_exists(
             data["employee_number"]
@@ -73,24 +87,11 @@ class TechnicianService:
     @staticmethod
     def update(record_id, data):
 
-        if not data["first_name"].strip():
-            raise ValueError(
-                "First Name is required."
-            )
-
-        if not data["last_name"].strip():
-            raise ValueError(
-                "Last Name is required."
-            )
-
-        if not data["employee_number"].strip():
-            raise ValueError(
-                "Employee Number is required."
-            )
+        TechnicianService.validate(data)
 
         if TechnicianModel.employee_number_exists(
             data["employee_number"],
-            exclude_id=record_id
+            exclude_id=record_id,
         ):
             raise ValueError(
                 "Employee Number already exists."
@@ -107,8 +108,14 @@ class TechnicianService:
 
     @staticmethod
     def delete(record_id):
-        TechnicianModel.delete(record_id)
 
-    @staticmethod
-    def get_active_technicians():
-        return TechnicianModel.get_active_technicians()
+        if TechnicianModel.is_used_in_work_orders(
+            record_id
+        ):
+            raise ValueError(
+                "This technician is linked to one or more "
+                "work orders and cannot be deleted. "
+                "Set the technician to Inactive instead."
+            )
+
+        TechnicianModel.delete(record_id)

@@ -1,3 +1,5 @@
+from genericpath import exists
+
 from app.database.connection import Database
 from app.helpers.code_generator import CodeGenerator
 
@@ -126,39 +128,45 @@ class TechnicianModel:
         conn = Database.connect()
         cursor = conn.cursor()
 
-        cursor.execute("""
-            INSERT INTO technicians
-            (
-                employee_number,
-                first_name,
-                last_name,
-                phone,
-                email,
-                trade,
-                department,
-                hourly_rate,
-                status
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            data["employee_number"],
-            data["first_name"],
-            data["last_name"],
-            data["phone"],
-            data["email"],
-            data["trade"],
-            data["department"],
-            data["hourly_rate"],
-            data["status"],
-        ))
+        try:
+            cursor.execute("""
+                INSERT INTO technicians
+                (
+                    employee_number,
+                    first_name,
+                    last_name,
+                    phone,
+                    email,
+                    trade,
+                    department,
+                    hourly_rate,
+                    status
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                data["employee_number"],
+                data["first_name"],
+                data["last_name"],
+                data["phone"],
+                data["email"],
+                data["trade"],
+                data["department"],
+                data["hourly_rate"],
+                data["status"],
+            ))
 
-        conn.commit()
+            record_id = cursor.lastrowid
 
-        record_id = cursor.lastrowid
+            conn.commit()
 
-        conn.close()
+            return record_id
 
-        return record_id
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()
 
     # ---------------------------------------------------------
     # Update
@@ -169,34 +177,43 @@ class TechnicianModel:
         conn = Database.connect()
         cursor = conn.cursor()
 
-        cursor.execute("""
-            UPDATE technicians
-            SET
-                employee_number = ?,
-                first_name = ?,
-                last_name = ?,
-                phone = ?,
-                email = ?,
-                trade = ?,
-                department = ?,
-                hourly_rate = ?,
-                status = ?
-            WHERE id = ?
-        """, (
-            data["employee_number"],
-            data["first_name"],
-            data["last_name"],
-            data["phone"],
-            data["email"],
-            data["trade"],
-            data["department"],
-            data["hourly_rate"],
-            data["status"],
-            record_id,
-        ))
+        try:
+            cursor.execute("""
+                UPDATE technicians
+                SET
+                    employee_number = ?,
+                    first_name = ?,
+                    last_name = ?,
+                    phone = ?,
+                    email = ?,
+                    trade = ?,
+                    department = ?,
+                    hourly_rate = ?,
+                    status = ?
+                WHERE id = ?
+            """, (
+                data["employee_number"],
+                data["first_name"],
+                data["last_name"],
+                data["phone"],
+                data["email"],
+                data["trade"],
+                data["department"],
+                data["hourly_rate"],
+                data["status"],
+                record_id,
+            ))
 
-        conn.commit()
-        conn.close()
+            record_id = cursor.lastrowid
+
+            conn.commit()
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()
 
     # ---------------------------------------------------------
     # Delete
@@ -207,13 +224,22 @@ class TechnicianModel:
         conn = Database.connect()
         cursor = conn.cursor()
 
-        cursor.execute("""
-            DELETE FROM technicians
-            WHERE id = ?
-        """, (record_id,))
+        try:
+            cursor.execute("""
+                DELETE FROM technicians
+                WHERE id = ?
+            """, (record_id,))
 
-        conn.commit()
-        conn.close()
+            record_id = cursor.lastrowid
+
+            conn.commit()
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()
 
     # ---------------------------------------------------------
     # Duplicate employee-number check
@@ -285,3 +311,21 @@ class TechnicianModel:
         conn.close()
 
         return rows
+
+    @staticmethod
+    def is_used_in_work_orders(record_id):
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT 1
+            FROM work_orders
+            WHERE technician_id = ?
+            LIMIT 1
+        """, (record_id,))
+
+        exists = cursor.fetchone() is not None
+
+        conn.close()
+
+        return exists

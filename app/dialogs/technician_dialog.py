@@ -3,7 +3,6 @@ from app.core.lookup_manager import LookupManager
 from app.services.technician_service import TechnicianService
 from app.services.validation_service import ValidationService
 from app.ui.generated.ui_add_technician import Ui_AddTechnicianDialog
-from app.helpers.form_helper import FormHelper
 
 
 class TechnicianDialog(BaseDialog):
@@ -27,8 +26,14 @@ class TechnicianDialog(BaseDialog):
         self.load_lookup_values()
         self.connect_signals()
 
-        self.ui.txtEmployeeNumber.setReadOnly(True)
-        
+        self.set_read_only(
+            self.ui.txtEmployeeNumber
+        )
+
+    # ---------------------------------------------------------
+    # Signals
+    # ---------------------------------------------------------
+
     def connect_signals(self):
         self.ui.buttonBox.accepted.connect(
             self.save_and_close
@@ -72,11 +77,21 @@ class TechnicianDialog(BaseDialog):
         self.ui.txtPhone.clear()
         self.ui.txtEmail.clear()
 
-        self.ui.cmbTrade.setCurrentIndex(0)
-        self.ui.cmbDepartment.setCurrentIndex(0)
-        self.ui.cmbStatus.setCurrentText("Active")
+        if self.ui.cmbTrade.count() > 0:
+            self.ui.cmbTrade.setCurrentIndex(0)
+
+        if self.ui.cmbDepartment.count() > 0:
+            self.ui.cmbDepartment.setCurrentIndex(0)
+
+        self.ui.cmbStatus.setCurrentText(
+            "Active"
+        )
 
         self.ui.dsbHourlyRate.setValue(0.00)
+
+        self.set_focus(
+            self.ui.txtFirstName
+        )
 
     # ---------------------------------------------------------
     # Form data
@@ -114,15 +129,15 @@ class TechnicianDialog(BaseDialog):
 
     def set_form_data(self, technician):
         self.ui.txtEmployeeNumber.setText(
-            technician["employee_number"]
+            technician["employee_number"] or ""
         )
 
         self.ui.txtFirstName.setText(
-            technician["first_name"]
+            technician["first_name"] or ""
         )
 
         self.ui.txtLastName.setText(
-            technician["last_name"]
+            technician["last_name"] or ""
         )
 
         self.ui.txtPhone.setText(
@@ -191,6 +206,9 @@ class TechnicianDialog(BaseDialog):
                 "First Name"
             )
         ):
+            self.set_focus(
+                self.ui.txtFirstName
+            )
             return False
 
         if not ValidationService.check(
@@ -200,6 +218,9 @@ class TechnicianDialog(BaseDialog):
                 "Last Name"
             )
         ):
+            self.set_focus(
+                self.ui.txtLastName
+            )
             return False
 
         if not ValidationService.check(
@@ -208,6 +229,9 @@ class TechnicianDialog(BaseDialog):
                 data["email"]
             )
         ):
+            self.set_focus(
+                self.ui.txtEmail
+            )
             return False
 
         if not ValidationService.check(
@@ -216,6 +240,9 @@ class TechnicianDialog(BaseDialog):
                 data["phone"]
             )
         ):
+            self.set_focus(
+                self.ui.txtPhone
+            )
             return False
 
         if not ValidationService.check(
@@ -225,6 +252,7 @@ class TechnicianDialog(BaseDialog):
                 "Hourly Rate"
             )
         ):
+            self.ui.dsbHourlyRate.setFocus()
             return False
 
         return True
@@ -237,7 +265,9 @@ class TechnicianDialog(BaseDialog):
         data = self.get_form_data()
 
         if self.is_add:
-            TechnicianService.create(data)
+            self.record_id = TechnicianService.create(
+                data
+            )
         else:
             TechnicianService.update(
                 self.record_id,

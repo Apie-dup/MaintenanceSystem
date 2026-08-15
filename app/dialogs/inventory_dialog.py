@@ -4,7 +4,7 @@ from app.helpers.lookup_helper import LookupHelper
 from app.services.inventory_service import InventoryService
 from app.services.supplier_service import SupplierService
 from app.services.validation_service import ValidationService
-from app.ui.generated.ui_add_inventory import Ui_AddInventoryDialog
+from app.ui.generated.ui_add_inventory import Ui_AddInventoryItemDialog
 from app.helpers.form_helper import FormHelper
 
 
@@ -15,8 +15,19 @@ class InventoryDialog(BaseDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.ui = Ui_AddInventoryDialog()
+        self.ui = Ui_AddInventoryItemDialog()
         self.ui.setupUi(self)
+
+        self.resize(700, 700)
+
+        self.setMinimumSize(
+            700,
+            700,    
+        )
+
+        self.setMaximumWidth(
+            900
+        )
 
         self.apply_form_standards()
 
@@ -121,7 +132,7 @@ class InventoryDialog(BaseDialog):
         self.ui.txtDescription.clear()
         self.ui.cmbLocation.setCurrentIndex(0)
         self.ui.txtBarcode.clear()
-        self.ui.txtNotes.clear()
+        self.ui.teNotes.clear()
 
         self.ui.cmbCategory.setCurrentIndex(0)
         self.ui.cmbSupplier.setCurrentIndex(0)
@@ -179,7 +190,7 @@ class InventoryDialog(BaseDialog):
                 self.ui.cmbStatus.currentText(),
 
             "notes":
-                self.ui.txtNotes.toPlainText().strip(),
+                self.ui.teNotes.toPlainText().strip(),
         }
 
     def set_form_data(self, inventory):
@@ -242,7 +253,7 @@ class InventoryDialog(BaseDialog):
             inventory["status"] or "Active"
         )
 
-        self.ui.txtNotes.setPlainText(
+        self.ui.teNotes.setPlainText(
             inventory["notes"] or ""
         )
 

@@ -7,9 +7,7 @@ from app.ui.generated.ui_work_orders_page import Ui_WorkOrdersPage
 class WorkOrdersPage(CrudPage):
 
     PAGE_TITLE = "Work Orders"
-
     ENTITY_NAME = "Work Order"
-
     RECORD_NAME = "work orders"
 
     TABLE_COLUMNS = [
@@ -67,7 +65,7 @@ class WorkOrdersPage(CrudPage):
     # ---------------------------------------------------------
 
     def connect_signals(self):
-        self.ui.txtSearch.textChanged.connect(
+        self.search_widget.textChanged.connect(
             self.search
         )
 
@@ -87,7 +85,6 @@ class WorkOrdersPage(CrudPage):
             self.refresh
         )
 
-        self.ui.tblWorkOrders.itemDoubleClicked.connect(
+        self.table.itemDoubleClicked.connect(
             lambda _item: self.edit_record()
         )
-    

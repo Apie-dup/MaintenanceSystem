@@ -1,15 +1,16 @@
+from operator import index
+
 from app.base.crud_page import CrudPage
 from app.dialogs.technician_dialog import TechnicianDialog
 from app.services.technician_service import TechnicianService
 from app.ui.generated.ui_technicians_page import Ui_TechniciansWindow
+from app.helpers.format_helper import FormatHelper
 
 
 class TechniciansPage(CrudPage):
 
     PAGE_TITLE = "Technicians"
-
     ENTITY_NAME = "Technician"
-
     RECORD_NAME = "technicians"
 
     TABLE_COLUMNS = [
@@ -41,7 +42,6 @@ class TechniciansPage(CrudPage):
         self.ui = Ui_TechniciansWindow()
         self.ui.setupUi(self)
 
-        # Shared CRUD framework configuration
         self.service = TechnicianService
         self.dialog_class = TechnicianDialog
         self.table = self.ui.tblTechnicians
@@ -50,19 +50,11 @@ class TechniciansPage(CrudPage):
 
         self.setup_page()
 
-    # ---------------------------------------------------------
-    # Setup
-    # ---------------------------------------------------------
-
     def setup_page(self):
         self.validate_configuration()
         self.setup_table()
         self.connect_signals()
         self.load_data()
-
-    # ---------------------------------------------------------
-    # Signals
-    # ---------------------------------------------------------
 
     def connect_signals(self):
         self.ui.btnAdd.clicked.connect(
@@ -81,10 +73,53 @@ class TechniciansPage(CrudPage):
             self.refresh
         )
 
-        self.ui.txtSearch.textChanged.connect(
+        self.search_widget.textChanged.connect(
             self.search
         )
 
-        self.ui.tblTechnicians.itemDoubleClicked.connect(
+        self.table.itemDoubleClicked.connect(
             lambda _item: self.edit_record()
         )
+
+    def populate_table(self, records):
+
+        super().populate_table(records)
+
+        hourly_rate_column = next(
+            (
+                index
+                for index, (field, _heading)
+                in enumerate(self.TABLE_COLUMNS)
+                if field == "hourly_rate"
+            ),
+            None
+        )
+
+        if hourly_rate_column is None:
+            return
+
+        for row in range(
+            self.table.rowCount()
+        ):
+            item = self.table.item(
+                row,
+                hourly_rate_column
+            )
+
+            if item is None:
+                continue
+
+            try:
+                value = float(
+                    item.text() or 0
+                )
+
+                item.setText(
+                    FormatHelper.currency(
+                        value
+                    )
+                )
+                
+            except ValueError:
+                continue
+        

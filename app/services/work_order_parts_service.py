@@ -1,7 +1,11 @@
+from app.database import connection
 from app.database.connection import Database
 from app.models.inventory_model import InventoryModel
 from app.models.work_order_model import WorkOrderModel
 from app.models.work_order_parts_model import WorkOrderPartModel
+from app.services.work_order_history_service import (
+    WorkOrderHistoryService
+)
 
 
 class WorkOrderPartService:
@@ -44,7 +48,6 @@ class WorkOrderPartService:
         conn = Database.connect()
 
         try:
-
             inventory = InventoryModel.get_by_id(
                 data["inventory_id"]
             )
@@ -66,7 +69,9 @@ class WorkOrderPartService:
                     f"Only {available} available."
                 )
 
-            unit_cost = inventory["unit_cost"]
+            unit_cost = float(
+                inventory["unit_cost"] or 0
+            )
 
             total_cost = (
                 data["quantity"] * unit_cost
@@ -101,9 +106,64 @@ class WorkOrderPartService:
                 connection=conn
             )
 
-            material_cost = WorkOrderPartModel.get_total_cost(
+            cursor = conn.cursor()
+
+            cursor.execute("""
+                SELECT
+                    technician_id,
+                    labour_hours
+                FROM work_orders
+                WHERE id = ?
+            """, (
                 data["work_order_id"],
-                connection=conn
+            ))
+
+            work_order = cursor.fetchone()
+
+            labour_cost = 0.00
+
+            if (
+                work_order is not None
+                and work_order["technician_id"] is not None
+            ):
+
+                cursor.execute("""
+                    SELECT hourly_rate
+                    FROM technicians
+                    WHERE id = ?
+                """, (
+                    work_order["technician_id"],
+                ))
+
+                technician = cursor.fetchone()
+
+                if technician is not None:
+                    labour_cost = (
+                        float(
+                            work_order["labour_hours"] or 0
+                        )
+                        *
+                        float(
+                            technician["hourly_rate"] or 0
+                        )
+                    )
+
+                    actual_cost = WorkOrderModel.calculate_actual_cost(
+                        data["work_order_id"],
+                        connection=conn
+                    )
+
+                    WorkOrderModel.update_actual_cost(
+                        data["work_order_id"],
+                        actual_cost,
+                        connection=conn
+                    )
+
+            material_cost = (
+                WorkOrderPartModel.get_total_cost(
+                    data["work_order_id"],
+                    connection=conn
+                )
             )
 
             WorkOrderModel.update_actual_cost(
@@ -112,17 +172,108 @@ class WorkOrderPartService:
                 connection=conn
             )
 
+            cursor = conn.cursor()
+
+            cursor.execute("""
+                    SELECT status
+                    FROM work_orders
+                    WHERE id = ?
+                """, (
+                    data["work_order_id"],
+                ))
+
+            work_order = cursor.fetchone()
+
+            if (
+                work_order is not None
+                and work_order["status"] == "Assigned"
+            ):
+                WorkOrderModel.set_status(
+                    data["work_order_id"],
+                    "In Progress",
+                    connection=conn,
+                )
+
             conn.commit()
 
-        except Exception:
+            if (
+                work_order is not None
+                and work_order["status"] == "Assigned"
+            ):
+                WorkOrderHistoryService.add(
+                data["work_order_id"],
+                action="Updated",
+                field_name="Status",
+                old_value="Assigned",
+                new_value="In Progress",
+                notes=(
+                    "Status changed automatically "
+                    "when a part was issued."
+                ),
+            )
 
+        except Exception:
             conn.rollback()
+            raise
+
+        finally:
+            conn.close()
+
+        # History is written only after successful commit.
+        WorkOrderHistoryService.add(
+            data["work_order_id"],
+            action="Part Issued",
+            field_name="Material",
+            old_value=None,
+            new_value=(
+                f'{data["quantity"]} x '
+                f'{inventory["part_name"]}'
+            ),
+            notes=(
+                f'Part {inventory["part_number"]} issued '
+                f'at unit cost {unit_cost:.2f}.'
+            ),
+        )
+
+    @staticmethod
+    def set_status(
+        work_order_id,
+        status,
+        connection=None
+    ):
+        owns_connection = (
+            connection is None
+        )
+
+        conn = (
+            connection
+            or Database.connect()
+        )
+
+        try:
+            cursor = conn.cursor()
+
+            cursor.execute("""
+                UPDATE work_orders
+                SET status = ?
+                WHERE id = ?
+            """, (
+                status,
+                work_order_id,
+            ))
+
+            if owns_connection:
+                conn.commit()
+
+        except Exception:
+            if owns_connection:
+                conn.rollback()
 
             raise
 
         finally:
-
-            conn.close()
+            if owns_connection:
+                conn.close()
 
     @staticmethod
     def remove_part(record_id):
@@ -132,15 +283,18 @@ class WorkOrderPartService:
         try:
             cursor = conn.cursor()
 
-            # Get the issued-part record using this transaction.
             cursor.execute("""
                 SELECT
-                    id,
-                    work_order_id,
-                    inventory_id,
-                    quantity
+                    work_order_parts.id,
+                    work_order_parts.work_order_id,
+                    work_order_parts.inventory_id,
+                    work_order_parts.quantity,
+                    inventory.part_number,
+                    inventory.part_name
                 FROM work_order_parts
-                WHERE id = ?
+                LEFT JOIN inventory
+                    ON work_order_parts.inventory_id = inventory.id
+                WHERE work_order_parts.id = ?
             """, (record_id,))
 
             issued_part = cursor.fetchone()
@@ -149,25 +303,39 @@ class WorkOrderPartService:
                 raise ValueError(
                     "Issued part record not found."
                 )
+            work_order_id = (
+                issued_part["work_order_id"]
+            )
+            inventory_id = (
+                issued_part["inventory_id"]
+            )
 
-            work_order_id = issued_part["work_order_id"]
-            inventory_id = issued_part["inventory_id"]
             issued_quantity = float(
                 issued_part["quantity"] or 0
             )
 
-            # Read current inventory quantity.
+            part_number = (
+                issued_part["part_number"] or ""
+            )
+
+            part_name = (
+                issued_part["part_name"] or ""
+            )
+
             cursor.execute("""
                 SELECT quantity
                 FROM inventory
                 WHERE id = ?
-            """, (inventory_id,))
+            """, (
+                inventory_id,
+            ))
 
             inventory = cursor.fetchone()
 
             if inventory is None:
                 raise ValueError(
-                    "The related inventory item could not be found."
+                    "The related inventory item "
+                    "could not be found."
                 )
 
             current_quantity = float(
@@ -175,34 +343,31 @@ class WorkOrderPartService:
             )
 
             restored_quantity = (
-                current_quantity + issued_quantity
+                current_quantity
+                + issued_quantity
             )
 
-            # Restore stock.
             InventoryModel.update_quantity(
                 inventory_id,
                 restored_quantity,
                 connection=conn
             )
 
-            # Delete the issued-part record.
             WorkOrderPartModel.delete(
                 record_id,
                 connection=conn
             )
 
-            # Recalculate material cost after deletion.
-            material_cost = (
-                WorkOrderPartModel.get_total_cost(
+            actual_cost = (
+                WorkOrderModel.calculate_actual_cost(
                     work_order_id,
                     connection=conn
                 )
             )
 
-            # Update work-order cost.
             WorkOrderModel.update_actual_cost(
                 work_order_id,
-                material_cost,
+                actual_cost,
                 connection=conn
             )
 
@@ -214,3 +379,19 @@ class WorkOrderPartService:
 
         finally:
             conn.close()
+
+        # Only log after successful commit.
+        WorkOrderHistoryService.add(
+            work_order_id,
+            action="Part Returned",
+            field_name="Material",
+            old_value=(
+                f"{issued_quantity} x "
+                f"{part_name}"
+            ),
+            new_value=None,
+            notes=(
+                f"Part {part_number} returned "
+                "to inventory."
+            ),
+        )

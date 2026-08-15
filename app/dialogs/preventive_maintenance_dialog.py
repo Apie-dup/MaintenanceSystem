@@ -1,5 +1,3 @@
-from tkinter import dialog
-
 from PySide6.QtCore import QDate, Qt
 from PySide6.QtGui import QColor
 
@@ -15,7 +13,10 @@ from app.ui.generated.ui_add_pm_dialog import (
 )
 from app.helpers.table_helper import TableHelper
 from app.services.work_order_service import WorkOrderService
-from app.helpers.form_helper import FormHelper
+from app.dialogs.work_order_dialog import (
+            WorkOrderDialog
+)
+from app.helpers.format_helper import FormatHelper
 
 
 class PreventiveMaintenanceDialog(BaseDialog):
@@ -38,6 +39,17 @@ class PreventiveMaintenanceDialog(BaseDialog):
         self.ui = Ui_PreventiveMaintenanceDialog()
         self.ui.setupUi(self)
 
+        self.resize(700, 700)
+
+        self.setMinimumSize(
+            700,
+            700,
+        )
+
+        self.setMaximumWidth(
+            900
+        )
+
         self.apply_form_standards()
         self.setup_dialog()
 
@@ -59,7 +71,10 @@ class PreventiveMaintenanceDialog(BaseDialog):
         self.ui.tblHistory.setEnabled(False)
 
     def configure_widgets(self):
-        self.ui.txtPMNumber.setReadOnly(True)
+
+        self.set_read_only(
+            self.ui.txtPMNumber
+        )
 
         self.ui.dtLastService.setCalendarPopup(True)
         self.ui.dtNextDue.setCalendarPopup(True)
@@ -170,6 +185,17 @@ class PreventiveMaintenanceDialog(BaseDialog):
         self.ui.chkActive.setChecked(True)
 
         self.calculate_next_due()
+
+        self.set_focus(
+            self.ui.txtTask
+        )
+
+        self.ui.tabWidget.setCurrentIndex(0)
+
+        self.ui.tabWidget.setTabEnabled(
+            1,
+            False
+        )
 
     # ---------------------------------------------------------
     # Form data
@@ -313,6 +339,13 @@ class PreventiveMaintenanceDialog(BaseDialog):
 
         self.set_form_data(pm)
 
+        self.ui.tabWidget.setTabEnabled(
+            1,
+            True
+        )
+
+        self.ui.tabWidget.setCurrentIndex(0)
+
         self.ui.groupHistory.setEnabled(True)
         self.ui.tblHistory.setEnabled(True)
         self.load_history()
@@ -335,7 +368,6 @@ class PreventiveMaintenanceDialog(BaseDialog):
         self.ui.tblHistory.clearSelection()
 
     def format_history_values(self):
-        from app.helpers.format_helper import FormatHelper
         cost_column = next(
             (
                 index
@@ -446,6 +478,8 @@ class PreventiveMaintenanceDialog(BaseDialog):
                 "Validation",
                 "Please select an asset."
             )
+            self.ui.cmbAsset.setFocus()
+
             return False
 
         if not ValidationService.check(
@@ -455,6 +489,8 @@ class PreventiveMaintenanceDialog(BaseDialog):
                 "Task"
             )
         ):
+
+            self.ui.txtTask.setFocus()
             return False
 
         if not ValidationService.check(
@@ -464,6 +500,7 @@ class PreventiveMaintenanceDialog(BaseDialog):
                 "Frequency Type"
             )
         ):
+            self.ui.cmbFrequencyType.setFocus()
             return False
 
         if data["frequency_value"] <= 0:
@@ -480,6 +517,8 @@ class PreventiveMaintenanceDialog(BaseDialog):
                 "Priority"
             )
         ):
+
+            self.ui.cmbPriority.setFocus()
             return False
 
         return True
@@ -492,9 +531,9 @@ class PreventiveMaintenanceDialog(BaseDialog):
         data = self.get_form_data()
 
         if self.is_add:
-            PreventiveMaintenanceService.create(
-                data
-            )
+            self.record_id = (
+                PreventiveMaintenanceService.create(data)
+            )    
         else:
             PreventiveMaintenanceService.update(
                 self.record_id,
@@ -518,10 +557,6 @@ class PreventiveMaintenanceDialog(BaseDialog):
 
         if work_order_id is None:
             return
-
-        from app.dialogs.work_order_dialog import (
-            WorkOrderDialog
-        )
 
         dialog = WorkOrderDialog(self)
         dialog.edit_record(work_order_id)
@@ -581,12 +616,3 @@ class PreventiveMaintenanceDialog(BaseDialog):
                 if item is not None:
                     item.setBackground(background)
                     item.setToolTip(tooltip)
-
-        for column in range(
-            self.ui.tblHistory.columnCount()
-        ):
-            item = self.ui.tblHistory.item(row, column)
-
-            if item is not None:
-                item.setBackground(background)
-                item.setToolTip(tooltip)

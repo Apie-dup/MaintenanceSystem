@@ -1,3 +1,4 @@
+from app.database import connection
 from app.database.connection import Database
 from app.helpers.code_generator import CodeGenerator
 
@@ -245,8 +246,10 @@ class InventoryModel:
                 OR inventory.barcode LIKE ?
                 OR suppliers.supplier_code LIKE ?
                 OR suppliers.supplier_name LIKE ?
+                OR inventory.status LIKE ?
             ORDER BY inventory.part_number
         """, (
+            search,
             search,
             search,
             search,
@@ -283,7 +286,6 @@ class InventoryModel:
     def get_low_stock():
         conn = Database.connect()
         cursor = conn.cursor()
-
         cursor.execute("""
             SELECT
                 inventory.id,
@@ -295,10 +297,10 @@ class InventoryModel:
                 inventory.location,
                 inventory.status
             FROM inventory
-            WHERE quantity <= minimum_quantity
-            ORDER BY part_name
+            WHERE inventory.quantity <= inventory.minimum_quantity
+              AND inventory.status = 'Active'
+            ORDER BY inventory.part_name
         """)
-
         rows = cursor.fetchall()
         conn.close()
 
@@ -329,20 +331,69 @@ class InventoryModel:
         connection=None
     ):
         owns_connection = connection is None
-
         conn = connection or Database.connect()
 
+        try:
+            cursor = conn.cursor()
+
+            cursor.execute("""
+                UPDATE inventory
+                SET quantity = ?
+                WHERE id = ?
+            """, (
+                quantity,
+                inventory_id,
+            ))
+
+            if cursor.rowcount == 0:
+                raise ValueError(
+                    "Inventory item not found."
+                )
+
+            if owns_connection:
+                conn.commit()
+
+        except Exception:
+            if owns_connection:
+                conn.rollback()
+
+            raise
+
+        finally:
+            if owns_connection:
+                conn.close()
+
+    @staticmethod
+    def part_number_exists(
+        part_number,
+        exclude_id=None
+    ):
+        conn = Database.connect()
         cursor = conn.cursor()
 
-        cursor.execute("""
-            UPDATE inventory
-            SET quantity = ?
-            WHERE id = ?
-        """, (
-            quantity,
-            inventory_id
-        ))
+        if exclude_id is None:
+            cursor.execute("""
+                SELECT 1
+                FROM inventory
+                WHERE part_number = ?
+                LIMIT 1
+            """, (
+                part_number,
+            ))
+        else:
+            cursor.execute("""
+                SELECT 1
+                FROM inventory
+                WHERE part_number = ?
+                AND id <> ?
+                LIMIT 1
+            """, (
+                part_number,
+                exclude_id,
+            ))
 
-        if owns_connection:
-            conn.commit()
-            conn.close()
+        exists = cursor.fetchone() is not None
+
+        conn.close()
+
+        return exists

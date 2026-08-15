@@ -21,10 +21,22 @@ class AssetService:
 
     @staticmethod
     def create(data):
+
+        if data["purchase_cost"] < 0:
+            raise ValueError(
+                "Purchase cost cannot be negative."
+            )
+        
         return AssetModel.insert(data)
 
     @staticmethod
     def update(record_id, data):
+
+        if data["purchase_cost"] < 0:
+            raise ValueError(
+                "Purchase cost cannot be negative."
+            )
+        
         AssetModel.update(
             record_id,
             data
@@ -33,3 +45,7 @@ class AssetService:
     @staticmethod
     def delete(record_id):
         AssetModel.delete(record_id)
+
+    @staticmethod
+    def get_active_assets():
+        return AssetModel.get_active_assets()
