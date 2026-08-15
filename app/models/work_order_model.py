@@ -1,3 +1,5 @@
+from multiprocessing import connection
+
 from app.database.connection import Database
 from app.helpers.code_generator import CodeGenerator
 
@@ -195,11 +197,11 @@ class WorkOrderModel:
 
     @staticmethod
     def insert(data):
+
         conn = Database.connect()
         cursor = conn.cursor()
 
         try:
-
             cursor.execute("""
                 INSERT INTO work_orders
                 (
@@ -241,13 +243,10 @@ class WorkOrderModel:
             record_id = cursor.lastrowid
 
             conn.commit()
-
             return record_id
-
         except Exception:
             conn.rollback()
             raise
-
         finally:
             conn.close()
 
@@ -676,3 +675,48 @@ class WorkOrderModel:
                 conn.close()
 
             return total
+
+    @staticmethod
+    def set_status(
+        work_order_id,
+        status,
+        connection=None
+    ):
+        owns_connection = (
+        connection is None
+    )
+
+        conn = (
+            connection
+            or Database.connect()
+        )
+
+        try:
+            cursor = conn.cursor()
+
+            cursor.execute("""
+                UPDATE work_orders
+                SET status = ?
+                WHERE id = ?
+            """, (
+                status,
+                work_order_id,
+            ))
+
+            if cursor.rowcount == 0:
+                raise ValueError(
+                    "Work Order not found."
+                )
+
+            if owns_connection:
+                conn.commit()
+
+        except Exception:
+            if owns_connection:
+                conn.rollback()
+
+            raise
+
+        finally:
+            if owns_connection:
+                conn.close()

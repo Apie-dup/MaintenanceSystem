@@ -60,23 +60,17 @@ class PreventiveMaintenanceService:
 
         save_data = dict(data)
 
-        save_data.setdefault(
-            "pm_id",
-            None
-        )
-
-        WorkOrderService.validate_data(
+        PreventiveMaintenanceService.validate(
             save_data
         )
 
-        if WorkOrderModel.number_exists(
-            save_data["work_order_number"]
-        ):
-            raise ValueError(
-                "Work Order Number already exists."
+        save_data["next_due_date"] = (
+            PreventiveMaintenanceService.calculate_next_due_date(
+                save_data
+            )
         )
 
-        return WorkOrderModel.insert(
+        return PreventiveMaintenanceModel.insert(
             save_data
         )
 
@@ -86,6 +80,23 @@ class PreventiveMaintenanceService:
 
     @staticmethod
     def update(record_id, data):
+
+        save_data = dict(data)
+
+        PreventiveMaintenanceService.validate(
+            save_data
+        )
+
+        save_data["next_due_date"] =(
+            PreventiveMaintenanceService.calculate_next_due_date(
+                save_data
+            )
+        )
+
+        PreventiveMaintenanceModel.update(
+            record_id,
+            save_data
+        )
 
         existing = WorkOrderModel.get_by_id(
             record_id
@@ -341,7 +352,8 @@ class PreventiveMaintenanceService:
             "actual_cost":
                 0.00,
 
-            "labour_hours":0.00,
+            "labour_hours":
+                float(pm["estimated_hours"] or 0),
 
             "notes": (
                 "Generated from Preventive Maintenance "
@@ -349,6 +361,8 @@ class PreventiveMaintenanceService:
                 f'Estimated labour: '
                 f'{float(pm["estimated_hours"] or 0):.2f} hours.'
         ),
+            "pm_id":
+                pm["id"]
         }
 
         return WorkOrderService.create(data)

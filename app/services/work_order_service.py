@@ -129,8 +129,8 @@ class WorkOrderService:
 
 
     # ---------------------------------------------------------
-    # Update
-    # ---------------------------------------------------------
+# Update
+# ---------------------------------------------------------
 
     @staticmethod
     def update(record_id, data):
@@ -144,7 +144,11 @@ class WorkOrderService:
                 "Work Order not found."
             )
 
+        # Work with a copy so we do not modify
+        # the dictionary supplied by the dialog.
         save_data = dict(data)
+
+        # Apply automatic status rules.
         save_data = (
             WorkOrderService.apply_automatic_status(
                 existing,
@@ -152,23 +156,18 @@ class WorkOrderService:
             )
         )
 
+        # Validate the resulting data.
         WorkOrderService.validate_data(
             save_data
         )
 
+        # Validate status workflow.
         WorkOrderService.validate_status_transition(
             existing["status"],
             save_data["status"]
         )
 
-        # Work with a copy so we do not modify
-        # the dictionary supplied by the dialog.
-        save_data = dict(data)
-
-        WorkOrderService.validate_data(
-            save_data
-        )
-
+        # Check duplicate Work Order number.
         if WorkOrderModel.number_exists(
             save_data["work_order_number"],
             exclude_id=record_id
@@ -177,9 +176,10 @@ class WorkOrderService:
                 "Work Order Number already exists."
             )
 
-        # Preserve the PM relationship.
+        # Preserve PM relationship.
         save_data["pm_id"] = existing["pm_id"]
 
+        # Recalculate actual cost.
         save_data["actual_cost"] = (
             WorkOrderService.calculate_actual_cost(
                 record_id,
@@ -187,13 +187,13 @@ class WorkOrderService:
             )
         )
 
-        # Save the Work Order first.
+        # Save Work Order.
         WorkOrderModel.update(
             record_id,
             save_data
         )
 
-        # Record fields that actually changed.
+        # Record changes.
         WorkOrderService.log_changes(
             record_id,
             existing,
@@ -604,25 +604,24 @@ class WorkOrderService:
         data
     ):
         current_status = existing["status"]
+        selected_status = data.get("status")
 
-        # Open → Assigned
-        # when a technician is assigned.
+        # Open -> Assigned
         if (
             current_status == "Open"
             and data.get("technician_id") is not None
-            and data.get("status") == "Open"
+            and selected_status == "Open"
         ):
             data["status"] = "Assigned"
-            return data
 
-        # Assigned → In Progress
-        # when labour has been entered.
-        if (
+        # Assigned -> In Progress
+        elif (
             current_status == "Assigned"
             and float(
                 data.get("labour_hours", 0) or 0
             ) > 0
-            and data.get("status") == "Assigned"
+            and selected_status == "Assigned"
         ):
             data["status"] = "In Progress"
-            return data
+
+        return data

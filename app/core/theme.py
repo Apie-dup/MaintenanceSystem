@@ -21,11 +21,10 @@ class AppTheme:
     FONT_FAMILY = "Segoe UI"
     FONT_SIZE = 13
 
-    # Accent color can be changed dynamically
     ACCENT_COLOR = "#0f6cbd"
     ACCENT_COLOR_HOVER = "#115ea3"
 
-    # Light theme colors
+    # Light theme
     LIGHT_BG = "#f7f7f7"
     LIGHT_SURFACE = "#ffffff"
     LIGHT_SURFACE_ALT = "#f3f3f3"
@@ -34,7 +33,7 @@ class AppTheme:
     LIGHT_BORDER = "#e1e1e1"
     LIGHT_SELECTION = "#cfe8ff"
 
-    # Dark theme colors
+    # Dark theme
     DARK_BG = "#202020"
     DARK_SURFACE = "#2b2b2b"
     DARK_SURFACE_ALT = "#323232"
@@ -43,7 +42,7 @@ class AppTheme:
     DARK_BORDER = "#444444"
     DARK_SELECTION = "#264f78"
 
-    # High contrast theme
+    # High contrast
     HC_BG = "#000000"
     HC_SURFACE = "#000000"
     HC_TEXT = "#ffffff"
@@ -71,10 +70,8 @@ class AppTheme:
 
         if cls.current_mode == cls.MODE_DARK:
             app.setStyleSheet(cls.dark_qss())
-
         elif cls.current_mode == cls.MODE_HIGH_CONTRAST:
             app.setStyleSheet(cls.high_contrast_qss())
-
         else:
             app.setStyleSheet(cls.light_qss())
 
@@ -89,6 +86,9 @@ class AppTheme:
 
         cls.apply(app)
 
+    # ---------------------------------------------------------
+    # Light QSS
+    # ---------------------------------------------------------
 
     @classmethod
     def light_qss(cls):
@@ -122,7 +122,6 @@ class AppTheme:
         QLabel#dashboardTitle {{
             font-size: 24px;
             font-weight: 600;
-            color: {cls.LIGHT_TEXT};
         }}
 
         QLabel#lblDashboardSubtitle,
@@ -131,21 +130,18 @@ class AppTheme:
             font-size: 14px;
         }}
 
-        /* --------------------------------
-           Sidebar
-        -------------------------------- */
-
+        /* Sidebar */
         #sidebar,
         #navigationFrame,
         #frameNavigation {{
-            background-color: #202020;
+            background-color: {cls.LIGHT_SURFACE};
             border: none;
         }}
 
         #sidebar QLabel,
         #navigationFrame QLabel,
         #frameNavigation QLabel {{
-            color: #ffffff;
+            color: {cls.LIGHT_TEXT};
             background: transparent;
         }}
 
@@ -153,7 +149,7 @@ class AppTheme:
         #navigationFrame QPushButton,
         #frameNavigation QPushButton {{
             background: transparent;
-            color: #f2f2f2;
+            color: {cls.LIGHT_TEXT};
             border: none;
             border-radius: 4px;
             padding: 9px 12px;
@@ -164,21 +160,18 @@ class AppTheme:
         #sidebar QPushButton:hover,
         #navigationFrame QPushButton:hover,
         #frameNavigation QPushButton:hover {{
-            background-color: #2d2d2d;
+            background-color: {cls.LIGHT_SURFACE_ALT};
         }}
 
         #sidebar QPushButton:checked,
         #navigationFrame QPushButton:checked,
         #frameNavigation QPushButton:checked {{
-            background-color: #333333;
+            background-color: {cls.LIGHT_SURFACE_ALT};
             border-left: 3px solid {cls.ACCENT_COLOR};
             font-weight: 600;
         }}
 
-        /* --------------------------------
-           Buttons
-        -------------------------------- */
-
+        /* Buttons */
         QPushButton {{
             background-color: {cls.LIGHT_SURFACE};
             color: {cls.LIGHT_TEXT};
@@ -213,10 +206,7 @@ class AppTheme:
             background-color: {cls.ACCENT_COLOR_HOVER};
         }}
 
-        /* --------------------------------
-           Inputs
-        -------------------------------- */
-
+        /* Inputs */
         QLineEdit,
         QComboBox,
         QSpinBox,
@@ -247,6 +237,7 @@ class AppTheme:
             color: #5f5f5f;
         }}
 
+        /* Combo popup */
         QComboBox QAbstractItemView {{
             background-color: {cls.LIGHT_SURFACE};
             color: {cls.LIGHT_TEXT};
@@ -271,10 +262,7 @@ class AppTheme:
             background-color: {cls.LIGHT_SELECTION};
         }}
 
-        /* --------------------------------
-           Group boxes
-        -------------------------------- */
-
+        /* GroupBox */
         QGroupBox {{
             background: transparent;
             border: none;
@@ -292,29 +280,15 @@ class AppTheme:
             background-color: {cls.LIGHT_BG};
         }}
 
-        /* --------------------------------
-           Cards (fixed)
-        -------------------------------- */
-
+        /* Cards */
         QFrame[card="true"],
-        .dashboardCard,
-        QFrame#cardAssets,
-        QFrame#cardOpenWOs,
-        QFrame#cardPMDueToday,
-        QFrame#cardPMOverdue,
-        QFrame#cardNext7Days,
-        QFrame#cardLowStock,
-        QFrame#cardTechnicians,
-        QFrame#cardInventoryValue {{
+        .dashboardCard {{
             background-color: {cls.LIGHT_SURFACE};
             border: 1px solid {cls.LIGHT_BORDER};
             border-radius: 6px;
         }}
 
-        /* --------------------------------
-           Tables
-        -------------------------------- */
-
+        /* Tables */
         QTableWidget,
         QTableView {{
             background-color: {cls.LIGHT_SURFACE};
@@ -340,66 +314,15 @@ class AppTheme:
             border: none;
             border-bottom: 1px solid {cls.LIGHT_BORDER};
         }}
+        """ + cls._scrollbars_qss(
+            track="#f1f1f1",
+            handle="#b8b8b8",
+            hover="#9a9a9a",
+        )
 
-        /* --------------------------------
-           Scrollbars
-        -------------------------------- */
-
-        QScrollBar:vertical {{
-            background: transparent;
-            width: 12px;
-        }}
-
-        QScrollBar::handle:vertical {{
-            background: #c4c4c4;
-            min-height: 28px;
-            border-radius: 6px;
-        }}
-
-        QScrollBar::handle:vertical:hover {{
-            background: #a8a8a8;
-        }}
-
-        QScrollBar::add-line:vertical,
-        QScrollBar::sub-line:vertical {{
-            height: 0;
-        }}
-
-        QScrollBar:horizontal {{
-            background: transparent;
-            height: 12px;
-        }}
-
-        QScrollBar::handle:horizontal {{
-            background: #c4c4c4;
-            min-width: 28px;
-            border-radius: 6px;
-        }}
-
-        QScrollBar::add-line:horizontal,
-        QScrollBar::sub-line:horizontal {{
-            width: 0;
-        }}
-
-        /* --------------------------------
-           Dialog buttons
-        -------------------------------- */
-
-        QDialogButtonBox QPushButton {{
-            min-width: 80px;
-        }}
-
-        QCheckBox {{
-            spacing: 7px;
-        }}
-
-        QToolTip {{
-            background-color: #2b2b2b;
-            color: white;
-            border: none;
-            padding: 5px;
-        }}
-        """
+    # ---------------------------------------------------------
+    # Dark QSS
+    # ---------------------------------------------------------
 
     @classmethod
     def dark_qss(cls):
@@ -434,10 +357,7 @@ class AppTheme:
             font-weight: 600;
         }}
 
-        /* --------------------------------
-           Sidebar
-        -------------------------------- */
-
+        /* Sidebar */
         #sidebar,
         #navigationFrame,
         #frameNavigation {{
@@ -470,10 +390,7 @@ class AppTheme:
             font-weight: 600;
         }}
 
-        /* --------------------------------
-           Buttons
-        -------------------------------- */
-
+        /* Buttons */
         QPushButton {{
             background-color: {cls.DARK_SURFACE_ALT};
             color: {cls.DARK_TEXT};
@@ -493,10 +410,7 @@ class AppTheme:
             border: none;
         }}
 
-        /* --------------------------------
-           Inputs
-        -------------------------------- */
-
+        /* Inputs */
         QLineEdit,
         QComboBox,
         QSpinBox,
@@ -521,10 +435,7 @@ class AppTheme:
             border: 1px solid {cls.ACCENT_COLOR};
         }}
 
-        /* --------------------------------
-           Group boxes
-        -------------------------------- */
-
+        /* GroupBox */
         QGroupBox {{
             background: transparent;
             border: none;
@@ -541,29 +452,15 @@ class AppTheme:
             background-color: {cls.DARK_BG};
         }}
 
-        /* --------------------------------
-           Cards (fixed)
-        -------------------------------- */
-
+        /* Cards */
         QFrame[card="true"],
-        .dashboardCard,
-        QFrame#cardAssets,
-        QFrame#cardOpenWOs,
-        QFrame#cardPMDueToday,
-        QFrame#cardPMOverdue,
-        QFrame#cardNext7Days,
-        QFrame#cardLowStock,
-        QFrame#cardTechnicians,
-        QFrame#cardInventoryValue {{
+        .dashboardCard {{
             background-color: {cls.DARK_SURFACE};
             border: 1px solid {cls.DARK_BORDER};
             border-radius: 6px;
         }}
 
-        /* --------------------------------
-           Tables
-        -------------------------------- */
-
+        /* Tables */
         QTableWidget,
         QTableView {{
             background-color: {cls.DARK_SURFACE};
@@ -583,5 +480,127 @@ class AppTheme:
             padding: 8px 10px;
             font-weight: 600;
         }}
+        """ + cls._scrollbars_qss(
+            track="#202020",
+            handle="#5a5a5a",
+            hover="#737373",
+        )
+
+    # ---------------------------------------------------------
+    # High Contrast QSS
+    # ---------------------------------------------------------
+
+    @classmethod
+    def high_contrast_qss(cls):
+        return f"""
+        * {{
+            font-family: "{cls.FONT_FAMILY}";
+            font-size: {cls.FONT_SIZE}px;
+        }}
+
+        QWidget {{
+            background-color: {cls.HC_BG};
+            color: {cls.HC_TEXT};
+        }}
+
+        QPushButton {{
+            background-color: {cls.HC_BG};
+            color: {cls.HC_TEXT};
+            border: 2px solid {cls.HC_BORDER};
+            border-radius: 4px;
+            padding: 8px 16px;
+        }}
+
+        QLineEdit {{
+            background-color: {cls.HC_BG};
+            color: {cls.HC_TEXT};
+            border: 2px solid {cls.HC_BORDER};
+            border-radius: 4px;
+            padding: 6px 10px;
+            selection-background-color: {cls.HC_SELECTION};
+        }}
+
+        QTableWidget,
+        QTableView {{
+            background-color: {cls.HC_BG};
+            color: {cls.HC_TEXT};
+            border: 2px solid {cls.HC_BORDER};
+            gridline-color: {cls.HC_BORDER};
+        }}
+
+        QHeaderView::section {{
+            background-color: {cls.HC_BG};
+            color: {cls.HC_TEXT};
+            border: 2px solid {cls.HC_BORDER};
+            padding: 8px 10px;
+            font-weight: 600;
+        }}
         """
 
+    # ---------------------------------------------------------
+    # Scrollbars
+    # ---------------------------------------------------------
+
+    @classmethod
+    def _scrollbars_qss(cls, track, handle, hover):
+        return f"""
+        QScrollBar:vertical {{
+            background: {track};
+            width: 14px;
+            margin: 0px;
+            border: none;
+        }}
+
+        QScrollBar::handle:vertical {{
+            background: {handle};
+            min-height: 30px;
+            border-radius: 6px;
+            margin: 2px;
+        }}
+
+        QScrollBar::handle:vertical:hover {{
+            background: {hover};
+        }}
+
+        QScrollBar::add-line:vertical,
+        QScrollBar::sub-line:vertical {{
+            height: 0px;
+            background: none;
+            border: none;
+        }}
+
+        QScrollBar::add-page:vertical,
+        QScrollBar::sub-page:vertical {{
+            background: none;
+        }}
+
+        QScrollBar:horizontal {{
+            background: {track};
+            height: 14px;
+            margin: 0px;
+            border: none;
+        }}
+
+        QScrollBar::handle:horizontal {{
+            background: {handle};
+            min-width: 30px;
+            border-radius: 6px;
+            margin: 2px;
+        }}
+
+        QScrollBar::handle:horizontal:hover {{
+            background: {hover};
+        }}
+
+        QScrollBar::add-line:horizontal,
+        QScrollBar::sub-line:horizontal {{
+            width: 0px;
+            background: none;
+            border: none;
+        }}
+
+        QScrollBar::add-page:horizontal,
+        QScrollBar::sub-page:horizontal {{
+            background: none;
+        }}
+        """

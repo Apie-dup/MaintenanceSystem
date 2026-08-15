@@ -23,7 +23,7 @@
    <item>
     <widget class="QTabWidget" name="tabWorkOrder">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="General">
       <attribute name="title">
@@ -205,7 +205,14 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QDoubleSpinBox" name="dsbEstimatedCost"/>
+           <widget class="QDoubleSpinBox" name="dsbEstimatedCost">
+            <property name="prefix">
+             <string>N$ </string>
+            </property>
+            <property name="maximum">
+             <double>999999.989999999990687</double>
+            </property>
+           </widget>
           </item>
           <item row="1" column="2">
            <widget class="QLabel" name="lblActualCost">
@@ -215,7 +222,14 @@
            </widget>
           </item>
           <item row="1" column="3">
-           <widget class="QDoubleSpinBox" name="dsbActualCost"/>
+           <widget class="QDoubleSpinBox" name="dsbActualCost">
+            <property name="prefix">
+             <string>N$ </string>
+            </property>
+            <property name="maximum">
+             <double>999999.989999999990687</double>
+            </property>
+           </widget>
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="lblLabourHours">
@@ -288,7 +302,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="labelMaterialsTotal">
+             <widget class="QLabel" name="lblMaterialTotal">
               <property name="text">
                <string>Materials Total: N$0.00</string>
               </property>

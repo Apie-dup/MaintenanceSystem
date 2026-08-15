@@ -154,10 +154,13 @@ class WorkOrderDialog(BaseDialog):
             self
         )
 
-        if not dialog.exec():
-            return
+        if dialog.exec():
+            self.load_record(
+                self.record_id
+            )
 
         self.load_parts()
+        self.load_history()
 
         work_order = WorkOrderService.get_by_id(
             self.record_id

@@ -71,8 +71,12 @@ class LookupModel:
             record,
         )
 
+        record_id = cursor.lastrowid
+
         conn.commit()
         conn.close()
+
+        return record_id
 
     @staticmethod
     def update(record):
@@ -126,6 +130,7 @@ class LookupModel:
             FROM lookups
             WHERE lookup_type = ?
                 AND value LIKE ?
+                AND active = 1
             ORDER BY
                 sort_order,
                 value
