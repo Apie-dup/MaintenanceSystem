@@ -310,7 +310,7 @@ class Ui_AddWorkOrderDialog(object):
 
         self.retranslateUi(AddWorkOrderDialog)
 
-        self.tabWorkOrder.setCurrentIndex(1)
+        self.tabWorkOrder.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(AddWorkOrderDialog)

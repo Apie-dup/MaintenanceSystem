@@ -1,4 +1,5 @@
 from PySide6.QtWidgets import QApplication, QGraphicsBlurEffect
+import ctypes
 
 
 class AppTheme:
@@ -604,3 +605,24 @@ class AppTheme:
             background: none;
         }}
         """
+
+    @staticmethod
+    def is_system_dark():
+        try:
+            import winreg
+            key = winreg.OpenKey(
+                winreg.HKEY_CURRENT_USER,
+                r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize",
+            )
+            value, _ = winreg.QueryValueEx(key, "AppsUseLightTheme")
+            return value == 0
+        except Exception:
+            return False
+
+    @classmethod
+    def apply_system_theme(cls, app: QApplication):
+        if cls.is_system_dark():
+            cls.current_mode = cls.MODE_DARK
+        else:
+            cls.current_mode = cls.MODE_LIGHT
+        cls.apply(app)

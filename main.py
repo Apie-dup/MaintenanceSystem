@@ -25,6 +25,9 @@ def main():
         # Start Qt
         app = QApplication(sys.argv)
 
+        AppTheme.apply_system_theme(app)
+
+
         def apply_light_palette(app):
             palette = QPalette()
 
