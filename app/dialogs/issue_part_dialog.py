@@ -3,16 +3,22 @@ from app.services.work_order_parts_service import WorkOrderPartService
 from app.services.validation_service import ValidationService
 from app.ui.generated.ui_issue_part import Ui_IssuePartDialog
 from app.helpers.form_helper import FormHelper
+from app.helpers.currency_helper import CurrencyHelper
 
 
 class IssuePartDialog(BaseDialog):
 
     ENTITY_NAME = "Issue Part"
 
-    def __init__(self, work_order_id, parent=None):
+    def __init__(self, 
+                 work_order_id, 
+                 user=None, 
+                 parent=None
+            ):
         super().__init__(parent)
 
         self.work_order_id = work_order_id
+        self.user = user or {}
 
         self.ui = Ui_IssuePartDialog()
         self.ui.setupUi(self)
@@ -113,7 +119,9 @@ class IssuePartDialog(BaseDialog):
         )
 
         self.ui.txtUnitCost.setText(
-            f"N$ {unit_cost:,.2f}"
+            CurrencyHelper.display(
+                unit_cost
+            )
         )
 
         self.ui.spnQuantity.setMaximum(
@@ -143,7 +151,9 @@ class IssuePartDialog(BaseDialog):
         total = quantity * unit_cost
 
         self.ui.txtTotalCost.setText(
-            f"N$ {total:,.2f}"
+            CurrencyHelper.display(
+                total
+            )
         )
 
     # ---------------------------------------------------------
@@ -237,5 +247,6 @@ class IssuePartDialog(BaseDialog):
 
     def save(self):
         WorkOrderPartService.issue_part(
-            self.get_form_data()
+            self.get_form_data(),
+            user=self.user,
         )

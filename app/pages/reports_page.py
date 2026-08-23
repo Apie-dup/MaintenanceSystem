@@ -10,7 +10,12 @@ from app.ui.generated.ui_reports_page import (
     Ui_ReportsPage
 )
 from app.helpers.report_export_helper import ReportExportHelper
+from app.helpers.pdf_report_export_helper import PdfReportExportHelper
 from PySide6.QtCore import QDate
+from app.services.settings_service import SettingsService
+from app.helpers.date_helper import DateHelper
+from app.helpers.currency_helper import CurrencyHelper
+from app.core.permissions import Permissions
 
 
 class ReportsPage(QWidget):
@@ -84,6 +89,17 @@ class ReportsPage(QWidget):
         self.ui = Ui_ReportsPage()
         self.ui.setupUi(self)
 
+        self.user = getattr(
+            parent,
+            "user",
+            {}
+        )
+
+        self.role = self.user.get(
+            "role",
+            ""
+        )
+
         self.setup_page()
 
     def setup_page(self):
@@ -105,6 +121,19 @@ class ReportsPage(QWidget):
         self.update_date_filter_state()
 
         self.connect_signals()
+
+        self.apply_permissions()
+
+    def apply_permissions(self):
+
+        can_export = Permissions.has_permission(
+        self.role,
+        "reports.export"
+    )
+
+        self.ui.btnExport.setVisible(
+            can_export
+        )
 
         TableHelper.setup(
             self.ui.tblReport,
@@ -160,6 +189,12 @@ class ReportsPage(QWidget):
 
             columns = self.WORK_ORDER_COLUMNS
 
+            date_columns = (
+                6, #Created
+                7, #Due
+                8, #Complteted
+            )
+            
             rows = ReportService.get_work_orders(
                 from_date,
                 to_date
@@ -236,13 +271,26 @@ class ReportsPage(QWidget):
         if report_type == "Work Orders":
 
             labour_column = 9
-            estimated_column = 10
-            actual_column = 11
+
+            cost_columns = (
+                10, # Estimated Cost
+                11, # Actual Cost
+            )
+
+            date_columns = (
+                6, # Created
+                7, # Due
+                8, # Completed
+            )
 
             for row in range(
                 table.rowCount()
             ):
-                
+
+                #------------------------------
+                # Labour Hours
+                #------------------------------
+
                 item = table.item(
                     row,
                     labour_column
@@ -256,10 +304,11 @@ class ReportsPage(QWidget):
                     except ValueError:
                         pass
 
-                for column in (
-                    estimated_column,
-                    actual_column,
-                ):
+                #------------------------------
+                # Costs
+                #------------------------------
+
+                for column in cost_columns:
 
                     item = table.item(
                         row,
@@ -270,16 +319,38 @@ class ReportsPage(QWidget):
                         continue
 
                     try:
-                        value = float(
+                        value = CurrencyHelper.parse(
                             item.text()
                         )
-
+                        
                         item.setText(
-                            f"N$ {value:,.2f}"
+                            CurrencyHelper.display(
+                                value
+                            )
                         )
 
                     except ValueError:
                         pass
+
+                #-----------------------------
+                # Dates
+                #-----------------------------
+
+                for column in date_columns:
+
+                    item = table.item(
+                        row,
+                        column
+                    )
+
+                    if item is None:
+                        continue
+
+                    item.setText(
+                        DateHelper.display(
+                            item.text()
+                        )
+                    )
 
         elif report_type == "Maintenance Costs":
             
@@ -327,7 +398,7 @@ class ReportsPage(QWidget):
                         )
 
                         item.setText(
-                            f"N$ {value:,.2f}"
+                            SettingsService.format_currency(value)
                         )
 
                     except ValueError:
@@ -390,7 +461,7 @@ class ReportsPage(QWidget):
                         )
 
                         item.setText(
-                            f"N$ {value:,.2f}"
+                            SettingsService.format_currency(value)
                         )
 
                     except ValueError:
@@ -436,17 +507,45 @@ class ReportsPage(QWidget):
                     try:
                         value = float(
                             item.text()
-                            .replace("N$", "")
+                            .replace(SettingsService.currency_symbol(), "")
                             .replace(",", "")
                             .strip()
                         )
 
                         item.setText(
-                            f"N$ {value:,.2f}"
+                            SettingsService.format_currency(value)
                         )
 
                     except ValueError:
                         pass
+
+        elif report_type == "Preventive Maintenance":
+
+            date_columns = (
+                6, # Last Service
+                7, # Next Due
+            )
+
+            for row in range(
+                table.rowCount()
+            ):
+
+                for column in date_columns:
+
+                    item = table.item(
+                        row,
+                        column
+                    )
+
+                    if item is None:
+                        continue
+
+                    item.setText(
+                        DateHelper.display(
+                            item.text()
+                        )
+                    )
+
 
     def update_date_filter_state(self):
 
@@ -469,6 +568,18 @@ class ReportsPage(QWidget):
         )
 
     def export_report(self):
+
+        if not Permissions.has_permission(
+            self.role,
+            "reports.export"
+        ):
+            QMessageBox.warning(
+                self,
+                "Export Report",
+                "You do not have permission "
+                "to export reports."
+            )
+            return
 
         table = self.ui.tblReport
 
@@ -493,27 +604,76 @@ class ReportsPage(QWidget):
             + ".xlsx"
         )
 
-        file_path, _ = QFileDialog.getSaveFileName(
-            self,
-            "Export Report",
-            default_name,
-            "Excel Workbook (*.xlsx)"
+        file_path, selected_filter = (
+            QFileDialog.getSaveFileName(
+                self,
+                "Export Report",
+                default_name,
+                (
+                    "Excel Workbook (*.xlsx);;"
+                    "PDF Document (*.pdf)"
+                )
+            )
         )
 
         if not file_path:
             return
 
-        if not file_path.lower().endswith(
-            ".xlsx"
-        ):
-            file_path += ".xlsx"
-
         try:
-            ReportExportHelper.export_table_to_excel(
-                table,
-                file_path,
-                report_type
-            )
+
+            if "PDF" in selected_filter:
+
+                if not file_path.lower().endswith(
+                    ".pdf"
+                ):
+                    file_path += ".pdf"
+
+                from_date = (
+                    self.ui.dtFromDate
+                    .date()
+                    .toString("yyyy-MM-dd")
+                )
+
+                to_date = (
+                    self.ui.dtToDate
+                    .date()
+                    .toString("yyyy-MM-dd")
+                )
+
+                PdfReportExportHelper.export_table_to_pdf(
+                    table,
+                    file_path,
+                    report_type,
+                    from_date,
+                    to_date
+                )
+
+            else:
+
+                if not file_path.lower().endswith(
+                    ".xlsx"
+                ):
+                    file_path += ".xlsx"
+
+                from_date = (
+                    self.ui.dtFromDate
+                    .date()
+                    .toString("yyyy-MM-dd")
+                )
+
+                to_date = (
+                    self.ui.dtToDate
+                    .date()
+                    .toString("yyyy-MM-dd")
+                )
+
+                ReportExportHelper.export_table_to_excel(
+                    table,
+                    file_path,
+                    report_type,
+                    from_date,
+                    to_date
+                )
 
             QMessageBox.information(
                 self,
@@ -521,7 +681,21 @@ class ReportsPage(QWidget):
                 "Report exported successfully."
             )
 
+        except PermissionError:
+
+            QMessageBox.warning(
+                self,
+                "Export Report",
+                (
+                    "The report could not be saved because "
+                    "the file is currently in use.\n\n"
+                    "Close the existing PDF file and try again, "
+                    "or save the report with a different filename."
+                )
+            )
+
         except Exception as error:
+
             QMessageBox.critical(
                 self,
                 "Export Report",

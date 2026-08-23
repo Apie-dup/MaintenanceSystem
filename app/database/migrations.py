@@ -4,7 +4,7 @@ from app.core.logger import logger
 
 class MigrationManager:
 
-    LATEST_VERSION = 7
+    LATEST_VERSION = 14
 
     # ---------------------------------------------------------
     # Database version
@@ -89,6 +89,34 @@ class MigrationManager:
             elif version == 6:
                 MigrationManager.migrate_to_v7()
                 version = 7
+
+            elif version == 7:
+                MigrationManager.migrate_to_v8()
+                version = 8
+
+            elif version == 8:
+                MigrationManager.migrate_to_v9()
+                version = 9
+
+            elif version == 9:
+                MigrationManager.migrate_to_v10()
+                version = 10
+
+            elif version == 10:
+                MigrationManager.migrate_to_v11()
+                version = 11
+
+            elif version == 11:
+                MigrationManager.migrate_to_v12()
+                version = 12
+
+            elif version == 12:
+                MigrationManager.migrate_to_v13()
+                version = 13
+
+            elif version == 13:
+                MigrationManager.migrate_to_v14()
+                version = 14
 
             else:
                 raise RuntimeError(
@@ -318,35 +346,38 @@ class MigrationManager:
         conn = Database.connect()
         cursor = conn.cursor()
 
-        logger.info(
-            "Migrating database to Version 6..."
-        )
-
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS work_order_history
-            (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-                work_order_id INTEGER NOT NULL,
-
-                action TEXT NOT NULL,
-
-                field_name TEXT,
-
-                old_value TEXT,
-
-                new_value TEXT,
-
-                notes TEXT,
-
-                created_at TEXT
-                    DEFAULT CURRENT_TIMESTAMP,
-
-                FOREIGN KEY(work_order_id)
-                    REFERENCES work_orders(id)
-                    ON DELETE CASCADE
+        try:
+            logger.info(
+                "Migrating database to Version 6..."
             )
-        """)
+
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS work_order_history
+                (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    work_order_id INTEGER NOT NULL,
+                    action TEXT NOT NULL,
+                    field_name TEXT,
+                    old_value TEXT,
+                    new_value TEXT,
+                    notes TEXT,
+                    created_at TEXT
+                        DEFAULT CURRENT_TIMESTAMP,
+
+                    FOREIGN KEY(work_order_id)
+                        REFERENCES work_orders(id)
+                        ON DELETE CASCADE
+                )
+            """)
+
+            conn.commit()
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()
 
     @staticmethod
     def migrate_to_v7():
@@ -385,3 +416,448 @@ class MigrationManager:
 
         conn.commit()
         conn.close()
+
+    # -----------------------------------------------------
+    # Version 8
+    # Application settings
+    # -----------------------------------------------------
+
+    @staticmethod
+    def migrate_to_v8():
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        try:
+            logger.info(
+                "Migrating database to Version 8..."
+            )
+
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS app_settings
+                (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+                    key TEXT NOT NULL UNIQUE,
+
+                    value TEXT,
+
+                    description TEXT,
+
+                    updated_at TEXT
+                        DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+
+            settings = [
+                (
+                    "organization_name",
+                    "Your Organization",
+                    "Organization name used in reports and exports."
+                ),
+                (
+                    "system_name",
+                    "Maintenance Management System",
+                    "Application/system display name."
+                ),
+                (
+                    "currency_symbol",
+                    "N$",
+                    "Currency symbol used throughout the system."
+                ),
+                (
+                    "currency_code",
+                    "NAD",
+                    "ISO currency code."
+                ),
+                (
+                    "date_format",
+                    "dd-MMM-yyyy",
+                    "Default display date format."
+                ),
+            ]
+
+            cursor.executemany("""
+                INSERT OR IGNORE INTO app_settings
+                (
+                    key,
+                    value,
+                    description
+                )
+                VALUES (?, ?, ?)
+            """, settings)
+
+            conn.commit()
+
+            logger.info(
+                "Application settings table created and seeded."
+            )
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()
+
+    @staticmethod
+    def migrate_to_v9():
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        try:
+            logger.info(
+                "Migrating database to Version 9..."
+            )
+
+            cursor.execute("""
+                INSERT OR IGNORE INTO app_settings
+                (
+                    key,
+                    value,
+                    description
+                )
+                VALUES (?, ?, ?)
+            """, (
+                "theme_mode",
+                "light",
+                "Application theme: light or dark."
+            ))
+
+            conn.commit()
+
+            logger.info(
+                "Added theme_mode application setting."
+            )
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()
+
+    @staticmethod
+    def migrate_to_v10():
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        try:
+            logger.info(
+                "Migrating database to Version 10..."
+            )
+
+            #---------------------------------------------
+            # user_id
+            #---------------------------------------------
+
+            if not MigrationManager.column_exists(
+                cursor,
+                "work_order_history",
+                "user_id"
+            ):
+                cursor.execute("""
+                    ALTER TABLE work_order_history
+                    ADD COLUMN user_id INTEGER
+                    REFERENCES users(id)
+                """)
+
+                logger.info(
+                    "Added user_id to work_order_history."
+                )
+
+            else:
+                logger.info(
+                    "work_order_history.user_id "
+                    "already exists."
+                )
+
+            #--------------------------------------------
+            # username
+            #---------------------------------------------
+
+            if not MigrationManager.column_exists(
+                cursor,
+                "work_order_history",
+                "username"
+            ):
+                cursor.execute("""
+                    ALTER TABLE work_order_history
+                    ADD COLUMN username TEXT
+                """)
+
+                logger.info(
+                    "Added username to work_order_history."
+                )
+
+            #--------------------------------------------
+            # Index
+            #---------------------------------------------
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_work_order_history_user_id
+                ON work_order_history(user_id)
+            """)
+
+            conn.commit()
+
+            logger.info(
+                "Work Order audit user tracking added."
+            )
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()
+
+    @staticmethod
+    def migrate_to_v11():
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        try:
+            logger.info(
+                "Migrating database to Version 11..."
+            )
+
+            if not MigrationManager.column_exists(
+                cursor,
+                "work_orders",
+                "estimated_hours"
+            ):
+                cursor.execute("""
+                    ALTER TABLE work_orders
+                    ADD COLUMN estimated_hours REAL
+                    DEFAULT 0
+                """)
+
+                logger.info(
+                    "Added estimated_hours to work_orders."
+                )
+
+            else:
+                logger.info(
+                    "work_orders.estimated_hours "
+                    "already exists."
+                )
+
+            conn.commit()
+
+            logger.info(
+                "Work Order estimated labour tracking added."
+            )
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()
+
+    @staticmethod
+    def migrate_to_v12():
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        try:
+            logger.info(
+                "Migrating database to Version 12..."
+            )
+
+            # ---------------------------------------------
+            # meter_type
+            # ---------------------------------------------
+
+            if not MigrationManager.column_exists(
+                cursor,
+                "preventive_maintenance",
+                "meter_type"
+            ):
+                cursor.execute("""
+                    ALTER TABLE preventive_maintenance
+                    ADD COLUMN meter_type TEXT
+                """)
+
+                logger.info(
+                    "Added meter_type to preventive_maintenance."
+                )
+
+            # ---------------------------------------------
+            # last_service_meter
+            # ---------------------------------------------
+
+            if not MigrationManager.column_exists(
+                cursor,
+                "preventive_maintenance",
+                "last_service_meter"
+            ):
+                cursor.execute("""
+                    ALTER TABLE preventive_maintenance
+                    ADD COLUMN last_service_meter REAL
+                """)
+
+                logger.info(
+                    "Added last_service_meter "
+                    "to preventive_maintenance."
+                )
+
+            # ---------------------------------------------
+            # next_due_meter
+            # ---------------------------------------------
+
+            if not MigrationManager.column_exists(
+                cursor,
+                "preventive_maintenance",
+                "next_due_meter"
+            ):
+                cursor.execute("""
+                    ALTER TABLE preventive_maintenance
+                    ADD COLUMN next_due_meter REAL
+                """)
+
+                logger.info(
+                    "Added next_due_meter "
+                    "to preventive_maintenance."
+                )
+
+            conn.commit()
+
+            logger.info(
+                "Preventive Maintenance meter tracking added."
+            )
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()
+
+    @staticmethod
+    def migrate_to_v13():
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        try:
+            logger.info(
+                "Migrating database to Version 13..."
+            )
+
+        # -------------------------------------------------
+        # Asset meter readings
+        # -------------------------------------------------
+
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS asset_meter_readings
+                (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+                    asset_id INTEGER NOT NULL,
+
+                    meter_type TEXT NOT NULL,
+
+                    reading REAL NOT NULL,
+
+                    reading_date TEXT NOT NULL,
+
+                    notes TEXT,
+
+                    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+
+                    FOREIGN KEY (asset_id)
+                        REFERENCES assets(id)
+                        ON DELETE CASCADE
+                )
+            """)
+
+            logger.info(
+                "Created asset_meter_readings table."
+            )
+
+        # -------------------------------------------------
+        # Asset index
+        # -------------------------------------------------
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_asset_meter_readings_asset_id
+                ON asset_meter_readings(asset_id)
+            """)
+
+        # -------------------------------------------------
+        # Asset + meter type index
+        # -------------------------------------------------
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_asset_meter_readings_asset_meter
+                ON asset_meter_readings(
+                    asset_id,
+                    meter_type
+                )
+            """)
+
+            conn.commit()
+
+            logger.info(
+                "Asset meter reading tracking added."
+            )
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()
+
+    @staticmethod
+    def migrate_to_v14():
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        try:
+            logger.info(
+                "Migrating database to Version 14..."
+            )
+
+            if not MigrationManager.column_exists(
+                cursor,
+                "work_orders",
+                "meter_reading"
+            ):
+                cursor.execute("""
+                    ALTER TABLE work_orders
+                    ADD COLUMN meter_reading REAL
+                """)
+
+                logger.info(
+                    "Added meter_reading to work_orders."
+            )
+
+            else:
+                logger.info(
+                    "work_orders.meter_reading "
+                    "already exists."
+                )
+
+            conn.commit()
+
+            logger.info(
+                "Work Order meter reading tracking added."
+            )
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()

@@ -1,0 +1,15 @@
+<RCC>
+  <qresource prefix="/icons">
+    <file>dashboard.svg</file>
+    <file>assets.svg</file>
+    <file>workorders.svg</file>
+    <file>pm.svg</file>
+    <file>technicians.svg</file>
+    <file>inventory.svg</file>
+    <file>suppliers.svg</file>
+    <file>reports.svg</file>
+    <file>settings.svg</file>
+    <file>about.svg</file>
+    <file>logout.svg</file>
+  </qresource>
+</RCC>

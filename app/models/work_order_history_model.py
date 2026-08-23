@@ -15,6 +15,8 @@ class WorkOrderHistoryModel:
         old_value=None,
         new_value=None,
         notes=None,
+        user_id=None,
+        username=None,
     ):
         conn = Database.connect()
         cursor = conn.cursor()
@@ -28,9 +30,11 @@ class WorkOrderHistoryModel:
                     field_name,
                     old_value,
                     new_value,
-                    notes
+                    notes,
+                    user_id,
+                    username
                 )
-                VALUES (?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 work_order_id,
                 action,
@@ -38,12 +42,13 @@ class WorkOrderHistoryModel:
                 old_value,
                 new_value,
                 notes,
+                user_id,
+                username,
             ))
 
             record_id = cursor.lastrowid
 
             conn.commit()
-
             return record_id
 
         except Exception:
@@ -71,6 +76,8 @@ class WorkOrderHistoryModel:
                 old_value,
                 new_value,
                 notes,
+                user_id,
+                username,
                 created_at
             FROM work_order_history
             WHERE work_order_id = ?
@@ -85,3 +92,51 @@ class WorkOrderHistoryModel:
         conn.close()
 
         return rows
+
+    @staticmethod
+    def log_created(
+        work_order_id,
+        user_id=None,
+        username=None
+    ):
+        return WorkOrderHistoryModel.add(
+            work_order_id,
+            action="Created",
+            notes="Work Order created.",
+            user_id=user_id,
+            username=username,
+        )
+
+    @staticmethod
+    def log_completed(
+        work_order_id,
+        user_id=None,
+        username=None
+    ):
+        return WorkOrderHistoryService.add(
+            work_order_id,
+            action="Completed",
+            field_name="Status",
+            old_value=None,
+            new_value="Completed",
+            notes="Work Order completed.",
+            user_id=user_id,
+            username=username,
+        )
+
+    @staticmethod
+    def log_closed(
+        work_order_id,
+        user_id=None,
+        username=None
+    ):
+        return WorkOrderHistoryService.add(
+            work_order_id,
+            action="Closed",
+            field_name="Status",
+            old_value="Completed",
+            new_value="Closed",
+            notes="Work Order closed.",
+            user_id=user_id,
+            username=username,
+        )

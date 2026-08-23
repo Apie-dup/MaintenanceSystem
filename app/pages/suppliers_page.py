@@ -2,7 +2,7 @@ from app.base.crud_page import CrudPage
 from app.dialogs.supplier_dialog import SupplierDialog
 from app.services.supplier_service import SupplierService
 from app.ui.generated.ui_supplier_page import Ui_SuppliersWindow
-
+from app.core.permissions import Permissions
 
 class SuppliersPage(CrudPage):
 
@@ -44,13 +44,54 @@ class SuppliersPage(CrudPage):
         self.search_widget = self.ui.txtSearch
         self.status_label = self.ui.lblStatus
 
+        self.user = getattr(
+            parent,
+            "user",
+            {}
+        )
+
+        self.role = self.user.get(
+            "role",
+            ""
+        )
+
         self.setup_page()
 
     def setup_page(self):
         self.validate_configuration()
         self.setup_table()
         self.connect_signals()
+        self.apply_permissions()
         self.load_data()
+
+    def apply_permissions(self):
+
+        can_create = Permissions.has_permission(
+            self.role,
+            "suppliers.create"
+        )
+
+        can_edit = Permissions.has_permission(
+            self.role,
+            "suppliers.edit"
+        )
+
+        can_delete = Permissions.has_permission(
+            self.role,
+            "suppliers.delete"
+        )
+
+        self.ui.btnAdd.setVisible(
+            can_create
+        )
+
+        self.ui.btnEdit.setVisible(
+            can_edit
+        )
+
+        self.ui.btnDelete.setVisible(
+            can_delete
+        )
 
     def connect_signals(self):
         self.search_widget.textChanged.connect(
@@ -74,5 +115,60 @@ class SuppliersPage(CrudPage):
         )
 
         self.table.itemDoubleClicked.connect(
-            lambda _item: self.edit_record()
+            self.handle_double_click
         )
+
+    def handle_double_click(self, _item):
+
+        if Permissions.has_permission(
+            self.role,
+            "suppliers.edit"
+        ):
+            self.edit_record()
+
+    def add_record(self):
+
+        if not Permissions.has_permission(
+            self.role,
+            "suppliers.create"
+        ):
+            self.warning(
+                "Suppliers",
+                "You do not have permission "
+                "to add suppliers."
+            )
+            return
+
+        super().add_record()
+
+
+    def edit_record(self):
+
+        if not Permissions.has_permission(
+            self.role,
+            "suppliers.edit"
+        ):
+            self.warning(
+                "Suppliers",
+                "You do not have permission "
+                "to edit suppliers."
+            )
+            return
+
+        super().edit_record()
+
+
+    def delete_record(self):
+
+        if not Permissions.has_permission(
+            self.role,
+            "suppliers.delete"
+        ):
+            self.warning(
+                "Suppliers",
+                "You do not have permission "
+                "to delete suppliers."
+            )
+            return
+
+        super().delete_record()

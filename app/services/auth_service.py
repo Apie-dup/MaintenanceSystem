@@ -8,22 +8,19 @@ class AuthService:
     @staticmethod
     def login(username, password):
 
-        user = UserModel.get_by_username(username)
+        user = UserModel.get_by_username(
+            username
+        )
 
         if user is None:
             return None
 
-        (
-            user_id,
-            username,
-            password_hash,
-            fullname,
-            role,
-            active
-        ) = user
-
-        if active == 0:
+        if not user["active"]:
             return None
+
+        password_hash = (
+            user["password_hash"]
+        )
 
         if bcrypt.checkpw(
             password.encode(),
@@ -31,10 +28,10 @@ class AuthService:
         ):
 
             return {
-                "id": user_id,
-                "username": username,
-                "fullname": fullname,
-                "role": role
+                "id": user["id"],
+                "username": user["username"],
+                "fullname": user["fullname"],
+                "role": user["role"],
             }
 
         return None

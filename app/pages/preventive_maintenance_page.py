@@ -10,6 +10,7 @@ from app.services.preventive_maintenance_service import (
 from app.ui.generated.ui_preventive_maintenance_page import (
     Ui_PMWindow
 )
+from app.core.permissions import Permissions
 
 
 class PreventiveMaintenancePage(CrudPage):
@@ -54,6 +55,17 @@ class PreventiveMaintenancePage(CrudPage):
         self.search_widget = self.ui.txtSearch
         self.status_label = self.ui.lblStatus
 
+        self.user = getattr(
+            parent,
+            "user",
+            {}
+        )
+
+        self.role = self.user.get(
+            "role",
+            ""
+        )
+
         self.setup_page()
 
     # ---------------------------------------------------------
@@ -64,7 +76,48 @@ class PreventiveMaintenancePage(CrudPage):
         self.validate_configuration()
         self.setup_table()
         self.connect_signals()
+        self.apply_permissions()
         self.load_data()
+
+    def apply_permissions(self):
+
+        can_create = Permissions.has_permission(
+            self.role,
+            "pm.create"
+        )
+
+        can_edit = Permissions.has_permission(
+            self.role,
+            "pm.edit"
+        )
+
+        can_delete = Permissions.has_permission(
+            self.role,
+            "pm.delete"
+        )
+
+        can_generate = Permissions.has_permission(
+            self.role,
+            "pm.generate_work_order"
+        )
+
+        self.ui.btnAdd.setVisible(
+            can_create
+        )
+
+        self.ui.btnEdit.setVisible(
+            can_edit
+        )
+
+        self.ui.btnDelete.setVisible(
+            can_delete
+        )
+
+        self.ui.btnGenerateWorkOrder.setVisible(
+            can_generate
+        )
+
+
 
     # ---------------------------------------------------------
     # Data
@@ -108,7 +161,7 @@ class PreventiveMaintenancePage(CrudPage):
         )
 
         self.table.itemDoubleClicked.connect(
-            lambda _item: self.edit_record()
+            self.handle_double_click
         )
 
     # ---------------------------------------------------------
@@ -226,3 +279,155 @@ class PreventiveMaintenancePage(CrudPage):
         )
 
         self.load_data()
+
+    def generate_work_order(self):
+
+        if not Permissions.has_permission(
+            self.role,
+            "pm.generate_work_order"
+        ):
+            self.warning(
+                "Generate Work Order",
+                "You do not have permission "
+                "to generate Work Orders "
+                "from PM schedules."
+            )
+            return
+
+        pm_id = self.selected_id()
+
+        if pm_id is None:
+            self.warning(
+                "Generated Work Order",
+                "Please select a PM schedule."
+            )
+            return
+
+        if not self.confirm(
+            "Generate Work Order",
+            (
+                "Generate a new Work Order "
+                "from the selected PM schedule?"
+            )
+        ):
+            return
+
+        try:
+            work_order_id =(
+                PreventiveMaintenanceService
+                .generate_work_order(
+                    pm_id,
+                    user=self.user
+                )
+            )
+
+        except ValueError as error:
+            self.warning(
+                "Generate Work Order",
+                str(error)
+            )
+            return
+
+        except Exception as error:
+            self.error(
+                "Generate Work Order",
+                (
+                    "Could not generate the work order."
+                    f"\n\n{error}"
+                ),
+            )
+            return
+
+        self.information(
+            "Generate Work Order",
+            (
+                "Work order generated successfully."
+                f"\n\nRecord ID: {work_order_id}"
+            ),
+        )
+
+        self.load_data()
+
+
+    def handle_double_click(self, _item):
+        record_id = self.selected_id()
+
+        if record_id is None:
+            return
+
+        # Users with edit permissins
+        if Permissions.has_permission(
+            self.role,
+            "pm.edit"
+        ):
+            self.edit_record()
+            return
+
+        # View-only users
+        if Permissions.has_permission(
+            self.role,
+            "pm"
+        ):
+            dialog = self.dialog_class(
+                parent=self
+            )
+
+            dialog.edit_record(
+                record_id
+            )
+
+            if hasattr(
+                dialog,
+                "set_pm_read_only"
+            ):
+                dialog.set_pm_read_only(
+                    True
+                )
+
+            dialog.exec()
+
+    def add_record(self):
+        if not Permissions.has_permission(
+            self.role,
+            "pm.create"
+        ):
+            self.warning(
+                "Preventive Maintenance",
+                "You do not have permission "
+                "to add PM schedules."
+            )
+            return
+
+        super().add_record()
+
+
+    def edit_record(self):
+
+        if not Permissions.has_permission(
+            self.role,
+            "pm.edit"
+        ):
+            self.warning(
+                "Preventive Maintenance",
+                "You do not have permission "
+                "to edit PM schedules."
+            )
+            return
+
+        super().edit_record()
+
+
+    def delete_record(self):
+
+        if not Permissions.has_permission(
+            self.role,
+            "pm.delete"
+        ):
+            self.warning(
+                "Preventive Maintenance",
+                "You do not have permission "
+                "to delete PM schedules."
+            )
+            return
+
+        super().delete_record()

@@ -5,6 +5,7 @@ from app.helpers.format_helper import FormatHelper
 from app.helpers.table_helper import TableHelper
 from app.services.dashboard_service import DashboardService
 from app.ui.generated.ui_dashboard_page import Ui_DashboardPage
+from app.services.settings_service import SettingsService
 
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QHeaderView
@@ -42,11 +43,14 @@ class DashboardPage(BasePage):
         self.setup_page()
 
     def setup_page(self):
+
         if hasattr(self.ui, "dashboardTitle"):
             self.ui.dashboardTitle.setStyleSheet("")
 
         if hasattr(self.ui, "dashboardSubtitle"):
             self.ui.dashboardSubtitle.setStyleSheet("")
+
+        self.refresh_identity()
 
         self.setup_tables()
 
@@ -221,3 +225,14 @@ class DashboardPage(BasePage):
                 cell = self.ui.tblPMDue.item(row, col)
                 if cell:
                     cell.setBackground(color)
+
+    def refresh_identity(self):
+        if hasattr(self.ui, "dashboardTitle"):
+            self.ui.dashboardTitle.setText(
+                SettingsService.system_name()
+            )
+
+        if hasattr(self.ui, "dashboardSubtitle"):
+            self.ui.dashboardSubtitle.setText(
+                SettingsService.organization_name()
+            )

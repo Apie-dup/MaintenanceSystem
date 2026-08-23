@@ -1,7 +1,9 @@
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment
 from openpyxl.utils import get_column_letter
+from app.services.settings_service import SettingsService
 
+currency_symbol = SettingsService.currency_symbol()
 
 class ReportExportHelper:
 
@@ -9,7 +11,9 @@ class ReportExportHelper:
     def export_table_to_excel(
         table,
         file_path,
-        report_title
+        report_title,
+        from_date=None,
+        to_date=None
     ):
         workbook = Workbook()
 
@@ -45,6 +49,34 @@ class ReportExportHelper:
         title_cell.alignment = Alignment(
             horizontal="center"
         )
+
+        #--------------------------------------------------
+        # Report period
+        #--------------------------------------------------
+
+        date_based_reports = {
+            "Work Orders",
+            "Maintenance Costs",
+            "Technician Performance",
+        }
+
+        if (
+            report_title in date_based_reports
+            and from_date
+            and to_date
+        ):
+            period_cell = worksheet.cell(
+                row=2,
+                column=1,
+                value=(
+                    f"Period: {from_date} to {to_date}"
+                )
+            )
+
+            period_cell.font = Font(
+                italic=True,
+                size=10
+            )
 
         # -------------------------------------------------
         # Column headings
@@ -116,12 +148,12 @@ class ReportExportHelper:
                 # Currency value
                 # -----------------------------------------
 
-                if text.startswith("N$"):
+                if text.startswith(currency_symbol):
 
                     try:
                         numeric_value = float(
                             text
-                            .replace("N$", "")
+                            .replace(currency_symbol, "")
                             .replace(",", "")
                             .strip()
                         )
@@ -129,7 +161,7 @@ class ReportExportHelper:
                         cell.value = numeric_value
 
                         cell.number_format = (
-                            '"N$" #,##0.00'
+                            f'"{currency_symbol}" #,##0.00'
                         )
 
                     except ValueError:

@@ -41,15 +41,15 @@ class Ui_DashboardWindow(object):
 
         self.formLayout_2.setWidget(0, QFormLayout.ItemRole.LabelRole, self.lblLogo)
 
-        self.lblCompany = QLabel(self.sidebar)
-        self.lblCompany.setObjectName(u"lblCompany")
+        self.dashboardTitle = QLabel(self.sidebar)
+        self.dashboardTitle.setObjectName(u"dashboardTitle")
 
-        self.formLayout_2.setWidget(1, QFormLayout.ItemRole.LabelRole, self.lblCompany)
+        self.formLayout_2.setWidget(1, QFormLayout.ItemRole.LabelRole, self.dashboardTitle)
 
-        self.lblMaintenaceManagementSysytem = QLabel(self.sidebar)
-        self.lblMaintenaceManagementSysytem.setObjectName(u"lblMaintenaceManagementSysytem")
+        self.dashboardSubtitle = QLabel(self.sidebar)
+        self.dashboardSubtitle.setObjectName(u"dashboardSubtitle")
 
-        self.formLayout_2.setWidget(2, QFormLayout.ItemRole.LabelRole, self.lblMaintenaceManagementSysytem)
+        self.formLayout_2.setWidget(2, QFormLayout.ItemRole.LabelRole, self.dashboardSubtitle)
 
         self.verticalSpacer_7 = QSpacerItem(20, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
@@ -178,7 +178,7 @@ class Ui_DashboardWindow(object):
 
         self.verticalSpacer = QSpacerItem(20, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
-        self.formLayout_2.setItem(19, QFormLayout.ItemRole.LabelRole, self.verticalSpacer)
+        self.formLayout_2.setItem(20, QFormLayout.ItemRole.LabelRole, self.verticalSpacer)
 
         self.btnLogout = QPushButton(self.sidebar)
         self.btnLogout.setObjectName(u"btnLogout")
@@ -188,7 +188,12 @@ class Ui_DashboardWindow(object):
         self.btnLogout.setCheckable(True)
         self.btnLogout.setAutoExclusive(True)
 
-        self.formLayout_2.setWidget(20, QFormLayout.ItemRole.LabelRole, self.btnLogout)
+        self.formLayout_2.setWidget(21, QFormLayout.ItemRole.LabelRole, self.btnLogout)
+
+        self.btnAbout = QPushButton(self.sidebar)
+        self.btnAbout.setObjectName(u"btnAbout")
+
+        self.formLayout_2.setWidget(19, QFormLayout.ItemRole.LabelRole, self.btnAbout)
 
 
         self.formLayout.setWidget(0, QFormLayout.ItemRole.LabelRole, self.sidebar)
@@ -217,8 +222,8 @@ class Ui_DashboardWindow(object):
     def retranslateUi(self, DashboardWindow):
         DashboardWindow.setWindowTitle(QCoreApplication.translate("DashboardWindow", u"Mantenance Management System", None))
         self.lblLogo.setText("")
-        self.lblCompany.setText(QCoreApplication.translate("DashboardWindow", u"Your Organization", None))
-        self.lblMaintenaceManagementSysytem.setText(QCoreApplication.translate("DashboardWindow", u"Maintenance Management System", None))
+        self.dashboardTitle.setText(QCoreApplication.translate("DashboardWindow", u"Organization", None))
+        self.dashboardSubtitle.setText(QCoreApplication.translate("DashboardWindow", u"System", None))
         self.btnDashboard.setText(QCoreApplication.translate("DashboardWindow", u"Dashboard", None))
         self.btnAssets.setText(QCoreApplication.translate("DashboardWindow", u"Assets", None))
         self.btnWorkOrders.setText(QCoreApplication.translate("DashboardWindow", u"Work Orders", None))
@@ -230,6 +235,7 @@ class Ui_DashboardWindow(object):
         self.btnLookups.setText(QCoreApplication.translate("DashboardWindow", u"Lookup Management", None))
         self.btnSettings.setText(QCoreApplication.translate("DashboardWindow", u"Settings", None))
         self.btnLogout.setText(QCoreApplication.translate("DashboardWindow", u"Logout", None))
+        self.btnAbout.setText(QCoreApplication.translate("DashboardWindow", u"About", None))
         self.mainToolBar.setWindowTitle(QCoreApplication.translate("DashboardWindow", u"toolBar", None))
     # retranslateUi
 

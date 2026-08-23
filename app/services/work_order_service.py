@@ -91,7 +91,10 @@ class WorkOrderService:
     # ---------------------------------------------------------
 
     @staticmethod
-    def create(data):
+    def create(
+        data,
+        user=None
+    ):
 
         save_data = dict(data)
 
@@ -122,7 +125,17 @@ class WorkOrderService:
         )
 
         WorkOrderHistoryService.log_created(
-            work_order_id
+            work_order_id,
+            user_id=(
+                user.get("id")
+                if user
+                else None
+            ),
+            username=(
+                user.get("username")
+                if user
+                else None
+            ),
         )
 
         return work_order_id
@@ -133,7 +146,10 @@ class WorkOrderService:
 # ---------------------------------------------------------
 
     @staticmethod
-    def update(record_id, data):
+    def update(record_id, 
+               data,
+               user=None
+            ):
 
         existing = WorkOrderModel.get_by_id(
             record_id
@@ -197,7 +213,8 @@ class WorkOrderService:
         WorkOrderService.log_changes(
             record_id,
             existing,
-            save_data
+            save_data,
+            user=user,
         )
 
         completed_statuses = {
@@ -390,7 +407,12 @@ class WorkOrderService:
 
     
     @staticmethod
-    def complete_work_order(record_id):
+    def complete_work_order(
+        record_id,
+        user=None,
+        meter_reading=None
+    ):
+
         work_order = WorkOrderModel.get_by_id(
             record_id
         )
@@ -422,30 +444,126 @@ class WorkOrderService:
                 "completing the Work Order."
             )
 
+        old_status = work_order["status"]
+
         completed_date = DateHelper.today_string()
+
+        #---------------------------------------------------
+        # Validate PM relation BEFORE changing Work Order
+        #---------------------------------------------------
+
+        pm_id = work_order["pm_id"]
+        pm_schedule = None
+
+        meter_types = {
+            "Running Hours",
+            "Kilometers",
+            "Cycles",
+        }
+
+        if pm_id is not None:
+
+            from app.services.preventive_maintenance_service import (
+                PreventiveMaintenanceService
+            )
+
+            pm_schedule = PreventiveMaintenanceService.get_by_id(
+                pm_id
+            )
+
+            if pm_schedule is None:
+                raise ValueError(
+                    "The Preventive Maintenance schedule "
+                    "linked to this Work Order no longer exists."
+                )
+
+        #---------------------------------------------------
+        # Validate meter-based PM before completing WO
+        #---------------------------------------------------
+
+        if (
+            pm_schedule["frequency_type"]
+            in meter_types
+        ):
+
+            if meter_reading is None:
+                raise ValueError(
+                    "A meter reading is required "
+                    "to complete this Work Order."
+                )
+
+            try:
+                meter_reading = float(
+                    meter_reading
+                )
+
+            except (TypeError, ValueError):
+                raise ValueError(
+                    "Meter reading must be a valid number."
+                )
+
+            if meter_reading < 0:
+                raise ValueError(
+                    "Meter reading cannot be negative."
+                )
+
+            last_meter = float(
+                pm_schedule[
+                    "last_service_meter"
+                ] or 0
+            )
+
+            if meter_reading < last_meter:
+                raise ValueError(
+                    "Meter reading cannot be lower "
+                    "than the previous service "
+                    "meter reading."
+                )
+
+        #---------------------------------------------------
+        # Complete Work Order
+        #---------------------------------------------------
 
         WorkOrderModel.complete(
             record_id,
             completed_date
         )
 
+        #---------------------------------------------------
+        # Audit
+        #---------------------------------------------------
+
         WorkOrderHistoryService.log_completed(
-            record_id
+            record_id,
+            old_status=old_status,
+            user_id=(
+                user.get("id")
+                if user
+                else None
+            ),
+            username=(
+                user.get("username")
+                if user
+                else None
+            ),
         )
 
-        if work_order["pm_id"] is not None:
-            from app.services.preventive_maintenance_service import (
-                PreventiveMaintenanceService
-            )
+        #---------------------------------------------------
+        # Advance PM schedule
+        #---------------------------------------------------
+
+        if pm_id is not None:
 
             PreventiveMaintenanceService.complete_schedule(
-                work_order["pm_id"],
+                pm_id,
                 completed_date
             )
 
-
     @staticmethod
-    def close_work_order(record_id):
+    def close_work_order(
+        record_id,
+        user=None
+    ):
 
         work_order = WorkOrderModel.get_by_id(
             record_id
@@ -466,20 +584,34 @@ class WorkOrderService:
                 "Only a completed Work Order can be closed."
             )
 
+        old_status = work_order["status"]
+
         WorkOrderModel.close(
             record_id,
             DateHelper.today_string()
         )
 
         WorkOrderHistoryService.log_closed(
-            record_id
+            record_id,
+            old_status=old_status,
+            user_id=(
+                user.get("id")
+                if user
+                else None
+            ),
+            username=(
+                user.get("username")
+                if user
+                else None
+            ),
         )
 
     @staticmethod
     def log_changes(
         work_order_id,
         existing,
-        new_data
+        new_data,
+        user=None,
     ):
 
         field = {
@@ -493,7 +625,6 @@ class WorkOrderService:
             "date_created": "Date Created",
             "due_date": "Due Date",
             "estimated_cost": "Estimated Cost",
-            "actual_cost": "Actual Cost",
             "labour_hours": "Labour Hours",
             "notes": "Notes",
         }
@@ -549,7 +680,30 @@ class WorkOrderService:
                     else str(new_value)
                 )
 
-                if old_text == new_text:
+            if field_name in {
+                "estimated_cost",
+                "labour_hours",
+            }:
+                try:
+                    old_number = float(
+                        old_value or 0
+                    )
+
+                    new_number = float(
+                        new_value or 0
+                    )
+
+                    if old_number == new_number:
+                        continue
+
+                except (TypeError, ValueError):
+                    pass
+
+            #---------------------------------------------
+            # Ignore unchanged values
+            #---------------------------------------------
+
+            if old_text == new_text:
                     continue
 
             WorkOrderHistoryService.add(
@@ -558,6 +712,16 @@ class WorkOrderService:
                 field_name=display_name,
                 old_value=old_text,
                 new_value=new_text,
+                user_id=(
+                    user.get("id")
+                    if user
+                    else None
+                ),
+                username=(
+                    user.get("username")
+                    if user
+                    else None
+                ),
             )
 
     @staticmethod
@@ -625,3 +789,48 @@ class WorkOrderService:
             data["status"] = "In Progress"
 
         return data
+
+    @staticmethod
+    def reopen_work_order(
+        record_id,
+        reason,
+        user=None,
+    ):
+
+        work_order = WorkOrderModel.get_by_id(
+            record_id
+        )
+
+        if work_order is None:
+            raise ValueError(
+                "Work Order not found."
+            )
+
+        if work_order["status"] == "Closed":
+            raise ValueError(
+                "A closed Work Order cannot be reopened."
+            )
+
+        if work_order["status"] != "Completed":
+            raise ValueError(
+                "Only a completed Work Order can be reopened."
+            )
+
+        WorkOrderModel.reopen(
+            record_id,
+        )
+
+        WorkOrderHistoryService.log_reopened(
+            record_id,
+            reason,
+            user_id=(
+                user.get("id")
+                if user
+                else None
+            ),
+            username=(
+                user.get("username")
+                if user
+                else None
+            ),
+        )

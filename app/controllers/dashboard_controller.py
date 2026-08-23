@@ -130,9 +130,6 @@ class DashboardController(QMainWindow):
     def open_setting(self):
         self.info("Settings", "Settings view is not available in this dashboard build.")
 
-    def logout(self):
-        self.close()
-
     def load_statistics(self):
 
         stats = DashboardService.get_statistics()

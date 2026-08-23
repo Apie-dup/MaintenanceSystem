@@ -17,6 +17,7 @@ from app.dialogs.work_order_dialog import (
             WorkOrderDialog
 )
 from app.helpers.format_helper import FormatHelper
+from app.core.permissions import Permissions
 
 
 class PreventiveMaintenanceDialog(BaseDialog):
@@ -62,6 +63,7 @@ class PreventiveMaintenanceDialog(BaseDialog):
         self.load_assets()
         self.configure_widgets()
         self.connect_signals()
+        self.update_frequency_mode()
 
         TableHelper.setup(
             self.ui.tblHistory,
@@ -93,6 +95,9 @@ class PreventiveMaintenanceDialog(BaseDialog):
         self.ui.dsbEstimatedCost.setMinimum(0.00)
         self.ui.dsbEstimatedCost.setMaximum(999999999.99)
 
+        # Calculated by the application.
+        self.ui.dsbNextDueMeter.setReadOnly(True)
+
     def connect_signals(self):
         self.ui.buttonBox.accepted.connect(
             self.save_and_close
@@ -103,11 +108,15 @@ class PreventiveMaintenanceDialog(BaseDialog):
         )
 
         self.ui.cmbFrequencyType.currentTextChanged.connect(
-            self.calculate_next_due
+            self.update_frequency_mode
         )
 
         self.ui.spnFrequencyValue.valueChanged.connect(
-            self.calculate_next_due
+            self.calculate_next_due_meter
+        )
+
+        self.ui.dsbLastServiceMeter.valueChanged.connect(
+            self.calculate_next_due_meter
         )
 
         self.ui.dtLastService.dateChanged.connect(
@@ -175,6 +184,10 @@ class PreventiveMaintenanceDialog(BaseDialog):
 
         self.ui.dtLastService.setDate(today)
 
+        self.ui.cmbMeterType.setCurrentIndex(-1)
+        self.ui.dsbLastServiceMeter.setValue(0.00)
+        self.ui.dsbNextDueMeter.setValue(0.00)
+
         self.ui.dsbEstimatedHours.setValue(0.00)
         self.ui.dsbEstimatedCost.setValue(0.00)
 
@@ -183,6 +196,8 @@ class PreventiveMaintenanceDialog(BaseDialog):
         )
 
         self.ui.chkActive.setChecked(True)
+
+        self.update_frequency_mode()
 
         self.calculate_next_due()
 
@@ -202,6 +217,21 @@ class PreventiveMaintenanceDialog(BaseDialog):
     # ---------------------------------------------------------
 
     def get_form_data(self):
+
+        frequency_type = (
+            self.ui.cmbFrequencyType.currentText().strip()
+        )
+
+        meter_types = {
+            "Running Hours",
+            "Kilometres",
+            "Cycles:",
+        }
+
+        is_meter_based = (
+            frequency_type in meter_types
+        )
+
         return {
             "pm_number":
                 self.ui.txtPMNumber.text().strip(),
@@ -216,20 +246,61 @@ class PreventiveMaintenanceDialog(BaseDialog):
                 self.ui.teDescription.toPlainText().strip(),
 
             "frequency_type":
-                self.ui.cmbFrequencyType.currentText().strip(),
+                frequency_type,
 
             "frequency_value":
                 self.ui.spnFrequencyValue.value(),
 
+            #---------------------------------------------------------
+            # Calendar-based scheduling
+            #---------------------------------------------------------
+
             "last_service_date":
-                self.ui.dtLastService.date().toString(
-                    "yyyy-MM-dd"
+                (
+                    None
+                    if is_meter_based
+                    else self.ui.dtLastService.date().toString(
+                        "yyyy-MM-dd"
+                    )
                 ),
 
             "next_due_date":
-                self.ui.dtNextDue.date().toString(
-                    "yyyy-MM-dd"
+                (
+                    None
+                    if is_meter_based
+                    else self.ui.dtNextDue.date().toString(
+                        "yyyy-MM-dd"
+                    )
                 ),
+
+            #---------------------------------------------------------
+            # Meter-based scheduling
+            #---------------------------------------------------------
+
+            "meter_type":
+                (
+                    frequency_type
+                    if is_meter_based
+                    else None
+                ),
+
+            "last_service_meter":
+                (
+                    self.ui.dsbLastServiceMeter.value()
+                    if is_meter_based
+                    else None
+                ),
+
+            "next_due_meter":
+                (
+                    self.ui.dsbNextDueMeter.value()
+                    if is_meter_based
+                    else None
+                ),
+
+            #---------------------------------------------------------
+            # Estimates
+            #---------------------------------------------------------
 
             "estimated_hours":
                 self.ui.dsbEstimatedHours.value(),
@@ -277,6 +348,26 @@ class PreventiveMaintenanceDialog(BaseDialog):
             self.ui.dtNextDue,
             pm["next_due_date"]
         )
+
+        meter_type = (
+            pm["meter_type"]
+            or pm["frequency_type"]
+            or ""
+        )
+
+        self.ui.cmbMeterType.setCurrentText(
+            meter_type
+        )
+
+        self.ui.dsbLastServiceMeter.setValue(
+            float(pm["last_service_meter"] or 0)
+        )
+
+        self.ui.dsbNextDueMeter.setValue(
+            float(pm["next_due_meter"] or 0)
+        )
+
+        self.update_frequency_mode()
 
         self.ui.dsbEstimatedHours.setValue(
             float(pm["estimated_hours"] or 0)
@@ -425,15 +516,26 @@ class PreventiveMaintenanceDialog(BaseDialog):
     # ---------------------------------------------------------
 
     def calculate_next_due(self, *_args):
+
         frequency_type = (
             self.ui.cmbFrequencyType.currentText().strip()
         )
+
+        meter_types = {
+            "Running Hours",
+            "Kilometres",
+            "Cycles",
+        }
 
         frequency_value = (
             self.ui.spnFrequencyValue.value()
         )
 
         if not frequency_type or frequency_value <= 0:
+            return
+
+        # Meter-based PMs do not use calendar dates.
+        if frequency_type in meter_types:
             return
 
         last_service_text = (
@@ -452,7 +554,6 @@ class PreventiveMaintenanceDialog(BaseDialog):
                 frequency_type,
                 frequency_value
             )
-
         except ValueError:
             return
 
@@ -466,59 +567,139 @@ class PreventiveMaintenanceDialog(BaseDialog):
                 qt_next_due
             )
 
+    def set_pm_read_only(
+        self,
+        read_only=True
+    ):
+        # ---------------------------------------------------------
+        # Text fields
+        # ---------------------------------------------------------
+
+        self.ui.txtPMNumber.setReadOnly(
+            True
+        )
+
+        self.ui.txtTask.setReadOnly(
+            read_only
+        )
+
+        self.ui.teDescription.setReadOnly(
+            read_only
+        )
+
+        self.ui.teNotes.setReadOnly(
+            read_only
+        )
+
+        # ---------------------------------------------------------
+        # Combo boxes
+        # ---------------------------------------------------------
+
+        self.ui.cmbAsset.setEnabled(
+            not read_only
+        )
+
+        self.ui.cmbFrequencyType.setEnabled(
+            not read_only
+        )
+
+        self.ui.cmbPriority.setEnabled(
+            not read_only
+        )
+
+        # ---------------------------------------------------------
+        # Frequency
+        # ---------------------------------------------------------
+
+        self.ui.spnFrequencyValue.setReadOnly(
+            read_only
+        )
+
+        # ---------------------------------------------------------
+        # Dates
+        # ---------------------------------------------------------
+
+        self.ui.dtLastService.setEnabled(
+            not read_only
+        )
+
+        # Next Due is always calculated/read-only.
+        self.ui.dtNextDue.setReadOnly(
+            True
+        )
+
+        self.ui.cmbMeterType.setEnabled(
+            not read_only
+        )
+
+        self.ui.dsbLastServiceMeter.setReadOnly(
+            read_only
+        )
+
+        self.ui.dsbNextDueMeter.setReadOnly(
+            True
+        )
+
+        # ---------------------------------------------------------
+        # Estimated values
+        # ---------------------------------------------------------
+
+        self.ui.dsbEstimatedHours.setReadOnly(
+            read_only
+        )
+
+        self.ui.dsbEstimatedCost.setReadOnly(
+            read_only
+        )
+
+        # ---------------------------------------------------------
+        # Active
+        # ---------------------------------------------------------
+
+        self.ui.chkActive.setEnabled(
+            not read_only
+        )
+
+        # ---------------------------------------------------------
+        # Save button
+        # ---------------------------------------------------------
+
+        save_button = self.ui.buttonBox.button(
+            self.ui.buttonBox.StandardButton.Save
+        )
+
+        if save_button is not None:
+            save_button.setVisible(
+                not read_only
+            )
+
+        #----------------------------------------------------------
+        # Dialog title
+        # ---------------------------------------------------------
+
+        if read_only:
+            self.setWindowTitle(
+                "View Preventive Maintenance"
+            )
+
     # ---------------------------------------------------------
     # Validation
     # ---------------------------------------------------------
 
     def validate(self):
+
         data = self.get_form_data()
 
-        if data["asset_id"] is None:
+        try:
+            PreventiveMaintenanceService.validate(
+                data
+            )
+
+        except ValueError as error:
             self.warning(
-                "Validation",
-                "Please select an asset."
+                "Preventive Maintenance",
+                str(error)
             )
-            self.ui.cmbAsset.setFocus()
-
-            return False
-
-        if not ValidationService.check(
-            self,
-            ValidationService.required(
-                data["task"],
-                "Task"
-            )
-        ):
-
-            self.ui.txtTask.setFocus()
-            return False
-
-        if not ValidationService.check(
-            self,
-            ValidationService.required(
-                data["frequency_type"],
-                "Frequency Type"
-            )
-        ):
-            self.ui.cmbFrequencyType.setFocus()
-            return False
-
-        if data["frequency_value"] <= 0:
-            self.warning(
-                "Validation",
-                "Frequency Value must be greater than zero."
-            )
-            return False
-
-        if not ValidationService.check(
-            self,
-            ValidationService.required(
-                data["priority"],
-                "Priority"
-            )
-        ):
-
-            self.ui.cmbPriority.setFocus()
             return False
 
         return True
@@ -546,20 +727,54 @@ class PreventiveMaintenanceDialog(BaseDialog):
         if row < 0:
             return
 
-        self.ui.tblHistory.selectRow(row)
+        self.ui.tblHistory.selectRow(
+            row
+        )
 
-        id_item = self.ui.tblHistory.item(row, 0)
+        id_item = self.ui.tblHistory.item(
+            row,
+            0
+        )
 
         if id_item is None:
             return
 
-        work_order_id = id_item.data(Qt.ItemDataRole.UserRole)
+        work_order_id = id_item.data(
+            Qt.ItemDataRole.UserRole
+        )
 
         if work_order_id is None:
             return
 
-        dialog = WorkOrderDialog(self)
-        dialog.edit_record(work_order_id)
+        main_window = self.window()
+
+        user = getattr(
+            main_window,
+            "user",
+            {}
+        )
+
+        role = user.get(
+            "role",
+            ""
+        )
+
+        dialog = WorkOrderDialog(
+            self
+        )
+
+        dialog.edit_record(
+            work_order_id
+        )
+
+        # Read-only when the user cannot edit Work Orders.
+        if not Permissions.has_permission(
+            role,
+            "work_orders.edit"
+        ):
+            dialog.set_work_order_read_only(
+                True
+            )
 
         if dialog.exec():
             self.load_history()
@@ -616,3 +831,89 @@ class PreventiveMaintenanceDialog(BaseDialog):
                 if item is not None:
                     item.setBackground(background)
                     item.setToolTip(tooltip)
+
+    def update_frequency_mode(self):
+
+        frequency_type = (
+            self.ui.cmbFrequencyType.currentText().strip()
+        )
+
+        meter_types = {
+            "Running Hours",
+            "Kilometres",
+            "Cycles",
+        }
+
+        is_meter_based = (
+            frequency_type in meter_types
+        )
+
+    # -------------------------------------------------
+    # Calendar fields
+    # -------------------------------------------------
+
+        self.ui.dtLastService.setEnabled(
+            not is_meter_based
+        )
+
+        self.ui.dtNextDue.setEnabled(
+        not is_meter_based
+        )
+
+    # -------------------------------------------------
+    # Meter fields
+    # -------------------------------------------------
+
+        self.ui.cmbMeterType.setEnabled(
+            is_meter_based
+        )
+
+        self.ui.dsbLastServiceMeter.setEnabled(
+            is_meter_based
+        )
+
+        self.ui.dsbNextDueMeter.setEnabled(
+            is_meter_based
+        )
+
+        if is_meter_based:
+            self.ui.cmbMeterType.setCurrentText(
+                frequency_type
+            )
+
+            self.calculate_next_due_meter()
+
+        else:
+            self.calculate_next_due()
+
+    def calculate_next_due_meter(self, *_args):
+
+        frequency_type = (
+            self.ui.cmbFrequencyType.currentText().strip()
+        )
+
+        meter_types = {
+            "Running Hours",
+            "Kilometres",
+            "Cycles",
+        }
+
+        if frequency_type not in meter_types:
+            return
+
+        frequency_value = (
+            self.ui.spnFrequencyValue.value()
+        )
+
+        last_service_meter = (
+            self.ui.dsbLastServiceMeter.value()
+        )
+
+        next_due_meter = (
+            last_service_meter
+            + frequency_value
+        )
+
+        self.ui.dsbNextDueMeter.setValue(
+            next_due_meter
+        )

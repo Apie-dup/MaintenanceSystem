@@ -1,3 +1,4 @@
+from app.helpers.currency_helper import CurrencyHelper
 from app.core.settings import Settings
 
 
@@ -17,10 +18,7 @@ class FormatHelper:
         if value is None:
             value = 0
 
-        return (
-            f"{Settings.CURRENCY_SYMBOL} "
-            f"{float(value):,.{Settings.CURRENCY_DECIMALS}f}"
-        )
+        return CurrencyHelper.display(value)
 
     # -------------------------------------------------
     # Quantity

@@ -4,6 +4,7 @@ from app.helpers.code_generator import CodeGenerator
 
 class PreventiveMaintenanceModel:
 
+
     # ---------------------------------------------------------
     # Get all PM plans
     # ---------------------------------------------------------
@@ -93,6 +94,9 @@ class PreventiveMaintenanceModel:
                 preventive_maintenance.frequency_value,
                 preventive_maintenance.last_service_date,
                 preventive_maintenance.next_due_date,
+                preventive_maintenance.meter_type,
+                preventive_maintenance.last_service_meter,
+                preventive_maintenance.next_due_meter,
                 preventive_maintenance.estimated_hours,
                 preventive_maintenance.estimated_cost,
                 preventive_maintenance.priority,
@@ -206,38 +210,44 @@ class PreventiveMaintenanceModel:
 
         try:
             cursor.execute("""
-            INSERT INTO preventive_maintenance
-            (
-                pm_number,
-                asset_id,
-                task,
-                description,
-                frequency_type,
-                frequency_value,
-                last_service_date,
-                next_due_date,
-                estimated_hours,
-                estimated_cost,
-                priority,
-                active,
-                notes
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            data["pm_number"],
-            data["asset_id"],
-            data["task"],
-            data["description"],
-            data["frequency_type"],
-            data["frequency_value"],
-            data["last_service_date"],
-            data["next_due_date"],
-            data["estimated_hours"],
-            data["estimated_cost"],
-            data["priority"],
-            data["active"],
-            data["notes"],
-        ))
+                INSERT INTO preventive_maintenance
+                (
+                    pm_number,
+                    asset_id,
+                    task,
+                    description,
+                    frequency_type,
+                    frequency_value,
+                    last_service_date,
+                    next_due_date,
+                    meter_type,
+                    last_service_meter,
+                    next_due_meter,
+                    estimated_hours,
+                    estimated_cost,
+                    priority,
+                    active,
+                    notes
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                data["pm_number"],
+                data["asset_id"],
+                data["task"],
+                data["description"],
+                data["frequency_type"],
+                data["frequency_value"],
+                data["last_service_date"],
+                data["next_due_date"],
+                data.get("meter_type"),
+                data.get("last_service_meter"),
+                data.get("next_due_meter"),
+                data["estimated_hours"],
+                data["estimated_cost"],
+                data["priority"],
+                data["active"],
+                data["notes"],
+            ))
 
             record_id = cursor.lastrowid
 
@@ -263,44 +273,51 @@ class PreventiveMaintenanceModel:
 
         try:
             cursor.execute("""
-            UPDATE preventive_maintenance
-            SET
-                pm_number = ?,
-                asset_id = ?,
-                task = ?,
-                description = ?,
-                frequency_type = ?,
-                frequency_value = ?,
-                last_service_date = ?,
-                next_due_date = ?,
-                estimated_hours = ?,
-                estimated_cost = ?,
-                priority = ?,
-                active = ?,
-                notes = ?
-            WHERE id = ?
-        """, (
-            data["pm_number"],
-            data["asset_id"],
-            data["task"],
-            data["description"],
-            data["frequency_type"],
-            data["frequency_value"],
-            data["last_service_date"],
-            data["next_due_date"],
-            data["estimated_hours"],
-            data["estimated_cost"],
-            data["priority"],
-            data["active"],
-            data["notes"],
-            record_id,
-        ))
+                UPDATE preventive_maintenance
+                    SET
+                    pm_number = ?,
+                    asset_id = ?,
+                    task = ?,
+                    description = ?,
+                    frequency_type = ?,
+                    frequency_value = ?,
+                    last_service_date = ?,
+                    next_due_date = ?,
+                    meter_type = ?,
+                    last_service_meter = ?,
+                    next_due_meter = ?,
+                    estimated_hours = ?,
+                    estimated_cost = ?,
+                    priority = ?,
+                    active = ?,
+                    notes = ?
+                WHERE id = ?
+            """, (
+                data["pm_number"],
+                data["asset_id"],
+                data["task"],
+                data["description"],
+                data["frequency_type"],
+                data["frequency_value"],
+                data["last_service_date"],
+                data["next_due_date"],
+                data.get("meter_type"),
+                data.get("last_service_meter"),
+                data.get("next_due_meter"),
+                data["estimated_hours"],
+                data["estimated_cost"],
+                data["priority"],
+                data["active"],
+                data["notes"],
+                record_id,
+            ))
 
-            record_id = cursor.lastrowid
+            if cursor.rowcount == 0:
+                raise ValueError(
+                    "Preventive Maintenance schedule not found."
+                )
 
             conn.commit()
-
-            return record_id
 
         except Exception:
             conn.rollback()
@@ -541,3 +558,38 @@ class PreventiveMaintenanceModel:
 
         conn.commit()
         conn.close()
+
+    @staticmethod
+    def update_service_meter(
+        pm_id,
+        last_service_meter,
+        next_due_meter
+    ):
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute("""
+                UPDATE preventive_maintenance
+                SET
+                    last_service_meter = ?,
+                    next_due_meter = ?
+                WHERE id = ?
+            """, (
+                last_service_meter,
+                next_due_meter,
+                pm_id,
+            ))
+
+            if cursor.rowcount == 0:
+                raise ValueError(
+                    "Preventive Maintenance schedule not found."
+                )
+            conn.commit()
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()

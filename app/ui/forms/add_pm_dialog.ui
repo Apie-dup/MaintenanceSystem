@@ -87,6 +87,12 @@
           </item>
           <item row="3" column="1">
            <widget class="QPlainTextEdit" name="teDescription">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -175,10 +181,41 @@
           <item row="0" column="1">
            <widget class="QComboBox" name="cmbPriority"/>
           </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="lblEstimatedHours">
+            <property name="text">
+             <string>Estimated Hours:</string>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="2">
            <widget class="QLabel" name="lblActive">
             <property name="text">
              <string>Active:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QDoubleSpinBox" name="dsbEstimatedHours"/>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="lblMeterType">
+            <property name="text">
+             <string>Meter Type:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="4">
+           <widget class="QDoubleSpinBox" name="dsbLastServiceMeter">
+            <property name="maximum">
+             <double>999999.989999999990687</double>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QLabel" name="lblLastServiceMeter">
+            <property name="text">
+             <string>Last Service Meter:</string>
             </property>
            </widget>
           </item>
@@ -189,25 +226,51 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="lblEstimatedHours">
-            <property name="text">
-             <string>Estimated Hours:</string>
-            </property>
+          <item row="3" column="1">
+           <widget class="QComboBox" name="cmbMeterType">
+            <item>
+             <property name="text">
+              <string>Running Hours</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Kilometers</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Cycles</string>
+             </property>
+            </item>
            </widget>
           </item>
-          <item row="1" column="1">
-           <widget class="QDoubleSpinBox" name="dsbEstimatedHours"/>
-          </item>
-          <item row="1" column="2" colspan="2">
+          <item row="2" column="2" colspan="2">
            <widget class="QLabel" name="lblEstimatedCost">
             <property name="text">
              <string>Estimated Cost:</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="4">
+          <item row="2" column="4">
            <widget class="QDoubleSpinBox" name="dsbEstimatedCost"/>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="lblNextDueMeter">
+            <property name="text">
+             <string>Next Due Meter:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QDoubleSpinBox" name="dsbNextDueMeter">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+            <property name="maximum">
+             <double>999999.989999999990687</double>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -220,6 +283,12 @@
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
            <widget class="QPlainTextEdit" name="teNotes">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="minimumSize">
              <size>
               <width>0</width>

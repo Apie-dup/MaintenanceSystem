@@ -43,7 +43,10 @@ class WorkOrderPartService:
     # ---------------------------------------------------------
 
     @staticmethod
-    def issue_part(data):
+    def issue_part(
+        data,
+        user=None
+    ):
 
         conn = Database.connect()
 
@@ -196,6 +199,16 @@ class WorkOrderPartService:
                     "Status changed automatically "
                     "when a part was issued."
                 ),
+                user_id=(
+                    user.get("id")
+                    if user
+                    else None
+                ),
+                username=(
+                    user.get("username")
+                    if user
+                    else None
+                ),
             )
 
         WorkOrderHistoryService.add(
@@ -204,14 +217,25 @@ class WorkOrderPartService:
             field_name="Material",
             old_value=None,
             new_value=(
-                f'{quantity:g} x '
-                f'{inventory["part_name"]}'
-            ),
-            notes=(
-                f'Part {inventory["part_number"]} issued '
-                f'at unit cost {unit_cost:.2f}.'
-            ),
-        )
+            f'{quantity:g} x '
+            f'{inventory["part_name"]}'
+        ),
+        notes=(
+            f'Part {inventory["part_number"]} '
+            f'issued at unit cost '
+            f'{unit_cost:.2f}.'
+        ),
+        user_id=(
+            user.get("id")
+            if user
+            else None
+        ),
+        username=(
+            user.get("username")
+            if user
+            else None
+        ),
+    )
 
     @staticmethod
     def set_status(
@@ -254,7 +278,10 @@ class WorkOrderPartService:
                 conn.close()
 
     @staticmethod
-    def remove_part(record_id):
+    def remove_part(
+        record_id,
+        user=None
+    ):
 
         conn = Database.connect()
 
@@ -364,12 +391,22 @@ class WorkOrderPartService:
             action="Part Returned",
             field_name="Material",
             old_value=(
-                f"{issued_quantity} x "
-                f"{part_name}"
-            ),
-            new_value=None,
-            notes=(
-                f"Part {part_number} returned "
-                "to inventory."
-            ),
-        )
+            f"{issued_quantity:g} x "
+            f"{part_name}"
+        ),
+        new_value=None,
+        notes=(
+            f"Part {part_number} "
+            f"returned to inventory."
+        ),
+        user_id=(
+            user.get("id")
+            if user
+            else None
+        ),
+        username=(
+            user.get("username")
+            if user
+            else None
+        ),
+    )

@@ -17,7 +17,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QFrame, QHBoxLayout, QLabel,
     QMainWindow, QMenuBar, QPushButton, QSizePolicy,
-    QStackedWidget, QStatusBar, QToolBar, QWidget)
+    QStackedWidget, QStatusBar, QToolBar, QVBoxLayout,
+    QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -34,52 +35,88 @@ class Ui_MainWindow(object):
         self.navigationFrame.setMaximumSize(QSize(220, 16777215))
         self.navigationFrame.setFrameShape(QFrame.Shape.StyledPanel)
         self.navigationFrame.setFrameShadow(QFrame.Shadow.Raised)
+        self.verticalLayout = QVBoxLayout(self.navigationFrame)
+        self.verticalLayout.setObjectName(u"verticalLayout")
         self.lblLogo = QLabel(self.navigationFrame)
         self.lblLogo.setObjectName(u"lblLogo")
-        self.lblLogo.setGeometry(QRect(11, 11, 198, 54))
+
+        self.verticalLayout.addWidget(self.lblLogo)
+
         self.lblCompany = QLabel(self.navigationFrame)
         self.lblCompany.setObjectName(u"lblCompany")
-        self.lblCompany.setGeometry(QRect(11, 71, 198, 54))
+
+        self.verticalLayout.addWidget(self.lblCompany)
+
         self.btnDashboard = QPushButton(self.navigationFrame)
         self.btnDashboard.setObjectName(u"btnDashboard")
-        self.btnDashboard.setGeometry(QRect(11, 191, 81, 26))
         self.btnDashboard.setCheckable(False)
+
+        self.verticalLayout.addWidget(self.btnDashboard)
+
         self.btnAssets = QPushButton(self.navigationFrame)
         self.btnAssets.setObjectName(u"btnAssets")
-        self.btnAssets.setGeometry(QRect(11, 223, 81, 26))
         self.btnAssets.setCheckable(False)
+
+        self.verticalLayout.addWidget(self.btnAssets)
+
         self.btnWorkOrders = QPushButton(self.navigationFrame)
         self.btnWorkOrders.setObjectName(u"btnWorkOrders")
-        self.btnWorkOrders.setGeometry(QRect(11, 255, 83, 26))
         self.btnWorkOrders.setCheckable(False)
+
+        self.verticalLayout.addWidget(self.btnWorkOrders)
+
         self.btnPM = QPushButton(self.navigationFrame)
         self.btnPM.setObjectName(u"btnPM")
-        self.btnPM.setGeometry(QRect(11, 287, 143, 26))
         self.btnPM.setCheckable(False)
+
+        self.verticalLayout.addWidget(self.btnPM)
+
         self.btnTechnicians = QPushButton(self.navigationFrame)
         self.btnTechnicians.setObjectName(u"btnTechnicians")
-        self.btnTechnicians.setGeometry(QRect(11, 319, 81, 26))
         self.btnTechnicians.setCheckable(False)
+
+        self.verticalLayout.addWidget(self.btnTechnicians)
+
         self.btnInventory = QPushButton(self.navigationFrame)
         self.btnInventory.setObjectName(u"btnInventory")
-        self.btnInventory.setGeometry(QRect(11, 351, 81, 26))
         self.btnInventory.setCheckable(False)
+
+        self.verticalLayout.addWidget(self.btnInventory)
+
         self.btnSuppliers = QPushButton(self.navigationFrame)
         self.btnSuppliers.setObjectName(u"btnSuppliers")
-        self.btnSuppliers.setGeometry(QRect(11, 383, 81, 26))
         self.btnSuppliers.setCheckable(False)
+
+        self.verticalLayout.addWidget(self.btnSuppliers)
+
         self.btnReports = QPushButton(self.navigationFrame)
         self.btnReports.setObjectName(u"btnReports")
-        self.btnReports.setGeometry(QRect(11, 415, 81, 26))
         self.btnReports.setCheckable(False)
+
+        self.verticalLayout.addWidget(self.btnReports)
+
+        self.btnUsers = QPushButton(self.navigationFrame)
+        self.btnUsers.setObjectName(u"btnUsers")
+
+        self.verticalLayout.addWidget(self.btnUsers)
+
         self.btnSettings = QPushButton(self.navigationFrame)
         self.btnSettings.setObjectName(u"btnSettings")
-        self.btnSettings.setGeometry(QRect(11, 447, 81, 26))
         self.btnSettings.setCheckable(False)
+
+        self.verticalLayout.addWidget(self.btnSettings)
+
+        self.btnAbout = QPushButton(self.navigationFrame)
+        self.btnAbout.setObjectName(u"btnAbout")
+
+        self.verticalLayout.addWidget(self.btnAbout)
+
         self.btnLogout = QPushButton(self.navigationFrame)
         self.btnLogout.setObjectName(u"btnLogout")
-        self.btnLogout.setGeometry(QRect(11, 479, 81, 26))
         self.btnLogout.setCheckable(False)
+
+        self.verticalLayout.addWidget(self.btnLogout)
+
 
         self.horizontalLayout.addWidget(self.navigationFrame)
 
@@ -112,6 +149,9 @@ class Ui_MainWindow(object):
         self.pageSettings = QWidget()
         self.pageSettings.setObjectName(u"pageSettings")
         self.stackedWidget.addWidget(self.pageSettings)
+        self.pageUsers = QWidget()
+        self.pageUsers.setObjectName(u"pageUsers")
+        self.stackedWidget.addWidget(self.pageUsers)
 
         self.horizontalLayout.addWidget(self.stackedWidget)
 
@@ -129,6 +169,9 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
+        self.stackedWidget.setCurrentIndex(9)
+
+
         QMetaObject.connectSlotsByName(MainWindow)
     # setupUi
 
@@ -144,7 +187,9 @@ class Ui_MainWindow(object):
         self.btnInventory.setText(QCoreApplication.translate("MainWindow", u"Inventory", None))
         self.btnSuppliers.setText(QCoreApplication.translate("MainWindow", u"Suppliers", None))
         self.btnReports.setText(QCoreApplication.translate("MainWindow", u"Reports", None))
+        self.btnUsers.setText(QCoreApplication.translate("MainWindow", u"Users", None))
         self.btnSettings.setText(QCoreApplication.translate("MainWindow", u"Settings", None))
+        self.btnAbout.setText(QCoreApplication.translate("MainWindow", u"About", None))
         self.btnLogout.setText(QCoreApplication.translate("MainWindow", u"Logout", None))
         self.toolBar.setWindowTitle(QCoreApplication.translate("MainWindow", u"toolBar", None))
     # retranslateUi

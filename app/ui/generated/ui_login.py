@@ -24,8 +24,8 @@ class Ui_LoginWindow(object):
     def setupUi(self, LoginWindow):
         if not LoginWindow.objectName():
             LoginWindow.setObjectName(u"LoginWindow")
-        LoginWindow.resize(1054, 600)
-        LoginWindow.setMinimumSize(QSize(520, 340))
+        LoginWindow.resize(520, 340)
+        LoginWindow.setMinimumSize(QSize(340, 340))
         self.centralwidget = QWidget(LoginWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.verticalLayout = QVBoxLayout(self.centralwidget)
@@ -108,7 +108,7 @@ class Ui_LoginWindow(object):
         LoginWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(LoginWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1054, 33))
+        self.menubar.setGeometry(QRect(0, 0, 520, 33))
         LoginWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(LoginWindow)
         self.statusbar.setObjectName(u"statusbar")

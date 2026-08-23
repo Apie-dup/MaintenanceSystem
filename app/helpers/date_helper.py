@@ -1,5 +1,6 @@
 from datetime import date, datetime, timedelta
 import calendar
+from app.services.settings_service import SettingsService
 
 
 class DateHelper:
@@ -44,6 +45,47 @@ class DateHelper:
             value,
             "%Y-%m-%d"
         ).date()
+
+    # -------------------------------------------------
+    # Display formatting
+    # -------------------------------------------------
+
+    @staticmethod
+    def display(value):
+
+        if value is None or value == "":
+            return ""
+
+        if isinstance(value, datetime):
+            value = value.date()
+
+        elif isinstance(value, str):
+            try:
+                value = DateHelper.from_string(
+                    value
+                )
+            except ValueError:
+                return value
+
+        date_format = (
+            SettingsService.date_format()
+        )
+
+        formats = {
+            "dd-MMM-yyyy": "%d-%b-%Y",
+            "dd/MM/yyyy": "%d/%m/%Y",
+            "yyyy-MM-dd": "%Y-%m-%d",
+            "MM/dd/yyyy": "%m/%d/%Y",
+        }
+
+        python_format = formats.get(
+            date_format,
+            "%d-%b-%Y"
+        )
+
+        return value.strftime(
+            python_format
+        )
 
     # -------------------------------------------------
     # Add Days

@@ -11,6 +11,13 @@ from app.models.work_order_model import WorkOrderModel
 
 class PreventiveMaintenanceService:
 
+    METER_FREQUENCY_TYPES = {
+        "Running Hours",
+        "Kilometers",
+        "Cycles",
+    }
+
+
     # ---------------------------------------------------------
     # Get All
     # ---------------------------------------------------------
@@ -64,11 +71,19 @@ class PreventiveMaintenanceService:
             save_data
         )
 
-        save_data["next_due_date"] = (
-            PreventiveMaintenanceService.calculate_next_due_date(
-                save_data
+        if save_data["frequency_type"] in {
+            "Running Hours",
+            "Kilometres",
+            "Cycles",
+        }:
+            save_data["next_due_date"] = None
+
+        else:
+            save_data["next_due_date"] = (
+                PreventiveMaintenanceService.calculate_next_due_date(
+                    save_data
+                )
             )
-        )
 
         return PreventiveMaintenanceModel.insert(
             save_data
@@ -87,74 +102,24 @@ class PreventiveMaintenanceService:
             save_data
         )
 
-        save_data["next_due_date"] =(
-            PreventiveMaintenanceService.calculate_next_due_date(
-                save_data
+        if save_data["frequency_type"] in {
+            "Running Hours",
+            "Kilometres",
+            "Cycles",
+        }:
+            save_data["next_due_date"] = None
+
+        else:
+            save_data["next_due_date"] = (
+                PreventiveMaintenanceService.calculate_next_due_date(
+                    save_data
+                )
             )
-        )
 
         PreventiveMaintenanceModel.update(
             record_id,
             save_data
         )
-
-        existing = WorkOrderModel.get_by_id(
-            record_id
-        )
-
-        if existing is None:
-            raise ValueError(
-                "Work Order not found."
-            )
-
-        save_data = dict(data)
-
-        WorkOrderService.validate_data(
-            save_data
-        )
-
-        if WorkOrderModel.number_exists(
-            save_data["work_order_number"],
-            exclude_id=record_id,
-        ):
-            raise ValueError(
-                "Work Order Number already exists."
-            )
-
-        save_data["pm_id"] = existing["pm_id"]
-
-        WorkOrderModel.update(
-            record_id,
-            save_data
-        )
-
-        completed_statuses = {
-            "Completed",
-            "Closed",
-        }
-
-        was_completed = (
-            existing["status"]
-            in completed_statuses
-        )
-
-        is_completed = (
-            save_data["status"]
-            in completed_statuses
-        )
-
-        if (
-            not was_completed
-            and is_completed
-            and existing["pm_id"] is not None
-        ):
-            from app.services.preventive_maintenance_service import (
-                PreventiveMaintenanceService
-            )
-
-            PreventiveMaintenanceService.complete_schedule(
-                existing["pm_id"]
-            )
 
     # ---------------------------------------------------------
     # Delete
@@ -186,7 +151,11 @@ class PreventiveMaintenanceService:
                 "Task is required."
             )
 
-        if not data["frequency_type"].strip():
+        frequency_type = (
+            data["frequency_type"].strip()
+        )
+
+        if not frequency_type:
             raise ValueError(
                 "Frequency Type is required."
             )
@@ -196,10 +165,56 @@ class PreventiveMaintenanceService:
                 "Frequency Value must be greater than zero."
             )
 
-        if not data["last_service_date"]:
-            raise ValueError(
-                "Last Service Date is required."
-            )
+        meter_types = {
+            "Running Hours",
+            "Kilometres",
+            "Cycles",
+        }
+
+        is_meter_based = (
+            frequency_type in meter_types
+        )
+
+        if is_meter_based:
+
+            if data.get("last_service_meter") is None:
+                raise ValueError(
+                    "Last Service Meter is required."
+                )
+
+            if data.get("next_due_meter") is None:
+                raise ValueError(
+                    "Next Due Meter is required."
+                )
+
+            if float(
+                data["last_service_meter"]
+            ) < 0:
+                raise ValueError(
+                    "Last Service Meter cannot be negative."
+                )
+
+            if float(
+                data["next_due_meter"]
+            ) <= float(
+                data["last_service_meter"]
+            ):
+                raise ValueError(
+                    "Next Due Meter must be greater "
+                    "than Last Service Meter."
+                )
+
+        else:
+
+            if not data["last_service_date"]:
+                raise ValueError(
+                    "Last Service Date is required."
+                )
+
+            if not data["next_due_date"]:
+                raise ValueError(
+                    "Next Due Date is required."
+                )
 
         if not data["priority"].strip():
             raise ValueError(
@@ -288,7 +303,10 @@ class PreventiveMaintenanceService:
     
 
     @staticmethod
-    def generate_work_order(pm_id):
+    def generate_work_order(
+        pm_id,
+        user=None,
+    ):
 
         pm = PreventiveMaintenanceModel.get_by_id(pm_id)
 
@@ -352,8 +370,11 @@ class PreventiveMaintenanceService:
             "actual_cost":
                 0.00,
 
-            "labour_hours":
+            "estimated_hours":
                 float(pm["estimated_hours"] or 0),
+
+            "labour_hours":
+                0.00,
 
             "notes": (
                 "Generated from Preventive Maintenance "
@@ -365,12 +386,16 @@ class PreventiveMaintenanceService:
                 pm["id"]
         }
 
-        return WorkOrderService.create(data)
+        return WorkOrderService.create(
+            data,
+            user=user
+        )
 
     @staticmethod
     def complete_schedule(
         pm_id,
-        completion_date=None
+        completion_date=None,
+        meter_reading=None,
     ):
 
         pm = PreventiveMaintenanceModel.get_by_id(pm_id)
@@ -385,7 +410,7 @@ class PreventiveMaintenanceService:
             "An inactive PM schedule cannot be completed."
             )
 
-        frequency_value = int(
+        frequency_value = float(
             pm["frequency_value"] or 0
         )
 
@@ -394,10 +419,68 @@ class PreventiveMaintenanceService:
             "The PM schedule has an invalid frequency value."
             )
 
+        frequency_type = pm["frequency_type"]
+
+        meter_types = {
+            "Running Hours",
+            "Kilometers",
+            "Cycles",
+        }
+
+        #---------------------------------------------------------
+        # Meter-based Pm
+        #---------------------------------------------------------
+
+        if frequency_type in meter_types:
+
+            if meter_reading is None:
+                raise ValueError(
+                    "A meter reading is required to "
+                    "complete this PM schedule."
+                )
+
+            meter_reading = float(
+                meter_reading
+            )
+
+            if meter_reading < 0:
+                raise ValueError(
+                    "Meter reading cannot be negative."
+                )
+
+            previous_meter = float(
+                pm["last_service_meter"] or 0
+            )
+
+            if meter_reading < previous_meter:
+                raise ValueError(
+                    "Meter reading cannot be less than "
+                    "the previous service meter reading."
+                )
+
+            next_due_meter = (
+                meter_reading
+                + frequency_value
+            )
+
+            PreventiveMaintenanceModel.update_service_meter(
+                pm_id,
+                meter_reading,
+                next_due_meter,
+            )
+
+            return
+
+        #---------------------------------------------------------
+        # Calendar-based PM
+
         if completion_date is None:
             completion_date = DateHelper.today()
 
-        elif isinstance(completion_date, str):
+        elif isinstance(
+            completion_date, 
+            str
+        ):
             completion_date = DateHelper.from_string(
                 completion_date
             )
@@ -405,13 +488,17 @@ class PreventiveMaintenanceService:
         next_due_date = (
             DateHelper.calculate_next_due_date(
                 completion_date,
-                pm["frequency_type"],
-                int(pm["frequency_value"]),
+                frequency_type,
+                int(frequency_value),
             )
         )
 
         PreventiveMaintenanceModel.update_service_dates(
             pm_id,
-            DateHelper.to_string(completion_date),
-            DateHelper.to_string(next_due_date)
+            DateHelper.to_string(
+                completion_date
+            ),
+            DateHelper.to_string(
+                next_due_date
+            ),
         )

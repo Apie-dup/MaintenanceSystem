@@ -89,6 +89,7 @@ class WorkOrderModel:
                 work_orders.date_created,
                 work_orders.due_date,
                 work_orders.estimated_cost,
+                work_orders.estimated_hours,
                 work_orders.actual_cost,
                 work_orders.labour_hours,
                 work_orders.notes,
@@ -216,12 +217,13 @@ class WorkOrderModel:
                     date_created,
                     due_date,
                     estimated_cost,
+                    estimated_hours,
                     actual_cost,
                     labour_hours,
                     notes,
                     pm_id
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 data["work_order_number"],
                 data["asset_id"],
@@ -234,6 +236,7 @@ class WorkOrderModel:
                 data["date_created"],
                 data["due_date"],
                 data["estimated_cost"],
+                data.get("estimated_hours", 0),
                 data["actual_cost"],
                 data["labour_hours"],
                 data["notes"],
@@ -274,6 +277,7 @@ class WorkOrderModel:
                     date_created = ?,
                     due_date = ?,
                     estimated_cost = ?,
+                    estimated_hours = ?,
                     actual_cost = ?,
                     labour_hours = ?,
                     notes = ?,
@@ -291,6 +295,7 @@ class WorkOrderModel:
                 data["date_created"],
                 data["due_date"],
                 data["estimated_cost"],
+                data.get("estimated_hours", 0),
                 data["actual_cost"],
                 data["labour_hours"],
                 data["notes"],
@@ -720,3 +725,37 @@ class WorkOrderModel:
         finally:
             if owns_connection:
                 conn.close()
+
+    @staticmethod
+    def reopen(record_id):
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute("""
+                UPDATE work_orders
+                SET
+                    status = "In Progress",
+                    completed_date = NULL,
+                    closed_date = NULL
+                WHERE id = ?
+                  AND status = 'Completed'
+            """, (
+                record_id,
+            ))
+
+            if cursor.rowcount == 0:
+                raise ValueError(
+                    "Only completed Work Orders "
+                    "can be reopened."
+                )
+
+            conn.commit()
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()

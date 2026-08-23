@@ -3,6 +3,7 @@ from app.database.schema import DatabaseSchema
 from app.database.seed import DatabaseSeeder
 from app.database.migrations import MigrationManager
 from app.core.logger import logger
+from app.core.version import APP_NAME
 
 class DatabaseSetup:
 
@@ -10,7 +11,7 @@ class DatabaseSetup:
     def initialize():
 
         logger.info("%s", "=" * 50)
-        logger.info("Maintenance Management System")
+        logger.info(APP_NAME)
         logger.info("Database Initializer")
         logger.info("%s", "=" * 50)
 
@@ -26,7 +27,7 @@ class DatabaseSetup:
         # Seed default data
         DatabaseSeeder.seed()
 
-        logger.info("Database initialized succssesfully.")
+        logger.info("Database initialized successfully.")
 
     @staticmethod
     def rebuild():

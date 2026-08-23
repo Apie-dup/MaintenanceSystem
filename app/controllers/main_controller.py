@@ -25,6 +25,10 @@ from app.controllers.lookup_controller import LookupController
 
 from app.core.page_manager import PageManager
 from app.core.navigation_manager import NavigationManager
+from app.services.settings_service import SettingsService
+from app.dialogs.about_dialog import AboutDialog
+from app.pages.users_page import UsersPage
+from app.core.permissions import Permissions
 
 
 class MainController(QMainWindow):
@@ -39,14 +43,12 @@ class MainController(QMainWindow):
 
         self.configure_main_layout()
         self.ensure_lookup_button()
+        self.ensure_about_button()
         self.configure_navigation_buttons()
         self.normalize_sidebar_layout()
         self.setup_navigation_icons()
 
-        self.setWindowTitle(
-            "Maintenance Management System - "
-            f"{user.get('fullname', '')}"
-        )
+        self.update_application_identity()
 
         self.page_manager = PageManager()
         self.navigation = NavigationManager(
@@ -57,7 +59,8 @@ class MainController(QMainWindow):
         self.register_pages()
         self.register_navigation()
 
-        self.show_dashboard()
+        self.apply_permissions()
+        self.show_default_page()
 
     def configure_main_layout(self):
         self.ui.stackedWidget.setSizePolicy(
@@ -76,28 +79,28 @@ class MainController(QMainWindow):
             / "icons"
         )
 
-        dashboard_icon = icons_dir / "dashboard.png"
+        dashboard_icon = icons_dir / "dashboard.svg"
 
         if dashboard_icon.exists():
             self.ui.btnDashboard.setIcon(
                 QIcon(str(dashboard_icon))
             )
 
-        assets_icon = icons_dir / "assets.png"
+        assets_icon = icons_dir / "assets.svg"
 
         if assets_icon.exists():
             self.ui.btnAssets.setIcon(
                 QIcon(str(assets_icon))
             )
 
-        work_orders_icon = icons_dir / "workorders.png"
+        work_orders_icon = icons_dir / "workorders.svg"
 
         if work_orders_icon.exists():
             self.ui.btnWorkOrders.setIcon(
                 QIcon(str(work_orders_icon))
             )
 
-        pm_icon = icons_dir / "pm.png"
+        pm_icon = icons_dir / "pm.svg"
 
         if not pm_icon.exists():
             pm_icon = icons_dir / "preventive_maintenance.png"
@@ -107,51 +110,62 @@ class MainController(QMainWindow):
                 QIcon(str(pm_icon))
             )
 
-        technicians_icon = icons_dir / "technicians.png"
-
-        if not technicians_icon.exists():
-            technicians_icon = icons_dir / "technicians.png.png"
+        technicians_icon = icons_dir / "technicians.svg"
 
         if technicians_icon.exists():
             self.ui.btnTechnicians.setIcon(
                 QIcon(str(technicians_icon))
             )
 
-        inventory_icon = icons_dir / "inventory.png"
+        inventory_icon = icons_dir / "inventory.svg"
 
         if inventory_icon.exists():
             self.ui.btnInventory.setIcon(
                 QIcon(str(inventory_icon))
             )
 
-        suppliers_icon = icons_dir / "suppliers.png"
+        suppliers_icon = icons_dir / "suppliers.svg"
         if suppliers_icon.exists():
             self.ui.btnSuppliers.setIcon(
                 QIcon(str(suppliers_icon))
             )
 
-        reports_icon = icons_dir / "reports.png"
+        reports_icon = icons_dir / "reports.svg"
 
         if reports_icon.exists():
             self.ui.btnReports.setIcon(
                 QIcon(str(reports_icon))
             )
 
-        lookup_icon = icons_dir / "lookup.png"
+        lookup_icon = icons_dir / "lookup.svg"
 
         if lookup_icon.exists():
             self.ui.btnLookups.setIcon(
                 QIcon(str(lookup_icon))
             )
 
-        settings_icon = icons_dir / "settings.png"
+        users_icon = icons_dir / "users.svg"
+
+        if users_icon.exists():
+            self.ui.btnUsers.setIcon(
+                QIcon(str(users_icon))
+            )
+
+        settings_icon = icons_dir / "settings.svg"
 
         if settings_icon.exists():
             self.ui.btnSettings.setIcon(
                 QIcon(str(settings_icon))
             )
 
-        logout_icon = icons_dir / "logout.png"
+        about_icon = icons_dir / "about.svg"
+
+        if about_icon.exists():
+            self.ui.btnAbout.setIcon(
+                QIcon(str(about_icon))
+            )
+
+        logout_icon = icons_dir / "logout.svg"
 
         if logout_icon.exists():
             self.ui.btnLogout.setIcon(
@@ -167,6 +181,26 @@ class MainController(QMainWindow):
         self.ui.btnLookups.setText("Lookup Management")
         self.ui.btnLookups.setCheckable(False)
 
+    def ensure_about_button(self):
+        if hasattr(self.ui, "btnAbout"):
+            return
+
+        self.ui.btnAbout = QPushButton(
+            self.ui.navigationFrame
+        )
+
+        self.ui.btnAbout.setObjectName(
+            "btnAbout"
+        )
+
+        self.ui.btnAbout.setText(
+            "About"
+        )
+
+        self.ui.btnAbout.setCheckable(
+            False
+        )
+
     def navigation_buttons(self):
         return [
             self.ui.btnDashboard,
@@ -177,6 +211,8 @@ class MainController(QMainWindow):
             self.ui.btnInventory,
             self.ui.btnSuppliers,
             self.ui.btnReports,
+            self.ui.btnLookups,
+            self.ui.btnUsers,
             self.ui.btnSettings,
         ]
 
@@ -187,6 +223,7 @@ class MainController(QMainWindow):
             button.setAutoExclusive(True)
 
         self.ui.btnLookups.setProperty("navigation", True)
+        self.ui.btnAbout.setProperty("navigation", True)
         self.ui.btnLogout.setProperty("navigation", True)
 
     @staticmethod
@@ -202,31 +239,72 @@ class MainController(QMainWindow):
             button.setChecked(is_active)
             self.refresh_button_style(button)
 
-        for button in (self.ui.btnLookups, self.ui.btnLogout):
+        for button in (self.ui.btnLookups, self.ui.btnAbout, self.ui.btnLogout):
             button.setProperty("current", False)
             self.refresh_button_style(button)
 
         QApplication.processEvents()
 
     def normalize_sidebar_layout(self):
+
         sidebar = self.ui.navigationFrame
-        sidebar.setMinimumSize(220, 0)
-        sidebar.setMaximumSize(220, 16777215)
 
-        self.ui.lblCompany.setText("Your Organization")
-        self.ui.lblCompany.setWordWrap(True)
+        sidebar.setMinimumSize(
+            220,
+            0
+        )
 
-        existing_layout = sidebar.layout()
-        if existing_layout is not None:
-            QWidget().setLayout(existing_layout)
+        sidebar.setMaximumSize(
+            220,
+            16777215
+        )
 
-        layout = QVBoxLayout(sidebar)
-        layout.setContentsMargins(11, 11, 11, 16)
+        #-----------------------------------------------
+        # Reuse the existing sidebar Layout safely
+        #-----------------------------------------------
+
+        layout = sidebar.layout()
+
+        if layout is None:
+            layout = QVBoxLayout(sidebar)
+
+        else:
+            # Remove layout items without deleting
+            # the actual widgets.
+            while layout.count():
+                item = layout.takeAt(0)
+
+                widget = item.widget()
+
+                if widget is not None:
+                    widget.setParent(sidebar)
+
+        layout.setContentsMargins(
+            11,
+            11,
+            11,
+            16
+        )
+
         layout.setSpacing(8)
 
-        layout.addWidget(self.ui.lblLogo)
-        layout.addWidget(self.ui.lblCompany)
+        # -----------------------------------------------
+        # Haeder
+        # -----------------------------------------------
+
+        layout.addWidget(
+            self.ui.lblLogo
+        )
+
+        layout.addWidget(
+            self.ui.lblCompany
+        )
+
         layout.addSpacing(12)
+
+        # -----------------------------------------------
+        # Navigation
+        # -----------------------------------------------
 
         buttons = [
             self.ui.btnDashboard,
@@ -238,38 +316,61 @@ class MainController(QMainWindow):
             self.ui.btnSuppliers,
             self.ui.btnReports,
             self.ui.btnLookups,
+            self.ui.btnUsers,
             self.ui.btnSettings,
-            self.ui.btnLogout,
+            self.ui.btnAbout,
         ]
 
-        for button in buttons[:-1]:
+        for button in buttons:
+
             button.setSizePolicy(
                 QSizePolicy.Policy.Expanding,
                 QSizePolicy.Policy.Fixed,
             )
-            layout.addWidget(button)
 
+            layout.addWidget(
+                button
+            )
+
+        # Push About/logout area toward the bottom
         layout.addStretch(1)
 
-        logout_button = buttons[-1]
-        logout_button.setSizePolicy(
+        self.ui.btnLogout.setSizePolicy(
             QSizePolicy.Policy.Expanding,
             QSizePolicy.Policy.Fixed,
         )
-        layout.addWidget(logout_button)
+
+        layout.addWidget(
+            self.ui.btnLogout
+        )
 
     def create_pages(self):
+
         self.dashboard_page = DashboardPage(self)
+
         self.assets_page = AssetsPage(self)
+
         self.work_orders_page = WorkOrdersPage(self)
+
         self.pm_page = PreventiveMaintenancePage(self)
+
         self.technicians_page = TechniciansPage(self)
+
         self.inventory_page = InventoryPage(self)
+
         self.suppliers_page = SuppliersPage(self)
+
         self.reports_page = ReportsPage(self)
+
         self.settings_page = SettingsPage(self)
 
+        self.users_page = UsersPage(
+            self.user,
+            self
+        )
+
     def register_pages(self):
+
         self.page_manager.add_page(
             self.ui.pageDashboard,
             self.dashboard_page
@@ -315,7 +416,13 @@ class MainController(QMainWindow):
             self.settings_page
         )
 
+        self.page_manager.add_page(
+            self.ui.pageUsers,
+            self.users_page
+        )
+
     def register_navigation(self):
+
         self.ui.btnDashboard.clicked.connect(
             self.show_dashboard
         )
@@ -353,17 +460,28 @@ class MainController(QMainWindow):
                 self.open_lookups
             )
 
+        self.ui.btnUsers.clicked.connect(
+            self.show_users
+        )
+
         self.ui.btnSettings.clicked.connect(
             self.show_settings
         )
 
+        self.ui.btnAbout.clicked.connect(
+            self.show_about
+        )
+
         self.ui.btnLogout.clicked.connect(
-            self.close
+            self.logout
         )
 
     def show_dashboard(self):
+
         self.set_active_navigation(self.ui.btnDashboard)
+
         self.dashboard_page.refresh_dashboard()
+
         self.navigation.show(
             self.ui.pageDashboard
         )
@@ -425,3 +543,138 @@ class MainController(QMainWindow):
     def open_lookups(self):
         self.lookup_window = LookupController()
         self.lookup_window.show()
+
+    def show_about(self):
+
+        dialog = AboutDialog(self)
+
+        dialog.exec()
+
+    def show_users(self):
+        self.set_active_navigation(
+            self.ui.btnUsers
+        )
+
+        self.users_page.load_data()
+
+        self.navigation.show(
+            self.ui.pageUsers
+        )
+
+    def update_application_identity(self):
+
+        if hasattr(self, "dashboard_page"):
+            self.dashboard_page.refresh_identity()
+
+        organization_name = (
+            SettingsService.organization_name()
+        )
+
+        system_name = (
+            SettingsService.system_name()
+        )
+
+        self.ui.lblCompany.setText(
+            organization_name
+        )
+
+        user_name = (
+            self.user.get(
+                "fullname",
+                ""
+            )
+        )
+
+        # Main window title
+        self.setWindowTitle(
+            f"{system_name} - {user_name}"
+        )
+
+        # Sidebar organization name
+        self.ui.lblCompany.setText(
+            organization_name
+        )
+
+        self.ui.lblCompany.setWordWrap(
+            True
+        )
+
+    def apply_permissions(self):
+
+        role = self.user.get(
+            "role",
+            ""
+        )
+
+        permissions = {
+            self.ui.btnDashboard: "dashboard",
+            self.ui.btnAssets: "assets",
+            self.ui.btnWorkOrders: "work_orders",
+            self.ui.btnPM: "pm",
+            self.ui.btnTechnicians: "technicians",
+            self.ui.btnInventory: "inventory",
+            self.ui.btnSuppliers: "suppliers",
+            self.ui.btnReports: "reports",
+            self.ui.btnLookups: "lookups",
+            self.ui.btnUsers: "users",
+            self.ui.btnSettings: "settings",
+        }
+
+        for button, permission in permissions.items():
+
+            button.setVisible(
+                Permissions.has_permission(
+                    role,
+                    permission
+                )
+            )
+
+        self.ui.btnAbout.setVisible(True)
+
+        self.ui.btnLogout.setVisible(True)
+
+    def show_default_page(self):
+        role = self.user.get(
+            "role",
+            ""
+        )
+        if Permissions.has_permission(
+            role,
+            "dashboard"
+        ):
+            self.show_dashboard()
+            return
+
+        if Permissions.has_permission(
+            role,
+            "work_orders"
+        ):
+            self.show_work_orders()
+            return
+
+        if Permissions.has_permission(
+            role,
+            "assets"
+        ):
+            self.show_assets()
+            return
+
+    def logout(self):
+
+        # Local import avoids circular import
+        from app.controllers.login_controller import (
+            LoginController
+        )
+
+        app = QApplication.instance()
+
+        self.login_window = LoginController()
+
+        if app is not None:
+            app.login_window = self.login_window
+
+        self.login_window.show()
+
+        self.close()
+
+    

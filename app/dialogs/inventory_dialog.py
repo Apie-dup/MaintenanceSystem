@@ -276,6 +276,101 @@ class InventoryDialog(BaseDialog):
 
         self.set_form_data(inventory)
 
+    def set_inventory_read_only(
+        self,
+        read_only=True
+    ):
+
+        # ---------------------------------------------------------
+        # Text fields
+        # ---------------------------------------------------------
+
+        self.ui.txtPartNumber.setReadOnly(
+            True
+        )
+
+        self.ui.txtPartName.setReadOnly(
+            read_only
+        )
+
+        self.ui.txtDescription.setReadOnly(
+            read_only
+        )
+
+        self.ui.txtBarcode.setReadOnly(
+            read_only
+        )
+
+        self.ui.teNotes.setReadOnly(
+            read_only
+        )
+
+        # ---------------------------------------------------------
+        # Combo boxes
+        # ---------------------------------------------------------
+
+        self.ui.cmbCategory.setEnabled(
+            not read_only
+        )
+
+        self.ui.cmbSupplier.setEnabled(
+            not read_only
+        )
+
+        self.ui.cmbUnit.setEnabled(
+            not read_only
+        )
+
+        self.ui.cmbLocation.setEnabled(
+            not read_only
+        )
+
+        self.ui.cmbStatus.setEnabled(
+            not read_only
+        )
+
+        # ---------------------------------------------------------
+        # Quantities / cost
+        # ---------------------------------------------------------
+
+        self.ui.spnQuantity.setReadOnly(
+            read_only
+        )
+
+        self.ui.spnMinimumQuantity.setReadOnly(
+            read_only
+        )
+
+        self.ui.spnReorderQuantity.setReadOnly(
+            read_only
+        )
+
+        self.ui.dsbUnitCost.setReadOnly(
+            read_only
+        )
+
+        # ---------------------------------------------------------
+        # Save button
+        # ---------------------------------------------------------
+
+        save_button = self.ui.buttonBox.button(
+            self.ui.buttonBox.StandardButton.Save
+        )
+
+        if save_button is not None:
+            save_button.setVisible(
+                not read_only
+            )
+
+        # ---------------------------------------------------------
+        # Dialog title
+        # ---------------------------------------------------------
+
+        if read_only:
+            self.setWindowTitle(
+                "View Inventory Item"
+            )
+
     # ---------------------------------------------------------
     # Validation
     # ---------------------------------------------------------

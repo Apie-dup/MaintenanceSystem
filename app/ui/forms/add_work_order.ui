@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>580</width>
-    <height>970</height>
+    <width>600</width>
+    <height>702</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -22,6 +22,12 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTabWidget" name="tabWorkOrder">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
@@ -59,7 +65,14 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QLineEdit" name="txtWorkOrderNumber"/>
+           <widget class="QLineEdit" name="txtWorkOrderNumber">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
+           </widget>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="lblTitle">
@@ -69,7 +82,14 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QLineEdit" name="txtTitle"/>
+           <widget class="QLineEdit" name="txtTitle">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
+           </widget>
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="lblDescription">
@@ -89,7 +109,7 @@
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>0</height>
+              <height>40</height>
              </size>
             </property>
            </widget>
@@ -102,7 +122,14 @@
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="QComboBox" name="cmbPriority"/>
+           <widget class="QComboBox" name="cmbPriority">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
+           </widget>
           </item>
           <item row="4" column="0">
            <widget class="QLabel" name="lblStatus">
@@ -112,7 +139,14 @@
            </widget>
           </item>
           <item row="4" column="1">
-           <widget class="QComboBox" name="cmbStatus"/>
+           <widget class="QComboBox" name="cmbStatus">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -140,7 +174,14 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QComboBox" name="cmbAsset"/>
+           <widget class="QComboBox" name="cmbAsset">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
+           </widget>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="lblTechnician">
@@ -150,7 +191,14 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QComboBox" name="cmbTechnician"/>
+           <widget class="QComboBox" name="cmbTechnician">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
+           </widget>
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="lblRequestedBy">
@@ -160,7 +208,14 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QLineEdit" name="txtRequestedBy"/>
+           <widget class="QLineEdit" name="txtRequestedBy">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -185,7 +240,14 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QDateEdit" name="dtDateCreated"/>
+           <widget class="QDateEdit" name="dtDateCreated">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
+           </widget>
           </item>
           <item row="0" column="2">
            <widget class="QLabel" name="lblDueDate">
@@ -195,7 +257,14 @@
            </widget>
           </item>
           <item row="0" column="3">
-           <widget class="QDateEdit" name="dtDueDate"/>
+           <widget class="QDateEdit" name="dtDueDate">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
+           </widget>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="lblEstimatedCost">
@@ -206,8 +275,14 @@
           </item>
           <item row="1" column="1">
            <widget class="QDoubleSpinBox" name="dsbEstimatedCost">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
             <property name="prefix">
-             <string>N$ </string>
+             <string/>
             </property>
             <property name="maximum">
              <double>999999.989999999990687</double>
@@ -223,23 +298,50 @@
           </item>
           <item row="1" column="3">
            <widget class="QDoubleSpinBox" name="dsbActualCost">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
             <property name="prefix">
-             <string>N$ </string>
+             <string/>
             </property>
             <property name="maximum">
              <double>999999.989999999990687</double>
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
+          <item row="2" column="3">
+           <widget class="QDoubleSpinBox" name="dsbLabourHours">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
            <widget class="QLabel" name="lblLabourHours">
             <property name="text">
              <string>Labour Hours:</string>
             </property>
            </widget>
           </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="lblEstimatedHours">
+            <property name="text">
+             <string>Estimated Hours:</string>
+            </property>
+           </widget>
+          </item>
           <item row="2" column="1">
-           <widget class="QDoubleSpinBox" name="dsbLabourHours"/>
+           <widget class="QDoubleSpinBox" name="dsbEstimatedHours">
+            <property name="maximum">
+             <double>999999.989999999990687</double>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -259,10 +361,19 @@
           <item>
            <widget class="QPlainTextEdit" name="teNotes">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="sizeAdjustPolicy">
+             <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
             </property>
            </widget>
           </item>
@@ -304,7 +415,7 @@
             <item>
              <widget class="QLabel" name="lblMaterialTotal">
               <property name="text">
-               <string>Materials Total: N$0.00</string>
+               <string>Materials Total: 0.00</string>
               </property>
              </widget>
             </item>
@@ -349,6 +460,13 @@
       <widget class="QPushButton" name="btnCloseWorkOrder">
        <property name="text">
         <string>Close Work Order</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnReopen">
+       <property name="text">
+        <string>Reopen Work Order</string>
        </property>
       </widget>
      </item>

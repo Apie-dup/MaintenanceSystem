@@ -1,10 +1,10 @@
-from operator import index
-
 from app.base.crud_page import CrudPage
 from app.dialogs.technician_dialog import TechnicianDialog
 from app.services.technician_service import TechnicianService
 from app.ui.generated.ui_technicians_page import Ui_TechniciansWindow
 from app.helpers.format_helper import FormatHelper
+from app.core.permissions import Permissions
+from app.helpers.table_helper import TableHelper
 
 
 class TechniciansPage(CrudPage):
@@ -48,13 +48,66 @@ class TechniciansPage(CrudPage):
         self.search_widget = self.ui.txtSearch
         self.status_label = self.ui.lblStatus
 
+        self.user = getattr(
+            parent,
+            "user",
+            {}
+        )
+
+        self.role = self.user.get(
+            "role",
+            ""
+        )
+
         self.setup_page()
 
     def setup_page(self):
         self.validate_configuration()
         self.setup_table()
         self.connect_signals()
+        self.apply_permissions()
         self.load_data()
+
+    def apply_permissions(self):
+
+        can_create = Permissions.has_permission(
+            self.role,
+            "technicians.create"
+        )
+
+        can_edit = Permissions.has_permission(
+            self.role,
+            "technicians.edit"
+        )
+
+        can_delete = Permissions.has_permission(
+            self.role,
+            "technicians.delete"
+        )
+
+        self.ui.btnAdd.setVisible(
+            can_create
+        )
+
+        can_edit = (
+            Permissions.has_permission(
+                self.role,
+                "work_orders.edit"
+            )
+            or
+            Permissions.has_permission(
+                self.role,
+                "work_orders.update"
+            )
+        )
+
+        self.ui.btnEdit.setVisible(
+            can_edit
+        )
+
+        self.ui.btnDelete.setVisible(
+            can_delete
+        )
 
     def connect_signals(self):
         self.ui.btnAdd.clicked.connect(
@@ -78,8 +131,125 @@ class TechniciansPage(CrudPage):
         )
 
         self.table.itemDoubleClicked.connect(
-            lambda _item: self.edit_record()
+            self.handle_double_click
         )
+
+    def handle_double_click(self, _item):
+
+        record_id = TableHelper.selected_id(
+            self.table
+        )
+
+        if record_id is None:
+            return
+
+        #Full edit
+        if Permissions.has_permission(
+            self.role,
+            "work_orders.edit"
+        ):
+
+            self.edit_record()
+            return
+
+        # Technician operational update
+        if Permissions.has_permission(
+            self.role,
+            "work_orders.update"
+        ):
+            self.open_technician_work_order(
+                record_id
+            )
+            return
+
+        # Viewer
+        if Permissions.has_permission(
+            self.role,
+            "work_orders"
+        ):
+
+            dialog = self.dialog_class(
+                parent=self
+            )
+
+            dialog.edit_record(
+                record_id
+            )
+
+            dialog.set_work_order_read_only(
+                True
+            )
+
+            dialog.exec()
+
+    def add_record(self):
+
+        if not Permissions.has_permission(
+            self.role,
+            "technicians.create"
+        ):
+            self.warning(
+                "Technicians",
+                "You do not have permission "
+                "to add technicians."
+            )
+            return
+
+        super().add_record()
+
+
+    def edit_record(self):
+
+        if Permissions.has_permission(
+            self.role,
+            "work_orders.edit"
+        ):
+            super().edit_record()
+            return
+
+        if Permissions.has_permission(
+            self.role,
+            "work_orders.update"
+        ):
+
+            record_id = TableHelper.selected_id(
+                self.table
+            )
+
+            if record_id is None:
+                self.warning(
+                    "Work Orders",
+                    "Please select a work order"
+                )
+                return
+
+            self.open_technician_work_order(
+                record_id
+            )
+
+            return
+
+        self.warning(
+            "Work Orders",
+            "You do not have permission "
+            "to edit work orders."
+        )
+
+
+    def delete_record(self):
+
+        if not Permissions.has_permission(
+            self.role,
+            "technicians.delete"
+        ):
+            self.warning(
+                "Technicians",
+                "You do not have permission "
+                "to delete technicians."
+            )
+            return
+
+        super().delete_record()
 
     def populate_table(self, records):
 

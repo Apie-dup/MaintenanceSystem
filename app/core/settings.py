@@ -1,11 +1,14 @@
 class Settings:
     """
-    Application-wide configuration values.
+    Static application configuration values.
+
+    User-configurable values such as organization name,
+    system name, currency symbol, date format, and theme
+    are stored in app_settings and accessed through
+    SettingsService.
     """
 
     # Application
-    APP_NAME = "Maintenance Management System"
-    ORGANIZATION = "Du Plessis Enterprises"
     VERSION = "1.0.0"
 
     # UI
@@ -17,7 +20,6 @@ class Settings:
     TABLE_ROW_HEIGHT = 28
 
     # Formatting
-    CURRENCY_SYMBOL = "N$"
     CURRENCY_DECIMALS = 2
     QUANTITY_DECIMALS = 2
 

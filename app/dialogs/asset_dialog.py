@@ -357,3 +357,94 @@ class AssetDialog(BaseDialog):
                 self.record_id,
                 data,
             )
+
+    def set_asset_read_only(
+        self,
+        read_only=True
+    ):
+
+        # ---------------------------------------------
+        # Text fields
+        # ---------------------------------------------
+
+        self.ui.txtAssetName.setReadOnly(
+            read_only
+        )
+
+        self.ui.txtDescription.setReadOnly(
+            read_only
+        )
+
+        self.ui.txtManufacturer.setReadOnly(
+            read_only
+        )
+
+        self.ui.txtModel.setReadOnly(
+            read_only
+        )
+
+        self.ui.txtSerialNumber.setReadOnly(
+            read_only
+        )
+
+        self.ui.txtNotes.setReadOnly(
+            read_only
+        )
+
+        # Asset code is always read-only
+        self.ui.txtAssetCode.setReadOnly(
+            True
+        )
+
+        # ---------------------------------------------
+        # Comboboxes
+        # ---------------------------------------------
+
+        self.ui.cmbCategory.setEnabled(
+            not read_only
+        )
+
+        self.ui.cmbLocation.setEnabled(
+            not read_only
+        )
+
+        self.ui.cmbStatus.setEnabled(
+            not read_only
+        )
+
+        # ---------------------------------------------
+        # Dates and cost
+        # ---------------------------------------------
+
+        self.ui.dtPurchaseDate.setEnabled(
+            not read_only
+        )
+
+        self.ui.dtWarrantyExpiry.setEnabled(
+            not read_only
+        )
+
+        self.ui.dsbPurchaseCost.setReadOnly(
+            read_only
+        )
+
+        # ---------------------------------------------
+        # Save button
+        # ---------------------------------------------
+
+        save_button = (
+            self.ui.buttonBox.button(
+                self.ui.buttonBox
+                .StandardButton.Save
+            )
+        )
+
+        if save_button is not None:
+            save_button.setVisible(
+                not read_only
+            )
+
+        if read_only:
+            self.setWindowTitle(
+                "View Asset"
+            )

@@ -35,196 +35,143 @@
       <property name="frameShadow">
        <enum>QFrame::Shadow::Raised</enum>
       </property>
-      <widget class="QLabel" name="lblLogo">
-       <property name="geometry">
-        <rect>
-         <x>11</x>
-         <y>11</y>
-         <width>198</width>
-         <height>54</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-      <widget class="QLabel" name="lblCompany">
-       <property name="geometry">
-        <rect>
-         <x>11</x>
-         <y>71</y>
-         <width>198</width>
-         <height>54</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btnDashboard">
-       <property name="geometry">
-        <rect>
-         <x>11</x>
-         <y>191</y>
-         <width>81</width>
-         <height>26</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Dashboard</string>
-       </property>
-       <property name="checkable">
-        <bool>false</bool>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btnAssets">
-       <property name="geometry">
-        <rect>
-         <x>11</x>
-         <y>223</y>
-         <width>81</width>
-         <height>26</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Assets</string>
-       </property>
-       <property name="checkable">
-        <bool>false</bool>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btnWorkOrders">
-       <property name="geometry">
-        <rect>
-         <x>11</x>
-         <y>255</y>
-         <width>83</width>
-         <height>26</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Work Orders</string>
-       </property>
-       <property name="checkable">
-        <bool>false</bool>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btnPM">
-       <property name="geometry">
-        <rect>
-         <x>11</x>
-         <y>287</y>
-         <width>143</width>
-         <height>26</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Preventive Maintenance</string>
-       </property>
-       <property name="checkable">
-        <bool>false</bool>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btnTechnicians">
-       <property name="geometry">
-        <rect>
-         <x>11</x>
-         <y>319</y>
-         <width>81</width>
-         <height>26</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Technicians</string>
-       </property>
-       <property name="checkable">
-        <bool>false</bool>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btnInventory">
-       <property name="geometry">
-        <rect>
-         <x>11</x>
-         <y>351</y>
-         <width>81</width>
-         <height>26</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Inventory</string>
-       </property>
-       <property name="checkable">
-        <bool>false</bool>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btnSuppliers">
-       <property name="geometry">
-        <rect>
-         <x>11</x>
-         <y>383</y>
-         <width>81</width>
-         <height>26</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Suppliers</string>
-       </property>
-       <property name="checkable">
-        <bool>false</bool>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btnReports">
-       <property name="geometry">
-        <rect>
-         <x>11</x>
-         <y>415</y>
-         <width>81</width>
-         <height>26</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Reports</string>
-       </property>
-       <property name="checkable">
-        <bool>false</bool>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btnSettings">
-       <property name="geometry">
-        <rect>
-         <x>11</x>
-         <y>447</y>
-         <width>81</width>
-         <height>26</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Settings</string>
-       </property>
-       <property name="checkable">
-        <bool>false</bool>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btnLogout">
-       <property name="geometry">
-        <rect>
-         <x>11</x>
-         <y>479</y>
-         <width>81</width>
-         <height>26</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Logout</string>
-       </property>
-       <property name="checkable">
-        <bool>false</bool>
-       </property>
-      </widget>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QLabel" name="lblLogo">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblCompany">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnDashboard">
+         <property name="text">
+          <string>Dashboard</string>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnAssets">
+         <property name="text">
+          <string>Assets</string>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnWorkOrders">
+         <property name="text">
+          <string>Work Orders</string>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnPM">
+         <property name="text">
+          <string>Preventive Maintenance</string>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnTechnicians">
+         <property name="text">
+          <string>Technicians</string>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnInventory">
+         <property name="text">
+          <string>Inventory</string>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnSuppliers">
+         <property name="text">
+          <string>Suppliers</string>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnReports">
+         <property name="text">
+          <string>Reports</string>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnUsers">
+         <property name="text">
+          <string>Users</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnSettings">
+         <property name="text">
+          <string>Settings</string>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnAbout">
+         <property name="text">
+          <string>About</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnLogout">
+         <property name="text">
+          <string>Logout</string>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </item>
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
+      <property name="currentIndex">
+       <number>9</number>
+      </property>
       <widget class="QWidget" name="pageDashboard"/>
       <widget class="QWidget" name="pageAssets"/>
       <widget class="QWidget" name="pageWorkOrders"/>
@@ -234,6 +181,7 @@
       <widget class="QWidget" name="pageSuppliers"/>
       <widget class="QWidget" name="pageReports"/>
       <widget class="QWidget" name="pageSettings"/>
+      <widget class="QWidget" name="pageUsers"/>
      </widget>
     </item>
    </layout>

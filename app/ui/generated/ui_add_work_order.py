@@ -15,32 +15,34 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractButton, QApplication, QComboBox, QDateEdit,
-    QDialog, QDialogButtonBox, QDoubleSpinBox, QFormLayout,
-    QGridLayout, QGroupBox, QHBoxLayout, QHeaderView,
-    QLabel, QLineEdit, QPlainTextEdit, QPushButton,
-    QSizePolicy, QSpacerItem, QTabWidget, QTableWidget,
-    QTableWidgetItem, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractButton, QAbstractScrollArea, QApplication, QComboBox,
+    QDateEdit, QDialog, QDialogButtonBox, QDoubleSpinBox,
+    QFormLayout, QGridLayout, QGroupBox, QHBoxLayout,
+    QHeaderView, QLabel, QLineEdit, QPlainTextEdit,
+    QPushButton, QSizePolicy, QSpacerItem, QTabWidget,
+    QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget)
 
 class Ui_AddWorkOrderDialog(object):
     def setupUi(self, AddWorkOrderDialog):
         if not AddWorkOrderDialog.objectName():
             AddWorkOrderDialog.setObjectName(u"AddWorkOrderDialog")
-        AddWorkOrderDialog.resize(580, 970)
+        AddWorkOrderDialog.resize(600, 702)
         AddWorkOrderDialog.setMinimumSize(QSize(0, 0))
         self.verticalLayout = QVBoxLayout(AddWorkOrderDialog)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.tabWorkOrder = QTabWidget(AddWorkOrderDialog)
         self.tabWorkOrder.setObjectName(u"tabWorkOrder")
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.tabWorkOrder.sizePolicy().hasHeightForWidth())
+        self.tabWorkOrder.setSizePolicy(sizePolicy)
         self.General = QWidget()
         self.General.setObjectName(u"General")
         self.verticalLayout_3 = QVBoxLayout(self.General)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.groupGeneralInfo = QGroupBox(self.General)
         self.groupGeneralInfo.setObjectName(u"groupGeneralInfo")
-        sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.groupGeneralInfo.sizePolicy().hasHeightForWidth())
         self.groupGeneralInfo.setSizePolicy(sizePolicy)
         self.formGeneralInfo = QFormLayout(self.groupGeneralInfo)
@@ -55,6 +57,7 @@ class Ui_AddWorkOrderDialog(object):
 
         self.txtWorkOrderNumber = QLineEdit(self.groupGeneralInfo)
         self.txtWorkOrderNumber.setObjectName(u"txtWorkOrderNumber")
+        self.txtWorkOrderNumber.setMinimumSize(QSize(0, 20))
 
         self.formGeneralInfo.setWidget(0, QFormLayout.ItemRole.FieldRole, self.txtWorkOrderNumber)
 
@@ -65,6 +68,7 @@ class Ui_AddWorkOrderDialog(object):
 
         self.txtTitle = QLineEdit(self.groupGeneralInfo)
         self.txtTitle.setObjectName(u"txtTitle")
+        self.txtTitle.setMinimumSize(QSize(0, 20))
 
         self.formGeneralInfo.setWidget(1, QFormLayout.ItemRole.FieldRole, self.txtTitle)
 
@@ -77,7 +81,7 @@ class Ui_AddWorkOrderDialog(object):
         self.teDescription.setObjectName(u"teDescription")
         sizePolicy.setHeightForWidth(self.teDescription.sizePolicy().hasHeightForWidth())
         self.teDescription.setSizePolicy(sizePolicy)
-        self.teDescription.setMinimumSize(QSize(0, 0))
+        self.teDescription.setMinimumSize(QSize(0, 40))
 
         self.formGeneralInfo.setWidget(2, QFormLayout.ItemRole.FieldRole, self.teDescription)
 
@@ -88,6 +92,7 @@ class Ui_AddWorkOrderDialog(object):
 
         self.cmbPriority = QComboBox(self.groupGeneralInfo)
         self.cmbPriority.setObjectName(u"cmbPriority")
+        self.cmbPriority.setMinimumSize(QSize(0, 20))
 
         self.formGeneralInfo.setWidget(3, QFormLayout.ItemRole.FieldRole, self.cmbPriority)
 
@@ -98,6 +103,7 @@ class Ui_AddWorkOrderDialog(object):
 
         self.cmbStatus = QComboBox(self.groupGeneralInfo)
         self.cmbStatus.setObjectName(u"cmbStatus")
+        self.cmbStatus.setMinimumSize(QSize(0, 20))
 
         self.formGeneralInfo.setWidget(4, QFormLayout.ItemRole.FieldRole, self.cmbStatus)
 
@@ -118,6 +124,7 @@ class Ui_AddWorkOrderDialog(object):
 
         self.cmbAsset = QComboBox(self.groupAssignment)
         self.cmbAsset.setObjectName(u"cmbAsset")
+        self.cmbAsset.setMinimumSize(QSize(0, 20))
 
         self.formAssignment.setWidget(0, QFormLayout.ItemRole.FieldRole, self.cmbAsset)
 
@@ -128,6 +135,7 @@ class Ui_AddWorkOrderDialog(object):
 
         self.cmbTechnician = QComboBox(self.groupAssignment)
         self.cmbTechnician.setObjectName(u"cmbTechnician")
+        self.cmbTechnician.setMinimumSize(QSize(0, 20))
 
         self.formAssignment.setWidget(1, QFormLayout.ItemRole.FieldRole, self.cmbTechnician)
 
@@ -138,6 +146,7 @@ class Ui_AddWorkOrderDialog(object):
 
         self.txtRequestedBy = QLineEdit(self.groupAssignment)
         self.txtRequestedBy.setObjectName(u"txtRequestedBy")
+        self.txtRequestedBy.setMinimumSize(QSize(0, 20))
 
         self.formAssignment.setWidget(2, QFormLayout.ItemRole.FieldRole, self.txtRequestedBy)
 
@@ -157,6 +166,7 @@ class Ui_AddWorkOrderDialog(object):
 
         self.dtDateCreated = QDateEdit(self.groupDatesCosts)
         self.dtDateCreated.setObjectName(u"dtDateCreated")
+        self.dtDateCreated.setMinimumSize(QSize(0, 20))
 
         self.gridDatesCosts.addWidget(self.dtDateCreated, 0, 1, 1, 1)
 
@@ -167,6 +177,7 @@ class Ui_AddWorkOrderDialog(object):
 
         self.dtDueDate = QDateEdit(self.groupDatesCosts)
         self.dtDueDate.setObjectName(u"dtDueDate")
+        self.dtDueDate.setMinimumSize(QSize(0, 20))
 
         self.gridDatesCosts.addWidget(self.dtDueDate, 0, 3, 1, 1)
 
@@ -177,6 +188,7 @@ class Ui_AddWorkOrderDialog(object):
 
         self.dsbEstimatedCost = QDoubleSpinBox(self.groupDatesCosts)
         self.dsbEstimatedCost.setObjectName(u"dsbEstimatedCost")
+        self.dsbEstimatedCost.setMinimumSize(QSize(0, 20))
         self.dsbEstimatedCost.setMaximum(999999.989999999990687)
 
         self.gridDatesCosts.addWidget(self.dsbEstimatedCost, 1, 1, 1, 1)
@@ -188,19 +200,32 @@ class Ui_AddWorkOrderDialog(object):
 
         self.dsbActualCost = QDoubleSpinBox(self.groupDatesCosts)
         self.dsbActualCost.setObjectName(u"dsbActualCost")
+        self.dsbActualCost.setMinimumSize(QSize(0, 20))
         self.dsbActualCost.setMaximum(999999.989999999990687)
 
         self.gridDatesCosts.addWidget(self.dsbActualCost, 1, 3, 1, 1)
 
+        self.dsbLabourHours = QDoubleSpinBox(self.groupDatesCosts)
+        self.dsbLabourHours.setObjectName(u"dsbLabourHours")
+        self.dsbLabourHours.setMinimumSize(QSize(0, 20))
+
+        self.gridDatesCosts.addWidget(self.dsbLabourHours, 2, 3, 1, 1)
+
         self.lblLabourHours = QLabel(self.groupDatesCosts)
         self.lblLabourHours.setObjectName(u"lblLabourHours")
 
-        self.gridDatesCosts.addWidget(self.lblLabourHours, 2, 0, 1, 1)
+        self.gridDatesCosts.addWidget(self.lblLabourHours, 2, 2, 1, 1)
 
-        self.dsbLabourHours = QDoubleSpinBox(self.groupDatesCosts)
-        self.dsbLabourHours.setObjectName(u"dsbLabourHours")
+        self.lblEstimatedHours = QLabel(self.groupDatesCosts)
+        self.lblEstimatedHours.setObjectName(u"lblEstimatedHours")
 
-        self.gridDatesCosts.addWidget(self.dsbLabourHours, 2, 1, 1, 1)
+        self.gridDatesCosts.addWidget(self.lblEstimatedHours, 2, 0, 1, 1)
+
+        self.dsbEstimatedHours = QDoubleSpinBox(self.groupDatesCosts)
+        self.dsbEstimatedHours.setObjectName(u"dsbEstimatedHours")
+        self.dsbEstimatedHours.setMaximum(999999.989999999990687)
+
+        self.gridDatesCosts.addWidget(self.dsbEstimatedHours, 2, 1, 1, 1)
 
 
         self.verticalLayout_3.addWidget(self.groupDatesCosts)
@@ -216,8 +241,10 @@ class Ui_AddWorkOrderDialog(object):
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.teNotes = QPlainTextEdit(self.groupNotes)
         self.teNotes.setObjectName(u"teNotes")
-        sizePolicy1.setHeightForWidth(self.teNotes.sizePolicy().hasHeightForWidth())
-        self.teNotes.setSizePolicy(sizePolicy1)
+        sizePolicy.setHeightForWidth(self.teNotes.sizePolicy().hasHeightForWidth())
+        self.teNotes.setSizePolicy(sizePolicy)
+        self.teNotes.setMinimumSize(QSize(0, 40))
+        self.teNotes.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
 
         self.verticalLayout_2.addWidget(self.teNotes)
 
@@ -294,6 +321,11 @@ class Ui_AddWorkOrderDialog(object):
 
         self.horizontalLayout.addWidget(self.btnCloseWorkOrder)
 
+        self.btnReopen = QPushButton(AddWorkOrderDialog)
+        self.btnReopen.setObjectName(u"btnReopen")
+
+        self.horizontalLayout.addWidget(self.btnReopen)
+
         self.horizontalSpacer = QSpacerItem(0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer)
@@ -332,20 +364,22 @@ class Ui_AddWorkOrderDialog(object):
         self.lblDateCreated.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Date Created:", None))
         self.lblDueDate.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Due Date:", None))
         self.lblEstimatedCost.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Estimated Cost:", None))
-        self.dsbEstimatedCost.setPrefix(QCoreApplication.translate("AddWorkOrderDialog", u"N$ ", None))
+        self.dsbEstimatedCost.setPrefix("")
         self.lblActualCost.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Actual Cost:", None))
-        self.dsbActualCost.setPrefix(QCoreApplication.translate("AddWorkOrderDialog", u"N$ ", None))
+        self.dsbActualCost.setPrefix("")
         self.lblLabourHours.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Labour Hours:", None))
+        self.lblEstimatedHours.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Estimated Hours:", None))
         self.groupNotes.setTitle(QCoreApplication.translate("AddWorkOrderDialog", u"Notes", None))
         self.tabWorkOrder.setTabText(self.tabWorkOrder.indexOf(self.General), QCoreApplication.translate("AddWorkOrderDialog", u"General", None))
         self.groupMaterials.setTitle(QCoreApplication.translate("AddWorkOrderDialog", u"Materials Used", None))
         self.btnIssuePart.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Issue Parts", None))
         self.btnRemovePart.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Remove Parts", None))
-        self.lblMaterialTotal.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Materials Total: N$0.00", None))
+        self.lblMaterialTotal.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Materials Total: 0.00", None))
         self.tabWorkOrder.setTabText(self.tabWorkOrder.indexOf(self.Materials), QCoreApplication.translate("AddWorkOrderDialog", u"Materials", None))
         self.groupHistory.setTitle(QCoreApplication.translate("AddWorkOrderDialog", u"Work Order History", None))
         self.tabWorkOrder.setTabText(self.tabWorkOrder.indexOf(self.History), QCoreApplication.translate("AddWorkOrderDialog", u"History", None))
         self.btnComplete.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Complete Work Order", None))
         self.btnCloseWorkOrder.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Close Work Order", None))
+        self.btnReopen.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Reopen Work Order", None))
     # retranslateUi
 

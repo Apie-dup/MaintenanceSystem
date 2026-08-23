@@ -80,7 +80,13 @@ class Ui_PreventiveMaintenanceDialog(object):
 
         self.teDescription = QPlainTextEdit(self.groupGeneralInfo)
         self.teDescription.setObjectName(u"teDescription")
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.teDescription.sizePolicy().hasHeightForWidth())
+        self.teDescription.setSizePolicy(sizePolicy)
         self.teDescription.setMinimumSize(QSize(0, 70))
+        self.teDescription.setMaximumSize(QSize(16777215, 90))
 
         self.formLayout_2.setWidget(3, QFormLayout.ItemRole.FieldRole, self.teDescription)
 
@@ -138,49 +144,83 @@ class Ui_PreventiveMaintenanceDialog(object):
 
         self.groupPlanning = QGroupBox(self.Scheduel)
         self.groupPlanning.setObjectName(u"groupPlanning")
-        self.formLayout = QFormLayout(self.groupPlanning)
-        self.formLayout.setObjectName(u"formLayout")
-        self.formLayout.setHorizontalSpacing(12)
-        self.formLayout.setVerticalSpacing(8)
+        self.gridLayout_2 = QGridLayout(self.groupPlanning)
+        self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.lblPriority = QLabel(self.groupPlanning)
         self.lblPriority.setObjectName(u"lblPriority")
 
-        self.formLayout.setWidget(0, QFormLayout.ItemRole.LabelRole, self.lblPriority)
+        self.gridLayout_2.addWidget(self.lblPriority, 0, 0, 1, 1)
 
         self.cmbPriority = QComboBox(self.groupPlanning)
         self.cmbPriority.setObjectName(u"cmbPriority")
 
-        self.formLayout.setWidget(0, QFormLayout.ItemRole.FieldRole, self.cmbPriority)
+        self.gridLayout_2.addWidget(self.cmbPriority, 0, 1, 1, 1)
 
         self.lblEstimatedHours = QLabel(self.groupPlanning)
         self.lblEstimatedHours.setObjectName(u"lblEstimatedHours")
 
-        self.formLayout.setWidget(1, QFormLayout.ItemRole.LabelRole, self.lblEstimatedHours)
-
-        self.dsbEstimatedHours = QDoubleSpinBox(self.groupPlanning)
-        self.dsbEstimatedHours.setObjectName(u"dsbEstimatedHours")
-
-        self.formLayout.setWidget(1, QFormLayout.ItemRole.FieldRole, self.dsbEstimatedHours)
-
-        self.lblEstimatedCost = QLabel(self.groupPlanning)
-        self.lblEstimatedCost.setObjectName(u"lblEstimatedCost")
-
-        self.formLayout.setWidget(2, QFormLayout.ItemRole.LabelRole, self.lblEstimatedCost)
-
-        self.dsbEstimatedCost = QDoubleSpinBox(self.groupPlanning)
-        self.dsbEstimatedCost.setObjectName(u"dsbEstimatedCost")
-
-        self.formLayout.setWidget(2, QFormLayout.ItemRole.FieldRole, self.dsbEstimatedCost)
+        self.gridLayout_2.addWidget(self.lblEstimatedHours, 2, 0, 1, 1)
 
         self.lblActive = QLabel(self.groupPlanning)
         self.lblActive.setObjectName(u"lblActive")
 
-        self.formLayout.setWidget(3, QFormLayout.ItemRole.LabelRole, self.lblActive)
+        self.gridLayout_2.addWidget(self.lblActive, 0, 2, 1, 1)
+
+        self.dsbEstimatedHours = QDoubleSpinBox(self.groupPlanning)
+        self.dsbEstimatedHours.setObjectName(u"dsbEstimatedHours")
+
+        self.gridLayout_2.addWidget(self.dsbEstimatedHours, 2, 1, 1, 1)
+
+        self.lblMeterType = QLabel(self.groupPlanning)
+        self.lblMeterType.setObjectName(u"lblMeterType")
+
+        self.gridLayout_2.addWidget(self.lblMeterType, 3, 0, 1, 1)
+
+        self.dsbLastServiceMeter = QDoubleSpinBox(self.groupPlanning)
+        self.dsbLastServiceMeter.setObjectName(u"dsbLastServiceMeter")
+        self.dsbLastServiceMeter.setMaximum(999999.989999999990687)
+
+        self.gridLayout_2.addWidget(self.dsbLastServiceMeter, 3, 4, 1, 1)
+
+        self.lblLastServiceMeter = QLabel(self.groupPlanning)
+        self.lblLastServiceMeter.setObjectName(u"lblLastServiceMeter")
+
+        self.gridLayout_2.addWidget(self.lblLastServiceMeter, 3, 2, 1, 1)
 
         self.chkActive = QCheckBox(self.groupPlanning)
         self.chkActive.setObjectName(u"chkActive")
 
-        self.formLayout.setWidget(3, QFormLayout.ItemRole.FieldRole, self.chkActive)
+        self.gridLayout_2.addWidget(self.chkActive, 0, 3, 1, 1)
+
+        self.cmbMeterType = QComboBox(self.groupPlanning)
+        self.cmbMeterType.addItem("")
+        self.cmbMeterType.addItem("")
+        self.cmbMeterType.addItem("")
+        self.cmbMeterType.setObjectName(u"cmbMeterType")
+
+        self.gridLayout_2.addWidget(self.cmbMeterType, 3, 1, 1, 1)
+
+        self.lblEstimatedCost = QLabel(self.groupPlanning)
+        self.lblEstimatedCost.setObjectName(u"lblEstimatedCost")
+
+        self.gridLayout_2.addWidget(self.lblEstimatedCost, 2, 2, 1, 2)
+
+        self.dsbEstimatedCost = QDoubleSpinBox(self.groupPlanning)
+        self.dsbEstimatedCost.setObjectName(u"dsbEstimatedCost")
+
+        self.gridLayout_2.addWidget(self.dsbEstimatedCost, 2, 4, 1, 1)
+
+        self.lblNextDueMeter = QLabel(self.groupPlanning)
+        self.lblNextDueMeter.setObjectName(u"lblNextDueMeter")
+
+        self.gridLayout_2.addWidget(self.lblNextDueMeter, 4, 0, 1, 1)
+
+        self.dsbNextDueMeter = QDoubleSpinBox(self.groupPlanning)
+        self.dsbNextDueMeter.setObjectName(u"dsbNextDueMeter")
+        self.dsbNextDueMeter.setReadOnly(True)
+        self.dsbNextDueMeter.setMaximum(999999.989999999990687)
+
+        self.gridLayout_2.addWidget(self.dsbNextDueMeter, 4, 1, 1, 1)
 
 
         self.verticalLayout_3.addWidget(self.groupPlanning)
@@ -191,6 +231,8 @@ class Ui_PreventiveMaintenanceDialog(object):
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.teNotes = QPlainTextEdit(self.groupNotes)
         self.teNotes.setObjectName(u"teNotes")
+        sizePolicy.setHeightForWidth(self.teNotes.sizePolicy().hasHeightForWidth())
+        self.teNotes.setSizePolicy(sizePolicy)
         self.teNotes.setMinimumSize(QSize(0, 70))
 
         self.verticalLayout_2.addWidget(self.teNotes)
@@ -257,9 +299,16 @@ class Ui_PreventiveMaintenanceDialog(object):
         self.groupPlanning.setTitle(QCoreApplication.translate("PreventiveMaintenanceDialog", u"Planning", None))
         self.lblPriority.setText(QCoreApplication.translate("PreventiveMaintenanceDialog", u"Priority:", None))
         self.lblEstimatedHours.setText(QCoreApplication.translate("PreventiveMaintenanceDialog", u"Estimated Hours:", None))
-        self.lblEstimatedCost.setText(QCoreApplication.translate("PreventiveMaintenanceDialog", u"Estimated Cost:", None))
         self.lblActive.setText(QCoreApplication.translate("PreventiveMaintenanceDialog", u"Active:", None))
+        self.lblMeterType.setText(QCoreApplication.translate("PreventiveMaintenanceDialog", u"Meter Type:", None))
+        self.lblLastServiceMeter.setText(QCoreApplication.translate("PreventiveMaintenanceDialog", u"Last Service Meter:", None))
         self.chkActive.setText("")
+        self.cmbMeterType.setItemText(0, QCoreApplication.translate("PreventiveMaintenanceDialog", u"Running Hours", None))
+        self.cmbMeterType.setItemText(1, QCoreApplication.translate("PreventiveMaintenanceDialog", u"Kilometers", None))
+        self.cmbMeterType.setItemText(2, QCoreApplication.translate("PreventiveMaintenanceDialog", u"Cycles", None))
+
+        self.lblEstimatedCost.setText(QCoreApplication.translate("PreventiveMaintenanceDialog", u"Estimated Cost:", None))
+        self.lblNextDueMeter.setText(QCoreApplication.translate("PreventiveMaintenanceDialog", u"Next Due Meter:", None))
         self.groupNotes.setTitle(QCoreApplication.translate("PreventiveMaintenanceDialog", u"Notes", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Scheduel), QCoreApplication.translate("PreventiveMaintenanceDialog", u"Scheduel", None))
         self.groupHistory.setTitle(QCoreApplication.translate("PreventiveMaintenanceDialog", u"Maintenance Work Order History", None))
