@@ -1,5 +1,3 @@
-from PySide6.QtGui import QColor
-
 from app.base.crud_page import CrudPage
 from app.dialogs.preventive_maintenance_dialog import (
     PreventiveMaintenanceDialog
@@ -11,6 +9,8 @@ from app.ui.generated.ui_preventive_maintenance_page import (
     Ui_PMWindow
 )
 from app.core.permissions import Permissions
+from app.helpers.format_helper import FormatHelper
+from app.helpers.theme_helper import ThemeHelper
 
 
 class PreventiveMaintenancePage(CrudPage):
@@ -28,6 +28,9 @@ class PreventiveMaintenancePage(CrudPage):
         ("frequency_value", "Value"),
         ("last_service_date", "Last Service"),
         ("next_due_date", "Next Due"),
+        ("last_service_meter", "Last Meter"),
+        ("current_meter", "Current Meter"),
+        ("next_due_meter", "Next Meter"),
         ("due_status", "Due Status"),
         ("priority", "Priority"),
         ("active_display", "Active"),
@@ -125,11 +128,11 @@ class PreventiveMaintenancePage(CrudPage):
 
     def load_data(self):
         super().load_data()
-        self.apply_due_highlighting()
+        self.apply_due_status_colors()
 
     def search(self, text):
         super().search(text)
-        self.apply_due_highlighting()
+        self.apply_due_status_colors()
 
     # ---------------------------------------------------------
     # Signals
@@ -168,7 +171,8 @@ class PreventiveMaintenancePage(CrudPage):
     # Highlighting
     # ---------------------------------------------------------
 
-    def apply_due_highlighting(self):
+    def apply_due_status_colors(self):
+
         status_column = next(
             (
                 index
@@ -182,7 +186,10 @@ class PreventiveMaintenancePage(CrudPage):
         if status_column is None:
             return
 
-        for row in range(self.table.rowCount()):
+        for row in range(
+            self.table.rowCount()
+        ):
+
             status_item = self.table.item(
                 row,
                 status_column,
@@ -191,38 +198,54 @@ class PreventiveMaintenancePage(CrudPage):
             if status_item is None:
                 continue
 
-            status = status_item.text().strip()
+            status = (
+                status_item.text().strip()
+            )
+
+            #--------------------------------------------------
+            # Tooltip text
+            #--------------------------------------------------
 
             if status == "Overdue":
-                background = QColor("#f8d7da")
                 tooltip = (
                     "This preventive maintenance schedule "
                     "is overdue and requires attention."
                 )
 
             elif status == "Due Today":
-                background = QColor("#ffe5b4")
                 tooltip = (
                     "This preventive maintenance schedule "
                     "is due today."
                 )
 
             elif status == "Due Soon":
-                background = QColor("#fff3cd")
                 tooltip = (
                     "This schedule is due within the next "
                     "seven days."
                 )
 
             elif status == "Inactive":
-                background = QColor("#dddddd")
                 tooltip = "This schedule is inactive."
 
             else:
                 continue
 
-            status_item.setBackground(background)
-            status_item.setToolTip(tooltip)
+            #--------------------------------------------------
+            # Theme-aware background
+            #--------------------------------------------------
+
+            background = ThemeHelper.status_color(
+                self,
+                status
+            )
+            if background is not None:
+                status_item.setBackground(
+                    background
+                )
+
+            status_item.setToolTip(
+                tooltip
+            )
 
     # ---------------------------------------------------------
     # Generate Work Order
@@ -431,3 +454,51 @@ class PreventiveMaintenancePage(CrudPage):
             return
 
         super().delete_record()
+
+    def populate_table(self, records):
+
+        super().populate_table(records)
+
+        meter_fields = {
+            "last_service_meter",
+            "next_due_meter"
+        }
+
+        meter_columns = [
+            index
+            for index, (field, _heading)
+            in enumerate(self.TABLE_COLUMNS)
+            if field in meter_fields
+        ]
+
+        for row in range(
+            self.table.rowCount()
+        ):
+
+            for column in meter_columns:
+
+                item = self.table.item(
+                    row,
+                    column,
+                )
+
+                if item is None:
+                    continue
+
+                text = item.text().strip()
+
+                if not text:
+                    continue
+
+                try:
+
+                    value = float(text)
+
+                    item.setText(
+                        FormatHelper.quantity(
+                            value
+                        )
+                    )
+
+                except ValueError:
+                    continue

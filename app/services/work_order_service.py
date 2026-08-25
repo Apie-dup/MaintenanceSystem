@@ -6,6 +6,9 @@ from app.helpers.date_helper import DateHelper
 from app.services.work_order_history_service import (
     WorkOrderHistoryService
 )
+from app.services.asset_meter_reading_service import (
+    AssetMeterReadingService
+)
 
 
 
@@ -142,8 +145,8 @@ class WorkOrderService:
 
 
     # ---------------------------------------------------------
-# Update
-# ---------------------------------------------------------
+    # Update
+    # ---------------------------------------------------------
 
     @staticmethod
     def update(record_id, 
@@ -158,6 +161,28 @@ class WorkOrderService:
         if existing is None:
             raise ValueError(
                 "Work Order not found."
+            )
+
+        requested_status = (
+            data.get("status") or ""
+        ).strip()
+
+        if (
+            existing["status"] != "Completed"
+            and requested_status == "Completed"
+        ):
+            raise ValueError(
+                "Work Order must be completed using "
+                "the Complete Work Order workflow."
+            )
+
+        if (
+            existing["status"] != "Closed"
+            and requested_status == "Closed"
+        ):
+            raise ValueError(
+                "Work Order must be closed using "
+                "the Close Work Order workflow."
             )
 
         # Work with a copy so we do not modify
@@ -216,34 +241,6 @@ class WorkOrderService:
             save_data,
             user=user,
         )
-
-        completed_statuses = {
-            "Completed",
-            "Closed",
-        }
-
-        was_completed = (
-            existing["status"]
-            in completed_statuses
-        )
-
-        is_completed = (
-            save_data["status"]
-            in completed_statuses
-        )
-
-        if (
-            not was_completed
-            and is_completed
-            and existing["pm_id"] is not None
-        ):
-            from app.services.preventive_maintenance_service import (
-                PreventiveMaintenanceService
-            )
-
-            PreventiveMaintenanceService.complete_schedule(
-                existing["pm_id"]
-            )
 
     # ---------------------------------------------------------
     # Delete
@@ -438,7 +435,9 @@ class WorkOrderService:
                 "completing the Work Order."
             )
 
-        if float(work_order["labour_hours"] or 0) <= 0:
+        if float(
+            work_order["labour_hours"] or 0
+        ) <= 0:
             raise ValueError(
                 "Please enter Labour Hours before "
                 "completing the Work Order."
@@ -446,14 +445,14 @@ class WorkOrderService:
 
         old_status = work_order["status"]
 
-        completed_date = DateHelper.today_string()
-
-        #---------------------------------------------------
-        # Validate PM relation BEFORE changing Work Order
-        #---------------------------------------------------
+        completed_date = (
+            DateHelper.today_string()
+        )
 
         pm_id = work_order["pm_id"]
+
         pm_schedule = None
+        is_meter_based = False
 
         meter_types = {
             "Running Hours",
@@ -461,14 +460,20 @@ class WorkOrderService:
             "Cycles",
         }
 
+        # ---------------------------------------------------
+        # Validate linked PM
+        # ---------------------------------------------------
+
         if pm_id is not None:
 
             from app.services.preventive_maintenance_service import (
                 PreventiveMaintenanceService
             )
 
-            pm_schedule = PreventiveMaintenanceService.get_by_id(
-                pm_id
+            pm_schedule = (
+                PreventiveMaintenanceService.get_by_id(
+                    pm_id
+                )
             )
 
             if pm_schedule is None:
@@ -477,19 +482,24 @@ class WorkOrderService:
                     "linked to this Work Order no longer exists."
                 )
 
-        #---------------------------------------------------
-        # Validate meter-based PM before completing WO
-        #---------------------------------------------------
+            frequency_type = (
+                pm_schedule["frequency_type"] or ""
+            ).strip()
 
-        if (
-            pm_schedule["frequency_type"]
-            in meter_types
-        ):
+            is_meter_based = (
+                frequency_type in meter_types
+            )
+
+        # ---------------------------------------------------
+        # Validate meter reading
+        # ---------------------------------------------------
+
+        if is_meter_based:
 
             if meter_reading is None:
                 raise ValueError(
-                    "A meter reading is required "
-                    "to complete this Work Order."
+                    "Meter Reading is required before "
+                    "completing this Work Order."
                 )
 
             try:
@@ -499,40 +509,62 @@ class WorkOrderService:
 
             except (TypeError, ValueError):
                 raise ValueError(
-                    "Meter reading must be a valid number."
+                    "Meter Reading must be a valid number."
                 )
 
-            if meter_reading < 0:
+            if meter_reading <= 0:
                 raise ValueError(
-                    "Meter reading cannot be negative."
+                    "Meter Reading must be greater than zero."
                 )
 
-            last_meter = float(
-                pm_schedule[
-                    "last_service_meter"
-                ] or 0
+            last_service_meter = float(
+                pm_schedule["last_service_meter"]
+                or 0
             )
 
-            if meter_reading < last_meter:
+            if meter_reading < last_service_meter:
                 raise ValueError(
-                    "Meter reading cannot be lower "
-                    "than the previous service "
-                    "meter reading."
+                    "Meter Reading cannot be lower "
+                    "than the previous service meter reading."
                 )
 
-        #---------------------------------------------------
+            latest_reading = (
+                AssetMeterReadingService
+                .get_latest_reading(
+                    work_order["asset_id"],
+                    pm_schedule["frequency_type"],
+                )
+            )
+
+            if latest_reading is not None:
+
+                previous_reading = float(
+                    latest_reading["reading"] or 0
+                )
+
+                if meter_reading < previous_reading:
+                    raise ValueError(
+                        "Meter Reading cannot be lower "
+                        "than the asset's latest meter reading."
+                    )
+
+        # ---------------------------------------------------
         # Complete Work Order
-        #---------------------------------------------------
+        # ---------------------------------------------------
 
         WorkOrderModel.complete(
             record_id,
-            completed_date
+            completed_date,
+            meter_reading=(
+                meter_reading
+                if is_meter_based
+                else None
+            ),
         )
 
-        #---------------------------------------------------
+        # ---------------------------------------------------
         # Audit
-        #---------------------------------------------------
-
+        # ---------------------------------------------------
         WorkOrderHistoryService.log_completed(
             record_id,
             old_status=old_status,
@@ -547,16 +579,39 @@ class WorkOrderService:
                 else None
             ),
         )
+    
 
-        #---------------------------------------------------
+        # ---------------------------------------------------
+        # Record asset meter reading
+        # ---------------------------------------------------
+
+        if is_meter_based:
+
+            AssetMeterReadingService.add_reading(
+                asset_id=work_order["asset_id"],
+                meter_type=pm_schedule["frequency_type"],
+                reading=meter_reading,
+                reading_date=completed_date,
+                notes=(
+                    "Recorded on completion of "
+                    f'{work_order["work_order_number"]}.'
+                ),
+            )
+
+        # ---------------------------------------------------
         # Advance PM schedule
-        #---------------------------------------------------
+        # ---------------------------------------------------
 
         if pm_id is not None:
 
             PreventiveMaintenanceService.complete_schedule(
                 pm_id,
-                completed_date
+                completion_date=completed_date,
+                meter_reading=(
+                    meter_reading
+                    if is_meter_based
+                    else None
+                ),
             )
 
     @staticmethod

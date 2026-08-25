@@ -5,6 +5,7 @@ from app.models.asset_model import AssetModel
 from app.helpers.date_helper import DateHelper
 from app.services.work_order_service import WorkOrderService
 from app.models.work_order_model import WorkOrderModel
+from app.services.asset_meter_reading_service import AssetMeterReadingService
 
    
 
@@ -24,7 +25,55 @@ class PreventiveMaintenanceService:
 
     @staticmethod
     def get_all():
-        return PreventiveMaintenanceModel.get_all()
+
+        rows = PreventiveMaintenanceModel.get_all()
+
+        result = []
+
+        for row in rows:
+
+            pm = dict(row)
+
+            frequency_type = (
+                pm["frequency_type"] or ""
+            ).strip()
+
+            if (
+                frequency_type
+                in PreventiveMaintenanceService.METER_FREQUENCY_TYPES
+            ):
+
+                latest = (
+                    AssetMeterReadingService
+                    .get_latest_reading_value(
+                        pm["asset_id"],
+                        frequency_type,
+                    )
+                )
+
+                if latest is None:
+                    pm["current_meter"] = float(
+                        pm["last_service_meter"] or 0
+                    )
+
+                else:
+                    pm["current_meter"] = latest
+
+                pm["due_status"] = (
+                    PreventiveMaintenanceService
+                    .get_meter_due_status(pm)
+                )
+
+            else:
+                pm["current_meter"] = None
+
+                pm["due_status"] = (
+                    pm["calendar_due_status"]
+                )
+
+            result.append(pm)
+
+        return result
 
     # ---------------------------------------------------------
     # Get By ID
@@ -71,11 +120,11 @@ class PreventiveMaintenanceService:
             save_data
         )
 
-        if save_data["frequency_type"] in {
-            "Running Hours",
-            "Kilometres",
-            "Cycles",
-        }:
+        if (
+            save_data["frequency_type"]
+            in PreventiveMaintenanceService.METER_FREQUENCY_TYPES
+        ):
+
             save_data["next_due_date"] = None
 
         else:
@@ -85,7 +134,7 @@ class PreventiveMaintenanceService:
                 )
             )
 
-        return PreventiveMaintenanceModel.insert(
+        return PreventiveMaintenanceModel.create(
             save_data
         )
 
@@ -102,11 +151,10 @@ class PreventiveMaintenanceService:
             save_data
         )
 
-        if save_data["frequency_type"] in {
-            "Running Hours",
-            "Kilometres",
-            "Cycles",
-        }:
+        if (
+            save_data["frequency_type"]
+            in PreventiveMaintenanceService.METER_FREQUENCY_TYPES
+        ):
             save_data["next_due_date"] = None
 
         else:
@@ -167,12 +215,13 @@ class PreventiveMaintenanceService:
 
         meter_types = {
             "Running Hours",
-            "Kilometres",
+            "Kilometers",
             "Cycles",
         }
 
         is_meter_based = (
-            frequency_type in meter_types
+            frequency_type 
+            in PreventiveMaintenanceService.METER_FREQUENCY_TYPES
         )
 
         if is_meter_based:
@@ -242,16 +291,11 @@ class PreventiveMaintenanceService:
             data["last_service_date"]
         )
 
-        return DateHelper.to_string(
-
+        return DateHelper.to.string(
             DateHelper.calculate_next_due_date(
-
                 last_service,
-
                 data["frequency_type"],
-
                 data["frequency_value"]
-
             )
         )
 
@@ -261,41 +305,99 @@ class PreventiveMaintenanceService:
 
     @staticmethod
     def get_due_today():
-        return PreventiveMaintenanceModel.get_due_today()
+
+        records = PreventiveMaintenanceService.get_all()
+
+        return [
+            pm
+            for pm in records
+            if pm["due_status"] in {
+                "Due",
+                "Due Today",
+            }
+        ]
 
     @staticmethod
     def get_overdue():
-        return PreventiveMaintenanceModel.get_overdue()
+
+        records = PreventiveMaintenanceService.get_all()
+
+        return [
+            pm
+            for pm in records
+            if pm["due_status"] == "Overdue"
+        ]
     
     @staticmethod
     def get_due_this_week():
-        return PreventiveMaintenanceModel.get_due_this_week()
+
+        records = PreventiveMaintenanceService.get_all()
+
+        return [
+            pm
+            for pm in records
+            if pm["due_status"] in {
+                "Due",
+                "Due Today",
+                "Due Soon",
+            }
+        ]
 
     @staticmethod
     def get_due_today_count():
         return len(
-            PreventiveMaintenanceModel.get_due_today()
+            PreventiveMaintenanceService.get_due_today()
         )
 
 
     @staticmethod
     def get_due_this_week_count():
         return len(
-            PreventiveMaintenanceModel.get_due_this_week()
+            PreventiveMaintenanceService.get_due_this_week()
         )
 
 
     @staticmethod
     def get_overdue_count():
         return len(
-            PreventiveMaintenanceModel.get_overdue()
+            PreventiveMaintenanceService.get_overdue()
         )
 
     @staticmethod
     def get_due_list(limit=10):
-        return PreventiveMaintenanceModel.get_due_list(
-            limit
-    )
+
+        records = PreventiveMaintenanceService.get_all()
+
+        priority_order = {
+            "Overdue": 0,
+            "Due": 1,
+            "Due Today": 1,
+            "Due Soon": 2,
+            "Scheduled": 3,
+            "Inactive": 4,
+        }
+
+        due_records = [
+            pm
+            for pm in records
+            if pm["due_status"] in {
+                "Overdue",
+                "Due",
+                "Due Today",
+                "Due Soon",
+            }
+        ]
+
+        due_records.sort(
+            key=lambda pm: (
+                priority_order.get(
+                    pm["due_status"],
+                    99
+                ),
+            )
+        )
+
+        return due_records[:limit]
 
     # ---------------------------------------------------------
     # Generate Work Order
@@ -320,7 +422,19 @@ class PreventiveMaintenanceService:
                 "An inactive PM schedule cannot generate a work order."
             )
 
-        if not pm["next_due_date"]:
+        frequency_type = (
+            pm["frequency_type"] or ""
+        ).strip()
+
+        is_meter_based = (
+            frequency_type
+            in PreventiveMaintenanceService.METER_FREQUENCY_TYPES
+        )
+
+        if (
+            not is_meter_based
+            and not pm["next_due_date"]
+        ):
             raise ValueError(
                 "The PM schedule does not have a next due date."
             )
@@ -362,7 +476,14 @@ class PreventiveMaintenanceService:
                 DateHelper.today_string(),
 
             "due_date":
-                pm["next_due_date"],
+                (
+                    DateHelper.today_string()
+                    if is_meter_based
+                    else pm["next_due_date"]
+                ),
+
+            "meter_reading":
+                None,
 
             "estimated_cost":
                 float(pm["estimated_cost"] or 0),
@@ -502,3 +623,68 @@ class PreventiveMaintenanceService:
                 next_due_date
             ),
         )
+
+    @staticmethod
+    def get_meter_due_status(pm):
+
+        frequency_type = (
+            pm["frequency_type"] or ""
+        ).strip()
+
+        if (
+            frequency_type
+            not in PreventiveMaintenanceService.METER_FREQUENCY_TYPES
+        ):
+            return None
+
+        next_due_meter = float(
+            pm["next_due_meter"] or 0
+        )
+
+        frequency_value = float(
+            pm["frequency_value"] or 0
+        )
+
+        latest = (
+            AssetMeterReadingService
+            .get_latest_reading(
+                pm["asset_id"],
+                frequency_type,
+            )
+        )
+
+        if latest is None:
+            current_meter = float(
+                pm["last_service_meter"] or 0
+            )
+        else:
+            current_meter = float(
+                latest["reading"] or 0
+            )
+
+        if not bool(pm["active"]):
+            return "Inactive"
+
+        if next_due_meter <= 0:
+            return "Scheduled"
+
+        remaining = (
+            next_due_meter
+            - current_meter
+        )
+
+        if remaining < 0:
+            return "Overdue"
+
+        if remaining == 0:
+            return "Due"
+
+        due_soon_threshold = max(
+            frequency_value * 0.10,
+            1.0,
+        )
+
+        if remaining <= due_soon_threshold:
+            return "Due Soon"
+
+        return "Scheduled"

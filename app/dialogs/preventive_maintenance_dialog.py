@@ -18,6 +18,9 @@ from app.dialogs.work_order_dialog import (
 )
 from app.helpers.format_helper import FormatHelper
 from app.core.permissions import Permissions
+from app.services.asset_meter_reading_service import (
+    AssetMeterReadingService
+)
 
 
 class PreventiveMaintenanceDialog(BaseDialog):
@@ -52,6 +55,7 @@ class PreventiveMaintenanceDialog(BaseDialog):
         )
 
         self.apply_form_standards()
+        self._loading_record = False
         self.setup_dialog()
 
     # ---------------------------------------------------------
@@ -98,6 +102,24 @@ class PreventiveMaintenanceDialog(BaseDialog):
         # Calculated by the application.
         self.ui.dsbNextDueMeter.setReadOnly(True)
 
+        blank_date = QDate(2000, 1, 1)
+
+        self.ui.dtLastService.setMinimumDate(
+            blank_date
+        )
+
+        self.ui.dtNextDue.setMinimumDate(
+            blank_date
+        )
+
+        self.ui.dtLastService.setSpecialValueText(
+            ""
+        )
+
+        self.ui.dtNextDue.setSpecialValueText(
+            ""
+        )
+
     def connect_signals(self):
         self.ui.buttonBox.accepted.connect(
             self.save_and_close
@@ -125,6 +147,14 @@ class PreventiveMaintenanceDialog(BaseDialog):
 
         self.ui.tblHistory.itemDoubleClicked.connect(
             self.open_history_work_order
+        )
+
+        self.ui.cmbAsset.currentIndexChanged.connect(
+            self.load_latest_asset_meter
+        )
+
+        self.ui.cmbFrequencyType.currentIndexChanged.connect(
+            self.load_latest_asset_meter
         )
 
     # ---------------------------------------------------------
@@ -186,7 +216,9 @@ class PreventiveMaintenanceDialog(BaseDialog):
 
         self.ui.cmbMeterType.setCurrentIndex(-1)
         self.ui.dsbLastServiceMeter.setValue(0.00)
+        self.ui.dsbLastServiceMeter.setReadOnly(False)
         self.ui.dsbNextDueMeter.setValue(0.00)
+        self.ui.dsbNextDueMeter.setReadOnly(False)
 
         self.ui.dsbEstimatedHours.setValue(0.00)
         self.ui.dsbEstimatedCost.setValue(0.00)
@@ -224,8 +256,8 @@ class PreventiveMaintenanceDialog(BaseDialog):
 
         meter_types = {
             "Running Hours",
-            "Kilometres",
-            "Cycles:",
+            "Kilometers",
+            "Cycles",
         }
 
         is_meter_based = (
@@ -319,84 +351,115 @@ class PreventiveMaintenanceDialog(BaseDialog):
         }
 
     def set_form_data(self, pm):
-        self.ui.txtPMNumber.setText(
-            pm["pm_number"]
-        )
 
-        self.ui.txtTask.setText(
-            pm["task"] or ""
-        )
+        self._loading_record = True
 
-        self.ui.teDescription.setPlainText(
-            pm["description"] or ""
-        )
-
-        self.ui.cmbFrequencyType.setCurrentText(
-            pm["frequency_type"] or ""
-        )
-
-        self.ui.spnFrequencyValue.setValue(
-            int(pm["frequency_value"] or 1)
-        )
-
-        self.set_date_value(
-            self.ui.dtLastService,
-            pm["last_service_date"]
-        )
-
-        self.set_date_value(
-            self.ui.dtNextDue,
-            pm["next_due_date"]
-        )
-
-        meter_type = (
-            pm["meter_type"]
-            or pm["frequency_type"]
-            or ""
-        )
-
-        self.ui.cmbMeterType.setCurrentText(
-            meter_type
-        )
-
-        self.ui.dsbLastServiceMeter.setValue(
-            float(pm["last_service_meter"] or 0)
-        )
-
-        self.ui.dsbNextDueMeter.setValue(
-            float(pm["next_due_meter"] or 0)
-        )
-
-        self.update_frequency_mode()
-
-        self.ui.dsbEstimatedHours.setValue(
-            float(pm["estimated_hours"] or 0)
-        )
-
-        self.ui.dsbEstimatedCost.setValue(
-            float(pm["estimated_cost"] or 0)
-        )
-
-        self.ui.cmbPriority.setCurrentText(
-            pm["priority"] or ""
-        )
-
-        self.ui.chkActive.setChecked(
-            bool(pm["active"])
-        )
-
-        self.ui.teNotes.setPlainText(
-            pm["notes"] or ""
-        )
-
-        asset_index = self.ui.cmbAsset.findData(
-            pm["asset_id"]
-        )
-
-        if asset_index >= 0:
-            self.ui.cmbAsset.setCurrentIndex(
-                asset_index
+        try:
+            self.ui.txtPMNumber.setText(
+                pm["pm_number"]
             )
+
+            # Set asset early
+            asset_index = self.ui.cmbAsset.findData(
+                pm["asset_id"]
+            )
+
+            if asset_index >= 0:
+                self.ui.cmbAsset.setCurrentIndex(
+                    asset_index
+                )
+
+            self.ui.txtTask.setText(
+                pm["task"] or ""
+            )
+
+            self.ui.teDescription.setPlainText(
+                pm["description"] or ""
+            )
+
+            self.ui.cmbFrequencyType.setCurrentText(
+                pm["frequency_type"] or ""
+            )
+
+            self.ui.spnFrequencyValue.setValue(
+                int(pm["frequency_value"] or 1)
+            )
+
+            self.set_date_value(
+                self.ui.dtLastService,
+                pm["last_service_date"]
+            )
+
+            self.set_date_value(
+                self.ui.dtNextDue,
+                pm["next_due_date"]
+            )
+
+            meter_type = (
+                pm["meter_type"]
+                or pm["frequency_type"]
+                or ""
+            )
+
+            self.ui.cmbMeterType.setCurrentText(
+                meter_type
+            )
+
+            self.ui.dsbLastServiceMeter.setValue(
+                float(
+                    pm["last_service_meter"] 
+                    or 0
+                )
+            )
+
+            self.ui.dsbNextDueMeter.setValue(
+                float(
+                    pm["next_due_meter"]
+                    or 0
+                )
+            )
+
+            # Existing PM service milestone must not be
+            # changed manually
+
+            self.ui.dsbLastServiceMeter.setReadOnly(
+                True
+            )
+
+            self.ui.dsbNextDueMeter.setReadOnly(
+                True
+            )
+
+            self.ui.dsbEstimatedHours.setValue(
+                float(
+                    pm["estimated_hours"]
+                    or 0
+                )
+            )
+
+            self.ui.dsbEstimatedCost.setValue(
+                float(
+                    pm["estimated_cost"]
+                    or 0
+                )
+            )
+
+            self.ui.cmbPriority.setCurrentText(
+                pm["priority"] or ""
+            )
+
+            self.ui.chkActive.setChecked(
+                bool(pm["active"])
+            )
+
+            self.ui.teNotes.setPlainText(
+                pm["notes"] or ""
+            )
+
+            self.update_frequency_mode()
+
+        finally:
+            self._loading_record = False
 
     @staticmethod
     def set_date_value(date_widget, value):
@@ -440,6 +503,8 @@ class PreventiveMaintenanceDialog(BaseDialog):
         self.ui.groupHistory.setEnabled(True)
         self.ui.tblHistory.setEnabled(True)
         self.load_history()
+
+        self.update_frequency_mode()
 
     def load_history(self):
         if self.record_id is None:
@@ -523,7 +588,7 @@ class PreventiveMaintenanceDialog(BaseDialog):
 
         meter_types = {
             "Running Hours",
-            "Kilometres",
+            "Kilometers",
             "Cycles",
         }
 
@@ -840,7 +905,7 @@ class PreventiveMaintenanceDialog(BaseDialog):
 
         meter_types = {
             "Running Hours",
-            "Kilometres",
+            "Kilometers",
             "Cycles",
         }
 
@@ -848,21 +913,21 @@ class PreventiveMaintenanceDialog(BaseDialog):
             frequency_type in meter_types
         )
 
-    # -------------------------------------------------
-    # Calendar fields
-    # -------------------------------------------------
+        # -------------------------------------------------
+        # Calendar fields
+        # -------------------------------------------------
 
         self.ui.dtLastService.setEnabled(
             not is_meter_based
         )
 
         self.ui.dtNextDue.setEnabled(
-        not is_meter_based
+            not is_meter_based
         )
 
-    # -------------------------------------------------
-    # Meter fields
-    # -------------------------------------------------
+        # -------------------------------------------------
+        # Meter fields
+        # -------------------------------------------------
 
         self.ui.cmbMeterType.setEnabled(
             is_meter_based
@@ -876,14 +941,42 @@ class PreventiveMaintenanceDialog(BaseDialog):
             is_meter_based
         )
 
+        # -------------------------------------------------
+        # Meter-based PM
+        # -------------------------------------------------
+
         if is_meter_based:
-            self.ui.cmbMeterType.setCurrentText(
+            index = self.ui.cmbMeterType.findText(
                 frequency_type
             )
 
-            self.calculate_next_due_meter()
+            if index >= 0:
+                self.ui.cmbMeterType.setCurrentIndex(
+                    index
+                )
+
+            if not self._loading_record:
+                self.calculate_next_due_meter()
+
+            else:
+
+                self.ui.cmbMeterType.setCurrentIndex(
+                    -1
+                )
+
+                if not self._loading_record:
+                    self.calculate_next_due()
+
+        # -------------------------------------------------
+        # Calendar-based PM
+        # -------------------------------------------------
 
         else:
+
+            self.ui.cmbMeterType.setCurrentIndex(
+                -1
+            )
+
             self.calculate_next_due()
 
     def calculate_next_due_meter(self, *_args):
@@ -894,7 +987,7 @@ class PreventiveMaintenanceDialog(BaseDialog):
 
         meter_types = {
             "Running Hours",
-            "Kilometres",
+            "Kilometers",
             "Cycles",
         }
 
@@ -917,3 +1010,72 @@ class PreventiveMaintenanceDialog(BaseDialog):
         self.ui.dsbNextDueMeter.setValue(
             next_due_meter
         )
+
+    def load_latest_asset_meter(self):
+
+        if self._loading_record:
+            return
+
+        # Do not overwrite stored values when editing
+        # an existing PM schedule.
+        if self.record_id is not None:
+            return
+
+        frequency_type = (
+            self.ui.cmbFrequencyType
+            .currentText()
+            .strip()
+        )
+
+        meter_types = {
+            "Running Hours",
+            "Kilometers",
+            "Cycles",
+        }
+
+        if frequency_type not in meter_types:
+            return
+
+        asset_id = self.ui.cmbAsset.currentData()
+
+        if asset_id is None:
+            return
+
+        latest_meter = (
+            AssetMeterReadingService.get_latest_reading_value(
+                asset_id,
+                frequency_type
+            )
+        )
+
+        # ---------------------------------------------
+        # No meter history
+        # ---------------------------------------------
+
+        if latest_meter is None:
+
+            self.ui.dsbLastServiceMeter.setReadOnly(
+                False
+            )
+
+            self.ui.dsbLastServiceMeter.setValue(
+                0.00
+            )
+
+            self.calculate_next_due_meter()
+
+            return
+
+        # ---------------------------------------------
+        # Existing meter history
+        # ---------------------------------------------
+
+        self.ui.dsbLastServiceMeter.setValue(
+            latest_meter
+        )
+
+        self.ui.dsbLastServiceMeter.setReadOnly(
+            True
+        )
+
+        self.calculate_next_due_meter()

@@ -232,10 +232,66 @@
           <string>Dates and Costs</string>
          </property>
          <layout class="QGridLayout" name="gridDatesCosts">
+          <item row="2" column="1">
+           <widget class="QDoubleSpinBox" name="dsbEstimatedHours">
+            <property name="maximum">
+             <double>999999.989999999990687</double>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QDoubleSpinBox" name="dsbEstimatedCost">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
+            <property name="prefix">
+             <string/>
+            </property>
+            <property name="maximum">
+             <double>999999.989999999990687</double>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QDateEdit" name="dtDueDate">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="0">
            <widget class="QLabel" name="lblDateCreated">
             <property name="text">
              <string>Date Created:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="lblEstimatedCost">
+            <property name="text">
+             <string>Estimated Cost:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QDoubleSpinBox" name="dsbActualCost">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
+            <property name="prefix">
+             <string/>
+            </property>
+            <property name="maximum">
+             <double>999999.989999999990687</double>
             </property>
            </widget>
           </item>
@@ -256,72 +312,6 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="3">
-           <widget class="QDateEdit" name="dtDueDate">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>20</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="lblEstimatedCost">
-            <property name="text">
-             <string>Estimated Cost:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QDoubleSpinBox" name="dsbEstimatedCost">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>20</height>
-             </size>
-            </property>
-            <property name="prefix">
-             <string/>
-            </property>
-            <property name="maximum">
-             <double>999999.989999999990687</double>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QLabel" name="lblActualCost">
-            <property name="text">
-             <string>Actual Cost:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="3">
-           <widget class="QDoubleSpinBox" name="dsbActualCost">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>20</height>
-             </size>
-            </property>
-            <property name="prefix">
-             <string/>
-            </property>
-            <property name="maximum">
-             <double>999999.989999999990687</double>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="3">
-           <widget class="QDoubleSpinBox" name="dsbLabourHours">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>20</height>
-             </size>
-            </property>
-           </widget>
-          </item>
           <item row="2" column="2">
            <widget class="QLabel" name="lblLabourHours">
             <property name="text">
@@ -336,8 +326,38 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
-           <widget class="QDoubleSpinBox" name="dsbEstimatedHours">
+          <item row="1" column="2">
+           <widget class="QLabel" name="lblActualCost">
+            <property name="text">
+             <string>Actual Cost:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="3">
+           <widget class="QDoubleSpinBox" name="dsbLabourHours">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="lblMeterReading">
+            <property name="text">
+             <string>Meter Reading:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QDoubleSpinBox" name="dsbMeterReading">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
             <property name="maximum">
              <double>999999.989999999990687</double>
             </property>

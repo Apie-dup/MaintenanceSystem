@@ -29,6 +29,7 @@ class Permissions:
             # Work Orders
             "work_orders.create",
             "work_orders.edit",
+            "work_orders.delete",
             "work_orders.complete",
             "work_orders.close",
             "work_orders.reopen",

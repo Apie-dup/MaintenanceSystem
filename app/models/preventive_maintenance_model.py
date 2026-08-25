@@ -27,6 +27,9 @@ class PreventiveMaintenanceModel:
                 preventive_maintenance.frequency_value,
                 preventive_maintenance.last_service_date,
                 preventive_maintenance.next_due_date,
+                preventive_maintenance.meter_type,
+                preventive_maintenance.last_service_meter,
+                preventive_maintenance.next_due_meter,
                 
                 CASE
                     WHEN preventive_maintenance.active = 0
@@ -45,7 +48,7 @@ class PreventiveMaintenanceModel:
                         THEN 'Due Soon'
 
                     ELSE 'Scheduled'
-                END AS due_status,
+                END AS calendar_due_status,
                 
                 preventive_maintenance.estimated_hours,
                 preventive_maintenance.estimated_cost,

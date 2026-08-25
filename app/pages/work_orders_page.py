@@ -123,6 +123,11 @@ class WorkOrdersPage(CrudPage):
             )
         )
 
+        can_delete = Permissions.has_permission(
+            self.role,
+            "work_orders.delete"
+        )
+
         self.ui.btnAdd.setVisible(
             can_create
         )
@@ -134,7 +139,9 @@ class WorkOrdersPage(CrudPage):
         # Delete should normally stay unavailable
         # unless you explicitly create a permission for it.
         if hasattr(self.ui, "btnDelete"):
-            self.ui.btnDelete.setVisible(False)
+            self.ui.btnDelete.setVisible(
+                can_delete
+            )
 
     def handle_double_click(self, _item):
 

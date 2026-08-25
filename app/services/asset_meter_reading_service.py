@@ -68,3 +68,20 @@ class AssetMeterReadingService:
             asset_id,
             meter_type,
         )
+
+    @staticmethod
+    def get_latest_reading_value(
+        asset_id,
+        meter_type
+    ):
+        latest = AssetMeterReadingService.get_latest_reading(
+            asset_id,
+            meter_type
+        )
+
+        if latest is None:
+            return None
+
+        return float(
+            latest["reading"] or 0
+        )

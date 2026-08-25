@@ -19,6 +19,9 @@ from app.helpers.format_helper import FormatHelper
 from app.services.work_order_history_service import WorkOrderHistoryService
 from app.services.settings_service import SettingsService
 from app.core.permissions import Permissions
+from app.services.preventive_maintenance_service import (
+    PreventiveMaintenanceService
+)
 
 
 
@@ -468,6 +471,10 @@ class WorkOrderDialog(BaseDialog):
         self.ui.dsbEstimatedHours.setValue(0.00)
         self.ui.dsbLabourHours.setValue(0.00)
 
+        self.ui.dsbMeterReading.setValue(0.00)
+        self.ui.dsbMeterReading.setVisible(False)
+        self.ui.lblMeterReading.setVisible(False)
+
         self.ui.btnComplete.setEnabled(False)
         self.ui.btnCloseWorkOrder.setEnabled(False)
 
@@ -527,6 +534,13 @@ class WorkOrderDialog(BaseDialog):
             "estimated_hours":
                 self.ui.dsbEstimatedHours.value(),
 
+            "meter_reading":
+                (
+                    self.ui.dsbMeterReading.value()
+                    if self.ui.dsbMeterReading.isVisible()
+                    else None
+                ),
+
             "notes":
                 self.ui.teNotes.toPlainText().strip(),
         }
@@ -584,6 +598,12 @@ class WorkOrderDialog(BaseDialog):
             float(work_order["estimated_hours"] or 0)
         )
 
+        self.ui.dsbMeterReading.setValue(
+            float(
+                work_order["meter_reading"] or 0
+            )
+        )
+
         self.ui.teNotes.setPlainText(
             work_order["notes"] or ""
         )
@@ -614,6 +634,8 @@ class WorkOrderDialog(BaseDialog):
             )
         else:
             self.ui.cmbTechnician.setCurrentIndex(0)
+
+        self.update_meter_mode()
 
     @staticmethod
     def set_date_value(date_widget, value):
@@ -1161,18 +1183,67 @@ class WorkOrderDialog(BaseDialog):
     # ---------------------------------------------------------
 
     def save(self):
-        
+
         data = self.get_form_data()
 
+        #---------------------------------------------------------
+        # Terminal statuses must use dedicated workflow buttons
+        #---------------------------------------------------------
+
+        if not self.is_add:
+
+            existing = WorkOrderService.get_by_id(
+                self.record_id
+            )
+
+            if existing is None:
+                raise ValueError(
+                    "Work Order not found."
+                )
+
+            old_status = existing["status"]
+            new_status = data["status"]
+
+            # Do not allow ordinary Save to complete a Work Order.
+            if (
+                old_status != "Completed"
+                and new_status == "Completed"
+            ):
+                raise ValueError(
+                    "Use the complete Work Order button "
+                    "to complete this Work Order."
+                )
+
+        #---------------------------------------------------------
+        # Add
+        #---------------------------------------------------------
+
         if self.is_add:
+
+            if data["status"] in {
+                "Completed",
+                "Closed",
+            }:
+                raise ValueError(
+                    "A new work Order cannot be created "
+                    "as Completed or Closed."
+                )
+
             self.record_id = WorkOrderService.create(
                 data,
                 user=self.user
             )
 
-            self.ui.groupMaterials.setEnabled(True)
+            self.ui.groupMaterials.setEnabled(
+                True
+            )
+
+        #---------------------------------------------------------
+        # Update
+        #---------------------------------------------------------
 
         else:
+            
             WorkOrderService.update(
                 self.record_id,
                 data,
@@ -1187,6 +1258,9 @@ class WorkOrderDialog(BaseDialog):
 
     def complete_work_order(self):
 
+        # -------------------------------------------------
+        # Permission
+        # -------------------------------------------------
         if not Permissions.has_permission(
             self.role,
             "work_orders.complete"
@@ -1198,14 +1272,15 @@ class WorkOrderDialog(BaseDialog):
             )
             return
 
+        # -------------------------------------------------
+        # Record must exist
+        # -------------------------------------------------
         if self.record_id is None:
             self.warning(
                 "Complete Work Order",
                 "Please save the Work Order first."
             )
             return
-
-        meter_reading = None
 
         work_order = WorkOrderService.get_by_id(
             self.record_id
@@ -1218,11 +1293,13 @@ class WorkOrderDialog(BaseDialog):
             )
             return
 
+        # -------------------------------------------------
+        # Meter reading
+        # -------------------------------------------------
+
+        meter_reading = None
+
         if work_order["pm_id"] is not None:
-            
-            from app.services.preventive_maintenance_service import (
-                PreventiveMaintenanceService
-            )
 
             pm = PreventiveMaintenanceService.get_by_id(
                 work_order["pm_id"]
@@ -1235,35 +1312,45 @@ class WorkOrderDialog(BaseDialog):
                 )
                 return
 
+            meter_reading = None
+
+            if work_order["pm_id"] is not None:
+
+                pm = PreventiveMaintenanceService.get_by_id(
+                    work_order["pm_id"]
+                )
+
+                if pm is None:
+                    self.warning(
+                        "Complete Work Order",
+                        "The linked PM schedule could not be found."
+                    )
+                    return
+
             meter_types = {
                 "Running Hours",
                 "Kilometers",
-                "Cycled",
+                "Cycles",
             }
 
             if pm["frequency_type"] in meter_types:
 
-                last_meter = float(
-                    pm["last_service_meter"] or 0
+                meter_reading = (
+                    self.ui.dsbMeterReading.value()
                 )
 
-                meter_reading, accepted = (
-                    QInputDialog.getDouble(
-                        self,
-                        "PM Meter Reading",
-                        (
-                            f'Enter current'
-                            f'{pm["frequency_type"]} reading:'
-                        ),
-                        last_meter,
-                        0,
-                        999999999,
-                        2,
+                if meter_reading <= 0:
+                    self.warning(
+                        "Complete Work Order",
+                        "Please enter a valid Meter Reading "
+                        "before completing this Work Order."
                     )
-                )
-
-                if not accepted:
+                    self.ui.dsbMeterReading.setFocus()
                     return
+
+        # -------------------------------------------------
+        # Confirmation
+        # -------------------------------------------------
 
         if not self.confirm(
             "Complete Work Order",
@@ -1276,11 +1363,15 @@ class WorkOrderDialog(BaseDialog):
         ):
             return
 
+        # -------------------------------------------------
+        # Complete
+        # -------------------------------------------------
+
         try:
             WorkOrderService.complete_work_order(
                 self.record_id,
                 user=self.user,
-                meter_reading=meter_reading
+                meter_reading=meter_reading,
             )
 
         except ValueError as error:
@@ -1293,13 +1384,22 @@ class WorkOrderDialog(BaseDialog):
         except Exception as error:
             self.error(
                 "Complete Work Order",
-                f"Could not complete the Work Order.\n\n{error}"
+                (
+                    "Could not complete the Work Order."
+                    f"\n\n{error}"
+                )
             )
             return
+
+        # -------------------------------------------------
+        # Refresh dialog
+        # -------------------------------------------------
 
         self.load_record(
             self.record_id
         )
+
+        self.load_history()
 
         self.update_workflow_buttons()
 
@@ -1307,7 +1407,6 @@ class WorkOrderDialog(BaseDialog):
             "Complete Work Order",
             "Work Order completed successfully."
         )
-
 
     def close_work_order(self):
 
@@ -1649,4 +1748,48 @@ class WorkOrderDialog(BaseDialog):
         self.ui.btnReopen.setVisible(
             can_reopen
             and status == "Completed"
-    )
+        )
+
+    def update_meter_mode(self):
+
+        show_meter = False
+
+        if self.record_id is not None:
+
+            work_order = WorkOrderService.get_by_id(
+                self.record_id
+            )
+
+            if (
+                work_order is not None
+                and work_order["pm_id"] is not None
+            ):
+
+                from app.services.preventive_maintenance_service import (
+                    PreventiveMaintenanceService
+                )
+
+                pm = PreventiveMaintenanceService.get_by_id(
+                    work_order["pm_id"]
+                )
+
+                if pm is not None:
+
+                    meter_types = {
+                        "Running Hours",
+                        "Kilometers",
+                        "Cycles",
+                    }
+
+                    show_meter = (
+                        pm["frequency_type"]
+                        in meter_types
+                    )
+
+        self.ui.lblMeterReading.setVisible(
+            show_meter
+        )
+
+        self.ui.dsbMeterReading.setVisible(
+            show_meter
+        )

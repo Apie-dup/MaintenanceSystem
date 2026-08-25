@@ -6,14 +6,8 @@ from app.helpers.table_helper import TableHelper
 from app.services.dashboard_service import DashboardService
 from app.ui.generated.ui_dashboard_page import Ui_DashboardPage
 from app.services.settings_service import SettingsService
-
-from PySide6.QtGui import QColor
+from app.helpers.theme_helper import ThemeHelper
 from PySide6.QtWidgets import QHeaderView
-
-COLOR_OVERDUE = QColor(255, 200, 200)     # light red
-COLOR_DUE_TODAY = QColor(255, 230, 200)   # light orange
-COLOR_DUE_SOON = QColor(255, 255, 200)    # light yellow
-COLOR_UPCOMING = QColor(255, 255, 255)    # normal white
 
 
 class DashboardPage(BasePage):
@@ -30,7 +24,7 @@ class DashboardPage(BasePage):
         ("pm_number", "PM Number"),
         ("asset_name", "Asset"),
         ("task", "Task"),
-        ("next_due_date", "Next Due"),
+        ("due_display", "Due At"),
         ("due_status", "Status"),
     ]
 
@@ -183,18 +177,82 @@ class DashboardPage(BasePage):
         )
 
     def load_pm_due(self):
+
         records = DashboardService.get_pm_due_list()
+
+        display_records = []
+
+        meter_types = {
+            "Running Hours",
+            "Kilometers",
+            "Cycles",
+        }
+
+        for record in records:
+
+            pm = dict(record)
+
+            frequency_type = (
+                pm.get("frequency_type") or ""
+            ).strip()
+
+            #------------------------------------------
+            # Meter-based PM
+            #------------------------------------------
+
+            if frequency_type in meter_types:
+
+                next_due_meter = pm.get(
+                    "next_due_meter"
+                )
+
+                if next_due_meter is not None:
+
+                    value = float(
+                        next_due_meter
+                    )
+
+                    if frequency_type == "Running Hours":
+                        unit = "Hours"
+
+                    elif frequency_type == "Kilometers":
+                        unit = "km"
+
+                    elif frequency_type == "Cycles":
+                        unit = "Cycles"
+
+                    else:
+                        unit = frequency_type
+
+                    pm["due_display"] = (
+                        f"{value:,.2f} {unit}"
+                    )
+
+                else:
+                    pm["due_display"] = ""
+
+            #------------------------------------------
+            # Calendar-based PM
+            #------------------------------------------
+
+            else:
+                pm["due_display"] = (
+                    pm.get("next_due_date") or ""
+                )
+
+            display_records.append(pm)
 
         TableHelper.populate(
             self.ui.tblPMDue,
-            records,
+            display_records,
             self.PM_DUE_COLUMNS
         )
 
         status_col_index = next(
             (
                 index
-                for index, (field, _label) in enumerate(self.PM_DUE_COLUMNS)
+                for index, (field, _lable)
+                in enumerate(self.PM_DUE_COLUMNS)
                 if field == "due_status"
             ),
             None
@@ -203,26 +261,38 @@ class DashboardPage(BasePage):
         if status_col_index is None:
             return
 
-        for row in range(self.ui.tblPMDue.rowCount()):
-            item = self.ui.tblPMDue.item(row, status_col_index)
+        for row in range(
+            self.ui.tblPMDue.rowCount()
+        ):
+
+            item = self.ui.tblPMDue.item(
+                row,
+                status_col_index
+            )
+
             if not item:
                 continue
 
             status = item.text().strip()
 
-            # Apply colors
-            if status == "Overdue":
-                color = COLOR_OVERDUE
-            elif status == "Due Today":
-                color = COLOR_DUE_TODAY
-            elif status == "Due Soon":
-                color = COLOR_DUE_SOON
-            else:
-                color = COLOR_UPCOMING
+            color = ThemeHelper.status_color(
+                self,
+                status
+            )
 
-            # Apply background color to entire row
-            for col in range(self.ui.tblPMDue.columnCount()):
-                cell = self.ui.tblPMDue.item(row, col)
+            if color is None:
+                continue
+
+            # Dashboard: highlight entire PM row
+            for col in range(
+                self.ui.tblPMDue.columnCount()
+            ):
+
+                cell = self.ui.tblPMDue.item(
+                    row,
+                    col
+                )
+
                 if cell:
                     cell.setBackground(color)
 

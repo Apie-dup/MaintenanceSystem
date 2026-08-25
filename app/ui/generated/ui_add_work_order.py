@@ -159,10 +159,41 @@ class Ui_AddWorkOrderDialog(object):
         self.groupDatesCosts.setSizePolicy(sizePolicy)
         self.gridDatesCosts = QGridLayout(self.groupDatesCosts)
         self.gridDatesCosts.setObjectName(u"gridDatesCosts")
+        self.dsbEstimatedHours = QDoubleSpinBox(self.groupDatesCosts)
+        self.dsbEstimatedHours.setObjectName(u"dsbEstimatedHours")
+        self.dsbEstimatedHours.setMaximum(999999.989999999990687)
+
+        self.gridDatesCosts.addWidget(self.dsbEstimatedHours, 2, 1, 1, 1)
+
+        self.dsbEstimatedCost = QDoubleSpinBox(self.groupDatesCosts)
+        self.dsbEstimatedCost.setObjectName(u"dsbEstimatedCost")
+        self.dsbEstimatedCost.setMinimumSize(QSize(0, 20))
+        self.dsbEstimatedCost.setMaximum(999999.989999999990687)
+
+        self.gridDatesCosts.addWidget(self.dsbEstimatedCost, 1, 1, 1, 1)
+
+        self.dtDueDate = QDateEdit(self.groupDatesCosts)
+        self.dtDueDate.setObjectName(u"dtDueDate")
+        self.dtDueDate.setMinimumSize(QSize(0, 20))
+
+        self.gridDatesCosts.addWidget(self.dtDueDate, 0, 3, 1, 1)
+
         self.lblDateCreated = QLabel(self.groupDatesCosts)
         self.lblDateCreated.setObjectName(u"lblDateCreated")
 
         self.gridDatesCosts.addWidget(self.lblDateCreated, 0, 0, 1, 1)
+
+        self.lblEstimatedCost = QLabel(self.groupDatesCosts)
+        self.lblEstimatedCost.setObjectName(u"lblEstimatedCost")
+
+        self.gridDatesCosts.addWidget(self.lblEstimatedCost, 1, 0, 1, 1)
+
+        self.dsbActualCost = QDoubleSpinBox(self.groupDatesCosts)
+        self.dsbActualCost.setObjectName(u"dsbActualCost")
+        self.dsbActualCost.setMinimumSize(QSize(0, 20))
+        self.dsbActualCost.setMaximum(999999.989999999990687)
+
+        self.gridDatesCosts.addWidget(self.dsbActualCost, 1, 3, 1, 1)
 
         self.dtDateCreated = QDateEdit(self.groupDatesCosts)
         self.dtDateCreated.setObjectName(u"dtDateCreated")
@@ -175,42 +206,6 @@ class Ui_AddWorkOrderDialog(object):
 
         self.gridDatesCosts.addWidget(self.lblDueDate, 0, 2, 1, 1)
 
-        self.dtDueDate = QDateEdit(self.groupDatesCosts)
-        self.dtDueDate.setObjectName(u"dtDueDate")
-        self.dtDueDate.setMinimumSize(QSize(0, 20))
-
-        self.gridDatesCosts.addWidget(self.dtDueDate, 0, 3, 1, 1)
-
-        self.lblEstimatedCost = QLabel(self.groupDatesCosts)
-        self.lblEstimatedCost.setObjectName(u"lblEstimatedCost")
-
-        self.gridDatesCosts.addWidget(self.lblEstimatedCost, 1, 0, 1, 1)
-
-        self.dsbEstimatedCost = QDoubleSpinBox(self.groupDatesCosts)
-        self.dsbEstimatedCost.setObjectName(u"dsbEstimatedCost")
-        self.dsbEstimatedCost.setMinimumSize(QSize(0, 20))
-        self.dsbEstimatedCost.setMaximum(999999.989999999990687)
-
-        self.gridDatesCosts.addWidget(self.dsbEstimatedCost, 1, 1, 1, 1)
-
-        self.lblActualCost = QLabel(self.groupDatesCosts)
-        self.lblActualCost.setObjectName(u"lblActualCost")
-
-        self.gridDatesCosts.addWidget(self.lblActualCost, 1, 2, 1, 1)
-
-        self.dsbActualCost = QDoubleSpinBox(self.groupDatesCosts)
-        self.dsbActualCost.setObjectName(u"dsbActualCost")
-        self.dsbActualCost.setMinimumSize(QSize(0, 20))
-        self.dsbActualCost.setMaximum(999999.989999999990687)
-
-        self.gridDatesCosts.addWidget(self.dsbActualCost, 1, 3, 1, 1)
-
-        self.dsbLabourHours = QDoubleSpinBox(self.groupDatesCosts)
-        self.dsbLabourHours.setObjectName(u"dsbLabourHours")
-        self.dsbLabourHours.setMinimumSize(QSize(0, 20))
-
-        self.gridDatesCosts.addWidget(self.dsbLabourHours, 2, 3, 1, 1)
-
         self.lblLabourHours = QLabel(self.groupDatesCosts)
         self.lblLabourHours.setObjectName(u"lblLabourHours")
 
@@ -221,11 +216,28 @@ class Ui_AddWorkOrderDialog(object):
 
         self.gridDatesCosts.addWidget(self.lblEstimatedHours, 2, 0, 1, 1)
 
-        self.dsbEstimatedHours = QDoubleSpinBox(self.groupDatesCosts)
-        self.dsbEstimatedHours.setObjectName(u"dsbEstimatedHours")
-        self.dsbEstimatedHours.setMaximum(999999.989999999990687)
+        self.lblActualCost = QLabel(self.groupDatesCosts)
+        self.lblActualCost.setObjectName(u"lblActualCost")
 
-        self.gridDatesCosts.addWidget(self.dsbEstimatedHours, 2, 1, 1, 1)
+        self.gridDatesCosts.addWidget(self.lblActualCost, 1, 2, 1, 1)
+
+        self.dsbLabourHours = QDoubleSpinBox(self.groupDatesCosts)
+        self.dsbLabourHours.setObjectName(u"dsbLabourHours")
+        self.dsbLabourHours.setMinimumSize(QSize(0, 20))
+
+        self.gridDatesCosts.addWidget(self.dsbLabourHours, 2, 3, 1, 1)
+
+        self.lblMeterReading = QLabel(self.groupDatesCosts)
+        self.lblMeterReading.setObjectName(u"lblMeterReading")
+
+        self.gridDatesCosts.addWidget(self.lblMeterReading, 3, 0, 1, 1)
+
+        self.dsbMeterReading = QDoubleSpinBox(self.groupDatesCosts)
+        self.dsbMeterReading.setObjectName(u"dsbMeterReading")
+        self.dsbMeterReading.setMinimumSize(QSize(0, 20))
+        self.dsbMeterReading.setMaximum(999999.989999999990687)
+
+        self.gridDatesCosts.addWidget(self.dsbMeterReading, 3, 1, 1, 1)
 
 
         self.verticalLayout_3.addWidget(self.groupDatesCosts)
@@ -361,14 +373,15 @@ class Ui_AddWorkOrderDialog(object):
         self.lblTechnician.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Technician:", None))
         self.lblRequestedBy.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Requested By:", None))
         self.groupDatesCosts.setTitle(QCoreApplication.translate("AddWorkOrderDialog", u"Dates and Costs", None))
-        self.lblDateCreated.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Date Created:", None))
-        self.lblDueDate.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Due Date:", None))
-        self.lblEstimatedCost.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Estimated Cost:", None))
         self.dsbEstimatedCost.setPrefix("")
-        self.lblActualCost.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Actual Cost:", None))
+        self.lblDateCreated.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Date Created:", None))
+        self.lblEstimatedCost.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Estimated Cost:", None))
         self.dsbActualCost.setPrefix("")
+        self.lblDueDate.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Due Date:", None))
         self.lblLabourHours.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Labour Hours:", None))
         self.lblEstimatedHours.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Estimated Hours:", None))
+        self.lblActualCost.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Actual Cost:", None))
+        self.lblMeterReading.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Meter Reading:", None))
         self.groupNotes.setTitle(QCoreApplication.translate("AddWorkOrderDialog", u"Notes", None))
         self.tabWorkOrder.setTabText(self.tabWorkOrder.indexOf(self.General), QCoreApplication.translate("AddWorkOrderDialog", u"General", None))
         self.groupMaterials.setTitle(QCoreApplication.translate("AddWorkOrderDialog", u"Materials Used", None))

@@ -92,6 +92,7 @@ class WorkOrderModel:
                 work_orders.estimated_hours,
                 work_orders.actual_cost,
                 work_orders.labour_hours,
+                work_orders.meter_reading,
                 work_orders.notes,
                 work_orders.pm_id,
                 work_orders.created_at,
@@ -220,10 +221,11 @@ class WorkOrderModel:
                     estimated_hours,
                     actual_cost,
                     labour_hours,
+                    meter_reading,
                     notes,
                     pm_id
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 data["work_order_number"],
                 data["asset_id"],
@@ -239,6 +241,7 @@ class WorkOrderModel:
                 data.get("estimated_hours", 0),
                 data["actual_cost"],
                 data["labour_hours"],
+                data.get("meter_reading"),
                 data["notes"],
                 data.get("pm_id"),
             ))
@@ -280,6 +283,7 @@ class WorkOrderModel:
                     estimated_hours = ?,
                     actual_cost = ?,
                     labour_hours = ?,
+                    meter_reading = ?,
                     notes = ?,
                     pm_id = ?
                 WHERE id = ?
@@ -298,6 +302,7 @@ class WorkOrderModel:
                 data.get("estimated_hours", 0),
                 data["actual_cost"],
                 data["labour_hours"],
+                data.get("meter_reading"),
                 data["notes"],
                 data.get("pm_id"),
                 record_id,
@@ -540,8 +545,11 @@ class WorkOrderModel:
         return rows
 
     @staticmethod
-    def complete(record_id, completed_date):
-
+    def complete(
+        record_id,
+        completed_date,
+        meter_reading=None,
+    ):
         conn = Database.connect()
         cursor = conn.cursor()
 
@@ -550,10 +558,12 @@ class WorkOrderModel:
                 UPDATE work_orders
                 SET
                     status = 'Completed',
-                    completed_date = ?
+                    completed_date = ?,
+                    meter_reading = ?
                 WHERE id = ?
             """, (
                 completed_date,
+                meter_reading,
                 record_id,
             ))
 
@@ -561,7 +571,6 @@ class WorkOrderModel:
                 raise ValueError(
                     "Work Order not found."
                 )
-
             conn.commit()
 
         except Exception:
@@ -570,7 +579,6 @@ class WorkOrderModel:
 
         finally:
             conn.close()
-
 
     @staticmethod
     def close(record_id, closed_date):
