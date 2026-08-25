@@ -21,3 +21,10 @@ database/*.db
 # Qt generated cache
 *.qmlc
 *.jsc
+
+# Generated reports
+*_report_*.pdf
+*_report_*.xlsx
+work_orders.pdf
+work_orders.xlsx
+technician_performance.pdf
