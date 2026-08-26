@@ -126,6 +126,12 @@ class Ui_AssetsWindow(object):
 
         self.horizontalLayout_2.addWidget(self.btnDelete)
 
+        self.btnMeterReadings = QPushButton(AssetsWindow)
+        self.btnMeterReadings.setObjectName(u"btnMeterReadings")
+        self.btnMeterReadings.setMinimumSize(QSize(90, 30))
+
+        self.horizontalLayout_2.addWidget(self.btnMeterReadings)
+
         self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_2.addItem(self.horizontalSpacer)
@@ -178,6 +184,7 @@ class Ui_AssetsWindow(object):
         self.btnEdit.setText(QCoreApplication.translate("AssetsWindow", u"Edit", None))
         self.btnRefresh.setText(QCoreApplication.translate("AssetsWindow", u"Refresh", None))
         self.btnDelete.setText(QCoreApplication.translate("AssetsWindow", u"Delete", None))
+        self.btnMeterReadings.setText(QCoreApplication.translate("AssetsWindow", u"Meter Readings", None))
         self.lblStatus.setText(QCoreApplication.translate("AssetsWindow", u"Status", None))
     # retranslateUi
 

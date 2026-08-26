@@ -1,3 +1,5 @@
+from tkinter import dialog
+
 from app.base.crud_page import CrudPage
 from app.dialogs.asset_dialog import AssetDialog
 from app.services.asset_service import AssetService
@@ -5,6 +7,7 @@ from app.ui.generated.ui_assets_page import Ui_AssetsWindow
 from app.helpers.format_helper import FormatHelper
 from app.core.permissions import Permissions
 from app.helpers.table_helper import TableHelper
+from app.dialogs.asset_meter_reading_dialog import AssetMeterReadingDialog
 
 
 class AssetsPage(CrudPage):
@@ -57,6 +60,8 @@ class AssetsPage(CrudPage):
         self.user = getattr(parent, "user", {})
         self.role = self.user.get("role", "")
 
+        self.main_controller = parent
+
         self.setup_page()
 
     def setup_page(self):
@@ -81,6 +86,10 @@ class AssetsPage(CrudPage):
 
         self.ui.btnDelete.clicked.connect(
             self.delete_record
+        )
+
+        self.ui.btnMeterReadings.clicked.connect(
+            self.open_meter_readings
         )
 
         self.search_widget.textChanged.connect(
@@ -238,6 +247,11 @@ class AssetsPage(CrudPage):
             "assets.delete"
         )
 
+        can_view_meter_readings = Permissions.has_permission(
+            self.role,
+            "asset_meter_readings"
+        )
+
         self.ui.btnAdd.setVisible(
             can_create
         )
@@ -248,4 +262,43 @@ class AssetsPage(CrudPage):
 
         self.ui.btnDelete.setVisible(
             can_delete
+        )
+
+        self.ui.btnMeterReadings.setVisible(
+            can_view_meter_readings
+        )
+
+    def open_meter_readings(self):
+
+        record_id = TableHelper.selected_id(
+            self.table
+        )
+        if record_id is None:
+            self.warning(
+                "Meter Readings",
+                "Please select an asset."
+            )
+            return
+
+        dialog = AssetMeterReadingDialog(
+            asset_id=record_id,
+            user=self.user,
+            parent=self,
+        )
+
+        dialog.reading_recorded.connect(
+            self.handle_meter_reading_recorded
+        )
+
+        dialog.exec()
+
+    def handle_meter_reading_recorded(
+        self,
+        asset_id,
+    ):
+        if self.main_controller is None:
+            return
+
+        self.main_controller.refresh_after_meter_reading(
+            asset_id
         )

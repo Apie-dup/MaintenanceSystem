@@ -25,6 +25,8 @@ class Permissions:
             "assets.create",
             "assets.edit",
             "assets.delete",
+            "asset_meter_readings",
+            "asset_meter_readings.create",
 
             # Work Orders
             "work_orders.create",
@@ -88,6 +90,8 @@ class Permissions:
             # Assets
             "assets.create",
             "assets.edit",
+            "asset_meter_readings",
+            "asset_meter_readings.create",
 
             # Work Orders
             "work_orders.create",
@@ -134,6 +138,10 @@ class Permissions:
             "work_orders.complete",
             "work_orders.issue_parts",
 
+            # Assets
+            "asset_meter_readings",
+            "asset_meter_readings.create",
+
             # Inventory is view-only through the
             # Inventory page for now.
         },
@@ -150,6 +158,9 @@ class Permissions:
             "work_orders",
             "pm",
             "reports",
+
+            # Assets
+            "asset_meter_readings",
 
             # Viewer may export reports.
             "reports.export",

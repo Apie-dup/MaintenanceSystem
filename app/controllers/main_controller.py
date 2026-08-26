@@ -476,6 +476,23 @@ class MainController(QMainWindow):
             self.logout
         )
 
+    def refresh_after_meter_reading(
+        self,
+        asset_id=None,
+    ):
+        """
+        Refresh pages affected by a new asset meter reading.
+        """
+
+        if hasattr(self, "assets_page"):
+            self.assets_page.load_data()
+
+        if hasattr(self, "pm_page"):
+            self.pm_page.load_data()
+
+        if hasattr(self, "dashboard_page"):
+            self.dashboard_page.refresh_dashboard()
+
     def show_dashboard(self):
 
         self.set_active_navigation(self.ui.btnDashboard)
