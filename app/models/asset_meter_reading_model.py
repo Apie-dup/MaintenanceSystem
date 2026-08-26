@@ -10,6 +10,8 @@ class AssetMeterReadingModel:
         reading,
         reading_date,
         notes=None,
+        source_type="Manual",
+        work_order_id=None,
     ):
         conn = Database.connect()
         cursor = conn.cursor()
@@ -22,15 +24,19 @@ class AssetMeterReadingModel:
                     meter_type,
                     reading,
                     reading_date,
-                    notes
+                    notes,
+                    source_type,
+                    work_order_id
                 )
-                VALUES (?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
             """, (
                 asset_id,
                 meter_type,
                 reading,
                 reading_date,
                 notes,
+                source_type,
+                work_order_id,
             ))
 
             record_id = cursor.lastrowid
@@ -91,19 +97,25 @@ class AssetMeterReadingModel:
         if meter_type:
             cursor.execute("""
                 SELECT
-                    id,
-                    asset_id,
-                    meter_type,
-                    reading,
-                    reading_date,
-                    notes,
-                    created_at
+                    asset_meter_readings.id,
+                    asset_meter_readings.asset_id,
+                    asset_meter_readings.meter_type,
+                    asset_meter_readings.reading,
+                    asset_meter_readings.reading_date,
+                    asset_meter_readings.source_type,
+                    asset_meter_readings.work_order_id,
+                    work_orders.work_order_number,
+                    asset_meter_readings.notes,
+                    asset_meter_readings.created_at
                 FROM asset_meter_readings
-                WHERE asset_id = ?
-                  AND meter_type = ?
+                LEFT JOIN work_orders
+                    ON asset_meter_readings.work_order_id
+                        = work_orders.id
+                WHERE asset_meter_readings.asset_id = ?
+                    AND asset_meter_readings.meter_type = ?
                 ORDER BY
-                    reading_date DESC,
-                    id DESC
+                    asset_meter_readings.reading_date DESC,
+                    asset_meter_readings.id DESC
             """, (
                 asset_id,
                 meter_type,
@@ -112,18 +124,24 @@ class AssetMeterReadingModel:
         else:
             cursor.execute("""
                 SELECT
-                    id,
-                    asset_id,
-                    meter_type,
-                    reading,
-                    reading_date,
-                    notes,
-                    created_at
+                    asset_meter_readings.id,
+                    asset_meter_readings.asset_id,
+                    asset_meter_readings.meter_type,
+                    asset_meter_readings.reading,
+                    asset_meter_readings.reading_date,
+                    asset_meter_readings.source_type,
+                    asset_meter_readings.work_order_id,
+                    work_orders.work_order_number,
+                    asset_meter_readings.notes,
+                    asset_meter_readings.created_at
                 FROM asset_meter_readings
-                WHERE asset_id = ?
+                LEFT JOIN work_orders
+                    ON asset_meter_readings.work_order_id
+                        = work_orders.id
+                WHERE asset_meter_readings.asset_id = ?
                 ORDER BY
-                    reading_date DESC,
-                    id DESC
+                    asset_meter_readings.reading_date DESC,
+                    asset_meter_readings.id DESC
             """, (
                 asset_id,
             ))

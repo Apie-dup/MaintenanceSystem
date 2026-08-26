@@ -273,6 +273,7 @@ class AssetsPage(CrudPage):
         record_id = TableHelper.selected_id(
             self.table
         )
+
         if record_id is None:
             self.warning(
                 "Meter Readings",

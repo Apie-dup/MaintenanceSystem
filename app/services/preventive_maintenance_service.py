@@ -134,7 +134,7 @@ class PreventiveMaintenanceService:
                 )
             )
 
-        return PreventiveMaintenanceModel.create(
+        return PreventiveMaintenanceModel.insert(
             save_data
         )
 

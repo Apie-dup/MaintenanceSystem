@@ -60,15 +60,9 @@ class AssetMeterReadingDialog(QDialog):
 
         self.connect_signals()
 
-    def load_initial_data(self):
+        self.load_initial_data()
 
-        self.setWindowTitle(
-            "Asset Meter Readings"
-        )
-
-        self.ui.dtReadingDate.setDate(
-            QDate.currentDate()
-        )    
+    def load_initial_data(self):  
 
         self.load_asset()
 
@@ -100,13 +94,14 @@ class AssetMeterReadingDialog(QDialog):
 
     def setup_history_table(self):
 
-        self.ui.tblHistory.setColumnCount(4)
+        self.ui.tblHistory.setColumnCount(5)
 
         self.ui.tblHistory.setHorizontalHeaderLabels(
             [
                 "Reading Date",
                 "Meter Type",
                 "Reading",
+                "Source",
                 "Notes",
             ]
         )
@@ -159,6 +154,30 @@ class AssetMeterReadingDialog(QDialog):
 
         for row, record in enumerate(records):
 
+            reading = float(
+                record["reading"] or 0
+            )
+
+            source_type = (
+                record["source_type"]
+                or "Manual"
+            )
+
+            work_order_number = (
+                record["work_order_number"]
+                or ""
+            )
+
+            if (
+                source_type == "Work Order"
+                and work_order_number
+            ):
+
+                source_display = work_order_number
+
+            else:
+                source_display = source_type
+
             self.ui.tblHistory.setItem(
                 row,
                 0,
@@ -175,10 +194,6 @@ class AssetMeterReadingDialog(QDialog):
                 )
             )
 
-            reading = float(
-                record["reading"] or 0
-            )
-
             self.ui.tblHistory.setItem(
                 row,
                 2,
@@ -190,6 +205,14 @@ class AssetMeterReadingDialog(QDialog):
             self.ui.tblHistory.setItem(
                 row,
                 3,
+                QTableWidgetItem(
+                    source_display
+                )
+            )
+
+            self.ui.tblHistory.setItem(
+                row,
+                4,
                 QTableWidgetItem(
                     record["notes"] or ""
                 )

@@ -4,7 +4,7 @@ from app.core.logger import logger
 
 class MigrationManager:
 
-    LATEST_VERSION = 14
+    LATEST_VERSION = 16
 
     # ---------------------------------------------------------
     # Database version
@@ -118,6 +118,12 @@ class MigrationManager:
                 MigrationManager.migrate_to_v14()
                 version = 14
 
+            elif version == 14:
+                MigrationManager.migrate_to_v15()
+                version = 15
+            elif version == 15:
+                MigrationManager.migrate_to_v16()
+                version = 16
             else:
                 raise RuntimeError(
                     f"No migration path exists from version {version}."
@@ -853,6 +859,143 @@ class MigrationManager:
 
             logger.info(
                 "Work Order meter reading tracking added."
+            )
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()
+
+    @staticmethod
+    def migrate_to_v15():
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        try:
+            logger.info(
+                "Migrating database to Version 15..."
+            )
+
+            # -------------------------------------------------
+            # Meter reading source type
+            # -------------------------------------------------
+
+            if not MigrationManager.column_exists(
+                cursor,
+                "asset_meter_readings",
+                "source_type"
+            ):
+                cursor.execute("""
+                    ALTER TABLE asset_meter_readings
+                    ADD COLUMN source_type TEXT
+                    DEFAULT 'Manual'
+                """)
+
+                logger.info(
+                    "Added source_type to asset_meter_readings."
+                )
+
+            else:
+                logger.info(
+                    "asset_meter_readings.source_type "
+                    "already exists."
+                )
+
+            # -------------------------------------------------
+            # Related work order
+            # -------------------------------------------------
+
+            if not MigrationManager.column_exists(
+                cursor,
+                "asset_meter_readings",
+                "work_order_id"
+            ):
+                cursor.execute("""
+                    ALTER TABLE asset_meter_readings
+                    ADD COLUMN work_order_id INTEGER
+                """)
+                logger.info(
+                    "Added work_order_id to asset_meter_readings."
+                )
+
+            else:
+                logger.info(
+                    "asset_meter_readings.work_order_id "
+                    "already exists."
+                )
+
+            conn.commit()
+
+            logger.info(
+                "Asset meter reading source tracking added."
+            )
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()
+
+    @staticmethod
+    def migrate_to_v16():
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        try:
+            logger.info(
+                "Migrating database to Version 16..."
+            )
+
+            # -------------------------------------------------
+            # Backfill historical Work Order meter readings
+            # -------------------------------------------------
+
+            cursor.execute("""
+                UPDATE asset_meter_readings
+                SET
+                    source_type = 'Work Order',
+                    work_order_id = (
+                        SELECT work_orders.id
+                        FROM work_orders
+                        WHERE asset_meter_readings.notes
+                            = 'Recorded on completion of '
+                            || work_orders.work_order_number
+                            || '.'
+                        LIMIT 1
+                    )
+                WHERE
+                    source_type = 'Manual'
+                    AND work_order_id IS NULL
+                    AND notes LIKE
+                        'Recorded on completion of WO-%'
+                    AND EXISTS (
+                        SELECT 1
+                        FROM work_orders
+                        WHERE asset_meter_readings.notes
+                            = 'Recorded on completion of '
+                            || work_orders.work_order_number
+                            || '.'
+                    )
+            """)
+
+            updated_rows = cursor.rowcount
+
+            conn.commit()
+
+            logger.info(
+                "Backfilled %s historical "
+                "Work Order meter reading(s).",
+                updated_rows,
+            )
+
+            logger.info(
+                "Historical meter reading "
+                "source tracking updated."
             )
 
         except Exception:

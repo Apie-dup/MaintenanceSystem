@@ -12,6 +12,8 @@ class AssetMeterReadingService:
         reading,
         reading_date,
         notes=None,
+        source_type="Manual",
+        work_order_id=None,
     ):
 
         reading = float(reading)
@@ -45,6 +47,8 @@ class AssetMeterReadingService:
             reading,
             reading_date,
             notes,
+            source_type,
+            work_order_id,
         )
 
     @staticmethod

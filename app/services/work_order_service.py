@@ -596,6 +596,9 @@ class WorkOrderService:
                     "Recorded on completion of "
                     f'{work_order["work_order_number"]}.'
                 ),
+
+                source_type="Work Order",
+                work_order_id=record_id,
             )
 
         # ---------------------------------------------------

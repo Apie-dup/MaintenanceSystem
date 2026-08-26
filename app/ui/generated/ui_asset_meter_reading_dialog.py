@@ -25,7 +25,7 @@ class Ui_AssetMeterReadingDialog(object):
     def setupUi(self, AssetMeterReadingDialog):
         if not AssetMeterReadingDialog.objectName():
             AssetMeterReadingDialog.setObjectName(u"AssetMeterReadingDialog")
-        AssetMeterReadingDialog.resize(442, 492)
+        AssetMeterReadingDialog.resize(551, 496)
         self.verticalLayout_2 = QVBoxLayout(AssetMeterReadingDialog)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.lblTitle = QLabel(AssetMeterReadingDialog)
@@ -43,8 +43,8 @@ class Ui_AssetMeterReadingDialog(object):
         self.verticalLayout = QVBoxLayout(self.groupBox)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.tblHistory = QTableWidget(self.groupBox)
-        if (self.tblHistory.columnCount() < 4):
-            self.tblHistory.setColumnCount(4)
+        if (self.tblHistory.columnCount() < 5):
+            self.tblHistory.setColumnCount(5)
         __qtablewidgetitem = QTableWidgetItem()
         self.tblHistory.setHorizontalHeaderItem(0, __qtablewidgetitem)
         __qtablewidgetitem1 = QTableWidgetItem()
@@ -53,6 +53,8 @@ class Ui_AssetMeterReadingDialog(object):
         self.tblHistory.setHorizontalHeaderItem(2, __qtablewidgetitem2)
         __qtablewidgetitem3 = QTableWidgetItem()
         self.tblHistory.setHorizontalHeaderItem(3, __qtablewidgetitem3)
+        __qtablewidgetitem4 = QTableWidgetItem()
+        self.tblHistory.setHorizontalHeaderItem(4, __qtablewidgetitem4)
         self.tblHistory.setObjectName(u"tblHistory")
 
         self.verticalLayout.addWidget(self.tblHistory)
@@ -170,7 +172,9 @@ class Ui_AssetMeterReadingDialog(object):
         ___qtablewidgetitem2 = self.tblHistory.horizontalHeaderItem(2)
         ___qtablewidgetitem2.setText(QCoreApplication.translate("AssetMeterReadingDialog", u"Reading", None))
         ___qtablewidgetitem3 = self.tblHistory.horizontalHeaderItem(3)
-        ___qtablewidgetitem3.setText(QCoreApplication.translate("AssetMeterReadingDialog", u"Notes", None))
+        ___qtablewidgetitem3.setText(QCoreApplication.translate("AssetMeterReadingDialog", u"Source", None))
+        ___qtablewidgetitem4 = self.tblHistory.horizontalHeaderItem(4)
+        ___qtablewidgetitem4.setText(QCoreApplication.translate("AssetMeterReadingDialog", u"Notes", None))
         self.groupNewReading.setTitle(QCoreApplication.translate("AssetMeterReadingDialog", u"New Meter Reading", None))
         self.lblMeterType.setText(QCoreApplication.translate("AssetMeterReadingDialog", u"Meter Type:", None))
         self.cmbMeterType.setItemText(0, QCoreApplication.translate("AssetMeterReadingDialog", u"Running Hours", None))
