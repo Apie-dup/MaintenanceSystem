@@ -476,6 +476,51 @@ class PreventiveMaintenanceService:
             in PreventiveMaintenanceService.METER_FREQUENCY_TYPES
         )
 
+        #---------------------------------------------------------
+        # Meter-based threshold
+        #---------------------------------------------------------
+
+        if is_meter_based:
+
+            due_status = (
+                PreventiveMaintenanceService
+                .get_meter_due_status(pm)
+            )
+
+            if due_status not in {
+                "Due",
+                "Overdue",
+            }:
+
+                latest = (
+                    AssetMeterReadingService
+                    .get_latest_reading(
+                        pm["asset_id"],
+                        frequency_type
+                    )
+                )
+
+                if latest is None:
+                    current_meter = float(
+                        pm["last_service_meter"] or 0
+                    )
+                else:
+                    current_meter = float(
+                        latest["reading"] or 0
+                    )
+
+                next_due_meter = float(
+                    pm["next_due_meter"] or 0
+                )
+
+                raise ValueError(
+                    "This Preventive Maintenance schedule "
+                    "is not due yet.\n\n"
+                    f"Current meter: {current_meter:,.2f}\n"
+                    f"Due at: {next_due_meter:,.2f} "
+                    f"{frequency_type}"
+                )
+
         if (
             not is_meter_based
             and not pm["next_due_date"]
@@ -639,6 +684,7 @@ class PreventiveMaintenanceService:
 
         #---------------------------------------------------------
         # Calendar-based PM
+        #---------------------------------------------------------
 
         if completion_date is None:
             completion_date = DateHelper.today()

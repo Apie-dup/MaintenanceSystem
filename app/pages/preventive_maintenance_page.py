@@ -252,58 +252,6 @@ class PreventiveMaintenancePage(CrudPage):
     # ---------------------------------------------------------
 
     def generate_work_order(self):
-        pm_id = self.selected_id()
-
-        if pm_id is None:
-            self.warning(
-                "Generate Work Order",
-                "Please select a PM schedule.",
-            )
-            return
-
-        if not self.confirm(
-            "Generate Work Order",
-            (
-                "Generate a new work order from the selected "
-                "preventive maintenance schedule?"
-            ),
-        ):
-            return
-
-        try:
-            work_order_id = (
-                PreventiveMaintenanceService
-                .generate_work_order(pm_id)
-            )
-
-        except ValueError as error:
-            self.warning(
-                "Generate Work Order",
-                str(error),
-            )
-            return
-
-        except Exception as error:
-            self.error(
-                "Generate Work Order",
-                (
-                    "Could not generate the work order."
-                    f"\n\n{error}"
-                ),
-            )
-            return
-
-        self.information(
-            "Generate Work Order",
-            (
-                "Work order generated successfully."
-                f"\n\nRecord ID: {work_order_id}"
-            ),
-        )
-
-        self.load_data()
-
-    def generate_work_order(self):
 
         if not Permissions.has_permission(
             self.role,
@@ -321,7 +269,7 @@ class PreventiveMaintenancePage(CrudPage):
 
         if pm_id is None:
             self.warning(
-                "Generated Work Order",
+                "Generate Work Order",
                 "Please select a PM schedule."
             )
             return

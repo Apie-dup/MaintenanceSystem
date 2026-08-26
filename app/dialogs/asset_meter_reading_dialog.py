@@ -259,6 +259,17 @@ class AssetMeterReadingDialog(QDialog):
 
     def record_reading(self):
 
+        if not Permissions.has_permission(
+            self.role,
+            "asset_meter_readings.create"
+        ):
+            self.warning(
+                "Meter Reading",
+                "You do not have permission "
+                "to record meter readings."
+            )
+            return
+
         meter_type = (
             self.ui.cmbMeterType
             .currentText()
@@ -311,7 +322,7 @@ class AssetMeterReadingDialog(QDialog):
                 )
             )
             return
-        
+
         try:
             AssetMeterReadingService.add_reading(
                 asset_id=self.asset_id,
@@ -345,15 +356,12 @@ class AssetMeterReadingDialog(QDialog):
         self.ui.teNotes.clear()
 
         self.load_history()
-
         self.load_latest_meter()
 
         self.information(
             "Meter Reading",
             "Meter reading recorded successfully."
         )
-
-        
 
     # ---------------------------------------------------------
     # Messages
@@ -402,17 +410,3 @@ class AssetMeterReadingDialog(QDialog):
             widget.setEnabled(
                 can_create
             )
-        
-
-    def record_reading(self):
-
-        if not Permissions.has_permission(
-            self.role,
-            "asset_meter_readings.create"
-        ):
-            self.warning(
-                "Meter Reading",
-                "You do not have permission "
-                "to record meter readings."
-            )
-            return
