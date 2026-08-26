@@ -596,3 +596,63 @@ class PreventiveMaintenanceModel:
 
         finally:
             conn.close()
+
+    @staticmethod
+    def schedule_exists(
+        asset_id,
+        task,
+        frequency_type,
+        frequency_value,
+        exclude_id=None,
+    ):
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        try:
+
+            if exclude_id is None:
+
+                cursor.execute("""
+                    SELECT 1
+                    FROM preventive_maintenance
+                    WHERE asset_id = ?
+                      AND LOWER(TRIM(task)) = LOWER(TRIM(?))
+                      AND frequency_type = ?
+                      AND frequency_value = ?
+                      AND active = 1
+                    LIMIT 1
+                """, (
+                    asset_id,
+                    task,
+                    frequency_type,
+                    frequency_value,
+                ))
+
+            else:
+
+                cursor.execute("""
+                    SELECT 1
+                    FROM preventive_maintenance
+                    WHERE asset_id = ?
+                      AND LOWER(TRIM(task)) = LOWER(TRIM(?))
+                      AND frequency_type = ?
+                      AND frequency_value = ?
+                      AND active = 1
+                      AND id <> ?
+                    LIMIT 1
+                """, (
+                    asset_id,
+                    task,
+                    frequency_type,
+                    frequency_value,
+                    exclude_id,
+                ))
+
+            return (
+                cursor.fetchone()
+                is not None
+            )
+
+        finally:
+            conn.close()

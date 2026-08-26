@@ -120,6 +120,18 @@ class PreventiveMaintenanceService:
             save_data
         )
 
+        if PreventiveMaintenanceModel.schedule_exists(
+            save_data["asset_id"],
+            save_data["task"],
+            save_data["frequency_type"],
+            save_data["frequency_value"],
+        ):
+            raise ValueError(
+                "An active Preventive Maintenance schedule "
+                "already exists for this asset, task, "
+                "frequency type, and interval."
+            )
+
         if (
             save_data["frequency_type"]
             in PreventiveMaintenanceService.METER_FREQUENCY_TYPES
@@ -151,6 +163,19 @@ class PreventiveMaintenanceService:
             save_data
         )
 
+        if PreventiveMaintenanceModel.schedule_exists(
+            save_data["asset_id"],
+            save_data["task"],
+            save_data["frequency_type"],
+            save_data["frequency_value"],
+            exclude_id=record_id,
+        ):
+            raise ValueError(
+                "An active Preventive Maintenance schedule "
+                "already exists for this asset, task, "
+                "frequency type, and interval."
+            )
+
         if (
             save_data["frequency_type"]
             in PreventiveMaintenanceService.METER_FREQUENCY_TYPES
@@ -159,7 +184,8 @@ class PreventiveMaintenanceService:
 
         else:
             save_data["next_due_date"] = (
-                PreventiveMaintenanceService.calculate_next_due_date(
+                PreventiveMaintenanceService
+                .calculate_next_due_date(
                     save_data
                 )
             )
@@ -184,98 +210,117 @@ class PreventiveMaintenanceService:
     @staticmethod
     def validate(data):
 
-        if not data["pm_number"].strip():
+        if not (data.get("pm_number") or "").strip():
             raise ValueError(
                 "PM Number is required."
             )
 
-        if data["asset_id"] is None:
+        if data.get("asset_id") is None:
             raise ValueError(
                 "Please select an asset."
             )
 
-        if not data["task"].strip():
+        if not(data.get("task") or "").strip():
             raise ValueError(
                 "Task is required."
             )
 
         frequency_type = (
-            data["frequency_type"].strip()
-        )
+            data.get("frequency_type") or ""
+        ).strip()
 
         if not frequency_type:
             raise ValueError(
                 "Frequency Type is required."
             )
 
-        if data["frequency_value"] <= 0:
+        frequency_value = float(
+            data.get("frequency_value") or 0
+        )
+
+        if frequency_value <= 0:
             raise ValueError(
                 "Frequency Value must be greater than zero."
             )
 
-        meter_types = {
-            "Running Hours",
-            "Kilometers",
-            "Cycles",
-        }
-
         is_meter_based = (
-            frequency_type 
+            frequency_type
             in PreventiveMaintenanceService.METER_FREQUENCY_TYPES
         )
 
+        #---------------------------------------------------------
+        # Meter_based PM
+        #---------------------------------------------------------
+
         if is_meter_based:
 
-            if data.get("last_service_meter") is None:
+            last_meter = data.get(
+                "last_service_meter"
+            )
+
+            next_meter = data.get(
+                "next_due_meter"
+            )
+
+            if last_meter is None:
                 raise ValueError(
                     "Last Service Meter is required."
                 )
 
-            if data.get("next_due_meter") is None:
+            if next_meter is None:
                 raise ValueError(
                     "Next Due Meter is required."
                 )
 
-            if float(
-                data["last_service_meter"]
-            ) < 0:
+            last_meter = float(last_meter)
+            next_meter = float(next_meter)
+
+            if last_meter < 0:
                 raise ValueError(
                     "Last Service Meter cannot be negative."
                 )
 
-            if float(
-                data["next_due_meter"]
-            ) <= float(
-                data["last_service_meter"]
-            ):
+            if next_meter <= last_meter:
                 raise ValueError(
                     "Next Due Meter must be greater "
                     "than Last Service Meter."
                 )
 
+        #---------------------------------------------------------
+        # Calendar-based PM
+        #---------------------------------------------------------
+        
         else:
 
-            if not data["last_service_date"]:
+            if not data.get("last_service_date"):
                 raise ValueError(
                     "Last Service Date is required."
-                )
+            )
 
-            if not data["next_due_date"]:
+            if not data.get("next_due_date"):
                 raise ValueError(
                     "Next Due Date is required."
                 )
 
-        if not data["priority"].strip():
+        #---------------------------------------------------------
+        # General values
+        #---------------------------------------------------------
+
+        if not (data.get("priority") or "").strip():
             raise ValueError(
                 "Priority is required."
             )
 
-        if data["estimated_hours"] < 0:
+        if float(
+            data.get("estimated_hours") or 0
+        ) < 0:
             raise ValueError(
                 "Estimated Hours cannot be negative."
             )
 
-        if data["estimated_cost"] < 0:
+        if float(
+            data.get("estimated_cost") or 0
+        ) < 0:
             raise ValueError(
                 "Estimated Cost cannot be negative."
             )

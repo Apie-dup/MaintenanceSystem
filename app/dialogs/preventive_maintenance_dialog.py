@@ -586,22 +586,16 @@ class PreventiveMaintenanceDialog(BaseDialog):
             self.ui.cmbFrequencyType.currentText().strip()
         )
 
-        meter_types = {
-            "Running Hours",
-            "Kilometers",
-            "Cycles",
-        }
+        if (
+            frequency_type
+            not in PreventiveMaintenanceService.METER_FREQUENCY_TYPES
+        ):
+
+            return
 
         frequency_value = (
             self.ui.spnFrequencyValue.value()
         )
-
-        if not frequency_type or frequency_value <= 0:
-            return
-
-        # Meter-based PMs do not use calendar dates.
-        if frequency_type in meter_types:
-            return
 
         last_service_text = (
             self.ui.dtLastService.date().toString(
