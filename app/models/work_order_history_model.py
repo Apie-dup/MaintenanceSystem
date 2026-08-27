@@ -17,8 +17,15 @@ class WorkOrderHistoryModel:
         notes=None,
         user_id=None,
         username=None,
+        conn=None,
     ):
-        conn = Database.connect()
+        owns_connection = (
+            conn is None
+        )
+
+        if owns_connection:
+            conn = Database.connect()
+
         cursor = conn.cursor()
 
         try:
@@ -48,15 +55,21 @@ class WorkOrderHistoryModel:
 
             record_id = cursor.lastrowid
 
-            conn.commit()
+            if owns_connection:
+                conn.commit()
+
             return record_id
 
         except Exception:
-            conn.rollback()
+            if owns_connection:
+                conn.rollback()
+
             raise
 
         finally:
-            conn.close()
+
+            if owns_connection:
+                conn.close()
 
     # ---------------------------------------------------------
     # Get Work Order history
@@ -107,36 +120,4 @@ class WorkOrderHistoryModel:
             username=username,
         )
 
-    @staticmethod
-    def log_completed(
-        work_order_id,
-        user_id=None,
-        username=None
-    ):
-        return WorkOrderHistoryService.add(
-            work_order_id,
-            action="Completed",
-            field_name="Status",
-            old_value=None,
-            new_value="Completed",
-            notes="Work Order completed.",
-            user_id=user_id,
-            username=username,
-        )
-
-    @staticmethod
-    def log_closed(
-        work_order_id,
-        user_id=None,
-        username=None
-    ):
-        return WorkOrderHistoryService.add(
-            work_order_id,
-            action="Closed",
-            field_name="Status",
-            old_value="Completed",
-            new_value="Closed",
-            notes="Work Order closed.",
-            user_id=user_id,
-            username=username,
-        )
+    

@@ -9,6 +9,7 @@ from app.services.work_order_history_service import (
 from app.services.asset_meter_reading_service import (
     AssetMeterReadingService
 )
+from app.database.connection import Database
 
 
 
@@ -453,12 +454,7 @@ class WorkOrderService:
 
         pm_schedule = None
         is_meter_based = False
-
-        meter_types = {
-            "Running Hours",
-            "Kilometers",
-            "Cycles",
-        }
+        frequency_type = ""
 
         # ---------------------------------------------------
         # Validate linked PM
@@ -487,7 +483,8 @@ class WorkOrderService:
             ).strip()
 
             is_meter_based = (
-                frequency_type in meter_types
+                frequency_type 
+                in PreventiveMaintenanceService.METER_FREQUENCY_TYPES
             )
 
         # ---------------------------------------------------
@@ -532,7 +529,7 @@ class WorkOrderService:
                 AssetMeterReadingService
                 .get_latest_reading(
                     work_order["asset_id"],
-                    pm_schedule["frequency_type"],
+                    "frequency_type",
                 )
             )
 
@@ -549,73 +546,101 @@ class WorkOrderService:
                     )
 
         # ---------------------------------------------------
-        # Complete Work Order
+        # Complete Work Order transaction
         # ---------------------------------------------------
 
-        WorkOrderModel.complete(
-            record_id,
-            completed_date,
-            meter_reading=(
-                meter_reading
-                if is_meter_based
-                else None
-            ),
-        )
+        conn = Database.connect()
 
-        # ---------------------------------------------------
-        # Audit
-        # ---------------------------------------------------
-        WorkOrderHistoryService.log_completed(
-            record_id,
-            old_status=old_status,
-            user_id=(
-                user.get("id")
-                if user
-                else None
-            ),
-            username=(
-                user.get("username")
-                if user
-                else None
-            ),
-        )
-    
+        try:
 
-        # ---------------------------------------------------
-        # Record asset meter reading
-        # ---------------------------------------------------
+            #-------------------------------------------
+            # Complete Work Order
+            #-------------------------------------------
 
-        if is_meter_based:
-
-            AssetMeterReadingService.add_reading(
-                asset_id=work_order["asset_id"],
-                meter_type=pm_schedule["frequency_type"],
-                reading=meter_reading,
-                reading_date=completed_date,
-                notes=(
-                    "Recorded on completion of "
-                    f'{work_order["work_order_number"]}.'
-                ),
-
-                source_type="Work Order",
-                work_order_id=record_id,
-            )
-
-        # ---------------------------------------------------
-        # Advance PM schedule
-        # ---------------------------------------------------
-
-        if pm_id is not None:
-
-            PreventiveMaintenanceService.complete_schedule(
-                pm_id,
-                completion_date=completed_date,
+            WorkOrderModel.complete(
+                record_id,
+                completed_date,
                 meter_reading=(
                     meter_reading
                     if is_meter_based
                     else None
                 ),
+                conn=conn
             )
+
+            # ---------------------------------------------------
+            # Audit
+            # ---------------------------------------------------
+        
+            WorkOrderHistoryService.log_completed(
+                record_id,
+                old_status=old_status,
+                user_id=(
+                    user.get("id")
+                    if user
+                    else None
+                ),
+                username=(
+                    user.get("username")
+                    if user
+                    else None
+                ),
+                conn=conn
+            )
+    
+
+            # ---------------------------------------------------
+            # Record asset meter reading
+            # ---------------------------------------------------
+
+            if is_meter_based:
+
+                AssetMeterReadingService.add_reading(
+                    asset_id=work_order["asset_id"],
+                    meter_type=frequency_type,
+                    reading=meter_reading,
+                    reading_date=completed_date,
+                    notes=(
+                        "Recorded on completion of "
+                        f'{work_order["work_order_number"]}.'
+                    ),
+                    source_type="Work Order",
+                    work_order_id=record_id,
+                    conn=conn
+                )
+
+            # ---------------------------------------------------
+            # Advance PM schedule
+            # ---------------------------------------------------
+
+            if pm_id is not None:
+
+                PreventiveMaintenanceService.complete_schedule(
+                    pm_id,
+                    completion_date=completed_date,
+                    meter_reading=(
+                        meter_reading
+                        if is_meter_based
+                        else None
+                    ),
+                    conn=conn
+                )
+
+            #---------------------------------------------------
+            # Everything succeeded
+            #---------------------------------------------------
+
+            conn.commit()
+
+        except Exception:
+
+            conn.rollback()
+            raise
+
+        finally:
+
+            conn.close()
+                
 
     @staticmethod
     def close_work_order(

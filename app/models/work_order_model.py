@@ -549,8 +549,16 @@ class WorkOrderModel:
         record_id,
         completed_date,
         meter_reading=None,
+        conn=None,
     ):
-        conn = Database.connect()
+        
+        owns_connection = (
+            conn is None
+        )
+
+        if owns_connection:
+            conn = Database.connect()
+
         cursor = conn.cursor()
 
         try:
@@ -571,14 +579,21 @@ class WorkOrderModel:
                 raise ValueError(
                     "Work Order not found."
                 )
-            conn.commit()
+
+            if owns_connection:
+                conn.commit()
 
         except Exception:
-            conn.rollback()
+
+            if owns_connection:
+                conn.rollback()
+
             raise
 
         finally:
-            conn.close()
+
+            if owns_connection:
+                conn.close()
 
     @staticmethod
     def close(record_id, closed_date):

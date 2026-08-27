@@ -12,8 +12,16 @@ class AssetMeterReadingModel:
         notes=None,
         source_type="Manual",
         work_order_id=None,
+        conn=None,
     ):
-        conn = Database.connect()
+
+        owns_connection = (
+            conn is None
+        )
+
+        if owns_connection:
+            conn = Database.connect()
+
         cursor = conn.cursor()
 
         try:
@@ -41,7 +49,8 @@ class AssetMeterReadingModel:
 
             record_id = cursor.lastrowid
 
-            conn.commit()
+            if owns_connection:
+                conn.commit()
 
             return record_id
 
@@ -50,41 +59,58 @@ class AssetMeterReadingModel:
             raise
 
         finally:
-            conn.close()
+
+            if owns_connection:
+                conn.close()
 
     @staticmethod
     def get_latest_reading(
         asset_id,
         meter_type,
+        conn=None,
     ):
-        conn = Database.connect()
+
+        owns_connection = (
+            conn is None
+        )
+
+        if owns_connection:
+            conn = Database.connect()
+
         cursor = conn.cursor()
 
-        cursor.execute("""
-            SELECT
-                id,
+        try:
+            cursor.execute("""
+                SELECT
+                    id,
+                    asset_id,
+                    meter_type,
+                    reading,
+                    reading_date,
+                    source_type,
+                    work_order_id,
+                    notes,
+                    created_at
+                FROM asset_meter_readings
+                WHERE asset_id = ?
+                AND meter_type = ?
+                ORDER BY
+                    reading_date DESC,
+                    id DESC
+                LIMIT 1
+            """, (
                 asset_id,
                 meter_type,
-                reading,
-                reading_date,
-                notes,
-                created_at
-            FROM asset_meter_readings
-            WHERE asset_id = ?
-              AND meter_type = ?
-            ORDER BY
-                reading_date DESC,
-                id DESC
-            LIMIT 1
-        """, (
-            asset_id,
-            meter_type,
-        ))
+            ))
 
-        row = cursor.fetchone()
-        conn.close()
+            return cursor.fetchone()
 
-        return row
+        finally:
+
+            if owns_connection:
+                conn.close()
+
+        
 
     @staticmethod
     def get_history(

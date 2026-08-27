@@ -14,6 +14,7 @@ class AssetMeterReadingService:
         notes=None,
         source_type="Manual",
         work_order_id=None,
+        conn=None,
     ):
 
         reading = float(reading)
@@ -27,6 +28,7 @@ class AssetMeterReadingService:
             AssetMeterReadingModel.get_latest_reading(
                 asset_id,
                 meter_type,
+                conn=conn,
             )
         )
 
@@ -49,6 +51,7 @@ class AssetMeterReadingService:
             notes,
             source_type,
             work_order_id,
+            conn=conn,
         )
 
     @staticmethod
@@ -76,7 +79,7 @@ class AssetMeterReadingService:
     @staticmethod
     def get_latest_reading_value(
         asset_id,
-        meter_type
+        meter_type,
     ):
         latest = AssetMeterReadingService.get_latest_reading(
             asset_id,

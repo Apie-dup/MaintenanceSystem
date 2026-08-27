@@ -607,9 +607,13 @@ class PreventiveMaintenanceService:
         pm_id,
         completion_date=None,
         meter_reading=None,
+        conn=None,
     ):
 
-        pm = PreventiveMaintenanceModel.get_by_id(pm_id)
+        pm = PreventiveMaintenanceModel.get_by_id(
+            pm_id,
+            conn=conn,
+        )
 
         if pm is None:
             raise ValueError(
@@ -630,19 +634,18 @@ class PreventiveMaintenanceService:
             "The PM schedule has an invalid frequency value."
             )
 
-        frequency_type = pm["frequency_type"]
-
-        meter_types = {
-            "Running Hours",
-            "Kilometers",
-            "Cycles",
-        }
+        frequency_type = (
+            pm["frequency_type"] or ""
+        ).strip()
 
         #---------------------------------------------------------
         # Meter-based Pm
         #---------------------------------------------------------
 
-        if frequency_type in meter_types:
+        if (
+            frequency_type 
+            in PreventiveMaintenanceService.METER_FREQUENCY_TYPES
+        ):
 
             if meter_reading is None:
                 raise ValueError(
@@ -678,6 +681,7 @@ class PreventiveMaintenanceService:
                 pm_id,
                 meter_reading,
                 next_due_meter,
+                conn=conn,
             )
 
             return
@@ -687,14 +691,18 @@ class PreventiveMaintenanceService:
         #---------------------------------------------------------
 
         if completion_date is None:
-            completion_date = DateHelper.today()
+            completion_date = (
+                DateHelper.today()
+            )
 
         elif isinstance(
             completion_date, 
             str
         ):
-            completion_date = DateHelper.from_string(
-                completion_date
+            completion_date = (
+                DateHelper.from_string(
+                    completion_date
+                )
             )
 
         next_due_date = (
@@ -713,6 +721,8 @@ class PreventiveMaintenanceService:
             DateHelper.to_string(
                 next_due_date
             ),
+
+            conn=conn
         )
 
     @staticmethod

@@ -80,42 +80,56 @@ class PreventiveMaintenanceModel:
     # ---------------------------------------------------------
 
     @staticmethod
-    def get_by_id(record_id):
-        conn = Database.connect()
+    def get_by_id(
+        record_id,
+        conn=None
+    ):
+
+        owns_connection = (
+            conn is None
+        )
+
+        if owns_connection:
+            conn = Database.connect()
+
         cursor = conn.cursor()
 
-        cursor.execute("""
-            SELECT
-                preventive_maintenance.id,
-                preventive_maintenance.pm_number,
-                preventive_maintenance.asset_id,
-                assets.asset_number,
-                assets.asset_name,
-                preventive_maintenance.task,
-                preventive_maintenance.description,
-                preventive_maintenance.frequency_type,
-                preventive_maintenance.frequency_value,
-                preventive_maintenance.last_service_date,
-                preventive_maintenance.next_due_date,
-                preventive_maintenance.meter_type,
-                preventive_maintenance.last_service_meter,
-                preventive_maintenance.next_due_meter,
-                preventive_maintenance.estimated_hours,
-                preventive_maintenance.estimated_cost,
-                preventive_maintenance.priority,
-                preventive_maintenance.active,
-                preventive_maintenance.notes,
-                preventive_maintenance.created_at
-            FROM preventive_maintenance
-            LEFT JOIN assets
-                ON preventive_maintenance.asset_id = assets.id
-            WHERE preventive_maintenance.id = ?
-        """, (record_id,))
+        try:    
+            cursor.execute("""
+                SELECT
+                    preventive_maintenance.id,
+                    preventive_maintenance.pm_number,
+                    preventive_maintenance.asset_id,
+                    assets.asset_number,
+                    assets.asset_name,
+                    preventive_maintenance.task,
+                    preventive_maintenance.description,
+                    preventive_maintenance.frequency_type,
+                    preventive_maintenance.frequency_value,
+                    preventive_maintenance.last_service_date,
+                    preventive_maintenance.next_due_date,
+                    preventive_maintenance.meter_type,
+                    preventive_maintenance.last_service_meter,
+                    preventive_maintenance.next_due_meter,
+                    preventive_maintenance.estimated_hours,
+                    preventive_maintenance.estimated_cost,
+                    preventive_maintenance.priority,
+                    preventive_maintenance.active,
+                    preventive_maintenance.notes,
+                    preventive_maintenance.created_at
+                FROM preventive_maintenance
+                LEFT JOIN assets
+                    ON preventive_maintenance.asset_id = assets.id
+                WHERE preventive_maintenance.id = ?
+            """, (
+                record_id,
+            ))
+            return cursor.fetchone()
 
-        row = cursor.fetchone()
-        conn.close()
+        finally:
 
-        return row
+            if owns_connection:
+                conn.close()
 
     # ---------------------------------------------------------
     # Search PM plans
@@ -542,33 +556,68 @@ class PreventiveMaintenanceModel:
     def update_service_dates(
         pm_id,
         last_service_date,
-        next_due_date
+        next_due_date,
+        conn=None,
     ):
-        conn = Database.connect()
+
+        owns_connection = (
+            conn is None
+        )
+
+        if owns_connection:
+            conn = Database.connect()
+
         cursor = conn.cursor()
 
-        cursor.execute("""
-            UPDATE preventive_maintenance
-            SET
-                last_service_date = ?,
-                next_due_date = ?
-            WHERE id = ?
-        """, (
-            last_service_date,
-            next_due_date,
-            pm_id,
-        ))
+        try:
+            cursor.execute("""
+                UPDATE preventive_maintenance
+                SET
+                    last_service_date = ?,
+                    next_due_date = ?
+                WHERE id = ?
+            """ , (
+                last_service_date,
+                next_due_date,
+                pm_id,
+            ))
 
-        conn.commit()
-        conn.close()
+            if cursor.rowcount == 0:
+                raise ValueError(
+                    "Preventive Maintenance schedule not found."
+                )
+
+            if owns_connection:
+                conn.commit()
+
+        except Exception:
+            
+            if owns_connection:
+                conn.rollback()
+
+            raise
+
+        finally:
+
+            if owns_connection:
+                conn.close()
+
 
     @staticmethod
     def update_service_meter(
         pm_id,
         last_service_meter,
-        next_due_meter
+        next_due_meter,
+        conn=None,
     ):
-        conn = Database.connect()
+
+        owns_connection = (
+            conn is None
+        )
+
+        if owns_connection:
+            conn = Database.connect()
+
         cursor = conn.cursor()
 
         try:
@@ -588,14 +637,20 @@ class PreventiveMaintenanceModel:
                 raise ValueError(
                     "Preventive Maintenance schedule not found."
                 )
-            conn.commit()
+            if owns_connection:
+                conn.commit()
 
         except Exception:
-            conn.rollback()
+
+            if owns_connection:
+                conn.rollback()
+
             raise
 
         finally:
-            conn.close()
+
+            if owns_connection:
+                conn.close()
 
     @staticmethod
     def schedule_exists(
