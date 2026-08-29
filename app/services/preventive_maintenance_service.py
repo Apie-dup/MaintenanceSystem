@@ -1,3 +1,5 @@
+from pdb import pm
+
 from app.models.preventive_maintenance_model import (
     PreventiveMaintenanceModel
 )
@@ -38,6 +40,10 @@ class PreventiveMaintenanceService:
                 pm["frequency_type"] or ""
             ).strip()
 
+            #-------------------------------------------------------
+            # Current meter for display
+            #-------------------------------------------------------
+
             if (
                 frequency_type
                 in PreventiveMaintenanceService.METER_FREQUENCY_TYPES
@@ -59,17 +65,17 @@ class PreventiveMaintenanceService:
                 else:
                     pm["current_meter"] = latest
 
-                pm["due_status"] = (
-                    PreventiveMaintenanceService
-                    .get_meter_due_status(pm)
-                )
-
             else:
                 pm["current_meter"] = None
 
-                pm["due_status"] = (
-                    pm["calendar_due_status"]
-                )
+            #-------------------------------------------------------
+            # Unified PM status
+            #-------------------------------------------------------
+
+            pm["due_status"] = (
+                PreventiveMaintenanceService
+                .get_due_status(pm)
+            )
 
             result.append(pm)
 
@@ -336,7 +342,7 @@ class PreventiveMaintenanceService:
             data["last_service_date"]
         )
 
-        return DateHelper.to.string(
+        return DateHelper.to_string(
             DateHelper.calculate_next_due_date(
                 last_service,
                 data["frequency_type"],
@@ -476,27 +482,33 @@ class PreventiveMaintenanceService:
             in PreventiveMaintenanceService.METER_FREQUENCY_TYPES
         )
 
-        #---------------------------------------------------------
-        # Meter-based threshold
-        #---------------------------------------------------------
+        due_status = (
+            PreventiveMaintenanceService
+            .get_due_status(pm)
+        )
 
-        if is_meter_based:
-
-            due_status = (
-                PreventiveMaintenanceService
-                .get_meter_due_status(pm)
+        if due_status == "WO Open":
+            raise ValueError(
+                "An open Work Order already exists "
+                "for this PM schedule."
             )
 
-            if due_status not in {
-                "Due",
-                "Overdue",
-            }:
+        if due_status not in {
+            "Due",
+            "Overdue",
+        }:
+
+            #----------------------------------------
+            # Meter-base message
+            #----------------------------------------
+
+            if is_meter_based:
 
                 latest = (
                     AssetMeterReadingService
                     .get_latest_reading(
                         pm["asset_id"],
-                        frequency_type
+                        frequency_type,
                     )
                 )
 
@@ -517,9 +529,19 @@ class PreventiveMaintenanceService:
                     "This Preventive Maintenance schedule "
                     "is not due yet.\n\n"
                     f"Current meter: {current_meter:,.2f}\n"
-                    f"Due at: {next_due_meter:,.2f} "
+                    f"Due at: {next_due_meter:,.2f}"
                     f"{frequency_type}"
                 )
+
+            #----------------------------------------
+            # Calendar-based message
+            #----------------------------------------
+
+            raise ValueError(
+                "This Prevenive Maintenance schedule "
+                "is not due yet.\n\n"
+                f'Due date: {pm["next_due_date"]}'
+            )
 
         if (
             not is_meter_based
@@ -529,19 +551,11 @@ class PreventiveMaintenanceService:
                 "The PM schedule does not have a next due date."
             )
 
-        if WorkOrderService.open_pm_work_order_exists(
-            pm_id
-        ):
-            raise ValueError(
-                "An open work order already exists "
-                "for this PM schedule."
-            )
-
         data = {
             "work_order_number":
                 WorkOrderService.get_next_work_order_number(),
 
-            "asset_id":
+            "asset_id": 
                 pm["asset_id"],
 
             "title":
@@ -590,17 +604,19 @@ class PreventiveMaintenanceService:
             "notes": (
                 "Generated from Preventive Maintenance "
                 f'{pm["pm_number"]}.\n'
-                f'Estimated labour: '
+                f'Estimated_labour: '
                 f'{float(pm["estimated_hours"] or 0):.2f} hours.'
-        ),
+            ),
+
             "pm_id":
-                pm["id"]
+                pm["id"],
         }
 
         return WorkOrderService.create(
             data,
-            user=user
+            user=user,
         )
+
 
     @staticmethod
     def complete_schedule(
@@ -789,3 +805,72 @@ class PreventiveMaintenanceService:
             return "Due Soon"
 
         return "Scheduled"
+
+    @staticmethod
+    def get_due_status(pm):
+
+        frequency_type = (
+            pm["frequency_type"] or ""
+        ).strip()
+
+        #----------------------------------------------
+        # Inactive
+        #----------------------------------------------
+
+        if not bool(pm["active"]):
+            return "Inactive"
+
+        #----------------------------------------------
+        # Existing open Work Order
+        #----------------------------------------------
+
+        if WorkOrderService.open_pm_work_order_exists(
+            pm["id"]
+        ):
+            return "WO Open"
+
+        #----------------------------------------------
+        # Meter-based PM
+        #----------------------------------------------
+
+        if (
+            frequency_type
+            in PreventiveMaintenanceService.METER_FREQUENCY_TYPES
+        ):
+            return (
+                PreventiveMaintenanceService
+                .get_meter_due_status(pm)
+            )
+
+        #----------------------------------------------
+        # Calendar-based PM
+        #----------------------------------------------
+
+        next_due_date = (
+            pm["next_due_date"] or ""
+        ).strip()
+
+        if not next_due_date:
+            return "Scheduled"
+
+        today = DateHelper.today()
+
+        due_date = DateHelper.from_string(
+            next_due_date
+        )
+
+        if due_date < today:
+            return "Overdue"
+        
+        if due_date == today:
+            return "Due"
+
+        days_remaining = (
+            due_date - today
+        ).days
+
+        if days_remaining <= 7:
+            return "Due Soon"
+
+        return "Scheduled"
+        
