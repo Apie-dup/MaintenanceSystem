@@ -494,8 +494,10 @@ class PreventiveMaintenanceService:
             )
 
         if due_status not in {
+            "Due Soon",
             "Due",
             "Overdue",
+
         }:
 
             #----------------------------------------
@@ -580,11 +582,7 @@ class PreventiveMaintenanceService:
                 DateHelper.today_string(),
 
             "due_date":
-                (
-                    DateHelper.today_string()
-                    if is_meter_based
-                    else pm["next_due_date"]
-                ),
+                DateHelper.today_string(),
 
             "meter_reading":
                 None,
