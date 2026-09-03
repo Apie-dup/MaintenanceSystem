@@ -15,6 +15,7 @@ from app.services.settings_service import SettingsService
 from app.helpers.date_helper import DateHelper
 
 
+
 class PdfReportExportHelper:
 
     @staticmethod
@@ -321,7 +322,7 @@ class PdfReportExportHelper:
                 "%d-%b-%Y %H:%M"
             )
 
-            organizatio_name = (
+            organization_name = (
                 SettingsService.organization_name()
             )
 
@@ -330,7 +331,7 @@ class PdfReportExportHelper:
             )
 
             footer_text = (
-                f"{organizatio_name} - {system_name}"
+                f"{organization_name} - {system_name}"
             )
 
             canvas.setFont(
@@ -367,3 +368,375 @@ class PdfReportExportHelper:
             onFirstPage=draw_footer,
             onLaterPages=draw_footer
         )
+
+    @staticmethod
+    def export_vehicle_logbook_to_pdf(
+        records,
+        file_path,
+        asset_text,
+        from_date,
+        to_date,
+    ):
+
+        page_size = landscape(A4)
+
+        document = SimpleDocTemplate(
+            file_path,
+            pagesize=page_size,
+            rightMargin=10 * mm,
+            leftMargin=10 * mm,
+            topMargin=12 * mm,
+            bottomMargin=18 * mm,
+        )
+
+        styles = getSampleStyleSheet()
+        elements = []
+
+        # -------------------------------------------------
+        # Title
+        #--------------------------------------------------
+
+        elements.append(
+            Paragraph(
+                "<b>Vehicle Logbook</b>",
+                styles["Title"]
+            )
+        )
+
+        # -------------------------------------------------
+        # Vehicle
+        # -------------------------------------------------
+        
+        elements.append(
+            Spacer(1, 2 * mm)
+        )
+
+        elements.append(
+            Paragraph(
+                f"<b>Vehicle:</b> {asset_text}",
+                styles["Normal"]
+            )
+        )
+
+        elements.append(
+            Spacer(1, 1.5 * mm)
+        )
+
+        #---------------------------------------------------
+        # Period
+        # -------------------------------------------------
+
+        elements.append(
+            Paragraph(
+                (
+                    f"<b>Period:</b> "
+                    f"{DateHelper.display(from_date)} "
+                    f"to "
+                    f"{DateHelper.display(to_date)}"
+                ),
+                styles["Normal"]
+            )
+        )
+
+        elements.append(
+            Spacer(1, 5 * mm)
+        )
+
+        # -------------------------------------------------
+        # Column headings
+        # -------------------------------------------------
+
+        data = [[
+            "Date",
+            "Driver",
+            "From",
+            "To",
+            "Start km",
+            "End km",
+            "Distance",
+            "Purpose",
+            "Fuel",
+            "Fuel Cost",
+            "Notes",
+        ]]
+
+        total_distance = 0.0
+        total_fuel = 0.0
+        total_fuel_cost = 0.0
+
+        #--------------------------------------------------
+        # Logbook rows
+        # -------------------------------------------------
+
+        for record in records:
+
+            body_style = styles["Normal"]
+            body_style.fontSize = 6
+            body_style.leading = 7
+
+            distance = float(
+                record["distance"] or 0
+            )
+
+            fuel = float(
+                record["fuel_quantity"] or 0
+            )
+
+            fuel_cost = float(
+                record["fuel_cost"] or 0
+            )
+
+            total_distance += distance
+            total_fuel += fuel
+            total_fuel_cost += fuel_cost
+
+            data.append([
+                DateHelper.display(
+                    record["log_date"]
+                ),
+                Paragraph(
+                    record["driver_name"] or "",
+                    body_style
+                ),
+                Paragraph(
+                    record["origin"] or "",
+                    body_style
+                ),
+                Paragraph(
+                    record["destination"] or "",
+                    body_style
+                ),
+                f'{float(record["start_meter"] or 0):,.1f}',
+                f'{float(record["end_meter"] or 0):,.1f}',
+                f"{distance:,.1f}",
+                Paragraph(
+                    record["purpose"] or "",
+                    body_style
+                ),
+                f"{fuel:,.2f}",
+                f"{fuel_cost:,.2f}",
+                Paragraph(
+                    record["notes"] or "",
+                    body_style
+                ),
+            ])
+
+        # -------------------------------------------------
+        # Column widths
+        #--------------------------------------------------
+
+        available_width = (
+            page_size[0]
+            - document.leftMargin
+            - document.rightMargin
+        )
+
+        column_weights = [
+            9, # Date
+            14, # Driver
+            15, # From
+            15, # To
+            10, # Start km
+            10, # End km
+            9, # Distance
+            16, # Purpose
+            7, # Fuel
+            9, # Fuel_cost
+            18, # Notes
+        ]
+
+        total_weight = sum(
+            column_weights
+        )
+
+        column_widths = [
+            available_width
+            * weight
+            / total_weight
+            for weight in column_weights
+        ]
+
+        #---------------------------------------------
+        # Build table
+        #---------------------------------------------
+
+        pdf_table = Table(
+            data,
+            colWidths=column_widths,
+            repeatRows=1
+        )
+
+        pdf_table.setStyle(
+            TableStyle([
+                (
+                    "BACKGROUND",
+                    (0, 0),
+                    (-1, 0),
+                    colors.HexColor("#333333")
+                ),
+                (
+                    "TEXTCOLOR",
+                    (0, 0),
+                    (-1, 0),
+                    colors.white
+                ),
+                (
+                    "FONTNAME",
+                    (0, 0),
+                    (-1, 0),
+                    "Helvetica-Bold"
+                ),
+                (
+                    "ALIGN",
+                    (0, 0),
+                    (-1, 0),
+                    "CENTER"
+                ),
+                (
+                    "VALIGN",
+                    (0, 0),
+                    (-1, -1),
+                    "MIDDLE"
+                ),
+                (
+                    "GRID",
+                    (0, 0),
+                    (-1, -1),
+                    0.4,
+                    colors.grey
+                ),
+                (
+                    "FONTSIZE",
+                    (0, 0),
+                    (-1, -1),
+                    6
+                ),
+                (
+                    "ROWBACKGROUNDS",
+                    (0, 1),
+                    (-1, -1),
+                    [
+                        colors.white,
+                        colors.HexColor("#F3F3F3")
+                    ]
+                ),
+                (
+                    "LEFTPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    3
+                ),
+                (
+                    "RIGHTPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    3
+                ),
+                (
+                    "TOPPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    4
+                ),
+                (
+                    "BOTTOMPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    4
+                ),
+            ])
+        )
+
+        elements.append(
+            pdf_table
+        )
+
+        #--------------------------------------------
+        # Totals
+        #--------------------------------------------
+
+        elements.append(
+            Spacer(1, 5 * mm)
+        )
+
+        totals_style = styles["Normal"]
+        totals_style.fontSize = 8
+        totals_style.leading = 10
+
+        currency_symbol = (
+            SettingsService.currency_symbol()
+        )
+
+        elements.append(
+            Paragraph(
+                (
+                    f"<b>Total Distance:</b> "
+                    f"{total_distance:,.1f} km"
+                    f"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                    f"<b>Total Fuel:</b> "
+                    f"{total_fuel:,.2f}"
+                    f"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                    f"<b>Total Fuel Cost:</b> "
+                    f"{currency_symbol} "
+                    f"{total_fuel_cost:,.2f}"
+                ),
+                totals_style
+            )
+        )
+
+        #--------------------------------------------------
+        # Footer
+        #--------------------------------------------------
+
+        def draw_footer(canvas, doc):
+
+            canvas.saveState()
+
+            generated = datetime.now().strftime(
+                "%d-%b-%y %H:%M"
+            )
+
+            organization_name = (
+                SettingsService.organization_name()
+            )
+
+            system_name = (
+                SettingsService.system_name()
+            )
+
+            footer_text = (
+                f"{organization_name} - {system_name}"
+            )
+
+            canvas.setFont(
+                "Helvetica",
+                8
+            )
+
+            canvas.drawString(
+                document.leftMargin,
+                8 * mm,
+                footer_text
+            )
+
+            canvas.drawRightString(
+                page_size[0]
+                -document.rightMargin,
+                8 * mm,
+                (
+                    f"Generated: {generated}"
+                    f"    |    Page {doc.page}"
+                )
+            )
+            canvas.restoreState()
+
+        #---------------------------------------------------
+        # Create PDF
+        #---------------------------------------------------
+
+        document.build(
+            elements,
+            onFirstPage=draw_footer,
+            onLaterPages=draw_footer
+        )
+

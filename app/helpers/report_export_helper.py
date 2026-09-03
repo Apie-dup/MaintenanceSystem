@@ -3,8 +3,6 @@ from openpyxl.styles import Font, Alignment
 from openpyxl.utils import get_column_letter
 from app.services.settings_service import SettingsService
 
-currency_symbol = SettingsService.currency_symbol()
-
 class ReportExportHelper:
 
     @staticmethod
@@ -15,6 +13,11 @@ class ReportExportHelper:
         from_date=None,
         to_date=None
     ):
+
+        currency_symbol = (
+            SettingsService.currency_symbol()
+        )
+        
         workbook = Workbook()
 
         worksheet = workbook.active

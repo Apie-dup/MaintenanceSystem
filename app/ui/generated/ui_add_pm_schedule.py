@@ -111,6 +111,7 @@ class Ui_PreventiveMaintenaceDialog(object):
 
         self.spnFrequencyValue = QSpinBox(self.groupSchedule)
         self.spnFrequencyValue.setObjectName(u"spnFrequencyValue")
+        self.spnFrequencyValue.setMaximum(99999999)
 
         self.gridLayout.addWidget(self.spnFrequencyValue, 0, 4, 1, 1)
 

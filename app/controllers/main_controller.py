@@ -29,6 +29,7 @@ from app.services.settings_service import SettingsService
 from app.dialogs.about_dialog import AboutDialog
 from app.pages.users_page import UsersPage
 from app.core.permissions import Permissions
+from app.pages.vehicle_logbook_page import VehicleLogbookPage
 
 
 class MainController(QMainWindow):
@@ -102,12 +103,15 @@ class MainController(QMainWindow):
 
         pm_icon = icons_dir / "pm.svg"
 
-        if not pm_icon.exists():
-            pm_icon = icons_dir / "preventive_maintenance.png"
-
         if pm_icon.exists():
             self.ui.btnPM.setIcon(
                 QIcon(str(pm_icon))
+            )
+        vehicle_logbook_icon = icons_dir / "vehicle_logbook.svg"
+
+        if vehicle_logbook_icon.exists():
+            self.ui.btnVehicleLogbook.setIcon(
+                QIcon(str(vehicle_logbook_icon))
             )
 
         technicians_icon = icons_dir / "technicians.svg"
@@ -207,6 +211,7 @@ class MainController(QMainWindow):
             self.ui.btnAssets,
             self.ui.btnWorkOrders,
             self.ui.btnPM,
+            self.ui.btnVehicleLogbook,
             self.ui.btnTechnicians,
             self.ui.btnInventory,
             self.ui.btnSuppliers,
@@ -311,6 +316,7 @@ class MainController(QMainWindow):
             self.ui.btnAssets,
             self.ui.btnWorkOrders,
             self.ui.btnPM,
+            self.ui.btnVehicleLogbook,
             self.ui.btnTechnicians,
             self.ui.btnInventory,
             self.ui.btnSuppliers,
@@ -369,6 +375,13 @@ class MainController(QMainWindow):
             self
         )
 
+        self.vehicle_logbook_page = (
+            VehicleLogbookPage(
+                user=self.user,
+                parent=self,
+            )
+        )
+
     def register_pages(self):
 
         self.page_manager.add_page(
@@ -420,6 +433,11 @@ class MainController(QMainWindow):
             self.ui.pageUsers,
             self.users_page
         )
+        
+        self.page_manager.add_page(
+            self.ui.pageVehicleLogbook,
+            self.vehicle_logbook_page
+        )
 
     def register_navigation(self):
 
@@ -437,6 +455,10 @@ class MainController(QMainWindow):
 
         self.ui.btnPM.clicked.connect(
             self.show_pm
+        )
+
+        self.ui.btnVehicleLogbook.clicked.connect(
+            self.show_vehicle_logbook
         )
 
         self.ui.btnTechnicians.clicked.connect(
@@ -515,6 +537,18 @@ class MainController(QMainWindow):
         self.work_orders_page.load_data()
         self.navigation.show(
             self.ui.pageWorkOrders
+        )
+
+    def show_vehicle_logbook(self):
+
+        self.set_active_navigation(
+            self.ui.btnVehicleLogbook
+        )
+
+        self.vehicle_logbook_page.load_data()
+
+        self.navigation.show(
+            self.ui.pageVehicleLogbook
         )
 
     def show_pm(self):
@@ -693,5 +727,7 @@ class MainController(QMainWindow):
         self.login_window.show()
 
         self.close()
+
+    
 
     

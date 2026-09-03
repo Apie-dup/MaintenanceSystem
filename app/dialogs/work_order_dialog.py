@@ -482,6 +482,82 @@ class WorkOrderDialog(BaseDialog):
             self.ui.txtTitle
         )
 
+    def new_from_logbook(self, logbook):
+
+        # Start with the normal new Work Order setup.
+        self.new_record()
+
+        # ---------------------------------------------------------
+        # Vehicle
+        # ---------------------------------------------------------
+
+        asset_index = self.ui.cmbAsset.findData(
+            logbook["asset_id"]
+        )
+
+        if asset_index >= 0:
+            self.ui.cmbAsset.setCurrentIndex(
+                asset_index
+            )
+
+        # Keep the vehicle fixed because this Work Order
+        # originates from this vehicle's logbook entry.
+        self.ui.cmbAsset.setEnabled(False)
+
+        # ---------------------------------------------------------
+        # Requested by
+        # ---------------------------------------------------------
+
+        self.ui.txtRequestedBy.setText(
+            logbook["driver_name"] or ""
+        )
+
+        # ---------------------------------------------------------
+        # Description
+        # ---------------------------------------------------------
+
+        description_parts = []
+
+        if logbook["log_date"]:
+            description_parts.append(
+                f'Logbook Date: {logbook["log_date"]}'
+            )
+
+        if logbook["origin"] or logbook["destination"]:
+            description_parts.append(
+                (
+                    f'Journey: {logbook["origin"] or ""}'
+                    f' to {logbook["destination"] or ""}'
+                )
+            )
+
+        if logbook["purpose"]:
+            description_parts.append(
+                f'Purpose: {logbook["purpose"]}'
+            )
+
+        if logbook["end_meter"] is not None:
+            description_parts.append(
+                f'Odometer: {logbook["end_meter"]:,.1f} km'
+            )
+
+        if logbook["notes"]:
+            description_parts.append(
+                f'Logbook Notes: {logbook["notes"]}'
+            )
+
+        description_text = "\n".join(
+            description_parts
+        )
+
+        self.ui.teDescription.setPlainText(
+            description_text
+        )
+
+        # The user must enter the actual fault / job title.
+        self.ui.txtTitle.clear()
+        self.ui.txtTitle.setFocus()
+
     # ---------------------------------------------------------
     # Form data
     # ---------------------------------------------------------
@@ -1711,9 +1787,13 @@ class WorkOrderDialog(BaseDialog):
         )
 
         if work_order is None:
+            self.ui.btnComplete.setVisible(False)
+            self.ui.btnCloseWorkOrder.setVisible(False)
+            self.ui.btnReopen.setVisible(False)
             return
 
         status = work_order["status"]
+        pm_id = work_order["pm_id"]
 
         can_complete = Permissions.has_permission(
             self.role,
@@ -1748,6 +1828,7 @@ class WorkOrderDialog(BaseDialog):
         self.ui.btnReopen.setVisible(
             can_reopen
             and status == "Completed"
+            and pm_id is None
         )
 
     def update_meter_mode(self):

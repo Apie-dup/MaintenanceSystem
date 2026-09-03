@@ -51,6 +51,9 @@ class DashboardService:
 
     @staticmethod
     def get_pm_due_list():
-        return PreventiveMaintenanceService.get_due_list(
-            limit=10
+        return (
+            PreventiveMaintenanceService
+            .get_due_list(
+                limit = 10
+            )
         )

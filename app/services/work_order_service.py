@@ -899,6 +899,13 @@ class WorkOrderService:
                 "Only a completed Work Order can be reopened."
             )
 
+        if work_order["pm_id"] is not None:
+            raise ValueError(
+                "A Work Order generated from Preventive Maintenance "
+                "cannot be reopened after completion."
+            )
+
+
         WorkOrderModel.reopen(
             record_id,
         )

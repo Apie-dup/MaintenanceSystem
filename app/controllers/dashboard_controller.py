@@ -7,7 +7,7 @@ from app.services.dashboard_service import DashboardService
 from app.pages.assets_page import AssetsPage
 from app.pages.work_orders_page import WorkOrdersPage
 from app.controllers.lookup_controller import LookupController
-from app.pages.pm_page import PMPage
+from app.pages.preventive_maintenance_page import PreventiveMaintenancePage
 from app.pages.technicians_page import TechniciansPage
 from datetime import datetime
 from app.database.connection import Database

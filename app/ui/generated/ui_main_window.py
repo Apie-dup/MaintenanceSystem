@@ -71,6 +71,11 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.btnPM)
 
+        self.btnVehicleLogbook = QPushButton(self.navigationFrame)
+        self.btnVehicleLogbook.setObjectName(u"btnVehicleLogbook")
+
+        self.verticalLayout.addWidget(self.btnVehicleLogbook)
+
         self.btnTechnicians = QPushButton(self.navigationFrame)
         self.btnTechnicians.setObjectName(u"btnTechnicians")
         self.btnTechnicians.setCheckable(False)
@@ -131,6 +136,9 @@ class Ui_MainWindow(object):
         self.pageWorkOrders = QWidget()
         self.pageWorkOrders.setObjectName(u"pageWorkOrders")
         self.stackedWidget.addWidget(self.pageWorkOrders)
+        self.pageVehicleLogbook = QWidget()
+        self.pageVehicleLogbook.setObjectName(u"pageVehicleLogbook")
+        self.stackedWidget.addWidget(self.pageVehicleLogbook)
         self.pagePM = QWidget()
         self.pagePM.setObjectName(u"pagePM")
         self.stackedWidget.addWidget(self.pagePM)
@@ -152,6 +160,9 @@ class Ui_MainWindow(object):
         self.pageUsers = QWidget()
         self.pageUsers.setObjectName(u"pageUsers")
         self.stackedWidget.addWidget(self.pageUsers)
+        self.page = QWidget()
+        self.page.setObjectName(u"page")
+        self.stackedWidget.addWidget(self.page)
 
         self.horizontalLayout.addWidget(self.stackedWidget)
 
@@ -169,7 +180,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(9)
+        self.stackedWidget.setCurrentIndex(3)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -183,6 +194,7 @@ class Ui_MainWindow(object):
         self.btnAssets.setText(QCoreApplication.translate("MainWindow", u"Assets", None))
         self.btnWorkOrders.setText(QCoreApplication.translate("MainWindow", u"Work Orders", None))
         self.btnPM.setText(QCoreApplication.translate("MainWindow", u"Preventive Maintenance", None))
+        self.btnVehicleLogbook.setText(QCoreApplication.translate("MainWindow", u"Vehicle Logbook", None))
         self.btnTechnicians.setText(QCoreApplication.translate("MainWindow", u"Technicians", None))
         self.btnInventory.setText(QCoreApplication.translate("MainWindow", u"Inventory", None))
         self.btnSuppliers.setText(QCoreApplication.translate("MainWindow", u"Suppliers", None))

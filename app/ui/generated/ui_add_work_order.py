@@ -79,9 +79,12 @@ class Ui_AddWorkOrderDialog(object):
 
         self.teDescription = QPlainTextEdit(self.groupGeneralInfo)
         self.teDescription.setObjectName(u"teDescription")
-        sizePolicy.setHeightForWidth(self.teDescription.sizePolicy().hasHeightForWidth())
-        self.teDescription.setSizePolicy(sizePolicy)
-        self.teDescription.setMinimumSize(QSize(0, 40))
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.teDescription.sizePolicy().hasHeightForWidth())
+        self.teDescription.setSizePolicy(sizePolicy1)
+        self.teDescription.setMinimumSize(QSize(0, 80))
 
         self.formGeneralInfo.setWidget(2, QFormLayout.ItemRole.FieldRole, self.teDescription)
 
@@ -244,9 +247,6 @@ class Ui_AddWorkOrderDialog(object):
 
         self.groupNotes = QGroupBox(self.General)
         self.groupNotes.setObjectName(u"groupNotes")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.groupNotes.sizePolicy().hasHeightForWidth())
         self.groupNotes.setSizePolicy(sizePolicy1)
         self.verticalLayout_2 = QVBoxLayout(self.groupNotes)

@@ -4,7 +4,7 @@ from app.core.logger import logger
 
 class MigrationManager:
 
-    LATEST_VERSION = 16
+    LATEST_VERSION = 19
 
     # ---------------------------------------------------------
     # Database version
@@ -124,6 +124,15 @@ class MigrationManager:
             elif version == 15:
                 MigrationManager.migrate_to_v16()
                 version = 16
+            elif version == 16:
+                MigrationManager.migrate_to_v17()
+                version = 17
+            elif version == 17:
+                MigrationManager.migrate_to_v18()
+                version = 18
+            elif version == 18:
+                MigrationManager.migrate_to_v19()
+                version = 19
             else:
                 raise RuntimeError(
                     f"No migration path exists from version {version}."
@@ -1004,3 +1013,228 @@ class MigrationManager:
 
         finally:
             conn.close()
+
+# ---------------------------------------------------------
+# Version 17
+# Vehicle Logbook
+# ---------------------------------------------------------
+
+    @staticmethod
+    def migrate_to_v17():
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        try:
+            logger.info(
+                "Migrating database to Version 17..."
+            )
+
+            # -------------------------------------------------
+            # Vehicle logbook
+            # -------------------------------------------------
+
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS vehicle_logbook
+                (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+                    asset_id INTEGER NOT NULL,
+
+                    log_date TEXT NOT NULL,
+
+                    driver_name TEXT,
+
+                    start_meter REAL NOT NULL,
+                    end_meter REAL NOT NULL,
+
+                    distance REAL NOT NULL
+                        DEFAULT 0,
+
+                    origin TEXT,
+                    destination TEXT,
+                    purpose TEXT,
+
+                    fuel_quantity REAL
+                        DEFAULT 0,
+
+                    fuel_cost REAL
+                        DEFAULT 0,
+
+                    notes TEXT,
+
+                    user_id INTEGER,
+                    username TEXT,
+
+                    created_at TEXT
+                        DEFAULT CURRENT_TIMESTAMP,
+
+                    FOREIGN KEY (asset_id)
+                        REFERENCES assets(id)
+                        ON DELETE RESTRICT,
+
+                    FOREIGN KEY (user_id)
+                        REFERENCES users(id)
+                        ON DELETE SET NULL
+                )
+            """)
+
+            logger.info(
+                "Created vehicle_logbook table."
+            )
+
+            # -------------------------------------------------
+            # Asset index
+            # -------------------------------------------------
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_vehicle_logbook_asset_id
+                ON vehicle_logbook(asset_id)
+            """)
+
+            # -------------------------------------------------
+            # Log date index
+            # -------------------------------------------------
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_vehicle_logbook_log_date
+                ON vehicle_logbook(log_date)
+            """)
+
+            # -------------------------------------------------
+            # Asset + date index
+            # -------------------------------------------------
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_vehicle_logbook_asset_date
+                ON vehicle_logbook(
+                    asset_id,
+                    log_date
+                )
+            """)
+
+            conn.commit()
+
+            logger.info(
+                "Vehicle Logbook tracking added."
+            )
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()
+
+    @staticmethod
+    def migrate_to_v18():
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        print(
+            "Migrating database to version 18..."
+        )
+
+        # -------------------------------------------------
+        # Add Vehicle Logbook link to meter readings
+        # -------------------------------------------------
+
+        cursor.execute("""
+            PRAGMA table_info(asset_meter_readings)
+        """)
+
+        columns = {
+            row["name"]
+            for row in cursor.fetchall()
+        }
+
+        if "logbook_id" not in columns:
+
+            cursor.execute("""
+                ALTER TABLE asset_meter_readings
+                ADD COLUMN logbook_id INTEGER
+                REFERENCES vehicle_logbook(id)
+                ON DELETE SET NULL
+            """)
+
+            print(
+                "Added logbook_id to "
+                "asset_meter_readings."
+            )
+
+        # -------------------------------------------------
+        # Index
+        # -------------------------------------------------
+
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS
+            idx_asset_meter_readings_logbook_id
+            ON asset_meter_readings(logbook_id)
+        """)
+
+        conn.commit()
+        conn.close()
+
+        print(
+            "Vehicle Logbook meter-reading "
+            "link added."
+        )
+
+    @staticmethod
+    def migrate_to_v19():
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        print(
+            "Migrating database to version 19..."
+        )
+
+        # -------------------------------------------------
+        # Add Work Order link to Vehicle Logbook
+        # -------------------------------------------------
+
+        cursor.execute("""
+            PRAGMA table_info(vehicle_logbook)
+        """)
+
+        columns = {
+            row["name"]
+            for row in cursor.fetchall()
+        }
+
+        if "work_order_id" not in columns:
+
+            cursor.execute("""
+                ALTER TABLE vehicle_logbook
+                ADD COLUMN work_order_id INTEGER
+                REFERENCES work_orders(id)
+                ON DELETE SET NULL
+            """)
+
+            print(
+                "Added work_order_id to "
+                "vehicle_logbook."
+            )
+
+        # -------------------------------------------------
+        # Index
+        # -------------------------------------------------
+
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS
+            idx_vehicle_logbook_work_order_id
+            ON vehicle_logbook(work_order_id)
+        """)
+
+        conn.commit()
+        conn.close()
+
+        print(
+            "Vehicle Logbook work-order "
+            "link added."
+        )

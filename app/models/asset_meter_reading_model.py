@@ -12,6 +12,7 @@ class AssetMeterReadingModel:
         notes=None,
         source_type="Manual",
         work_order_id=None,
+        logbook_id=None,
         conn=None,
     ):
 
@@ -34,9 +35,10 @@ class AssetMeterReadingModel:
                     reading_date,
                     notes,
                     source_type,
-                    work_order_id
+                    work_order_id,
+                    logbook_id
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 asset_id,
                 meter_type,
@@ -45,6 +47,7 @@ class AssetMeterReadingModel:
                 notes,
                 source_type,
                 work_order_id,
+                logbook_id,
             ))
 
             record_id = cursor.lastrowid
@@ -55,7 +58,10 @@ class AssetMeterReadingModel:
             return record_id
 
         except Exception:
-            conn.rollback()
+
+            if owns_connection:
+                conn.rollback()
+
             raise
 
         finally:
@@ -89,6 +95,7 @@ class AssetMeterReadingModel:
                     reading_date,
                     source_type,
                     work_order_id,
+                    logbook_id,
                     notes,
                     created_at
                 FROM asset_meter_readings
@@ -130,6 +137,7 @@ class AssetMeterReadingModel:
                     asset_meter_readings.reading_date,
                     asset_meter_readings.source_type,
                     asset_meter_readings.work_order_id,
+                    asset_meter_readings.logbook_id,
                     work_orders.work_order_number,
                     asset_meter_readings.notes,
                     asset_meter_readings.created_at
@@ -157,6 +165,7 @@ class AssetMeterReadingModel:
                     asset_meter_readings.reading_date,
                     asset_meter_readings.source_type,
                     asset_meter_readings.work_order_id,
+                    asset_meter_readings.logbook_id,
                     work_orders.work_order_number,
                     asset_meter_readings.notes,
                     asset_meter_readings.created_at
@@ -176,3 +185,119 @@ class AssetMeterReadingModel:
         conn.close()
 
         return rows
+
+    @staticmethod
+    def get_by_logbook_id(
+        logbook_id,
+        conn=None,
+    ):
+
+        owns_connection = conn is None
+
+        if owns_connection:
+            conn = Database.connect()
+
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute("""
+                SELECT *
+                FROM asset_meter_readings
+                WHERE logbook_id = ?
+                LIMIT 1
+            """, (
+                logbook_id,
+            ))
+
+            return cursor.fetchone()
+
+        finally:
+
+            if owns_connection:
+                conn.close()
+
+    @staticmethod
+    def update_logbook_reading(
+        logbook_id,
+        asset_id,
+        reading,
+        reading_date,
+        conn=None,
+    ):
+
+        owns_connection = conn is None
+
+        if owns_connection:
+            conn = Database.connect()
+
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute("""
+                UPDATE asset_meter_readings
+                
+                SET
+                    asset_id = ?,
+                    meter_type = 'Kilometers',
+                    reading = ?,
+                    reading_date = ?,
+                    source_type = 'Vehicle Logbook'
+                    
+                WHERE logbook_id = ?
+            """, (
+                asset_id,
+                reading,
+                reading_date,
+                logbook_id,
+            ))
+
+            if owns_connection:
+                conn.commit()
+
+        except Exception:
+
+            if owns_connection:
+                conn.rollback()
+
+            raise
+
+        finally:
+
+            if owns_connection:
+                conn.close()
+
+    @staticmethod
+    def delete_by_logbook_id(
+        logbook_id,
+        conn=None,
+    ):
+
+        owns_connection = conn is None
+
+        if owns_connection:
+            conn = Database.connect()
+
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute("""
+                DELETE FROM asset_meter_readings
+                WHERE logbook_id = ?
+            """, (
+                logbook_id,
+            ))
+
+            if owns_connection:
+                conn.commit()
+
+        except Exception:
+
+            if owns_connection:
+                conn.rollback()
+
+            raise
+
+        finally:
+
+            if owns_connection:
+                conn.close()

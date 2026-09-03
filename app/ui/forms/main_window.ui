@@ -91,6 +91,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="btnVehicleLogbook">
+         <property name="text">
+          <string>Vehicle Logbook</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="btnTechnicians">
          <property name="text">
           <string>Technicians</string>
@@ -170,11 +177,12 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>9</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="pageDashboard"/>
       <widget class="QWidget" name="pageAssets"/>
       <widget class="QWidget" name="pageWorkOrders"/>
+      <widget class="QWidget" name="pageVehicleLogbook"/>
       <widget class="QWidget" name="pagePM"/>
       <widget class="QWidget" name="pageTechnicians"/>
       <widget class="QWidget" name="pageInventory"/>
@@ -182,6 +190,7 @@
       <widget class="QWidget" name="pageReports"/>
       <widget class="QWidget" name="pageSettings"/>
       <widget class="QWidget" name="pageUsers"/>
+      <widget class="QWidget" name="page"/>
      </widget>
     </item>
    </layout>

@@ -1,7 +1,7 @@
 from app.pages.dashboard_page import DashboardPage
 from app.pages.assets_page import AssetsPage
 from app.pages.work_orders_page import WorkOrdersPage
-from app.pages.pm_page import PMPage
+from app.pages.preventive_maintenance_page import PreventiveMaintenancePage
 from app.pages.technicians_page import TechniciansPage
 from app.pages.inventory_page import InventoryPage
 from app.pages.suppliers_page import SuppliersPage
@@ -13,7 +13,7 @@ MODULES = {
     "pageDashboard": DashboardPage,
     "pageAssets": AssetsPage,
     "pageWorkOrders": WorkOrdersPage,
-    "pagePM": PMPage,
+    "pagePM": PreventiveMaintenancePage,
     "pageTechnicians": TechniciansPage,
     "pageInventory": InventoryPage,
     "pageSuppliers": SuppliersPage,

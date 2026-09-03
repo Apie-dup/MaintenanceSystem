@@ -89,7 +89,7 @@ class PreventiveMaintenanceDialog(BaseDialog):
         self.ui.dtNextDue.setReadOnly(True)
 
         self.ui.spnFrequencyValue.setMinimum(1)
-        self.ui.spnFrequencyValue.setMaximum(9999)
+        self.ui.spnFrequencyValue.setMaximum(999999)
 
         self.ui.dsbEstimatedHours.setDecimals(2)
         self.ui.dsbEstimatedHours.setMinimum(0.00)
@@ -958,8 +958,8 @@ class PreventiveMaintenanceDialog(BaseDialog):
                     -1
                 )
 
-                if not self._loading_record:
-                    self.calculate_next_due()
+            if not self._loading_record:
+                self.calculate_next_due()
 
         # -------------------------------------------------
         # Calendar-based PM

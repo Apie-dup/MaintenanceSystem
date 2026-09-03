@@ -14,6 +14,7 @@ class AssetMeterReadingService:
         notes=None,
         source_type="Manual",
         work_order_id=None,
+        logbook_id=None,
         conn=None,
     ):
 
@@ -51,6 +52,7 @@ class AssetMeterReadingService:
             notes,
             source_type,
             work_order_id,
+            logbook_id,
             conn=conn,
         )
 
