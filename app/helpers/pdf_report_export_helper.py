@@ -455,6 +455,7 @@ class PdfReportExportHelper:
             "End km",
             "Distance",
             "Purpose",
+            "Defect / Fault",
             "Fuel",
             "Fuel Cost",
             "Notes",
@@ -464,15 +465,15 @@ class PdfReportExportHelper:
         total_fuel = 0.0
         total_fuel_cost = 0.0
 
+        body_style = styles["Normal"]
+        body_style.fontSize = 6
+        body_style.leading = 7
+
         #--------------------------------------------------
         # Logbook rows
         # -------------------------------------------------
 
         for record in records:
-
-            body_style = styles["Normal"]
-            body_style.fontSize = 6
-            body_style.leading = 7
 
             distance = float(
                 record["distance"] or 0
@@ -513,6 +514,10 @@ class PdfReportExportHelper:
                     record["purpose"] or "",
                     body_style
                 ),
+                Paragraph(
+                    record["defect_reported"] or "",
+                    body_style
+                ),
                 f"{fuel:,.2f}",
                 f"{fuel_cost:,.2f}",
                 Paragraph(
@@ -532,17 +537,18 @@ class PdfReportExportHelper:
         )
 
         column_weights = [
-            9, # Date
-            14, # Driver
-            15, # From
-            15, # To
-            10, # Start km
-            10, # End km
-            9, # Distance
-            16, # Purpose
+            8, # Date
+            12, # Driver
+            12, # From
+            12, # To
+            9, # Start km
+            9, # End km
+            8, # Distance
+            13, # Purpose
+            18, # Defect / Fault
             7, # Fuel
-            9, # Fuel_cost
-            18, # Notes
+            8, # Fuel_cost
+            14, # Notes
         ]
 
         total_weight = sum(

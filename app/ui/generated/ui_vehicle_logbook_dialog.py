@@ -130,6 +130,27 @@ class Ui_VehicleLogbookDialog(object):
 
         self.verticalLayout.addLayout(self.horizontalLayout_6)
 
+        self.horizontalLayout_13 = QHBoxLayout()
+        self.horizontalLayout_13.setObjectName(u"horizontalLayout_13")
+        self.lblDefectFaultRepoted = QLabel(VehicleLogbookDialog)
+        self.lblDefectFaultRepoted.setObjectName(u"lblDefectFaultRepoted")
+
+        self.horizontalLayout_13.addWidget(self.lblDefectFaultRepoted)
+
+        self.teDefectReported = QPlainTextEdit(VehicleLogbookDialog)
+        self.teDefectReported.setObjectName(u"teDefectReported")
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.teDefectReported.sizePolicy().hasHeightForWidth())
+        self.teDefectReported.setSizePolicy(sizePolicy)
+        self.teDefectReported.setMinimumSize(QSize(0, 60))
+
+        self.horizontalLayout_13.addWidget(self.teDefectReported)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout_13)
+
         self.verticalSpacer_4 = QSpacerItem(20, 5, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout.addItem(self.verticalSpacer_4)
@@ -235,6 +256,9 @@ class Ui_VehicleLogbookDialog(object):
 
         self.txtNotes = QPlainTextEdit(VehicleLogbookDialog)
         self.txtNotes.setObjectName(u"txtNotes")
+        sizePolicy.setHeightForWidth(self.txtNotes.sizePolicy().hasHeightForWidth())
+        self.txtNotes.setSizePolicy(sizePolicy)
+        self.txtNotes.setMinimumSize(QSize(0, 80))
 
         self.horizontalLayout_12.addWidget(self.txtNotes)
 
@@ -264,6 +288,7 @@ class Ui_VehicleLogbookDialog(object):
         self.label.setText(QCoreApplication.translate("VehicleLogbookDialog", u"From:", None))
         self.lblTo.setText(QCoreApplication.translate("VehicleLogbookDialog", u"To:", None))
         self.lblPurpose.setText(QCoreApplication.translate("VehicleLogbookDialog", u"Purpose:", None))
+        self.lblDefectFaultRepoted.setText(QCoreApplication.translate("VehicleLogbookDialog", u"Defect / Fault Reported:", None))
         self.lblStartMeter.setText(QCoreApplication.translate("VehicleLogbookDialog", u"Start km:", None))
         self.lblEndMeter.setText(QCoreApplication.translate("VehicleLogbookDialog", u"End km:", None))
         self.lblDistance.setText(QCoreApplication.translate("VehicleLogbookDialog", u"Distance:", None))

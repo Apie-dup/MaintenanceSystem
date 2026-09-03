@@ -157,6 +157,7 @@ class VehicleLogbookDialog(BaseDialog):
         self.ui.txtFrom.clear()
         self.ui.txtTo.clear()
         self.ui.txtPurpose.clear()
+        self.ui.teDefectReported.clear()
 
         self.ui.dsbStartMeter.setValue(0)
         self.ui.dsbEndMeter.setValue(0)
@@ -213,6 +214,9 @@ class VehicleLogbookDialog(BaseDialog):
 
             "purpose":
                 self.ui.txtPurpose.text().strip(),
+
+            "defect_reported":
+                self.ui.teDefectReported.toPlainText().strip(),
 
             "fuel_quantity":
                 self.ui.dsbFuelQuantity.value(),
@@ -323,6 +327,10 @@ class VehicleLogbookDialog(BaseDialog):
 
         self.ui.txtPurpose.setText(
             record["purpose"] or ""
+        )
+
+        self.ui.teDefectReported.setPlainText(
+            record["defect_reported"] or ""
         )
 
         self.ui.dsbStartMeter.setValue(

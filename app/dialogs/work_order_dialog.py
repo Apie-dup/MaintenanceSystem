@@ -518,6 +518,14 @@ class WorkOrderDialog(BaseDialog):
 
         description_parts = []
 
+        if logbook["defect_reported"]:
+            description_parts.append(
+                (
+                    "DEFECT / FAULT REPORTED:\n"
+                    f"{logbook["defect_reported"]}"
+                )
+            )
+
         if logbook["log_date"]:
             description_parts.append(
                 f'Logbook Date: {logbook["log_date"]}'

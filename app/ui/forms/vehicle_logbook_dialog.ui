@@ -142,6 +142,33 @@
     </layout>
    </item>
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_13">
+     <item>
+      <widget class="QLabel" name="lblDefectFaultRepoted">
+       <property name="text">
+        <string>Defect / Fault Reported:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPlainTextEdit" name="teDefectReported">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>60</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
     <spacer name="verticalSpacer_4">
      <property name="orientation">
       <enum>Qt::Orientation::Vertical</enum>
@@ -292,7 +319,20 @@
       </widget>
      </item>
      <item>
-      <widget class="QPlainTextEdit" name="txtNotes"/>
+      <widget class="QPlainTextEdit" name="txtNotes">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>80</height>
+        </size>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

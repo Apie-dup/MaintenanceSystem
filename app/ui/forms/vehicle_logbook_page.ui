@@ -99,6 +99,11 @@
      </column>
      <column>
       <property name="text">
+       <string>Defect / Fault</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
        <string>Fuel</string>
       </property>
      </column>

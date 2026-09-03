@@ -51,8 +51,8 @@ class Ui_VehicleLogbookPage(object):
         self.verticalLayout.addLayout(self.horizontalLayout)
 
         self.tblLogbook = QTableWidget(VehicleLogbookPage)
-        if (self.tblLogbook.columnCount() < 12):
-            self.tblLogbook.setColumnCount(12)
+        if (self.tblLogbook.columnCount() < 13):
+            self.tblLogbook.setColumnCount(13)
         __qtablewidgetitem = QTableWidgetItem()
         self.tblLogbook.setHorizontalHeaderItem(0, __qtablewidgetitem)
         __qtablewidgetitem1 = QTableWidgetItem()
@@ -77,6 +77,8 @@ class Ui_VehicleLogbookPage(object):
         self.tblLogbook.setHorizontalHeaderItem(10, __qtablewidgetitem10)
         __qtablewidgetitem11 = QTableWidgetItem()
         self.tblLogbook.setHorizontalHeaderItem(11, __qtablewidgetitem11)
+        __qtablewidgetitem12 = QTableWidgetItem()
+        self.tblLogbook.setHorizontalHeaderItem(12, __qtablewidgetitem12)
         self.tblLogbook.setObjectName(u"tblLogbook")
 
         self.verticalLayout.addWidget(self.tblLogbook)
@@ -157,9 +159,11 @@ class Ui_VehicleLogbookPage(object):
         ___qtablewidgetitem9 = self.tblLogbook.horizontalHeaderItem(9)
         ___qtablewidgetitem9.setText(QCoreApplication.translate("VehicleLogbookPage", u"Puspose", None))
         ___qtablewidgetitem10 = self.tblLogbook.horizontalHeaderItem(10)
-        ___qtablewidgetitem10.setText(QCoreApplication.translate("VehicleLogbookPage", u"Fuel", None))
+        ___qtablewidgetitem10.setText(QCoreApplication.translate("VehicleLogbookPage", u"Defect / Fault", None))
         ___qtablewidgetitem11 = self.tblLogbook.horizontalHeaderItem(11)
-        ___qtablewidgetitem11.setText(QCoreApplication.translate("VehicleLogbookPage", u"Work Order", None))
+        ___qtablewidgetitem11.setText(QCoreApplication.translate("VehicleLogbookPage", u"Fuel", None))
+        ___qtablewidgetitem12 = self.tblLogbook.horizontalHeaderItem(12)
+        ___qtablewidgetitem12.setText(QCoreApplication.translate("VehicleLogbookPage", u"Work Order", None))
         self.btnAdd.setText(QCoreApplication.translate("VehicleLogbookPage", u"Add Entry", None))
         self.btnEdit.setText(QCoreApplication.translate("VehicleLogbookPage", u"Edit", None))
         self.btnRefresh.setText(QCoreApplication.translate("VehicleLogbookPage", u"Refresh", None))

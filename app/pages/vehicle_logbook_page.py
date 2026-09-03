@@ -43,6 +43,7 @@ class VehicleLogbookPage(CrudPage):
         ("purpose", "Purpose"),
         ("fuel_quantity", "Fuel"),
         ("work_order_number", "Work Order"),
+        ("defect_status", "Defect / Fault"),
     ]
 
     SEARCH_FIELDS = [
@@ -52,6 +53,7 @@ class VehicleLogbookPage(CrudPage):
         "origin",
         "destination",
         "purpose",
+        "defect_reported",
     ]
 
     def __init__(

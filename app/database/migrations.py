@@ -4,7 +4,7 @@ from app.core.logger import logger
 
 class MigrationManager:
 
-    LATEST_VERSION = 19
+    LATEST_VERSION = 20
 
     # ---------------------------------------------------------
     # Database version
@@ -133,6 +133,9 @@ class MigrationManager:
             elif version == 18:
                 MigrationManager.migrate_to_v19()
                 version = 19
+            elif version == 19:
+                MigrationManager.migrate_to_v20()
+                version = 20
             else:
                 raise RuntimeError(
                     f"No migration path exists from version {version}."
@@ -1237,4 +1240,46 @@ class MigrationManager:
         print(
             "Vehicle Logbook work-order "
             "link added."
+        )
+
+    @staticmethod
+    def migrate_to_v20():
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        print(
+            "Migrating database to version 20..."
+        )
+
+        # -------------------------------------------------
+        # Add defect/fault field to Vehicle Logbook
+        # -------------------------------------------------
+
+        cursor.execute("""
+            PRAGMA table_info(vehicle_logbook)
+        """)
+
+        columns = {
+            row["name"]
+            for row in cursor.fetchall()
+        }
+
+        if "defect_reported" not in columns:
+
+            cursor.execute("""
+                ALTER TABLE vehicle_logbook
+                ADD COLUMN defect_reported TEXT
+            """)
+
+            print(
+                "Added defect_reported to "
+                "vehicle_logbook."
+            )
+
+        conn.commit()
+        conn.close()
+
+        print(
+            "Vehicle Logbook defect reporting added."
         )

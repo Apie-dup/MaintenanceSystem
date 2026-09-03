@@ -26,6 +26,18 @@ class VehicleLogbookModel:
                 vehicle_logbook.origin,
                 vehicle_logbook.destination,
                 vehicle_logbook.purpose,
+                vehicle_logbook.defect_reported,
+
+                CASE
+                    WHEN TRIM(
+                        COALESCE(
+                            vehicle_logbook.defect_reported,
+                            ''
+                        )
+                    ) <> ''
+                    THEN 'Reported'
+                    ELSE ''
+                END AS defect_status,
 
                 vehicle_logbook.fuel_quantity,
                 vehicle_logbook.fuel_cost,
@@ -131,6 +143,7 @@ class VehicleLogbookModel:
                     origin,
                     destination,
                     purpose,
+                    defect_reported,
 
                     fuel_quantity,
                     fuel_cost,
@@ -144,7 +157,7 @@ class VehicleLogbookModel:
                 (
                     ?, ?, ?,
                     ?, ?, ?,
-                    ?, ?, ?,
+                    ?, ?, ?, ?,
                     ?, ?,
                     ?,
                     ?, ?
@@ -161,6 +174,7 @@ class VehicleLogbookModel:
                 data.get("origin"),
                 data.get("destination"),
                 data.get("purpose"),
+                data.get("defect_reported"),
 
                 data.get("fuel_quantity", 0),
                 data.get("fuel_cost", 0),
@@ -220,6 +234,7 @@ class VehicleLogbookModel:
                     origin = ?,
                     destination = ?,
                     purpose = ?,
+                    defect_reported = ?,
                     
                     fuel_quantity = ?,
                     fuel_cost = ?,
@@ -239,6 +254,7 @@ class VehicleLogbookModel:
                 data.get("origin"),
                 data.get("destination"),
                 data.get("purpose"),
+                data.get("defect_reported"),
 
                 data.get("fuel_quantity", 0),
                 data.get("fuel_cost", 0),
@@ -324,6 +340,13 @@ class VehicleLogbookModel:
                 vehicle_logbook.origin,
                 vehicle_logbook.destination,
                 vehicle_logbook.purpose,
+                vehicle_logbook.defect_reported,
+
+                CASE
+                    WHEN TRIM(COALESCE(vehicle_logbook.defect_reported, '')) <> ''
+                    THEN 'Reported'
+                    ELSE ''
+                END AS defect_status,
 
                 vehicle_logbook.fuel_quantity,
                 vehicle_logbook.fuel_cost,
@@ -347,11 +370,13 @@ class VehicleLogbookModel:
                 OR vehicle_logbook.origin LIKE ?
                 OR vehicle_logbook.destination LIKE ?
                 OR vehicle_logbook.purpose LIKE ?
+                OR vehicle_logbook.defect_reported LIKE ?
 
             ORDER BY
                 vehicle_logbook.log_date DESC,
                 vehicle_logbook.id DESC
         """, (
+            search_text,
             search_text,
             search_text,
             search_text,
@@ -387,6 +412,7 @@ class VehicleLogbookModel:
                 vehicle_logbook.origin,
                 vehicle_logbook.destination,
                 vehicle_logbook.purpose,
+                vehicle_logbook.defect_reported,
                 vehicle_logbook.fuel_quantity,
                 vehicle_logbook.fuel_cost,
                 vehicle_logbook.notes,
