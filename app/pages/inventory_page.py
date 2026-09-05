@@ -74,6 +74,24 @@ class InventoryPage(CrudPage):
 
         self.setup_page()
 
+    def show_low_stock(self):
+
+        records = (
+            InventoryService.get_low_stock()
+        )
+
+        self.populate_table(
+            records
+        )
+
+
+    def show_all(self):
+
+        if self.search_widget is not None:
+            self.search_widget.clear()
+
+        self.load_data()
+
     def setup_page(self):
         self.validate_configuration()
         self.setup_table()

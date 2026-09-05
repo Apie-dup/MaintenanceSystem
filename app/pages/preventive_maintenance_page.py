@@ -130,6 +130,45 @@ class PreventiveMaintenancePage(CrudPage):
         super().load_data()
         self.apply_due_status_colors()
 
+    def show_due_filter(self, due_filter):
+
+        records = self.service.get_all()
+
+        status_map = {
+            "today": "Due Today",
+            "next7": "Due Soon",
+            "overdue": "Overdue",
+        }
+
+        required_status = status_map.get(
+            due_filter
+        )
+
+        if required_status is None:
+            self.load_data()
+            return
+
+        filtered_records = [
+            record
+            for record in records
+            if (
+                record["due_status"] or ""
+            ).strip() == required_status
+        ]
+
+        self.populate_table(
+            filtered_records
+        )
+
+        self.apply_due_status_colors()
+
+
+    def show_all(self):
+        if self.search_widget is not None:
+            self.search_widget.clear()
+
+        self.load_data()
+
     def search(self, text):
         super().search(text)
         self.apply_due_status_colors()

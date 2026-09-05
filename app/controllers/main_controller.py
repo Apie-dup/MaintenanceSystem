@@ -1,4 +1,5 @@
 from pathlib import Path
+from tkinter import dialog
 
 from PySide6.QtWidgets import (
     QApplication,
@@ -31,6 +32,9 @@ from app.pages.users_page import UsersPage
 from app.core.permissions import Permissions
 from app.pages.vehicle_logbook_page import VehicleLogbookPage
 from app.dialogs.work_order_dialog import WorkOrderDialog
+from app.dialogs.preventive_maintenance_dialog import (
+    PreventiveMaintenanceDialog
+)
 
 
 class MainController(QMainWindow):
@@ -455,7 +459,9 @@ class MainController(QMainWindow):
         )
 
         self.ui.btnPM.clicked.connect(
-            self.show_pm
+            lambda: self.show_pm(
+                due_filter=None
+            )
         )
 
         self.ui.btnVehicleLogbook.clicked.connect(
@@ -469,7 +475,9 @@ class MainController(QMainWindow):
         )
 
         self.ui.btnInventory.clicked.connect(
-            self.show_inventory
+            lambda: self.show_inventory(
+                low_stock=False
+            )
         )
 
         self.ui.btnSuppliers.clicked.connect(
@@ -561,9 +569,23 @@ class MainController(QMainWindow):
             self.ui.pageVehicleLogbook
         )
 
-    def show_pm(self):
-        self.set_active_navigation(self.ui.btnPM)
-        self.pm_page.load_data()
+    def show_pm(
+        self,
+        due_filter=None
+    ):
+
+        self.set_active_navigation(
+            self.ui.btnPM
+        )
+
+        if due_filter:
+            self.pm_page.show_due_filter(
+                due_filter
+            )
+
+        else:
+            self.pm_page.show_all()
+
         self.navigation.show(
             self.ui.pagePM
         )
@@ -575,9 +597,21 @@ class MainController(QMainWindow):
             self.ui.pageTechnicians
         )
 
-    def show_inventory(self):
-        self.set_active_navigation(self.ui.btnInventory)
-        self.inventory_page.load_data()
+    def show_inventory(
+        self,
+        low_stock=False
+    ):
+
+        self.set_active_navigation(
+            self.ui.btnInventory
+        )
+
+        if low_stock:
+            self.inventory_page.show_low_stock()
+
+        else:
+            self.inventory_page.show_all()
+
         self.navigation.show(
             self.ui.pageInventory
         )
@@ -758,6 +792,30 @@ class MainController(QMainWindow):
 
         if dialog.exec():
             self.work_orders_page.load_data()
+            self.dashboard_page.refresh_dashboard()
+
+    def open_pm_by_id(self, pm_id):
+
+        self.set_active_navigation(
+            self.ui.btnPM
+        )
+
+        self.pm_page.load_data()
+
+        self.navigation.show(
+            self.ui.pagePM
+        )
+
+        dialog = PreventiveMaintenanceDialog(self)
+
+        dialog.edit_record(
+            pm_id
+        )
+
+        if dialog.exec():
+
+            self.pm_page.load_data()
+
             self.dashboard_page.refresh_dashboard()
 
     

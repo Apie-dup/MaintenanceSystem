@@ -23,10 +23,10 @@ class Ui_DashboardPage(object):
     def setupUi(self, DashboardPage):
         if not DashboardPage.objectName():
             DashboardPage.setObjectName(u"DashboardPage")
-        DashboardPage.resize(930, 572)
+        DashboardPage.resize(930, 642)
         self.frameContent = QFrame(DashboardPage)
         self.frameContent.setObjectName(u"frameContent")
-        self.frameContent.setGeometry(QRect(9, 9, 948, 795))
+        self.frameContent.setGeometry(QRect(9, 9, 948, 810))
         self.frameContent.setFrameShape(QFrame.Shape.StyledPanel)
         self.frameContent.setFrameShadow(QFrame.Shadow.Raised)
         self.gridLayout_2 = QGridLayout(self.frameContent)
@@ -114,6 +114,20 @@ class Ui_DashboardPage(object):
 
         self._6.addWidget(self.lblLowStockHint)
 
+        self.btnLowStock = QPushButton(self.cardLowStock)
+        self.btnLowStock.setObjectName(u"btnLowStock")
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.btnLowStock.sizePolicy().hasHeightForWidth())
+        self.btnLowStock.setSizePolicy(sizePolicy)
+        self.btnLowStock.setMinimumSize(QSize(0, 28))
+        self.btnLowStock.setMaximumSize(QSize(16777215, 32))
+        self.btnLowStock.setFlat(True)
+        self.btnLowStock.setProperty(u"dashboardAction", True)
+
+        self._6.addWidget(self.btnLowStock)
+
 
         self.overviewCardsLayout.addWidget(self.cardLowStock, 1, 1, 1, 1)
 
@@ -166,6 +180,17 @@ class Ui_DashboardPage(object):
 
         self._5.addWidget(self.lblPMDueWeekHint_2)
 
+        self.btnPMNext7Days = QPushButton(self.cardNext7Days)
+        self.btnPMNext7Days.setObjectName(u"btnPMNext7Days")
+        sizePolicy.setHeightForWidth(self.btnPMNext7Days.sizePolicy().hasHeightForWidth())
+        self.btnPMNext7Days.setSizePolicy(sizePolicy)
+        self.btnPMNext7Days.setMinimumSize(QSize(0, 28))
+        self.btnPMNext7Days.setSizeIncrement(QSize(0, 32))
+        self.btnPMNext7Days.setFlat(True)
+        self.btnPMNext7Days.setProperty(u"dashboardAction", True)
+
+        self._5.addWidget(self.btnPMNext7Days)
+
 
         self.overviewCardsLayout.addWidget(self.cardNext7Days, 1, 0, 1, 1)
 
@@ -191,6 +216,17 @@ class Ui_DashboardPage(object):
         self.lblPMOverDueHint.setObjectName(u"lblPMOverDueHint")
 
         self._4.addWidget(self.lblPMOverDueHint)
+
+        self.btnPMOverdue = QPushButton(self.cardPMOverdue)
+        self.btnPMOverdue.setObjectName(u"btnPMOverdue")
+        sizePolicy.setHeightForWidth(self.btnPMOverdue.sizePolicy().hasHeightForWidth())
+        self.btnPMOverdue.setSizePolicy(sizePolicy)
+        self.btnPMOverdue.setMinimumSize(QSize(0, 28))
+        self.btnPMOverdue.setMaximumSize(QSize(16777215, 32))
+        self.btnPMOverdue.setFlat(True)
+        self.btnPMOverdue.setProperty(u"dashboardAction", True)
+
+        self._4.addWidget(self.btnPMOverdue)
 
 
         self.overviewCardsLayout.addWidget(self.cardPMOverdue, 0, 4, 1, 1)
@@ -225,24 +261,36 @@ class Ui_DashboardPage(object):
         self.cardOpenWOs.setObjectName(u"cardOpenWOs")
         self.cardOpenWOs.setMinimumSize(QSize(180, 115))
         self.cardOpenWOs.setFrameShape(QFrame.Shape.StyledPanel)
-        self._2 = QVBoxLayout(self.cardOpenWOs)
-        self._2.setObjectName(u"_2")
+        self.gridLayout_6 = QGridLayout(self.cardOpenWOs)
+        self.gridLayout_6.setObjectName(u"gridLayout_6")
         self.lblOpenWorkOrdersTitle = QLabel(self.cardOpenWOs)
         self.lblOpenWorkOrdersTitle.setObjectName(u"lblOpenWorkOrdersTitle")
 
-        self._2.addWidget(self.lblOpenWorkOrdersTitle)
+        self.gridLayout_6.addWidget(self.lblOpenWorkOrdersTitle, 0, 0, 1, 1)
 
         self.lblOpenWorkOrdersValue = QLabel(self.cardOpenWOs)
         self.lblOpenWorkOrdersValue.setObjectName(u"lblOpenWorkOrdersValue")
         self.lblOpenWorkOrdersValue.setFont(font)
         self.lblOpenWorkOrdersValue.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self._2.addWidget(self.lblOpenWorkOrdersValue)
+        self.gridLayout_6.addWidget(self.lblOpenWorkOrdersValue, 1, 0, 1, 1)
 
         self.lblOpenWorkOrdersHint = QLabel(self.cardOpenWOs)
         self.lblOpenWorkOrdersHint.setObjectName(u"lblOpenWorkOrdersHint")
 
-        self._2.addWidget(self.lblOpenWorkOrdersHint)
+        self.gridLayout_6.addWidget(self.lblOpenWorkOrdersHint, 2, 0, 1, 1)
+
+        self.btnViewOpenWorkOrders = QPushButton(self.cardOpenWOs)
+        self.btnViewOpenWorkOrders.setObjectName(u"btnViewOpenWorkOrders")
+        sizePolicy.setHeightForWidth(self.btnViewOpenWorkOrders.sizePolicy().hasHeightForWidth())
+        self.btnViewOpenWorkOrders.setSizePolicy(sizePolicy)
+        self.btnViewOpenWorkOrders.setMinimumSize(QSize(0, 28))
+        self.btnViewOpenWorkOrders.setMaximumSize(QSize(16777215, 32))
+        self.btnViewOpenWorkOrders.setStyleSheet(u"")
+        self.btnViewOpenWorkOrders.setFlat(True)
+        self.btnViewOpenWorkOrders.setProperty(u"dashboardAction", True)
+
+        self.gridLayout_6.addWidget(self.btnViewOpenWorkOrders, 3, 0, 1, 1)
 
 
         self.overviewCardsLayout.addWidget(self.cardOpenWOs, 0, 1, 1, 1)
@@ -270,6 +318,17 @@ class Ui_DashboardPage(object):
 
         self._3.addWidget(self.lblPMDueWeekHint)
 
+        self.btnPMDueToday = QPushButton(self.cardPMDueToday)
+        self.btnPMDueToday.setObjectName(u"btnPMDueToday")
+        sizePolicy.setHeightForWidth(self.btnPMDueToday.sizePolicy().hasHeightForWidth())
+        self.btnPMDueToday.setSizePolicy(sizePolicy)
+        self.btnPMDueToday.setMinimumSize(QSize(0, 28))
+        self.btnPMDueToday.setMaximumSize(QSize(16777215, 32))
+        self.btnPMDueToday.setFlat(True)
+        self.btnPMDueToday.setProperty(u"dashboardAction", True)
+
+        self._3.addWidget(self.btnPMDueToday)
+
 
         self.overviewCardsLayout.addWidget(self.cardPMDueToday, 0, 2, 1, 1)
 
@@ -288,11 +347,16 @@ class Ui_DashboardPage(object):
         self.lblVehicleDefectsValue.setObjectName(u"lblVehicleDefectsValue")
         self.lblVehicleDefectsValue.setFont(font)
 
-        self.gridLayout_5.addWidget(self.lblVehicleDefectsValue, 1, 0, 1, 1, Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignVCenter)
+        self.gridLayout_5.addWidget(self.lblVehicleDefectsValue, 1, 0, 1, 1)
 
         self.btnVehicleDefects = QPushButton(self.cardVehicleDefects)
         self.btnVehicleDefects.setObjectName(u"btnVehicleDefects")
+        sizePolicy.setHeightForWidth(self.btnVehicleDefects.sizePolicy().hasHeightForWidth())
+        self.btnVehicleDefects.setSizePolicy(sizePolicy)
+        self.btnVehicleDefects.setMinimumSize(QSize(0, 28))
+        self.btnVehicleDefects.setMaximumSize(QSize(16777215, 32))
         self.btnVehicleDefects.setFlat(True)
+        self.btnVehicleDefects.setProperty(u"dashboardAction", True)
 
         self.gridLayout_5.addWidget(self.btnVehicleDefects, 2, 0, 1, 1)
 
@@ -367,24 +431,29 @@ class Ui_DashboardPage(object):
         self.lbLowStockTitle.setText(QCoreApplication.translate("DashboardPage", u"Low Stock", None))
         self.lblLowStockValue.setText(QCoreApplication.translate("DashboardPage", u"123", None))
         self.lblLowStockHint.setText(QCoreApplication.translate("DashboardPage", u"Stock running low", None))
+        self.btnLowStock.setText(QCoreApplication.translate("DashboardPage", u"View Low Stock", None))
         self.lblAssetsValue.setText(QCoreApplication.translate("DashboardPage", u"123", None))
         self.labelAssetsTitle.setText(QCoreApplication.translate("DashboardPage", u"Assets", None))
         self.lblAssetsHint.setText(QCoreApplication.translate("DashboardPage", u"Registered", None))
         self.lblPMDueWeekTitle_2.setText(QCoreApplication.translate("DashboardPage", u"Next 7 Days", None))
         self.lblPMDueWeekValue_2.setText(QCoreApplication.translate("DashboardPage", u"123", None))
         self.lblPMDueWeekHint_2.setText(QCoreApplication.translate("DashboardPage", u"Upcomming PM", None))
+        self.btnPMNext7Days.setText(QCoreApplication.translate("DashboardPage", u"View Upcoming PM", None))
         self.dashboardCard_4.setText(QCoreApplication.translate("DashboardPage", u"PM Overdue", None))
         self.lblPMOverdueValue.setText(QCoreApplication.translate("DashboardPage", u"123", None))
         self.lblPMOverDueHint.setText(QCoreApplication.translate("DashboardPage", u"Past due date", None))
+        self.btnPMOverdue.setText(QCoreApplication.translate("DashboardPage", u"View Overdue PM", None))
         self.lblTechniciansTitle.setText(QCoreApplication.translate("DashboardPage", u"Technicians", None))
         self.lblTechniciansValue.setText(QCoreApplication.translate("DashboardPage", u"123", None))
         self.lblTechniciansHint.setText(QCoreApplication.translate("DashboardPage", u"Active technicians", None))
         self.lblOpenWorkOrdersTitle.setText(QCoreApplication.translate("DashboardPage", u"Open WOs", None))
         self.lblOpenWorkOrdersValue.setText(QCoreApplication.translate("DashboardPage", u"123", None))
         self.lblOpenWorkOrdersHint.setText(QCoreApplication.translate("DashboardPage", u"Currently open", None))
+        self.btnViewOpenWorkOrders.setText(QCoreApplication.translate("DashboardPage", u"View Open Work Orders", None))
         self.lblPMDueWeekTitle.setText(QCoreApplication.translate("DashboardPage", u"PM Due Today", None))
         self.lblPMDueWeekValue.setText(QCoreApplication.translate("DashboardPage", u"123", None))
         self.lblPMDueWeekHint.setText(QCoreApplication.translate("DashboardPage", u"Due today", None))
+        self.btnPMDueToday.setText(QCoreApplication.translate("DashboardPage", u"View Due PM", None))
         self.lblVehicleDefectsTitle.setText(QCoreApplication.translate("DashboardPage", u"Unresolved Vehicle Defects", None))
         self.lblVehicleDefectsValue.setText(QCoreApplication.translate("DashboardPage", u"123", None))
         self.btnVehicleDefects.setText(QCoreApplication.translate("DashboardPage", u"View Defects", None))

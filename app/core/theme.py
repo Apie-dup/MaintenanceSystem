@@ -181,6 +181,12 @@ class AppTheme:
             min-height: 30px;
         }}
 
+        QPushButton[dashboardAction="true"] {{
+            min-height: 28px;
+            max-height: 32px;
+            padding: 4px 10px;
+        }}
+
         QPushButton:hover {{
             background-color: {cls.LIGHT_SURFACE_ALT};
             border-color: #c8c8c8;
@@ -398,6 +404,12 @@ class AppTheme:
             border-radius: 4px;
             padding: 8px 16px;
             min-height: 30px;
+        }}
+
+        QPushButton[dashboardAction="true"] {{
+            min-height: 28px;
+            max-height: 32px;
+            padding: 4px 10px;
         }}
 
         QPushButton:hover {{

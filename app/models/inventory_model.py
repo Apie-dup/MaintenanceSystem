@@ -397,3 +397,53 @@ class InventoryModel:
         conn.close()
 
         return exists
+
+    @staticmethod
+    def get_low_stock():
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT
+                inventory.id,
+                inventory.part_number,
+                inventory.part_name,
+                inventory.description,
+                inventory.category,
+                
+                inventory.supplier_id,
+                suppliers.supplier_code,
+                suppliers.supplier_name,
+                
+                inventory.unit,
+                inventory.quantity,
+                inventory.minimum_quantity,
+                inventory.reorder_quantity,
+                inventory.unit_cost,
+                inventory.location,
+                inventory.barcode,
+                inventory.status,
+                inventory.notes
+            
+            FROM inventory
+            
+            LEFT JOIN suppliers
+                ON inventory.supplier_id = suppliers.id
+                
+            WHERE
+                inventory.quantity
+                    <= inventory.minimum_quantity
+                    
+                AND inventory.status = 'Active'
+                
+            ORDER BY
+                inventory.quantity ASC,
+                inventory.part_number
+        """)
+
+        rows = cursor.fetchall()
+
+        conn.close()
+
+        return rows

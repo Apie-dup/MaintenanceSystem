@@ -144,3 +144,10 @@ class InventoryService:
     @staticmethod
     def get_total_stock_value():
         return InventoryModel.get_total_stock_value()
+
+    @staticmethod
+    def get_low_stock():
+
+        return (
+            InventoryModel.get_low_stock()
+        )

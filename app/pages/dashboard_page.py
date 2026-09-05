@@ -75,6 +75,30 @@ class DashboardPage(BasePage):
             self.open_urgent_work_order
         )
 
+        self.ui.tblPMDue.itemDoubleClicked.connect(
+            self.open_pm_record
+        )
+
+        self.ui.btnViewOpenWorkOrders.clicked.connect(
+            self.open_work_orders
+        )
+
+        self.ui.btnPMDueToday.clicked.connect(
+            self.open_pm_due_today
+        )
+
+        self.ui.btnPMNext7Days.clicked.connect(
+            self.open_pm_next_7_days
+        )
+
+        self.ui.btnPMOverdue.clicked.connect(
+            self.open_pm_overdue
+        )
+
+        self.ui.btnLowStock.clicked.connect(
+            self.open_low_stock
+        )
+
     def open_vehicle_defects(self):
 
         if self.main_controller is None:
@@ -98,6 +122,65 @@ class DashboardPage(BasePage):
 
         self.main_controller.open_work_order_by_id(
             record_id
+        )
+
+    def open_pm_record(self):
+
+        record_id = TableHelper.selected_id(
+            self.ui.tblPMDue
+        )
+
+        if record_id is None:
+            return
+
+        if self.main_controller is None:
+            return
+
+        self.main_controller.open_pm_by_id(
+            record_id
+        )
+
+    def open_work_orders(self):
+
+        if self.main_controller is None:
+            return
+
+        self.main_controller.show_work_orders()
+
+    def open_pm_due_today(self):
+
+        if self.main_controller is None:
+            return
+
+        self.main_controller.show_pm(
+            due_filter="today"
+        )
+
+    def open_pm_next_7_days(self):
+
+        if self.main_controller is None:
+            return
+
+        self.main_controller.show_pm(
+            due_filter="next7"
+        )
+
+    def open_pm_overdue(self):
+
+        if self.main_controller is None:
+            return
+
+        self.main_controller.show_pm(
+            due_filter="overdue"
+        )
+
+    def open_low_stock(self):
+
+        if self.main_controller is None:
+            return
+
+        self.main_controller.show_inventory(
+            low_stock=True
         )
 
     def setup_tables(self):
