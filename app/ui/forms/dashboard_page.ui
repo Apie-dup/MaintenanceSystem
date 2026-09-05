@@ -13,475 +13,520 @@
   <property name="windowTitle">
    <string>Dash Board Page</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="QFrame" name="frameContent">
-     <property name="frameShape">
-      <enum>QFrame::Shape::StyledPanel</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Shadow::Raised</enum>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_2">
-      <item row="2" column="0">
-       <widget class="QLabel" name="dashboardSubtitle">
-        <property name="styleSheet">
-         <string notr="true">font-size: 16px;</string>
+  <widget class="QFrame" name="frameContent">
+   <property name="geometry">
+    <rect>
+     <x>9</x>
+     <y>9</y>
+     <width>948</width>
+     <height>795</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::Shape::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Shadow::Raised</enum>
+   </property>
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="2" column="0">
+     <widget class="QLabel" name="dashboardSubtitle">
+      <property name="styleSheet">
+       <string notr="true">font-size: 16px;</string>
+      </property>
+      <property name="text">
+       <string>Maintenance overview for 02 August 2026</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="0">
+     <widget class="QGroupBox" name="dashboardSection_2">
+      <property name="title">
+       <string>PM Due</string>
+      </property>
+      <property name="flat">
+       <bool>true</bool>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_4">
+       <item row="0" column="0">
+        <widget class="QTableWidget" name="tblPMDue">
+         <column>
+          <property name="text">
+           <string>PM Number</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Asset</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Task</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Next Due</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Status</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QGroupBox" name="dashboardSection">
+      <property name="title">
+       <string>Urgent Work Orders</string>
+      </property>
+      <property name="flat">
+       <bool>true</bool>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="0">
+        <widget class="QTableWidget" name="tblUrgentWorkOrders">
+         <column>
+          <property name="text">
+           <string>Work Order</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Asset</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Priority</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Due</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Status</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <layout class="QGridLayout" name="overviewCardsLayout">
+      <item row="1" column="1">
+       <widget class="QFrame" name="cardLowStock">
+        <property name="minimumSize">
+         <size>
+          <width>180</width>
+          <height>115</height>
+         </size>
         </property>
-        <property name="text">
-         <string>Maintenance overview for 02 August 2026</string>
+        <property name="frameShape">
+         <enum>QFrame::Shape::StyledPanel</enum>
         </property>
-       </widget>
-      </item>
-      <item row="5" column="0">
-       <widget class="QGroupBox" name="dashboardSection_2">
-        <property name="title">
-         <string>PM Due</string>
-        </property>
-        <property name="flat">
-         <bool>true</bool>
-        </property>
-        <layout class="QGridLayout" name="gridLayout_4">
-         <item row="0" column="0">
-          <widget class="QTableWidget" name="tblPMDue">
-           <column>
-            <property name="text">
-             <string>PM Number</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Asset</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Task</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Next Due</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Status</string>
-            </property>
-           </column>
+        <layout class="QVBoxLayout" name="_6">
+         <item>
+          <widget class="QLabel" name="lbLowStockTitle">
+           <property name="text">
+            <string>Low Stock</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblLowStockValue">
+           <property name="font">
+            <font>
+             <pointsize>18</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>123</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblLowStockHint">
+           <property name="text">
+            <string>Stock running low</string>
+           </property>
           </widget>
          </item>
         </layout>
        </widget>
       </item>
-      <item row="4" column="0">
-       <widget class="QGroupBox" name="dashboardSection">
-        <property name="title">
-         <string>Urgent Work Orders</string>
+      <item row="0" column="0">
+       <widget class="QFrame" name="cardAssets">
+        <property name="minimumSize">
+         <size>
+          <width>180</width>
+          <height>115</height>
+         </size>
         </property>
-        <property name="flat">
-         <bool>true</bool>
+        <property name="frameShape">
+         <enum>QFrame::Shape::StyledPanel</enum>
         </property>
-        <layout class="QGridLayout" name="gridLayout_3">
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="1" column="0">
+          <widget class="QLabel" name="lblAssetsValue">
+           <property name="font">
+            <font>
+             <pointsize>18</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>123</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
          <item row="0" column="0">
-          <widget class="QTableWidget" name="tblUrgentWorkOrders">
-           <column>
-            <property name="text">
-             <string>Work Order</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Asset</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Priority</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Due</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Status</string>
-            </property>
-           </column>
+          <widget class="QLabel" name="labelAssetsTitle">
+           <property name="text">
+            <string>Assets</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="lblAssetsHint">
+           <property name="text">
+            <string>Registered</string>
+           </property>
           </widget>
          </item>
         </layout>
        </widget>
-      </item>
-      <item row="3" column="0">
-       <layout class="QGridLayout" name="overviewCardsLayout">
-        <item row="0" column="0">
-         <widget class="QFrame" name="cardAssets">
-          <property name="minimumSize">
-           <size>
-            <width>180</width>
-            <height>115</height>
-           </size>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::Shape::StyledPanel</enum>
-          </property>
-          <layout class="QGridLayout" name="gridLayout">
-           <item row="1" column="0">
-            <widget class="QLabel" name="lblAssetsValue">
-             <property name="font">
-              <font>
-               <pointsize>18</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>123</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignmentFlag::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="labelAssetsTitle">
-             <property name="text">
-              <string>Assets</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="lblAssetsHint">
-             <property name="text">
-              <string>Registered</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QFrame" name="cardOpenWOs">
-          <property name="minimumSize">
-           <size>
-            <width>180</width>
-            <height>115</height>
-           </size>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::Shape::StyledPanel</enum>
-          </property>
-          <layout class="QVBoxLayout" name="_2">
-           <item>
-            <widget class="QLabel" name="lblOpenWorkOrdersTitle">
-             <property name="text">
-              <string>Open WOs</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="lblOpenWorkOrdersValue">
-             <property name="font">
-              <font>
-               <pointsize>18</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>123</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignmentFlag::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="lblOpenWorkOrdersHint">
-             <property name="text">
-              <string>Currently open</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="QFrame" name="cardPMDueToday">
-          <property name="minimumSize">
-           <size>
-            <width>180</width>
-            <height>115</height>
-           </size>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::Shape::StyledPanel</enum>
-          </property>
-          <layout class="QVBoxLayout" name="_3">
-           <item>
-            <widget class="QLabel" name="lblPMDueWeekTitle">
-             <property name="text">
-              <string>PM Due Today</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="lblPMDueWeekValue">
-             <property name="font">
-              <font>
-               <pointsize>18</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>123</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignmentFlag::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="lblPMDueWeekHint">
-             <property name="text">
-              <string>Due today</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="0" column="3">
-         <widget class="QFrame" name="cardPMOverdue">
-          <property name="minimumSize">
-           <size>
-            <width>180</width>
-            <height>115</height>
-           </size>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::Shape::StyledPanel</enum>
-          </property>
-          <layout class="QVBoxLayout" name="_4">
-           <item>
-            <widget class="QLabel" name="dashboardCard_4">
-             <property name="text">
-              <string>PM Overdue</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="lblPMOverdueValue">
-             <property name="font">
-              <font>
-               <pointsize>18</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>123</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignmentFlag::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="lblPMOverDueHint">
-             <property name="text">
-              <string>Past due date</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QFrame" name="cardNext7Days">
-          <property name="minimumSize">
-           <size>
-            <width>180</width>
-            <height>115</height>
-           </size>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::Shape::StyledPanel</enum>
-          </property>
-          <layout class="QVBoxLayout" name="_5">
-           <item>
-            <widget class="QLabel" name="lblPMDueWeekTitle_2">
-             <property name="text">
-              <string>Next 7 Days</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="lblPMDueWeekValue_2">
-             <property name="font">
-              <font>
-               <pointsize>18</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>123</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignmentFlag::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="lblPMDueWeekHint_2">
-             <property name="text">
-              <string>Upcomming PM</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QFrame" name="cardLowStock">
-          <property name="minimumSize">
-           <size>
-            <width>180</width>
-            <height>115</height>
-           </size>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::Shape::StyledPanel</enum>
-          </property>
-          <layout class="QVBoxLayout" name="_6">
-           <item>
-            <widget class="QLabel" name="lbLowStockTitle">
-             <property name="text">
-              <string>Low Stock</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="lblLowStockValue">
-             <property name="font">
-              <font>
-               <pointsize>18</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>123</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignmentFlag::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="lblLowStockHint">
-             <property name="text">
-              <string>Stock running low</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QFrame" name="cardTechnicians">
-          <property name="minimumSize">
-           <size>
-            <width>180</width>
-            <height>115</height>
-           </size>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::Shape::StyledPanel</enum>
-          </property>
-          <layout class="QVBoxLayout" name="_7">
-           <item>
-            <widget class="QLabel" name="lblTechniciansTitle">
-             <property name="text">
-              <string>Technicians</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="lblTechniciansValue">
-             <property name="font">
-              <font>
-               <pointsize>18</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>123</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignmentFlag::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="lblTechniciansHint">
-             <property name="text">
-              <string>Active technicians</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="1" column="3">
-         <widget class="QFrame" name="cardInventoryValue">
-          <property name="minimumSize">
-           <size>
-            <width>180</width>
-            <height>115</height>
-           </size>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::Shape::StyledPanel</enum>
-          </property>
-          <layout class="QVBoxLayout" name="_8">
-           <item>
-            <widget class="QLabel" name="lblInventoryValueTitle">
-             <property name="text">
-              <string>Inventory Value</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="lblInventoryValueValue">
-             <property name="font">
-              <font>
-               <pointsize>18</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>N$ 248,500.00</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="lblInvetoryValueHint">
-             <property name="text">
-              <string>Current stock value</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-       </layout>
       </item>
       <item row="1" column="0">
-       <widget class="QLabel" name="dashboardTitle">
-        <property name="styleSheet">
-         <string notr="true">font-size: 22px; font-weight: bold;</string>
+       <widget class="QFrame" name="cardNext7Days">
+        <property name="minimumSize">
+         <size>
+          <width>180</width>
+          <height>115</height>
+         </size>
         </property>
-        <property name="text">
-         <string>Dashboard</string>
+        <property name="frameShape">
+         <enum>QFrame::Shape::StyledPanel</enum>
         </property>
+        <layout class="QVBoxLayout" name="_5">
+         <item>
+          <widget class="QLabel" name="lblPMDueWeekTitle_2">
+           <property name="text">
+            <string>Next 7 Days</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblPMDueWeekValue_2">
+           <property name="font">
+            <font>
+             <pointsize>18</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>123</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblPMDueWeekHint_2">
+           <property name="text">
+            <string>Upcomming PM</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="0" column="4">
+       <widget class="QFrame" name="cardPMOverdue">
+        <property name="minimumSize">
+         <size>
+          <width>180</width>
+          <height>115</height>
+         </size>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Shape::StyledPanel</enum>
+        </property>
+        <layout class="QVBoxLayout" name="_4">
+         <item>
+          <widget class="QLabel" name="dashboardCard_4">
+           <property name="text">
+            <string>PM Overdue</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblPMOverdueValue">
+           <property name="font">
+            <font>
+             <pointsize>18</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>123</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblPMOverDueHint">
+           <property name="text">
+            <string>Past due date</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QFrame" name="cardTechnicians">
+        <property name="minimumSize">
+         <size>
+          <width>180</width>
+          <height>115</height>
+         </size>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Shape::StyledPanel</enum>
+        </property>
+        <layout class="QVBoxLayout" name="_7">
+         <item>
+          <widget class="QLabel" name="lblTechniciansTitle">
+           <property name="text">
+            <string>Technicians</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblTechniciansValue">
+           <property name="font">
+            <font>
+             <pointsize>18</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>123</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblTechniciansHint">
+           <property name="text">
+            <string>Active technicians</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QFrame" name="cardOpenWOs">
+        <property name="minimumSize">
+         <size>
+          <width>180</width>
+          <height>115</height>
+         </size>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Shape::StyledPanel</enum>
+        </property>
+        <layout class="QVBoxLayout" name="_2">
+         <item>
+          <widget class="QLabel" name="lblOpenWorkOrdersTitle">
+           <property name="text">
+            <string>Open WOs</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblOpenWorkOrdersValue">
+           <property name="font">
+            <font>
+             <pointsize>18</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>123</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblOpenWorkOrdersHint">
+           <property name="text">
+            <string>Currently open</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QFrame" name="cardPMDueToday">
+        <property name="minimumSize">
+         <size>
+          <width>180</width>
+          <height>115</height>
+         </size>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Shape::StyledPanel</enum>
+        </property>
+        <layout class="QVBoxLayout" name="_3">
+         <item>
+          <widget class="QLabel" name="lblPMDueWeekTitle">
+           <property name="text">
+            <string>PM Due Today</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblPMDueWeekValue">
+           <property name="font">
+            <font>
+             <pointsize>18</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>123</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblPMDueWeekHint">
+           <property name="text">
+            <string>Due today</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QFrame" name="cardVehicleDefects">
+        <property name="frameShape">
+         <enum>QFrame::Shape::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Shadow::Raised</enum>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_5">
+         <item row="0" column="0">
+          <widget class="QLabel" name="lblVehicleDefectsTitle">
+           <property name="text">
+            <string>Unresolved Vehicle Defects</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
+          <widget class="QLabel" name="lblVehicleDefectsValue">
+           <property name="font">
+            <font>
+             <pointsize>18</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>123</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QPushButton" name="btnVehicleDefects">
+           <property name="text">
+            <string>View Defects</string>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QFrame" name="cardInventoryValue">
+        <property name="minimumSize">
+         <size>
+          <width>180</width>
+          <height>115</height>
+         </size>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Shape::StyledPanel</enum>
+        </property>
+        <layout class="QVBoxLayout" name="_8">
+         <item>
+          <widget class="QLabel" name="lblInventoryValueTitle">
+           <property name="text">
+            <string>Inventory Value</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblInventoryValueValue">
+           <property name="font">
+            <font>
+             <pointsize>18</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>N$ 248,500.00</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblInvetoryValueHint">
+           <property name="text">
+            <string>Current stock value</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>
-    </widget>
-   </item>
-  </layout>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="dashboardTitle">
+      <property name="styleSheet">
+       <string notr="true">font-size: 22px; font-weight: bold;</string>
+      </property>
+      <property name="text">
+       <string>Dashboard</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
  </widget>
  <resources/>
  <connections/>

@@ -334,3 +334,11 @@ class VehicleLogbookService:
             logbook_id,
             work_order_id
         )
+
+    @staticmethod
+    def get_unresolved_defects():
+
+        return (
+            VehicleLogbookModel
+            .get_unresolved_defects()
+        )

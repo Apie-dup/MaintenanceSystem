@@ -462,3 +462,95 @@ class VehicleLogbookModel:
         if owns_connection:
             conn.commit()
             conn.close()
+
+    @staticmethod
+    def get_unresolved_defects():
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT
+                vehicle_logbook.id,
+                vehicle_logbook.asset_id,
+
+                vehicle_logbook.log_date,
+
+                assets.asset_number,
+                assets.asset_name,
+
+                vehicle_logbook.driver_name,
+
+                vehicle_logbook.origin,
+                vehicle_logbook.destination,
+
+                vehicle_logbook.start_meter,
+                vehicle_logbook.end_meter,
+                vehicle_logbook.distance,
+
+                vehicle_logbook.purpose,
+
+                vehicle_logbook.fuel_quantity,
+                vehicle_logbook.fuel_cost,
+
+                vehicle_logbook.defect_reported,
+
+                CASE
+                    WHEN TRIM(
+                        COALESCE(
+                            vehicle_logbook.defect_reported,
+                            ''
+                        )
+                    ) <> ''
+                    THEN 'Reported'
+                    ELSE ''
+                END AS defect_status,
+
+                vehicle_logbook.work_order_id,
+
+                work_orders.work_order_number,
+                work_orders.status AS work_order_status,
+
+                vehicle_logbook.notes,
+                vehicle_logbook.user_id,
+                vehicle_logbook.username,
+                vehicle_logbook.created_at
+
+            FROM vehicle_logbook
+
+            INNER JOIN assets
+                ON vehicle_logbook.asset_id = assets.id
+
+            LEFT JOIN work_orders
+                ON vehicle_logbook.work_order_id = work_orders.id
+
+            WHERE
+                TRIM(
+                    COALESCE(
+                        vehicle_logbook.defect_reported,
+                        ''
+                    )
+                ) <> ''
+
+                AND (
+                    vehicle_logbook.work_order_id IS NULL
+                    
+                    OR work_orders.status IS NULL
+                    
+                    OR work_orders.status NOT IN (
+                        'Completed',
+                        'Closed',
+                        'Cancelled'
+                    )
+                )
+            
+            ORDER BY
+                vehicle_logbook.log_date DESC,
+                vehicle_logbook.id DESC
+        """)
+
+        rows = cursor.fetchall()
+
+        conn.close()
+
+        return rows

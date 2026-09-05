@@ -31,6 +31,8 @@ class DashboardPage(BasePage):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        self.main_controller = parent
+
         self.ui = Ui_DashboardPage()
         self.ui.setupUi(self)
 
@@ -60,7 +62,23 @@ class DashboardPage(BasePage):
             QHeaderView.ResizeMode.Stretch
         )
 
+        self.connect_signals()
+
         self.refresh_dashboard()
+
+    def connect_signals(self):
+        self.ui.btnVehicleDefects.clicked.connect(
+            self.open_vehicle_defects
+        )
+
+    def open_vehicle_defects(self):
+
+        if self.main_controller is None:
+            return
+
+        self.main_controller.show_vehicle_logbook(
+            unresolved_defects=True
+        )
 
     def setup_tables(self):
         TableHelper.setup(
@@ -147,6 +165,10 @@ class DashboardPage(BasePage):
             FormatHelper.integer(
                 summary["low_stock"]
             )
+        )
+
+        self.ui.lblVehicleDefectsValue.setText(
+            str(summary["vehicle_defects"])
         )
 
         subtitle_text = datetime.now().strftime(

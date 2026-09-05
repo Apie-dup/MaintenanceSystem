@@ -458,7 +458,9 @@ class MainController(QMainWindow):
         )
 
         self.ui.btnVehicleLogbook.clicked.connect(
-            self.show_vehicle_logbook
+            lambda: self.show_vehicle_logbook(
+                unresolved_defects=False
+            )
         )
 
         self.ui.btnTechnicians.clicked.connect(
@@ -539,13 +541,20 @@ class MainController(QMainWindow):
             self.ui.pageWorkOrders
         )
 
-    def show_vehicle_logbook(self):
+    def show_vehicle_logbook(
+            self,
+            unresolved_defects=False
+        ):
 
         self.set_active_navigation(
             self.ui.btnVehicleLogbook
         )
 
-        self.vehicle_logbook_page.load_data()
+        if unresolved_defects:
+            self.vehicle_logbook_page.show_unresolved_defects()
+
+        else:
+            self.vehicle_logbook_page.show_all()
 
         self.navigation.show(
             self.ui.pageVehicleLogbook

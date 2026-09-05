@@ -17,8 +17,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QFrame, QHBoxLayout, QLabel,
     QMainWindow, QMenuBar, QPushButton, QSizePolicy,
-    QStackedWidget, QStatusBar, QToolBar, QVBoxLayout,
-    QWidget)
+    QSpacerItem, QStackedWidget, QStatusBar, QToolBar,
+    QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -47,11 +47,19 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.lblCompany)
 
+        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout.addItem(self.verticalSpacer_2)
+
         self.btnDashboard = QPushButton(self.navigationFrame)
         self.btnDashboard.setObjectName(u"btnDashboard")
         self.btnDashboard.setCheckable(False)
 
         self.verticalLayout.addWidget(self.btnDashboard)
+
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout.addItem(self.verticalSpacer)
 
         self.btnAssets = QPushButton(self.navigationFrame)
         self.btnAssets.setObjectName(u"btnAssets")
@@ -76,11 +84,19 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.btnVehicleLogbook)
 
+        self.verticalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout.addItem(self.verticalSpacer_3)
+
         self.btnTechnicians = QPushButton(self.navigationFrame)
         self.btnTechnicians.setObjectName(u"btnTechnicians")
         self.btnTechnicians.setCheckable(False)
 
         self.verticalLayout.addWidget(self.btnTechnicians)
+
+        self.verticalSpacer_4 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout.addItem(self.verticalSpacer_4)
 
         self.btnInventory = QPushButton(self.navigationFrame)
         self.btnInventory.setObjectName(u"btnInventory")
@@ -94,11 +110,19 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.btnSuppliers)
 
+        self.verticalSpacer_5 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout.addItem(self.verticalSpacer_5)
+
         self.btnReports = QPushButton(self.navigationFrame)
         self.btnReports.setObjectName(u"btnReports")
         self.btnReports.setCheckable(False)
 
         self.verticalLayout.addWidget(self.btnReports)
+
+        self.verticalSpacer_6 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout.addItem(self.verticalSpacer_6)
 
         self.btnUsers = QPushButton(self.navigationFrame)
         self.btnUsers.setObjectName(u"btnUsers")
@@ -115,6 +139,10 @@ class Ui_MainWindow(object):
         self.btnAbout.setObjectName(u"btnAbout")
 
         self.verticalLayout.addWidget(self.btnAbout)
+
+        self.verticalSpacer_7 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout.addItem(self.verticalSpacer_7)
 
         self.btnLogout = QPushButton(self.navigationFrame)
         self.btnLogout.setObjectName(u"btnLogout")

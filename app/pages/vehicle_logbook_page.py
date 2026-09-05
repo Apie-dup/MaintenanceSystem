@@ -370,3 +370,23 @@ class VehicleLogbookPage(CrudPage):
         self.ui.btnOpenWorkOrder.setEnabled(
             has_work_order
         )
+
+    def show_unresolved_defects(self):
+
+        records = (
+            VehicleLogbookService
+            .get_unresolved_defects()
+        )
+
+        self.populate_table(records)
+
+        self.update_work_order_buttons()
+
+    def show_all(self):
+
+        if self.search_widget is not None:
+            self.search_widget.clear()
+
+        self.load_data()
+
+        self.update_work_order_buttons()

@@ -5,6 +5,7 @@ from app.services.preventive_maintenance_service import (
 )
 from app.services.technician_service import TechnicianService
 from app.services.work_order_service import WorkOrderService
+from app.services.vehicle_logbook_service import VehicleLogbookService
 
 
 class DashboardService:
@@ -41,6 +42,12 @@ class DashboardService:
             "low_stock": len(
                 InventoryService.get_low_stock()
             ),
+
+            "vehicle_defects":
+                len(
+                    VehicleLogbookService
+                    .get_unresolved_defects()
+                )
         }
 
     @staticmethod
