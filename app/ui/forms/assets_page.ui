@@ -173,6 +173,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="btnHistory">
+         <property name="text">
+          <string>Maintenance History</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="btnRefresh">
          <property name="minimumSize">
           <size>

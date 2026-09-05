@@ -8,6 +8,9 @@ from app.helpers.format_helper import FormatHelper
 from app.core.permissions import Permissions
 from app.helpers.table_helper import TableHelper
 from app.dialogs.asset_meter_reading_dialog import AssetMeterReadingDialog
+from app.dialogs.asset_history_dialog import(
+    AssetHistoryDialog
+)
 
 
 class AssetsPage(CrudPage):
@@ -82,6 +85,10 @@ class AssetsPage(CrudPage):
 
         self.ui.btnEdit.clicked.connect(
             self.edit_record
+        )
+
+        self.ui.btnHistory.clicked.connect(
+            self.open_history
         )
 
         self.ui.btnDelete.clicked.connect(
@@ -303,3 +310,17 @@ class AssetsPage(CrudPage):
         self.main_controller.refresh_after_meter_reading(
             asset_id
         )
+
+    def open_history(self):
+
+        record_id = self.require_selection()
+
+        if record_id is None:
+            return
+
+        dialog = AssetHistoryDialog(
+            asset_id=record_id,
+            parent=self,
+        )
+
+        dialog.exec()
