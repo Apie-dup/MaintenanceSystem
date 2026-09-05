@@ -71,6 +71,10 @@ class DashboardPage(BasePage):
             self.open_vehicle_defects
         )
 
+        self.ui.tblUrgentWorkOrders.itemDoubleClicked.connect(
+            self.open_urgent_work_order
+        )
+
     def open_vehicle_defects(self):
 
         if self.main_controller is None:
@@ -78,6 +82,22 @@ class DashboardPage(BasePage):
 
         self.main_controller.show_vehicle_logbook(
             unresolved_defects=True
+        )
+
+    def open_urgent_work_order(self):
+
+        record_id = TableHelper.selected_id(
+            self.ui.tblUrgentWorkOrders
+        )
+
+        if record_id is None:
+            return
+
+        if self.main_controller is None:
+            return
+
+        self.main_controller.open_work_order_by_id(
+            record_id
         )
 
     def setup_tables(self):

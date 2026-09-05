@@ -30,6 +30,7 @@ from app.dialogs.about_dialog import AboutDialog
 from app.pages.users_page import UsersPage
 from app.core.permissions import Permissions
 from app.pages.vehicle_logbook_page import VehicleLogbookPage
+from app.dialogs.work_order_dialog import WorkOrderDialog
 
 
 class MainController(QMainWindow):
@@ -736,6 +737,28 @@ class MainController(QMainWindow):
         self.login_window.show()
 
         self.close()
+
+    def open_work_order_by_id(self, work_order_id):
+
+        self.set_active_navigation(
+            self.ui.btnWorkOrders
+        )
+
+        self.work_orders_page.load_data()
+
+        self.navigation.show(
+            self.ui.pageWorkOrders
+        )
+
+        dialog = WorkOrderDialog(self)
+
+        dialog.edit_record(
+            work_order_id
+        )
+
+        if dialog.exec():
+            self.work_orders_page.load_data()
+            self.dashboard_page.refresh_dashboard()
 
     
 
