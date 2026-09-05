@@ -26,16 +26,22 @@ class Ui_DashboardPage(object):
         DashboardPage.resize(930, 642)
         self.frameContent = QFrame(DashboardPage)
         self.frameContent.setObjectName(u"frameContent")
-        self.frameContent.setGeometry(QRect(9, 9, 948, 810))
+        self.frameContent.setGeometry(QRect(20, -30, 948, 810))
         self.frameContent.setFrameShape(QFrame.Shape.StyledPanel)
         self.frameContent.setFrameShadow(QFrame.Shadow.Raised)
         self.gridLayout_2 = QGridLayout(self.frameContent)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
+        self.dashboardTitle = QLabel(self.frameContent)
+        self.dashboardTitle.setObjectName(u"dashboardTitle")
+        self.dashboardTitle.setStyleSheet(u"font-size: 22px; font-weight: bold;")
+
+        self.gridLayout_2.addWidget(self.dashboardTitle, 1, 1, 1, 1)
+
         self.dashboardSubtitle = QLabel(self.frameContent)
         self.dashboardSubtitle.setObjectName(u"dashboardSubtitle")
         self.dashboardSubtitle.setStyleSheet(u"font-size: 16px;")
 
-        self.gridLayout_2.addWidget(self.dashboardSubtitle, 2, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.dashboardSubtitle, 2, 1, 1, 1)
 
         self.dashboardSection_2 = QGroupBox(self.frameContent)
         self.dashboardSection_2.setObjectName(u"dashboardSection_2")
@@ -60,7 +66,7 @@ class Ui_DashboardPage(object):
         self.gridLayout_4.addWidget(self.tblPMDue, 0, 0, 1, 1)
 
 
-        self.gridLayout_2.addWidget(self.dashboardSection_2, 5, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.dashboardSection_2, 5, 1, 1, 1)
 
         self.dashboardSection = QGroupBox(self.frameContent)
         self.dashboardSection.setObjectName(u"dashboardSection")
@@ -85,7 +91,7 @@ class Ui_DashboardPage(object):
         self.gridLayout_3.addWidget(self.tblUrgentWorkOrders, 0, 0, 1, 1)
 
 
-        self.gridLayout_2.addWidget(self.dashboardSection, 4, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.dashboardSection, 4, 1, 1, 1)
 
         self.overviewCardsLayout = QGridLayout()
         self.overviewCardsLayout.setObjectName(u"overviewCardsLayout")
@@ -137,6 +143,16 @@ class Ui_DashboardPage(object):
         self.cardAssets.setFrameShape(QFrame.Shape.StyledPanel)
         self.gridLayout = QGridLayout(self.cardAssets)
         self.gridLayout.setObjectName(u"gridLayout")
+        self.lblAssetsHint = QLabel(self.cardAssets)
+        self.lblAssetsHint.setObjectName(u"lblAssetsHint")
+
+        self.gridLayout.addWidget(self.lblAssetsHint, 2, 0, 1, 1)
+
+        self.labelAssetsTitle = QLabel(self.cardAssets)
+        self.labelAssetsTitle.setObjectName(u"labelAssetsTitle")
+
+        self.gridLayout.addWidget(self.labelAssetsTitle, 0, 0, 1, 1)
+
         self.lblAssetsValue = QLabel(self.cardAssets)
         self.lblAssetsValue.setObjectName(u"lblAssetsValue")
         self.lblAssetsValue.setFont(font)
@@ -144,15 +160,16 @@ class Ui_DashboardPage(object):
 
         self.gridLayout.addWidget(self.lblAssetsValue, 1, 0, 1, 1)
 
-        self.labelAssetsTitle = QLabel(self.cardAssets)
-        self.labelAssetsTitle.setObjectName(u"labelAssetsTitle")
+        self.btnViewAssets = QPushButton(self.cardAssets)
+        self.btnViewAssets.setObjectName(u"btnViewAssets")
+        sizePolicy.setHeightForWidth(self.btnViewAssets.sizePolicy().hasHeightForWidth())
+        self.btnViewAssets.setSizePolicy(sizePolicy)
+        self.btnViewAssets.setMinimumSize(QSize(0, 28))
+        self.btnViewAssets.setMaximumSize(QSize(16777215, 32))
+        self.btnViewAssets.setFlat(True)
+        self.btnViewAssets.setProperty(u"dashboardAction", True)
 
-        self.gridLayout.addWidget(self.labelAssetsTitle, 0, 0, 1, 1)
-
-        self.lblAssetsHint = QLabel(self.cardAssets)
-        self.lblAssetsHint.setObjectName(u"lblAssetsHint")
-
-        self.gridLayout.addWidget(self.lblAssetsHint, 2, 0, 1, 1)
+        self.gridLayout.addWidget(self.btnViewAssets, 3, 0, 1, 1)
 
 
         self.overviewCardsLayout.addWidget(self.cardAssets, 0, 0, 1, 1)
@@ -253,6 +270,17 @@ class Ui_DashboardPage(object):
         self.lblTechniciansHint.setObjectName(u"lblTechniciansHint")
 
         self._7.addWidget(self.lblTechniciansHint)
+
+        self.btnViewTechnicians = QPushButton(self.cardTechnicians)
+        self.btnViewTechnicians.setObjectName(u"btnViewTechnicians")
+        sizePolicy.setHeightForWidth(self.btnViewTechnicians.sizePolicy().hasHeightForWidth())
+        self.btnViewTechnicians.setSizePolicy(sizePolicy)
+        self.btnViewTechnicians.setMinimumSize(QSize(0, 28))
+        self.btnViewTechnicians.setMaximumSize(QSize(16777215, 32))
+        self.btnViewTechnicians.setFlat(True)
+        self.btnViewTechnicians.setProperty(u"dashboardAction", True)
+
+        self._7.addWidget(self.btnViewTechnicians)
 
 
         self.overviewCardsLayout.addWidget(self.cardTechnicians, 1, 2, 1, 1)
@@ -385,17 +413,21 @@ class Ui_DashboardPage(object):
 
         self._8.addWidget(self.lblInvetoryValueHint)
 
+        self.btnViewInventory = QPushButton(self.cardInventoryValue)
+        self.btnViewInventory.setObjectName(u"btnViewInventory")
+        sizePolicy.setHeightForWidth(self.btnViewInventory.sizePolicy().hasHeightForWidth())
+        self.btnViewInventory.setSizePolicy(sizePolicy)
+        self.btnViewInventory.setMinimumSize(QSize(0, 28))
+        self.btnViewInventory.setMaximumSize(QSize(16777215, 32))
+        self.btnViewInventory.setProperty(u"dashboardAction", True)
+
+        self._8.addWidget(self.btnViewInventory)
+
 
         self.overviewCardsLayout.addWidget(self.cardInventoryValue, 1, 3, 1, 1)
 
 
-        self.gridLayout_2.addLayout(self.overviewCardsLayout, 3, 0, 1, 1)
-
-        self.dashboardTitle = QLabel(self.frameContent)
-        self.dashboardTitle.setObjectName(u"dashboardTitle")
-        self.dashboardTitle.setStyleSheet(u"font-size: 22px; font-weight: bold;")
-
-        self.gridLayout_2.addWidget(self.dashboardTitle, 1, 0, 1, 1)
+        self.gridLayout_2.addLayout(self.overviewCardsLayout, 3, 1, 1, 1)
 
 
         self.retranslateUi(DashboardPage)
@@ -405,6 +437,7 @@ class Ui_DashboardPage(object):
 
     def retranslateUi(self, DashboardPage):
         DashboardPage.setWindowTitle(QCoreApplication.translate("DashboardPage", u"Dash Board Page", None))
+        self.dashboardTitle.setText(QCoreApplication.translate("DashboardPage", u"Dashboard", None))
         self.dashboardSubtitle.setText(QCoreApplication.translate("DashboardPage", u"Maintenance overview for 02 August 2026", None))
         self.dashboardSection_2.setTitle(QCoreApplication.translate("DashboardPage", u"PM Due", None))
         ___qtablewidgetitem = self.tblPMDue.horizontalHeaderItem(0)
@@ -432,9 +465,10 @@ class Ui_DashboardPage(object):
         self.lblLowStockValue.setText(QCoreApplication.translate("DashboardPage", u"123", None))
         self.lblLowStockHint.setText(QCoreApplication.translate("DashboardPage", u"Stock running low", None))
         self.btnLowStock.setText(QCoreApplication.translate("DashboardPage", u"View Low Stock", None))
-        self.lblAssetsValue.setText(QCoreApplication.translate("DashboardPage", u"123", None))
-        self.labelAssetsTitle.setText(QCoreApplication.translate("DashboardPage", u"Assets", None))
         self.lblAssetsHint.setText(QCoreApplication.translate("DashboardPage", u"Registered", None))
+        self.labelAssetsTitle.setText(QCoreApplication.translate("DashboardPage", u"Assets", None))
+        self.lblAssetsValue.setText(QCoreApplication.translate("DashboardPage", u"123", None))
+        self.btnViewAssets.setText(QCoreApplication.translate("DashboardPage", u"View Assets", None))
         self.lblPMDueWeekTitle_2.setText(QCoreApplication.translate("DashboardPage", u"Next 7 Days", None))
         self.lblPMDueWeekValue_2.setText(QCoreApplication.translate("DashboardPage", u"123", None))
         self.lblPMDueWeekHint_2.setText(QCoreApplication.translate("DashboardPage", u"Upcomming PM", None))
@@ -446,6 +480,7 @@ class Ui_DashboardPage(object):
         self.lblTechniciansTitle.setText(QCoreApplication.translate("DashboardPage", u"Technicians", None))
         self.lblTechniciansValue.setText(QCoreApplication.translate("DashboardPage", u"123", None))
         self.lblTechniciansHint.setText(QCoreApplication.translate("DashboardPage", u"Active technicians", None))
+        self.btnViewTechnicians.setText(QCoreApplication.translate("DashboardPage", u"View Technicians", None))
         self.lblOpenWorkOrdersTitle.setText(QCoreApplication.translate("DashboardPage", u"Open WOs", None))
         self.lblOpenWorkOrdersValue.setText(QCoreApplication.translate("DashboardPage", u"123", None))
         self.lblOpenWorkOrdersHint.setText(QCoreApplication.translate("DashboardPage", u"Currently open", None))
@@ -460,6 +495,6 @@ class Ui_DashboardPage(object):
         self.lblInventoryValueTitle.setText(QCoreApplication.translate("DashboardPage", u"Inventory Value", None))
         self.lblInventoryValueValue.setText(QCoreApplication.translate("DashboardPage", u"N$ 248,500.00", None))
         self.lblInvetoryValueHint.setText(QCoreApplication.translate("DashboardPage", u"Current stock value", None))
-        self.dashboardTitle.setText(QCoreApplication.translate("DashboardPage", u"Dashboard", None))
+        self.btnViewInventory.setText(QCoreApplication.translate("DashboardPage", u"View Inventory", None))
     # retranslateUi
 

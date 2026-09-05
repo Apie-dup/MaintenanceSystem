@@ -99,6 +99,18 @@ class DashboardPage(BasePage):
             self.open_low_stock
         )
 
+        self.ui.btnViewAssets.clicked.connect(
+            self.open_assets
+        )
+
+        self.ui.btnViewInventory.clicked.connect(
+            self.open_inventory
+        )
+
+        self.ui.btnViewTechnicians.clicked.connect(
+            self.open_technicians
+        )
+
     def open_vehicle_defects(self):
 
         if self.main_controller is None:
@@ -181,6 +193,31 @@ class DashboardPage(BasePage):
 
         self.main_controller.show_inventory(
             low_stock=True
+        )
+
+    def open_assets(self):
+
+        if self.main_controller is None:
+            return
+
+        self.main_controller.show_assets()
+
+
+    def open_technicians(self):
+
+        if self.main_controller is None:
+            return
+
+        self.main_controller.show_technicians()
+
+
+    def open_inventory(self):
+
+        if self.main_controller is None:
+            return
+
+        self.main_controller.show_inventory(
+            low_stock=False
         )
 
     def setup_tables(self):
