@@ -4,7 +4,7 @@ from app.core.logger import logger
 
 class MigrationManager:
 
-    LATEST_VERSION = 20
+    LATEST_VERSION = 21
 
     # ---------------------------------------------------------
     # Database version
@@ -136,6 +136,9 @@ class MigrationManager:
             elif version == 19:
                 MigrationManager.migrate_to_v20()
                 version = 20
+            elif version == 20:
+                MigrationManager.migrate_to_v21()
+                version = 21
             else:
                 raise RuntimeError(
                     f"No migration path exists from version {version}."
@@ -1283,3 +1286,85 @@ class MigrationManager:
         print(
             "Vehicle Logbook defect reporting added."
         )
+
+    # ---------------------------------------------------------
+    # Version 21
+    # Preventive Maintenance Service History
+    # ---------------------------------------------------------
+
+    @staticmethod
+    def migrate_to_v21():
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        try:
+            logger.info(
+                "Migrating database to Version 21..."
+            )
+
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS pm_service_history
+                (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+                    pm_id INTEGER NOT NULL,
+                    work_order_id INTEGER,
+
+                    asset_id INTEGER NOT NULL,
+
+                    service_date TEXT NOT NULL,
+
+                    meter_type TEXT,
+                    meter_reading REAL,
+
+                    notes TEXT,
+
+                    created_at TEXT
+                        DEFAULT CURRENT_TIMESTAMP,
+
+                    FOREIGN KEY (pm_id)
+                        REFERENCES preventive_maintenance(id)
+                        ON DELETE RESTRICT,
+
+                    FOREIGN KEY (work_order_id)
+                        REFERENCES work_orders(id)
+                        ON DELETE SET NULL,
+
+                    FOREIGN KEY (asset_id)
+                        REFERENCES assets(id)
+                        ON DELETE RESTRICT
+                )
+            """)
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_pm_service_history_pm_id
+                ON pm_service_history(pm_id)
+            """)
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_pm_service_history_asset_id
+                ON pm_service_history(asset_id)
+            """)
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_pm_service_history_work_order_id
+                ON pm_service_history(work_order_id)
+            """)
+
+            conn.commit()
+
+            logger.info(
+                "Preventive Maintenance "
+                "service history added."
+            )
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()

@@ -58,44 +58,50 @@ class AssetHistoryModel:
                 UNION ALL
 
                 -- -----------------------------------------
-                -- Preventive Maintenance
+                -- Completed Preventive Maintenance
                 -- -----------------------------------------
 
                 SELECT
-                    COALESCE(
-                        preventive_maintenance.last_service_date,
-                        preventive_maintenance.next_due_date
-                    )
-                        AS event_date,
+                    pm_service_history.service_date
+                        As event_date,
 
                     'Preventive Maintenance'
                         AS event_type,
 
                     preventive_maintenance.pm_number
+                        || ' / ' ||
+                        COALESCE(
+                            work_orders.work_order_number,
+                            ''
+                        )
                         AS reference,
 
                     preventive_maintenance.task
                         AS description,
 
-                    CASE
-                        WHEN preventive_maintenance.active = 1
-                        THEN 'Active'
-                        ELSE 'Inactive'
-                    END
+                    'Completed'
                         AS status,
 
-                    preventive_maintenance.last_service_meter
+                    pm_service_history.meter_reading
                         AS meter,
 
-                    'pm'
+                    'work_order'
                         AS source_type,
 
-                    preventive_maintenance.id
+                    pm_service_history.work_order_id
                         AS source_id
 
-                FROM preventive_maintenance
+                FROM pm_service_history
 
-                WHERE preventive_maintenance.asset_id = ?
+                INNER JOIN preventive_maintenance
+                    ON pm_service_history.pm_id
+                        = preventive_maintenance.id
+
+                LEFT JOIN work_orders
+                    ON pm_service_history.work_order_id
+                        = work_orders.id
+
+                WHERE pm_service_history.asset_id = ?
 
                 UNION ALL
 

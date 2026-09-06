@@ -10,6 +10,9 @@ from app.services.asset_meter_reading_service import (
     AssetMeterReadingService
 )
 from app.database.connection import Database
+from app.services.pm_service_history_service import (
+    PMServiceHistoryService
+)
 
 
 
@@ -529,7 +532,7 @@ class WorkOrderService:
                 AssetMeterReadingService
                 .get_latest_reading(
                     work_order["asset_id"],
-                    "frequency_type",
+                    frequency_type,
                 )
             )
 
@@ -606,6 +609,37 @@ class WorkOrderService:
                     ),
                     source_type="Work Order",
                     work_order_id=record_id,
+                    conn=conn
+                )
+
+            # ---------------------------------------------------
+            # PM Service History
+            #----------------------------------------------------
+
+            if pm_id is not None:
+
+                PMServiceHistoryService.create(
+                    {
+                        "pm_id": pm_id,
+                        "work_order_id": record_id,
+                        "asset_id": work_order["asset_id"],
+                        "service_date": completed_date,
+                        "meter_type": (
+                            frequency_type
+                            if is_meter_based
+                            else None
+                        ),
+                        "meter_reading": (
+                            meter_reading
+                            if is_meter_based
+                            else None
+                        ),
+                        "notes": (
+                            f"Completed from "
+                            f'{work_order["work_order_number"]}.'
+                        ),
+
+                    },
                     conn=conn
                 )
 
