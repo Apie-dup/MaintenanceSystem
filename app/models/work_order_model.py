@@ -223,9 +223,11 @@ class WorkOrderModel:
                     labour_hours,
                     meter_reading,
                     notes,
-                    pm_id
+                    pm_id,
+                    pm_due_date,
+                    pm_due_meter
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 data["work_order_number"],
                 data["asset_id"],
@@ -244,6 +246,8 @@ class WorkOrderModel:
                 data.get("meter_reading"),
                 data["notes"],
                 data.get("pm_id"),
+                data.get("pm_due_date"),
+                data.get("pm_due_meter"),
             ))
 
             record_id = cursor.lastrowid
@@ -510,21 +514,23 @@ class WorkOrderModel:
                 work_orders.id,
                 work_orders.work_order_number,
                 work_orders.date_created,
-                work_orders.due_date,
+                work_orders.completed_date,
                 work_orders.status,
                 work_orders.technician_id,
+                
                 CASE
-                WHEN technicians.id IS NULL
-                    THEN 'Unassigned'
-                ELSE technicians.employee_number
-                     || ' - '
-                     || technicians.first_name
-                     || ' '
-                     || technicians.last_name
+                    WHEN technicians.id IS NULL
+                        THEN 'Unassigned'
+                    ELSE technicians.employee_number
+                        || ' - '
+                        || technicians.first_name
+                        || ' '
+                        || technicians.last_name
                 END AS technician_display,
 
                 work_orders.labour_hours,
                 work_orders.actual_cost,
+                work_orders.meter_reading,
                 work_orders.notes
 
             FROM work_orders
@@ -569,6 +575,10 @@ class WorkOrderModel:
                     completed_date = ?,
                     meter_reading = ?
                 WHERE id = ?
+                  AND status NOT IN (
+                      'Completed',
+                      'Closed'
+                    )
             """, (
                 completed_date,
                 meter_reading,
@@ -596,36 +606,55 @@ class WorkOrderModel:
                 conn.close()
 
     @staticmethod
-    def close(record_id, closed_date):
+    def close(
+        record_id,
+        closed_date,
+        conn=None,
+    ):
 
-        conn = Database.connect()
-        cursor = conn.cursor()
+        owns_connection = (
+            conn is None
+        )
 
-        try:
-            cursor.execute("""
-                UPDATE work_orders
-                SET
-                    status = 'Closed',
-                    closed_date = ?
-                WHERE id = ?
-            """, (
-                closed_date,
-                record_id,
-            ))
+        if owns_connection:
+            conn = Database.connect()
 
-            if cursor.rowcount == 0:
-                raise ValueError(
-                    "Work Order not found."
-                )
+            cursor = conn.cursor()
 
-            conn.commit()
+            try:
+                cursor.execute("""
+                    UPDATE work_orders
+                    SET
+                        status = 'Closed',
+                        closed_date = ?
+                    WHERE id = ?
+                        AND status = 'Completed'
+                """, (
+                    closed_date,
+                    record_id,
+                ))
 
-        except Exception:
-            conn.rollback()
-            raise
+                if cursor.rowcount == 0:
+                    raise ValueError(
+                        "Only completed Work Orders "
+                        "can be closed."
+                    )
 
-        finally:
-            conn.close()
+                if owns_connection:
+                    conn.commit()
+
+            except Exception:
+
+                if owns_connection:
+                    conn.rollback()
+
+                raise
+
+            finally:
+
+                if owns_connection:
+                    conn.close()
+
 
     @staticmethod
     def calculate_actual_cost(
@@ -750,35 +779,97 @@ class WorkOrderModel:
                 conn.close()
 
     @staticmethod
-    def reopen(record_id):
+    def reopen(
+        record_id,
+        conn=None
+    ):
+
+        owns_connection = (
+            conn is None
+        )
+
+        if owns_connection:
+            conn = Database.connect()
+
+            cursor = conn.cursor()
+
+            try:
+
+                cursor.execute("""
+                    UPDATE work_orders
+                    SET
+                        status = 'In Progress',
+                        completed_date = NULL,
+                        closed_date = NULL
+                    WHERE id = ?
+                        AND status = 'Completed'
+                """, (
+                    record_id,
+                ))
+
+                if cursor.rowcount == 0:
+                    raise ValueError(
+                        "Only completed Work Orders "
+                        "can be reopened."
+                    )
+
+                if owns_connection:
+                    conn.commit()
+
+            except Exception:
+
+                if owns_connection:
+                    conn.rollback()
+
+                raise
+
+            finally:
+
+                if owns_connection:
+                    conn.close()
+
+    @staticmethod
+    def pm_cycle_exists(
+        pm_id,
+        pm_due_date=None,
+        pm_due_meter=None,
+    ):
 
         conn = Database.connect()
         cursor = conn.cursor()
 
         try:
-            cursor.execute("""
-                UPDATE work_orders
-                SET
-                    status = "In Progress",
-                    completed_date = NULL,
-                    closed_date = NULL
-                WHERE id = ?
-                  AND status = 'Completed'
-            """, (
-                record_id,
-            ))
 
-            if cursor.rowcount == 0:
-                raise ValueError(
-                    "Only completed Work Orders "
-                    "can be reopened."
-                )
+            if pm_due_meter is not None:
 
-            conn.commit()
+                cursor.execute("""
+                    SELECT 1
+                    FROM work_orders
+                    WHERE pm_id = ?
+                      AND pm_due_meter = ?
+                    LIMIT 1
+                """, (
+                    pm_id,
+                    pm_due_meter,
+                ))
 
-        except Exception:
-            conn.rollback()
-            raise
+            else:
+
+                cursor.execute("""
+                    SELECT 1
+                    FROM work_orders
+                    WHERE pm_id = ?
+                      AND pm_due_date = ?
+                    LIMIT 1
+                """, (
+                    pm_id,
+                    pm_due_date,
+                ))
+
+            return (
+                cursor.fetchone()
+                is not None
+            )
 
         finally:
             conn.close()

@@ -4,7 +4,7 @@ from app.core.logger import logger
 
 class MigrationManager:
 
-    LATEST_VERSION = 21
+    LATEST_VERSION = 23
 
     # ---------------------------------------------------------
     # Database version
@@ -139,6 +139,12 @@ class MigrationManager:
             elif version == 20:
                 MigrationManager.migrate_to_v21()
                 version = 21
+            elif version == 21:
+                MigrationManager.migrate_to_v22()
+                version = 22
+            elif version == 22:
+                MigrationManager.migrate_to_v23()
+                version = 23
             else:
                 raise RuntimeError(
                     f"No migration path exists from version {version}."
@@ -1360,6 +1366,86 @@ class MigrationManager:
             logger.info(
                 "Preventive Maintenance "
                 "service history added."
+            )
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()
+
+    @staticmethod
+    def migrate_to_v22():
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        try:
+            logger.info(
+                "Migrating database to Version 22..."
+            )
+            cursor.execute("""
+                ALTER TABLE work_orders
+                ADD COLUMN pm_due_date TEXT
+            """)
+
+            cursor.execute("""
+                ALTER TABLE work_orders
+                ADD COLUMN pm_due_meter REAL
+            """)
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_work_orders_pm_due_date
+                ON work_orders(
+                    pm_id,
+                    pm_due_date
+                )
+            """)
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_work_orders_pm_due_meter
+                ON work_orders(
+                    pm_id,
+                    pm_due_meter
+                )
+            """)
+
+            conn.commit()
+
+            logger.info(
+                "PM Work Order cycle tracking added."
+            )
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()
+
+    @staticmethod
+    def migrate_to_v23():
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        try:
+            logger.info(
+                "Migrating database to Version 23..."
+            )
+
+            cursor.execute("""
+                CREATE UNIQUE INDEX IF NOT EXISTS
+                    idx_pm_service_history_work_order_unique
+                ON pm_service_history(work_order_id)
+                WHERE work_order_id IS NOT NULL
+            """)
+
+            conn.commit()
+
+            logger.info(
+                "PM service history duplicate protection added."
             )
 
         except Exception:

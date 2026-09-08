@@ -1,5 +1,3 @@
-from pdb import pm
-
 from app.models.preventive_maintenance_model import (
     PreventiveMaintenanceModel
 )
@@ -138,20 +136,6 @@ class PreventiveMaintenanceService:
                 "frequency type, and interval."
             )
 
-        if (
-            save_data["frequency_type"]
-            in PreventiveMaintenanceService.METER_FREQUENCY_TYPES
-        ):
-
-            save_data["next_due_date"] = None
-
-        else:
-            save_data["next_due_date"] = (
-                PreventiveMaintenanceService.calculate_next_due_date(
-                    save_data
-                )
-            )
-
         return PreventiveMaintenanceModel.insert(
             save_data
         )
@@ -182,20 +166,6 @@ class PreventiveMaintenanceService:
                 "frequency type, and interval."
             )
 
-        if (
-            save_data["frequency_type"]
-            in PreventiveMaintenanceService.METER_FREQUENCY_TYPES
-        ):
-            save_data["next_due_date"] = None
-
-        else:
-            save_data["next_due_date"] = (
-                PreventiveMaintenanceService
-                .calculate_next_due_date(
-                    save_data
-                )
-            )
-
         PreventiveMaintenanceModel.update(
             record_id,
             save_data
@@ -207,7 +177,19 @@ class PreventiveMaintenanceService:
 
     @staticmethod
     def delete(record_id):
-        PreventiveMaintenanceModel.delete(record_id)
+        if PreventiveMaintenanceModel.has_history(
+            record_id
+        ):
+            raise ValueError(
+                "This Preventive Maintenance schedule "
+                "cannot be deleted because it has "
+                "maintenance history.\n\n"
+                "Set the schedule to Inactive instead."
+            )
+
+        PreventiveMaintenanceModel.delete(
+            record_id
+        )
 
     # ---------------------------------------------------------
     # Validation
@@ -264,33 +246,39 @@ class PreventiveMaintenanceService:
                 "last_service_meter"
             )
 
-            next_meter = data.get(
-                "next_due_meter"
-            )
-
             if last_meter is None:
                 raise ValueError(
                     "Last Service Meter is required."
                 )
 
-            if next_meter is None:
-                raise ValueError(
-                    "Next Due Meter is required."
+            try:
+                last_meter = float(
+                    last_meter
                 )
 
-            last_meter = float(last_meter)
-            next_meter = float(next_meter)
+            except (TypeError, ValueError):
+                raise ValueError(
+                    "Last Service Meter must be a valid number."
+                )
 
             if last_meter < 0:
                 raise ValueError(
                     "Last Service Meter cannot be negative."
                 )
 
-            if next_meter <= last_meter:
-                raise ValueError(
-                    "Next Due Meter must be greater "
-                    "than Last Service Meter."
-                )
+            # The frequency type is also the meter type.
+            data["meter_type"] = frequency_type
+
+            # Meter PMs do not use calendar dates.
+            data["last_service_date"] = None
+            data["next_due_date"] = None
+
+            # Always calculate this here rather than trusting
+            # a value supplied by the dialog.
+            data["next_die_meter"] = (
+                last_meter
+                + frequency_value
+            )
 
         #---------------------------------------------------------
         # Calendar-based PM
@@ -301,12 +289,19 @@ class PreventiveMaintenanceService:
             if not data.get("last_service_date"):
                 raise ValueError(
                     "Last Service Date is required."
-            )
-
-            if not data.get("next_due_date"):
-                raise ValueError(
-                    "Next Due Date is required."
                 )
+
+            # Calendar PMs must not retain scheduling data.
+            data["meter_type"] = None
+            data["last_service_meter"] = None
+            data["next_due_meter"] = None
+
+            data["next_due_date"] = (
+                PreventiveMaintenanceService
+                .calculate_next_due_date(
+                    data
+                )
+            )
 
         #---------------------------------------------------------
         # General values
@@ -461,7 +456,9 @@ class PreventiveMaintenanceService:
         user=None,
     ):
 
-        pm = PreventiveMaintenanceModel.get_by_id(pm_id)
+        pm = PreventiveMaintenanceModel.get_by_id(
+        pm_id
+        )
 
         if pm is None:
             raise ValueError(
@@ -470,7 +467,8 @@ class PreventiveMaintenanceService:
 
         if not bool(pm["active"]):
             raise ValueError(
-                "An inactive PM schedule cannot generate a work order."
+                "An inactive PM schedule cannot "
+                "generate a work order." 
             )
 
         frequency_type = (
@@ -481,6 +479,41 @@ class PreventiveMaintenanceService:
             frequency_type
             in PreventiveMaintenanceService.METER_FREQUENCY_TYPES
         )
+
+        #-----------------------------------------------------------
+        # Determine PM cycle
+        #-----------------------------------------------------------
+
+        pm_due_date = None
+        pm_due_meter = None
+
+        if is_meter_based:
+
+            pm_due_meter = float(
+                pm["next_due_meter"] or 0
+            )
+
+            if pm_due_meter <= 0:
+                raise ValueError(
+                    "The Pm schedule does not have "
+                    "a valid next due meter."
+                )
+
+        else:
+
+            pm_due_date = (
+                pm["next_due_date"] or ""
+            ).strip()
+
+            if not pm_due_date:
+                raise ValueError(
+                    "The PM schedule does not have "
+                    "a valid due date."
+                )
+
+        #-------------------------------------------------------
+        # Determine due status
+        #-------------------------------------------------------
 
         due_status = (
             PreventiveMaintenanceService
@@ -493,16 +526,15 @@ class PreventiveMaintenanceService:
                 "for this PM schedule."
             )
 
+        #-------------------------------------------------------
+        # PM must be due
+        #-------------------------------------------------------
+
         if due_status not in {
             "Due Soon",
             "Due",
             "Overdue",
-
         }:
-
-            #----------------------------------------
-            # Meter-base message
-            #----------------------------------------
 
             if is_meter_based:
 
@@ -518,46 +550,49 @@ class PreventiveMaintenanceService:
                     current_meter = float(
                         pm["last_service_meter"] or 0
                     )
+
                 else:
                     current_meter = float(
                         latest["reading"] or 0
                     )
 
-                next_due_meter = float(
-                    pm["next_due_meter"] or 0
-                )
-
                 raise ValueError(
                     "This Preventive Maintenance schedule "
                     "is not due yet.\n\n"
                     f"Current meter: {current_meter:,.2f}\n"
-                    f"Due at: {next_due_meter:,.2f}"
+                    f"Due at: {pm_due_meter:,.2f} "
                     f"{frequency_type}"
                 )
 
-            #----------------------------------------
-            # Calendar-based message
-            #----------------------------------------
-
             raise ValueError(
-                "This Prevenive Maintenance schedule "
+                "This Preventive Maintenance schedule "
                 "is not due yet.\n\n"
-                f'Due date: {pm["next_due_date"]}'
+                f"Due date: {pm_due_date}"
             )
 
-        if (
-            not is_meter_based
-            and not pm["next_due_date"]
+        #-------------------------------------------------------
+        # Prevent duplicate Work Order for same PM schedule
+        #-------------------------------------------------------
+
+        if WorkOrderService.pm_cycle_exists(
+            pm["id"],
+            pm_due_date=pm_due_date,
+            pm_due_meter=pm_due_meter,
         ):
             raise ValueError(
-                "The PM schedule does not have a next due date."
+                "A Work Order has already been generated "
+                "for this Preventive Maintenance cycle."
             )
+
+        #-------------------------------------------------------
+        # Create Work Order
+        #-------------------------------------------------------
 
         data = {
             "work_order_number":
                 WorkOrderService.get_next_work_order_number(),
 
-            "asset_id": 
+            "asset_id":
                 pm["asset_id"],
 
             "title":
@@ -582,19 +617,27 @@ class PreventiveMaintenanceService:
                 DateHelper.today_string(),
 
             "due_date":
-                DateHelper.today_string(),
+                (
+                    DateHelper.today_string()
+                    if is_meter_based
+                    else pm_due_date
+                ),
 
             "meter_reading":
                 None,
 
             "estimated_cost":
-                float(pm["estimated_cost"] or 0),
+                float(
+                    pm["estimated_cost"] or 0
+                ),
 
             "actual_cost":
                 0.00,
 
             "estimated_hours":
-                float(pm["estimated_hours"] or 0),
+                float(
+                    pm["estimated_hours"] or 0
+                ),
 
             "labour_hours":
                 0.00,
@@ -602,19 +645,25 @@ class PreventiveMaintenanceService:
             "notes": (
                 "Generated from Preventive Maintenance "
                 f'{pm["pm_number"]}.\n'
-                f'Estimated_labour: '
+                f'Estimated labour: '
                 f'{float(pm["estimated_hours"] or 0):.2f} hours.'
             ),
 
             "pm_id":
                 pm["id"],
+
+            "pm_due_date":
+                pm_due_date,
+
+            "pm_due_meter":
+                pm_due_meter,
+
         }
 
         return WorkOrderService.create(
             data,
-            user=user,
+            user=user
         )
-
 
     @staticmethod
     def complete_schedule(
@@ -861,7 +910,7 @@ class PreventiveMaintenanceService:
             return "Overdue"
         
         if due_date == today:
-            return "Due"
+            return "Due Today"
 
         days_remaining = (
             due_date - today
@@ -871,4 +920,10 @@ class PreventiveMaintenanceService:
             return "Due Soon"
 
         return "Scheduled"
+
+    def has_history(pm_id):
+
+        return PreventiveMaintenanceModel.has_history(
+            pm_id
+        )
         

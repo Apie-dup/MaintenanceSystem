@@ -533,7 +533,7 @@ class PreventiveMaintenanceModel:
                     )
                         THEN 'Due Soon'
 
-                    ELSE 'Upcoming'
+                    ELSE 'Scheduled'
                 END AS due_status
 
             FROM preventive_maintenance
@@ -703,6 +703,38 @@ class PreventiveMaintenanceModel:
                     frequency_value,
                     exclude_id,
                 ))
+
+            return (
+                cursor.fetchone()
+                is not None
+            )
+
+        finally:
+            conn.close()
+
+    @staticmethod
+    def has_history(pm_id):
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute("""
+                SELECT 1
+                FROM pm_service_history
+                WHERE pm_id = ?
+                LIMIT 1
+            """, (pm_id,))
+
+            if cursor.fetchone() is not None:
+                return True
+
+            cursor.execute("""
+                SELECT 1
+                FROM work_orders
+                WHERE pm_id = ?
+                LIMIT 1
+            """, (pm_id,))
 
             return (
                 cursor.fetchone()

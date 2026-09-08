@@ -38,11 +38,6 @@ class PMServiceHistoryModel:
 
             record_id = cursor.lastrowid
 
-            print(
-                "PM SERVICE CREATED:",
-                record_id
-            )
-
             if owns_connection:
                 conn.commit()
 

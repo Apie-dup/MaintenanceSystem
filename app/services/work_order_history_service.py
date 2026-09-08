@@ -87,6 +87,7 @@ class WorkOrderHistoryService:
         old_status,
         user_id=None,
         username=None,
+        conn=None,
     ):
         return WorkOrderHistoryService.add(
             work_order_id,
@@ -97,6 +98,7 @@ class WorkOrderHistoryService:
             notes="Work Order closed.",
             user_id=user_id,
             username=username,
+            conn=conn,
         )
 
     @staticmethod
@@ -105,6 +107,7 @@ class WorkOrderHistoryService:
         reason,
         user_id=None,
         username=None,
+        conn=None,
     ):
         return WorkOrderHistoryService.add(
             work_order_id,
@@ -115,4 +118,5 @@ class WorkOrderHistoryService:
             notes=reason,
             user_id=user_id,
             username=username,
+            conn=conn,
         )

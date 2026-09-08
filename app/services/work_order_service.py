@@ -703,12 +703,16 @@ class WorkOrderService:
 
         old_status = work_order["status"]
 
-        WorkOrderModel.close(
-            record_id,
-            DateHelper.today_string()
-        )
+        conn = Database.connect()
 
-        WorkOrderHistoryService.log_closed(
+        try:
+
+            WorkOrderModel.close(
+                record_id,
+                DateHelper.today_string()
+            )
+
+            WorkOrderHistoryService.log_closed(
             record_id,
             old_status=old_status,
             user_id=(
@@ -721,7 +725,21 @@ class WorkOrderService:
                 if user
                 else None
             ),
-        )
+                conn=conn
+
+            )
+
+            conn.commit()
+
+        except Exception:
+
+            conn.rollback()
+
+            raise
+
+        finally:
+
+            conn.close()
 
     @staticmethod
     def log_changes(
@@ -939,22 +957,58 @@ class WorkOrderService:
                 "cannot be reopened after completion."
             )
 
+        if not (reason or "").strip():
+            raise ValueError(
+                "A reason is required when reopening a Work Order."
+            )
 
-        WorkOrderModel.reopen(
-            record_id,
-        )
+        conn = Database.connect()
 
-        WorkOrderHistoryService.log_reopened(
-            record_id,
-            reason,
-            user_id=(
-                user.get("id")
-                if user
-                else None
-            ),
-            username=(
-                user.get("username")
-                if user
-                else None
-            ),
+        try:
+
+            WorkOrderModel.reopen(
+                record_id,
+                conn=conn
+            )
+
+            WorkOrderHistoryService.log_reopened(
+                record_id,
+                reason,
+                user_id=(
+                    user.get("id")
+                    if user
+                    else None
+                ),
+                username=(
+                    user.get("username")
+                    if user
+                    else None
+                ),
+                conn=conn,
+            )
+
+            conn.commit()
+
+        except Exception:
+
+            conn.rollback()
+            raise
+
+        finally:
+
+            conn.close()
+
+
+
+    @staticmethod
+    def pm_cycle_exists(
+        pm_id,
+        pm_due_date=None,
+        pm_due_meter=None,
+    ):
+
+        return WorkOrderModel.pm_cycle_exists(
+            pm_id,
+            pm_due_date=pm_due_date,
+            pm_due_meter=pm_due_meter,
         )

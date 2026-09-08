@@ -13,70 +13,110 @@
   <property name="windowTitle">
    <string>Reports Page</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
     <widget class="QGroupBox" name="groupReportsOption">
      <property name="title">
       <string>Reports Option</string>
      </property>
-     <layout class="QFormLayout" name="formLayout">
-      <item row="0" column="0">
-       <widget class="QLabel" name="lblReportType">
-        <property name="text">
-         <string>Report Type:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QComboBox" name="cmbReportType">
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
-         <property name="text">
-          <string>Work Orders</string>
-         </property>
+         <widget class="QLabel" name="lblReportType">
+          <property name="text">
+           <string>Report Type:</string>
+          </property>
+         </widget>
         </item>
         <item>
-         <property name="text">
-          <string>Maintenance Costs</string>
-         </property>
+         <widget class="QComboBox" name="cmbReportType">
+          <item>
+           <property name="text">
+            <string>Work Orders</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Maintenance Costs</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Inventory Stock</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Preventive Maintenance</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Technician Performance</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QLabel" name="lblFromDate">
+          <property name="text">
+           <string>From Date:</string>
+          </property>
+         </widget>
         </item>
         <item>
-         <property name="text">
-          <string>Inventory Stock</string>
-         </property>
+         <widget class="QDateEdit" name="dtFromDate">
+          <property name="calendarPopup">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
         <item>
-         <property name="text">
-          <string>Preventive Maintenance</string>
-         </property>
+         <widget class="QLabel" name="lblToDate">
+          <property name="text">
+           <string>To Date:</string>
+          </property>
+         </widget>
         </item>
         <item>
-         <property name="text">
-          <string>Technician Performance</string>
-         </property>
+         <widget class="QDateEdit" name="dtToDate">
+          <property name="calendarPopup">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
-       </widget>
+       </layout>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="lblFromDate">
-        <property name="text">
-         <string>From Date:</string>
-        </property>
-       </widget>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QLabel" name="lblStatus_2">
+          <property name="text">
+           <string>Status:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="cmbStatus"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="lblAsset">
+          <property name="text">
+           <string>Asset:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="cmbAsset"/>
+        </item>
+       </layout>
       </item>
-      <item row="1" column="1">
-       <widget class="QDateEdit" name="dtFromDate"/>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="lblToDate">
-        <property name="text">
-         <string>To Date:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QDateEdit" name="dtToDate"/>
-      </item>
-      <item row="3" column="0" colspan="2">
+      <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
          <widget class="QPushButton" name="btnGenerate">
@@ -105,6 +145,143 @@
     </widget>
    </item>
    <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Report Summary</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QFrame" name="frame">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Shape::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Shadow::Raised</enum>
+        </property>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="0" alignment="Qt::AlignmentFlag::AlignHCenter">
+          <widget class="QLabel" name="lblTotal">
+           <property name="text">
+            <string>Total</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" alignment="Qt::AlignmentFlag::AlignHCenter">
+          <widget class="QLabel" name="lblTotalValue">
+           <property name="text">
+            <string>0</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="frame_2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Shape::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Shadow::Raised</enum>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_2">
+         <item row="0" column="0" alignment="Qt::AlignmentFlag::AlignHCenter">
+          <widget class="QLabel" name="lblOpen">
+           <property name="text">
+            <string>Open</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" alignment="Qt::AlignmentFlag::AlignHCenter">
+          <widget class="QLabel" name="lblOpenValue">
+           <property name="text">
+            <string>0</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="frame_3">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Shape::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Shadow::Raised</enum>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_3">
+         <item row="0" column="0" alignment="Qt::AlignmentFlag::AlignHCenter">
+          <widget class="QLabel" name="lblCompleted">
+           <property name="text">
+            <string>Completed</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" alignment="Qt::AlignmentFlag::AlignHCenter">
+          <widget class="QLabel" name="lblCompletedValue">
+           <property name="text">
+            <string>0</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="frame_4">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Shape::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Shadow::Raised</enum>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_4">
+         <item row="0" column="0" alignment="Qt::AlignmentFlag::AlignHCenter">
+          <widget class="QLabel" name="lblTotalCost">
+           <property name="text">
+            <string>Total Cost</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" alignment="Qt::AlignmentFlag::AlignHCenter">
+          <widget class="QLabel" name="lblTotalCostValue">
+           <property name="text">
+            <string>0.00</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="groupReportsResult">
      <property name="title">
       <string>Reports Result </string>
@@ -117,11 +294,35 @@
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="lblStatus">
-     <property name="text">
-      <string>Showing  0 Records </string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_6">
+     <item>
+      <widget class="QLabel" name="lblStatus">
+       <property name="text">
+        <string>Showing  0 Records </string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnPrint">
+       <property name="text">
+        <string>Print</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

@@ -178,7 +178,7 @@ Status
 
 - PM Due
 - PM Overdue
-- Upcoming PM
+- Scheduled PM
 
 ---
 

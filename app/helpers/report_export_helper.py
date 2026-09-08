@@ -11,7 +11,9 @@ class ReportExportHelper:
         file_path,
         report_title,
         from_date=None,
-        to_date=None
+        to_date=None,
+        filters=None,
+        summary=None,
     ):
 
         currency_symbol = (

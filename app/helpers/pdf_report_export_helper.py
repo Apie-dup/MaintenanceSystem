@@ -24,7 +24,9 @@ class PdfReportExportHelper:
         file_path,
         report_title,
         from_date=None,
-        to_date=None
+        to_date=None,
+        filters=None,
+        summary=None
     ):
         page_size = landscape(A4)
 
@@ -93,6 +95,132 @@ class PdfReportExportHelper:
         row_count = table.rowCount()
 
         data = []
+
+        #-------------------------------------------------
+        # Active filters
+        #--------------------------------------------------
+
+        if filters:
+
+            filter_parts = []
+
+            for label, value in filters.items():
+
+                if value:
+                    filter_parts.append(
+                        f"{label}: {value}"
+                    )
+
+            if filter_parts:
+
+                filter_text = (
+                    " | ".join(filter_parts)
+                )
+
+                elements.append(
+                    Paragraph(
+                        filter_text,
+                        styles["Normal"]
+                    )
+                )
+
+                elements.append(
+                    Spacer(1, 4 * mm)
+                )
+
+        # -------------------------------------------------
+        # Report summary
+        # -------------------------------------------------
+
+        if summary:
+
+            summary_data = []
+
+            headings = []
+            values = []
+
+            for label, value in summary.items():
+
+                headings.append(label)
+                values.append(str(value))
+
+            summary_data.append(headings)
+            summary_data.append(values)
+
+            summary_table = Table(
+                summary_data,
+                colWidths=[
+                    (
+                        page_size[0]
+                        - document.leftMargin
+                        - document.rightMargin
+                    )
+                    / len(headings)
+                ]
+                * len(headings)
+            )
+
+            summary_table.setStyle(
+                TableStyle([
+                    (
+                        "BACKGROUND",
+                        (0, 0),
+                        (-1, 0),
+                        colors.HexColor("333333")
+                    ),
+                    (
+                        "TEXTCOLOR",
+                        (0, 0),
+                        (-1, 0),
+                        colors.white
+                    ),
+                    (
+                        "FONTNAME",
+                        (0, 0),
+                        (-1, 0),
+                        "Helvetica-Bold"
+                    ),
+                    (
+                        "ALIGN",
+                        (0, 0),
+                        (-1, -1),
+                        "CENTER"
+                    ),
+                    (
+                        "GRID",
+                        (0, 0),
+                        (-1, -1),
+                        0.4,
+                        colors.grey
+                    ),
+                    (
+                        "FONTSIZE",
+                        (0, 0),
+                        (-1, -1),
+                        8
+                    ),
+                    (
+                        "TOPPADDING",
+                        (0, 0),
+                        (-1, -1),
+                        5
+                    ),
+                    (
+                        "BOTTOMPADDING",
+                        (0, 0),
+                        (-1, -1),
+                        5
+                    ),
+                ])
+            )
+
+            elements.append(
+                summary_table
+            )
+
+            elements.append(
+                Spacer(1, 6 * mm)
+            )
 
         # -------------------------------------------------
         # Column headings

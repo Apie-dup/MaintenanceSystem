@@ -16,6 +16,7 @@ from app.services.work_order_parts_service import WorkOrderPartService
 from app.helpers.table_helper import TableHelper
 from app.dialogs.issue_part_dialog import IssuePartDialog
 from app.helpers.format_helper import FormatHelper
+from app.helpers.theme_helper import ThemeHelper
 from app.services.work_order_history_service import WorkOrderHistoryService
 from app.services.settings_service import SettingsService
 from app.core.permissions import Permissions
@@ -1081,8 +1082,24 @@ class WorkOrderDialog(BaseDialog):
         )
 
         self.format_history_values()
+        self.apply_history_highlighting()
 
         self.ui.tblHistory.clearSelection()
+        self.ui.tblHistory.setCurrentItem(None)
+
+        count = len(records)
+        history_count_label = getattr(
+            self.ui,
+            "lblHistoryCount",
+            None,
+        )
+
+        if history_count_label is not None:
+            history_count_label.setText(
+                f"{count} work_order"
+                if count == 1
+                else f"{count} work_orders"
+            )
 
     def format_history_values(self):
 
@@ -1194,7 +1211,53 @@ class WorkOrderDialog(BaseDialog):
                         )
                     except ValueError:
                         pass
-                
+
+    def apply_history_highlighting(self):
+
+        status_column = next(
+            (
+                index
+                for index, (field, _heading)
+                in enumerate(self.HISTORY_COLUMNS)
+                if field == "status"
+            ),
+            None
+        )
+
+        if status_column is None:
+            return
+
+        tooltips = {
+            "Completed": "Work order completed.",
+            "Closed": "Work order closed.",
+            "In Progress": "Work order is in progress.",
+            "On Hold": "Work order is currently on hold.",
+            "Cancelled": "This work order was cancelled.",
+        }
+
+        for row in range(
+            self.ui.tblHistory.rowCount()
+        ):
+            item = self.ui.tblHistory.item(
+                row,
+                status_column
+            )
+
+            if item is None:
+                continue
+
+            status = item.text().strip()
+            color = ThemeHelper.status_color(
+                self,
+                status
+            )
+
+            if color is not None:
+                item.setBackground(color)
+
+            tooltip = tooltips.get(status)
+            if tooltip:
+                item.setToolTip(tooltip)
 
     # ---------------------------------------------------------
     # Validation

@@ -52,7 +52,8 @@ class DatabaseSeeder:
             "Semi-Annual",
             "Annual",
             "Running Hours",
-            "Cycle"
+            "Kilometers",
+            "Cycles"
 
         ]
 

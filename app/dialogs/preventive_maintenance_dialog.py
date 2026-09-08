@@ -21,6 +21,7 @@ from app.core.permissions import Permissions
 from app.services.asset_meter_reading_service import (
     AssetMeterReadingService
 )
+from app.helpers.theme_helper import ThemeHelper
 
 
 class PreventiveMaintenanceDialog(BaseDialog):
@@ -30,11 +31,12 @@ class PreventiveMaintenanceDialog(BaseDialog):
     HISTORY_COLUMNS = [
         ("work_order_number", "Work Order"),
         ("date_created", "Created"),
-        ("due_date", "Due Date"),
+        ("completed_date", "Completed"),
         ("status", "Status"),
         ("technician_display", "Technician"),
         ("labour_hours", "Hours"),
         ("actual_cost", "Actual Cost"),
+        ("meter_reading", "Meter"),
     ]
 
     def __init__(self, parent=None):
@@ -254,14 +256,9 @@ class PreventiveMaintenanceDialog(BaseDialog):
             self.ui.cmbFrequencyType.currentText().strip()
         )
 
-        meter_types = {
-            "Running Hours",
-            "Kilometers",
-            "Cycles",
-        }
-
         is_meter_based = (
-            frequency_type in meter_types
+            frequency_type 
+            in PreventiveMaintenanceService.METER_FREQUENCY_TYPES
         )
 
         return {
@@ -523,6 +520,20 @@ class PreventiveMaintenanceDialog(BaseDialog):
         self.apply_history_highlighting()
         self.ui.tblHistory.clearSelection()
 
+        count = len(records)
+        history_count_label = getattr(
+            self.ui,
+            "lblHistoryCount",
+            None,
+        )
+        
+        if history_count_label is not None:
+            history_count_label.setText(
+            f"{count} work_order"
+            if count == 1
+             else f"{count} Work Orders"
+        )
+
     def format_history_values(self):
         cost_column = next(
             (
@@ -540,6 +551,16 @@ class PreventiveMaintenanceDialog(BaseDialog):
                 for index, (field, _heading)
                 in enumerate(self.HISTORY_COLUMNS)
                 if field == "labour_hours"
+            ),
+            None
+        )
+
+        meter_column = next(
+            (
+                index
+                for index, (field, _heading)
+                in enumerate(self.HISTORY_COLUMNS)
+                if field == "meter_reading"
             ),
             None
         )
@@ -575,22 +596,34 @@ class PreventiveMaintenanceDialog(BaseDialog):
                         )
                     except ValueError:
                         pass
+            if meter_column is not None:
+                item = self.ui.tblHistory.item(
+                    row,
+                    meter_column
+                )
+
+                if item is not None and item.text().strip():
+                    try:
+                        item.setText(
+                            f"{float(item.text()):,.2f}"
+                        )
+                    except ValueError:
+                        pass
 
     # ---------------------------------------------------------
     # Next due calculation
     # ---------------------------------------------------------
 
     def calculate_next_due(self, *_args):
-
         frequency_type = (
             self.ui.cmbFrequencyType.currentText().strip()
         )
 
+        # Meter-based PM does not use Next Due date.
         if (
             frequency_type
-            not in PreventiveMaintenanceService.METER_FREQUENCY_TYPES
+            in PreventiveMaintenanceService.METER_FREQUENCY_TYPES
         ):
-
             return
 
         frequency_value = (
@@ -613,6 +646,7 @@ class PreventiveMaintenanceDialog(BaseDialog):
                 frequency_type,
                 frequency_value
             )
+
         except ValueError:
             return
 
@@ -839,6 +873,7 @@ class PreventiveMaintenanceDialog(BaseDialog):
             self.load_history()
 
     def apply_history_highlighting(self):
+
         status_column = next(
             (
                 index
@@ -852,44 +887,44 @@ class PreventiveMaintenanceDialog(BaseDialog):
         if status_column is None:
             return
 
-        for row in range(self.ui.tblHistory.rowCount()):
-            status_item = self.ui.tblHistory.item(
+        tooltips = {
+            "Completed": "Maintenance work completed.",
+            "Closed": "Maintenance work completed.",
+            "In Progress": "Maintenance work is in progress.",
+            "On Hold": "Maintenance work is currently on hold.",
+            "Cancelled": "This work order was cancelled.",
+        }
+
+        for row in range(
+            self.ui.tblHistory.rowCount()
+        ):
+
+            item = self.ui.tblHistory.item(
                 row,
                 status_column
             )
 
-            if status_item is None:
+            if item is None:
                 continue
 
-            status = status_item.text().strip()
+            status = item.text().strip()
 
-            if status in {"Completed", "Closed"}:
-                background = QColor(220, 245, 225)
-                tooltip = "Maintenance work completed."
+            color = ThemeHelper.status_color(
+                self,
+                status
+            )
 
-            elif status == "In Progress":
-                background = QColor(220, 235, 255)
-                tooltip = "Maintenance work is in progress."
+            if color is not None:
+                item.setBackground(color)
 
-            elif status == "On Hold":
-                background = QColor(255, 240, 205)
-                tooltip = "Maintenance work is currently on hold."
+            tooltip = tooltips.get(
+                status
+            )
 
-            elif status == "Cancelled":
-                background = QColor(235, 235, 235)
-                tooltip = "This work order was cancelled."
-
-            else:
-                continue
-
-            for column in range(
-                self.ui.tblHistory.columnCount()
-            ):
-                item = self.ui.tblHistory.item(row, column)
-
-                if item is not None:
-                    item.setBackground(background)
-                    item.setToolTip(tooltip)
+            if tooltip:
+                item.setToolTip(
+                    tooltip
+                )
 
     def update_frequency_mode(self):
 
@@ -897,14 +932,9 @@ class PreventiveMaintenanceDialog(BaseDialog):
             self.ui.cmbFrequencyType.currentText().strip()
         )
 
-        meter_types = {
-            "Running Hours",
-            "Kilometers",
-            "Cycles",
-        }
-
         is_meter_based = (
-            frequency_type in meter_types
+            frequency_type 
+            in PreventiveMaintenanceService.METER_FREQUENCY_TYPES
         )
 
         # -------------------------------------------------
@@ -924,7 +954,7 @@ class PreventiveMaintenanceDialog(BaseDialog):
         # -------------------------------------------------
 
         self.ui.cmbMeterType.setEnabled(
-            is_meter_based
+            False
         )
 
         self.ui.dsbLastServiceMeter.setEnabled(
@@ -979,13 +1009,10 @@ class PreventiveMaintenanceDialog(BaseDialog):
             self.ui.cmbFrequencyType.currentText().strip()
         )
 
-        meter_types = {
-            "Running Hours",
-            "Kilometers",
-            "Cycles",
-        }
-
-        if frequency_type not in meter_types:
+        if (
+            frequency_type 
+            not in PreventiveMaintenanceService.METER_FREQUENCY_TYPES
+        ):
             return
 
         frequency_value = (
@@ -1021,13 +1048,10 @@ class PreventiveMaintenanceDialog(BaseDialog):
             .strip()
         )
 
-        meter_types = {
-            "Running Hours",
-            "Kilometers",
-            "Cycles",
-        }
-
-        if frequency_type not in meter_types:
+        if (
+            frequency_type 
+            not in PreventiveMaintenanceService.METER_FREQUENCY_TYPES
+        ):
             return
 
         asset_id = self.ui.cmbAsset.currentData()

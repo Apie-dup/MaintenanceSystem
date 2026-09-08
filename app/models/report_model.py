@@ -6,7 +6,9 @@ class ReportModel:
     @staticmethod
     def get_work_orders(
         from_date=None,
-        to_date=None
+        to_date=None,
+        status=None,
+        asset_number=None,
     ):
         conn = Database.connect()
         cursor = conn.cursor()
@@ -64,6 +66,18 @@ class ReportModel:
             """
             parameters.append(to_date)
 
+        if status:
+            query += """
+                AND work_orders.status = ?
+            """
+            parameters.append(status)
+
+        if asset_number:
+            query += """
+                AND assets.asset_number = ?
+            """
+            parameters.append(asset_number)
+
         query += """
             ORDER BY
                 work_orders.date_created DESC,
@@ -83,7 +97,9 @@ class ReportModel:
     @staticmethod
     def get_maintenance_costs(
         from_date=None,
-        to_date=None
+        to_date=None,
+        status=None,
+        asset_number=None,
     ):
         conn = Database.connect()
         cursor = conn.cursor()
@@ -164,6 +180,18 @@ class ReportModel:
                 AND work_orders.date_created <= ?
             """
             parameters.append(to_date)
+
+        if status:
+            query += """
+                AND work_orders.status = ?
+            """
+            parameters.append(status)
+
+        if asset_number:
+            query += """
+                AND assets.asset_number = ?
+            """
+            parameters.append(asset_number)
 
         query += """
             GROUP BY
@@ -292,7 +320,7 @@ class ReportModel:
                          <= DATE('now', '+7 days')
                         THEN 'Due Soon'
 
-                    ELSE 'Upcoming'
+                    ELSE 'Scheduled'
                 END AS due_status
 
             FROM preventive_maintenance
@@ -347,6 +375,24 @@ class ReportModel:
                         ELSE 0
                     END
                 ) AS completed_count,
+
+                CASE
+                    WHEN COUNT(work_orders.id) = 0
+                        THEN 0
+                    ELSE
+                        (
+                            SUM(
+                                CASE
+                                    WHEN work_orders.status
+                                        IN ('Completed', 'Closed')
+                                    THEN 1
+                                    ELSE 0
+                                END
+                            )
+                            * 100.0
+                            / COUNT(work_orders.id)
+                        )
+                END AS completion_rate,
 
                 COALESCE(
                     SUM(work_orders.labour_hours),

@@ -61,6 +61,7 @@ class Permissions:
 
             # Reports
             "reports.export",
+            "reports.print",
 
             # Administration
             "lookups.manage",
@@ -120,6 +121,7 @@ class Permissions:
 
             # Reports
             "reports.export",
+            "reports.print",
         },
 
         # =================================================
