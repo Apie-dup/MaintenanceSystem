@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1359</width>
+    <width>1323</width>
     <height>520</height>
    </rect>
   </property>
@@ -151,6 +151,27 @@
        </property>
        <property name="text">
         <string>Edit</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnReceiveStock">
+       <property name="text">
+        <string>Receive Stock</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnAdjustStock">
+       <property name="text">
+        <string>Adjust Stock</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnTransactions">
+       <property name="text">
+        <string>Transactions</string>
        </property>
       </widget>
      </item>

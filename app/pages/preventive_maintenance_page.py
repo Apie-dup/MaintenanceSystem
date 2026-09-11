@@ -58,6 +58,8 @@ class PreventiveMaintenancePage(CrudPage):
         self.search_widget = self.ui.txtSearch
         self.status_label = self.ui.lblStatus
 
+        self.view_filter = None
+
         self.user = getattr(
             parent,
             "user",
@@ -127,12 +129,41 @@ class PreventiveMaintenancePage(CrudPage):
     # ---------------------------------------------------------
 
     def load_data(self):
-        super().load_data()
-        self.apply_due_status_colors()
-
-    def show_due_filter(self, due_filter):
 
         records = self.service.get_all()
+
+        records = self.apply_view_filter(
+            records
+        )
+
+        self.populate_table(
+            records
+        )
+
+        self.apply_due_status_colors()
+
+    def show_due_filter(
+        self,
+        due_filter
+    ):
+
+        self.set_view_filter(
+            due_filter
+        )
+
+        self.load_data()
+
+    def set_view_filter(
+        self,
+        view_filter=None
+    ):
+
+        self.view_filter = view_filter
+
+    def apply_view_filter(
+        self,
+        records
+    ):
 
         status_map = {
             "today": "Due Today",
@@ -141,36 +172,52 @@ class PreventiveMaintenancePage(CrudPage):
         }
 
         required_status = status_map.get(
-            due_filter
+            self.view_filter
         )
 
         if required_status is None:
-            self.load_data()
-            return
+            return records
 
-        filtered_records = [
+        return [
             record
             for record in records
-            if (
+            if(
                 record["due_status"] or ""
             ).strip() == required_status
         ]
 
-        self.populate_table(
-            filtered_records
-        )
-
-        self.apply_due_status_colors()
-
 
     def show_all(self):
+
+        self.set_view_filter(
+            None
+        )
+        
         if self.search_widget is not None:
             self.search_widget.clear()
 
         self.load_data()
 
     def search(self, text):
-        super().search(text)
+
+        text = text.strip()
+
+        if text:
+            records = self.service.search(
+                text
+            )
+
+        else:
+            records = self.service.get_all()
+
+        records = self.apply_view_filter(
+            records
+        )
+
+        self.populate_table(
+            records
+        )
+
         self.apply_due_status_colors()
 
     # ---------------------------------------------------------

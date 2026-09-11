@@ -1,6 +1,4 @@
 from pathlib import Path
-from tkinter import dialog
-
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -543,9 +541,27 @@ class MainController(QMainWindow):
             self.ui.pageAssets
         )
 
-    def show_work_orders(self):
-        self.set_active_navigation(self.ui.btnWorkOrders)
+    def show_work_orders(
+            self,
+            view_filter=None,
+            selected_id=None
+        ):
+
+        self.set_active_navigation(
+            self.ui.btnWorkOrders
+        )
+
+        self.work_orders_page.set_view_filter(
+            view_filter
+        )
+
         self.work_orders_page.load_data()
+
+        if selected_id is not None:
+            self.work_orders_page.select_record(
+                selected_id
+            )
+
         self.navigation.show(
             self.ui.pageWorkOrders
         )
@@ -772,10 +788,21 @@ class MainController(QMainWindow):
 
         self.close()
 
-    def open_work_order_by_id(self, work_order_id):
+    def open_work_order_by_id(
+            self, 
+            work_order_id
+        ):
 
         self.set_active_navigation(
             self.ui.btnWorkOrders
+        )
+
+        # ----------------------------------------------------------
+        # Clear dashboard drill-down filters
+        #-----------------------------------------------------------
+
+        self.work_orders_page.set_view_filter(
+            None
         )
 
         self.work_orders_page.load_data()
@@ -784,6 +811,10 @@ class MainController(QMainWindow):
             self.ui.pageWorkOrders
         )
 
+        # ---------------------------------------------------------
+        # Open selected Work Order
+        # ---------------------------------------------------------
+
         dialog = WorkOrderDialog(self)
 
         dialog.edit_record(
@@ -791,7 +822,9 @@ class MainController(QMainWindow):
         )
 
         if dialog.exec():
+
             self.work_orders_page.load_data()
+
             self.dashboard_page.refresh_dashboard()
 
     def open_pm_by_id(self, pm_id):

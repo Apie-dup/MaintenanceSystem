@@ -147,49 +147,42 @@ class PreventiveMaintenanceModel:
                 preventive_maintenance.id,
                 preventive_maintenance.pm_number,
                 preventive_maintenance.asset_id,
+                
                 assets.asset_number,
                 assets.asset_name,
+                
                 preventive_maintenance.task,
                 preventive_maintenance.description,
+                
                 preventive_maintenance.frequency_type,
                 preventive_maintenance.frequency_value,
+                
                 preventive_maintenance.last_service_date,
                 preventive_maintenance.next_due_date,
 
-                CASE
-                    WHEN preventive_maintenance.active = 0
-                        THEN 'Inactive'
-                
-                    WHEN preventive_maintenance.next_due_date < DATE('now')
-                        THEN 'Overdue'
-                
-                    WHEN preventive_maintenance.next_due_date = DATE('now')
-                        THEN 'Due Today'
-                
-                    WHEN preventive_maintenance.next_due_date <= DATE(
-                        'now',
-                        '+7 days'
-                    )
-                    THEN 'Due Soon'
-                
-                    ELSE 'Scheduled'
-                    END AS due_status,
-                
+                preventive_maintenance.meter_type,
+                preventive_maintenance.last_service_meter,
+                preventive_maintenance.next_due_meter,
+
                 preventive_maintenance.estimated_hours,
                 preventive_maintenance.estimated_cost,
                 preventive_maintenance.priority,
 
                 CASE
-                    WHEN preventive_maintenance.active = 1 THEN 'Yes'
+                    WHEN preventive_maintenance.active = 1 
+                        THEN 'Yes'
                     ELSE 'No'
                 END AS active_display,
                 
                 preventive_maintenance.active,
                 preventive_maintenance.notes,
                 preventive_maintenance.created_at
+            
             FROM preventive_maintenance
+            
             LEFT JOIN assets
                 ON preventive_maintenance.asset_id = assets.id
+            
             WHERE
                 preventive_maintenance.pm_number LIKE ?
                 OR assets.asset_number LIKE ?
@@ -198,6 +191,7 @@ class PreventiveMaintenanceModel:
                 OR preventive_maintenance.description LIKE ?
                 OR preventive_maintenance.frequency_type LIKE ?
                 OR preventive_maintenance.priority LIKE ?
+            
             ORDER BY
                 preventive_maintenance.next_due_date,
                 preventive_maintenance.pm_number

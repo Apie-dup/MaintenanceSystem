@@ -338,6 +338,11 @@ class Ui_AddWorkOrderDialog(object):
 
         self.horizontalLayout.addWidget(self.btnReopen)
 
+        self.btnCancelWorkOrder = QPushButton(AddWorkOrderDialog)
+        self.btnCancelWorkOrder.setObjectName(u"btnCancelWorkOrder")
+
+        self.horizontalLayout.addWidget(self.btnCancelWorkOrder)
+
         self.horizontalSpacer = QSpacerItem(0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer)
@@ -394,5 +399,6 @@ class Ui_AddWorkOrderDialog(object):
         self.btnComplete.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Complete Work Order", None))
         self.btnCloseWorkOrder.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Close Work Order", None))
         self.btnReopen.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Reopen Work Order", None))
+        self.btnCancelWorkOrder.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Cancel Work Order", None))
     # retranslateUi
 

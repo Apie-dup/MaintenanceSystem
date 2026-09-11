@@ -1,3 +1,5 @@
+from PySide6.QtWidgets import QHeaderView
+from PySide6.QtCore import Qt
 from datetime import datetime
 
 from app.base.base_page import BasePage
@@ -7,7 +9,7 @@ from app.services.dashboard_service import DashboardService
 from app.ui.generated.ui_dashboard_page import Ui_DashboardPage
 from app.services.settings_service import SettingsService
 from app.helpers.theme_helper import ThemeHelper
-from PySide6.QtWidgets import QHeaderView
+
 
 
 class DashboardPage(BasePage):
@@ -18,6 +20,7 @@ class DashboardPage(BasePage):
         ("priority", "Priority"),
         ("status", "Status"),
         ("due_date", "Due Date"),
+        ("due_status", "Due Status"),
     ]
 
     PM_DUE_COLUMNS = [
@@ -72,7 +75,7 @@ class DashboardPage(BasePage):
         )
 
         self.ui.tblUrgentWorkOrders.itemDoubleClicked.connect(
-            self.open_urgent_work_order
+            self.open_selected_urgent_work_order
         )
 
         self.ui.tblPMDue.itemDoubleClicked.connect(
@@ -81,6 +84,10 @@ class DashboardPage(BasePage):
 
         self.ui.btnViewOpenWorkOrders.clicked.connect(
             self.open_work_orders
+        )
+
+        self.ui.btnViewOverdueWorkOrders.clicked.connect(
+            self.open_overdue_work_orders
         )
 
         self.ui.btnPMDueToday.clicked.connect(
@@ -103,12 +110,12 @@ class DashboardPage(BasePage):
             self.open_assets
         )
 
-        self.ui.btnViewInventory.clicked.connect(
-            self.open_inventory
-        )
-
         self.ui.btnViewTechnicians.clicked.connect(
             self.open_technicians
+        )
+
+        self.ui.btnDueTodayWorkOrders.clicked.connect(
+            self.open_due_today_work_orders
         )
 
     def open_vehicle_defects(self):
@@ -120,23 +127,30 @@ class DashboardPage(BasePage):
             unresolved_defects=True
         )
 
-    def open_urgent_work_order(self):
+    def open_selected_urgent_work_order(
+            self,
+            _item=None
+        ):
 
-        record_id = TableHelper.selected_id(
-            self.ui.tblUrgentWorkOrders
-        )
+            record_id = TableHelper.selected_id(
+                self.ui.tblUrgentWorkOrders
+            )
 
-        if record_id is None:
-            return
+            if record_id is None:
+                return
 
-        if self.main_controller is None:
-            return
+            if self.main_controller is None:
+                return
 
-        self.main_controller.open_work_order_by_id(
-            record_id
-        )
+            self.main_controller.open_work_order_by_id(
+                record_id
+            )
 
-    def open_pm_record(self):
+
+    def open_pm_record(
+            self,
+            _item=None
+        ):
 
         record_id = TableHelper.selected_id(
             self.ui.tblPMDue
@@ -157,7 +171,18 @@ class DashboardPage(BasePage):
         if self.main_controller is None:
             return
 
-        self.main_controller.show_work_orders()
+        self.main_controller.show_work_orders(
+            view_filter="open"
+        )
+
+    def open_overdue_work_orders(self):
+
+        if self.main_controller is None:
+            return
+
+        self.main_controller.show_work_orders(
+            view_filter="overdue"
+        )
 
     def open_pm_due_today(self):
 
@@ -201,6 +226,15 @@ class DashboardPage(BasePage):
             return
 
         self.main_controller.show_assets()
+
+    def open_due_today_work_orders(self):
+
+        if self.main_controller is None:
+            return
+
+        self.main_controller.show_work_orders(
+            view_filter="due_today"
+        )
 
 
     def open_technicians(self):
@@ -250,6 +284,12 @@ class DashboardPage(BasePage):
             )
         )
 
+        self.ui.lblOverdueWorkOrdersValue.setText(
+            FormatHelper.integer(
+                summary["overdue_work_orders"]
+            )
+        )
+
         pm_due_today_text = FormatHelper.integer(
             summary["pm_due_today"]
         )
@@ -288,18 +328,21 @@ class DashboardPage(BasePage):
             )
         )
 
-        inventory_value_text = FormatHelper.currency(
-            summary["inventory_value"]
+        due_today_work_orders_text = (
+            FormatHelper.integer(
+                summary["due_today_work_orders"]
+            )
         )
 
-        if hasattr(self.ui, "lblInventoryValue"):
-            self.ui.lblInventoryValue.setText(
-                inventory_value_text
+        if hasattr(
+            self.ui,
+            "lblDueTodayWorkOrdersValue"
+        ):
+
+            self.ui.lblDueTodayWorkOrdersValue.setText(
+                due_today_work_orders_text
             )
-        else:
-            self.ui.lblInventoryValueValue.setText(
-                inventory_value_text
-            )
+
 
         self.ui.lblLowStockValue.setText(
             FormatHelper.integer(
@@ -328,8 +371,10 @@ class DashboardPage(BasePage):
         self.load_pm_due()
 
     def load_urgent_work_orders(self):
+
         records = (
-            DashboardService.get_urgent_work_orders()
+            DashboardService
+            .get_urgent_work_orders()
         )
 
         TableHelper.populate(
@@ -337,6 +382,24 @@ class DashboardPage(BasePage):
             records,
             self.URGENT_WORK_ORDER_COLUMNS
         )
+
+        due_status_column = next(
+            (
+                index
+                for index, column in enumerate(
+                    self.URGENT_WORK_ORDER_COLUMNS
+                )
+                if column[0] == "due_status"
+            ),
+            None
+        )
+
+        if due_status_column is not None:
+
+            TableHelper.highlight_due_status(
+                self.ui.tblUrgentWorkOrders,
+                due_status_column
+            )
 
     def load_pm_due(self):
 
@@ -468,3 +531,32 @@ class DashboardPage(BasePage):
             self.ui.dashboardSubtitle.setText(
                 SettingsService.organization_name()
             )
+
+    def open_pm_due_today(self):
+
+        if self.main_controller is None:
+            return
+
+        self.main_controller.show_pm(
+            due_filter="today"
+        )
+
+    def open_pm_overdue(self):
+
+        if self.main_controller is None:
+            return
+
+        self.main_controller.show_pm(
+            due_filter="overdue"
+        )
+
+    def open_pm_next_7_days(self):
+
+        if self.main_controller is None:
+            return
+
+        self.main_controller.show_pm(
+            due_filter="next7"
+        )
+
+    

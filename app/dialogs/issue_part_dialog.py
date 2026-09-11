@@ -128,10 +128,28 @@ class IssuePartDialog(BaseDialog):
             max(0.01, available)
         )
 
-        if available > 0:
+        if available <= 0:
+
+            self.ui.spnQuantity.setValue(0.00)
+            self.ui.spnQuantity.setMaximum(0.00)
+            self.ui.spnQuantity.setValue(0.00)
+            self.ui.spnQuantity.setEnabled(False)
+
+        else:
+
+            self.ui.spnQuantity.setEnabled(True)
+
+            self.ui.spnQuantity.setMinimum(0.01)
+            self.ui.spnQuantity.setMaximum(
+                available
+            )
+
             self.ui.spnQuantity.setValue(
                 min(
-                    max(self.ui.spnQuantity.value(), 0.01),
+                    max(
+                        self.ui.spnQuantity.value(),
+                        0.01
+                    ),
                     available
                 )
             )
@@ -231,6 +249,14 @@ class IssuePartDialog(BaseDialog):
             return False
 
         available = float(part["quantity"] or 0)
+
+        if available <= 0:
+
+            self.warning(
+                "Validation",
+                "This inventory item is out of stock."
+            )
+            return False
 
         if data["quantity"] > available:
             self.warning(

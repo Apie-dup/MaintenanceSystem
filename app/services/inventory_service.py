@@ -1,5 +1,9 @@
 from app.models.inventory_model import InventoryModel
 from app.services.supplier_service import SupplierService
+from app.database.connection import Database
+from app.services.inventory_transaction_service import (
+    InventoryTransactionService
+)
 
 
 class InventoryService:
@@ -88,7 +92,10 @@ class InventoryService:
     # ---------------------------------------------------------
 
     @staticmethod
-    def create(data):
+    def create(
+        data,
+        user=None
+    ):
 
         InventoryService.validate(data)
 
@@ -99,19 +106,90 @@ class InventoryService:
                 "Part Number already exists."
             )
 
-        return InventoryModel.insert(data)
+        conn = Database.connect()
+
+        try:
+
+            opening_quantity = float(
+                data["quantity"] or 0
+            )
+
+            inventory_id = (
+                InventoryModel.insert(
+                    data,
+                    connection=conn
+                )
+            )
+
+            if opening_quantity > 0:
+
+                InventoryTransactionService.record(
+                    inventory_id=inventory_id,
+                    transaction_type=(
+                        InventoryTransactionService
+                        .OPENING_STOCK
+                    ),
+                    quantity_change=opening_quantity,
+                    previous_quantity=0,
+                    new_quantity=opening_quantity,
+                    unit_cost=float(
+                        data["unit_cost"] or 0
+                    ),
+                    reference="Opening Stock",
+                    notes=(
+                        "Opening stock recorded "
+                        "when inventory item was created."
+                    ),
+                    user=user,
+                    connection=conn,
+                )
+
+            conn.commit()
+
+            return inventory_id
+
+        except Exception:
+
+            conn.rollback()
+            raise
+
+        finally:
+
+            conn.close()
 
     # ---------------------------------------------------------
     # Update
     # ---------------------------------------------------------
 
     @staticmethod
-    def update(record_id, data):
+    def update(
+        record_id,
+        data
+    ):
 
-        InventoryService.validate(data)
+        existing = InventoryModel.get_by_id(
+            record_id
+        )
+
+        if existing is None:
+            raise ValueError(
+                "Inventory item not found."
+            )
+
+        save_data = dict(data)
+
+        # Stock quantity is controlled only through
+        # inventory transaction workflows.
+        save_data["quantity"] = float(
+            existing["quantity"] or 0
+        )
+
+        InventoryService.validate(
+            save_data
+        )
 
         if InventoryModel.part_number_exists(
-            data["part_number"],
+            save_data["part_number"],
             exclude_id=record_id,
         ):
             raise ValueError(
@@ -120,7 +198,7 @@ class InventoryService:
 
         InventoryModel.update(
             record_id,
-            data
+            save_data
         )
 
     # ---------------------------------------------------------

@@ -18,15 +18,12 @@ class PreventiveMaintenanceService:
         "Cycles",
     }
 
-
     # ---------------------------------------------------------
-    # Get All
+    # Prepare Records
     # ---------------------------------------------------------
 
     @staticmethod
-    def get_all():
-
-        rows = PreventiveMaintenanceModel.get_all()
+    def prepare_records(rows):
 
         result = []
 
@@ -38,9 +35,9 @@ class PreventiveMaintenanceService:
                 pm["frequency_type"] or ""
             ).strip()
 
-            #-------------------------------------------------------
-            # Current meter for display
-            #-------------------------------------------------------
+            # ------------------------------------------------
+            # Current meter display
+            # ------------------------------------------------
 
             if (
                 frequency_type
@@ -66,9 +63,9 @@ class PreventiveMaintenanceService:
             else:
                 pm["current_meter"] = None
 
-            #-------------------------------------------------------
+            # -------------------------------------------------
             # Unified PM status
-            #-------------------------------------------------------
+            # -------------------------------------------------
 
             pm["due_status"] = (
                 PreventiveMaintenanceService
@@ -78,6 +75,21 @@ class PreventiveMaintenanceService:
             result.append(pm)
 
         return result
+
+
+    # ---------------------------------------------------------
+    # Get All
+    # ---------------------------------------------------------
+
+    @staticmethod
+    def get_all():
+
+        rows = PreventiveMaintenanceModel.get_all()
+
+        return (
+            PreventiveMaintenanceService
+            .prepare_records(rows)
+        )
 
     # ---------------------------------------------------------
     # Get By ID
@@ -93,7 +105,14 @@ class PreventiveMaintenanceService:
 
     @staticmethod
     def search(search_text):
-        return PreventiveMaintenanceModel.search(search_text)
+        rows = PreventiveMaintenanceModel.search(
+            search_text
+        )
+
+        return (
+            PreventiveMaintenanceService
+            .prepare_records(rows)
+        )
 
     # ---------------------------------------------------------
     # Next PM Number
@@ -275,7 +294,7 @@ class PreventiveMaintenanceService:
 
             # Always calculate this here rather than trusting
             # a value supplied by the dialog.
-            data["next_die_meter"] = (
+            data["next_due_meter"] = (
                 last_meter
                 + frequency_value
             )

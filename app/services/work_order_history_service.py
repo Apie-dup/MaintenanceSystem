@@ -102,6 +102,27 @@ class WorkOrderHistoryService:
         )
 
     @staticmethod
+    def log_cancelled(
+        work_order_id,
+        old_status,
+        reason,
+        user_id=None,
+        username=None,
+        conn=None,
+    ):
+        return WorkOrderHistoryService.add(
+            work_order_id,
+            action="Cancelled",
+            field_name="Status",
+            old_value=old_status,
+            new_value="Cancelled",
+            notes=reason,
+            user_id=user_id,
+            username=username,
+            conn=conn,
+        )
+
+    @staticmethod
     def log_reopened(
         work_order_id,
         reason,

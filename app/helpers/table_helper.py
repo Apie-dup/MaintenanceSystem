@@ -1,4 +1,5 @@
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QColor
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QHeaderView,
@@ -154,3 +155,82 @@ class TableHelper:
     def clear(table):
         table.setRowCount(0)
         table.clearSelection()
+
+    @staticmethod
+    def highlight_due_status(
+        table,
+        due_status_column
+    ):
+
+        for row in range(
+            table.rowCount()
+        ):
+
+            status_item = table.item(
+                row,
+                due_status_column
+            )
+
+            if status_item is None:
+                continue
+
+            due_status = (
+                status_item.text()
+                .strip()
+            )
+
+            background = None
+            foreground = None
+
+            if due_status == "Overdue":
+
+                background = QColor(
+                    "#7f1d1d"
+                )
+
+                foreground = QColor(
+                    "#ffffff"
+                )
+
+            elif due_status == "Due Today":
+
+                background = QColor(
+                    "#9a3412"
+                )
+
+                foreground = QColor(
+                    "#ffffff"
+                )
+
+            elif due_status == "Due Soon":
+
+                background = QColor(
+                    "#665c17"
+                )
+
+                foreground = QColor(
+                    "#ffffff"
+                )
+
+            if background is None:
+                continue
+
+            for column in range(
+                table.columnCount()
+            ):
+
+                item = table.item(
+                    row,
+                    column
+                )
+
+                if item is None:
+                    continue
+
+                item.setBackground(
+                    background
+                )
+
+                item.setForeground(
+                    foreground
+                )

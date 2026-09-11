@@ -15,6 +15,12 @@ class InventoryDialog(BaseDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        self.user = getattr(
+            parent,
+            "user",
+            {}
+        )
+
         self.ui = Ui_AddInventoryItemDialog()
         self.ui.setupUi(self)
 
@@ -140,6 +146,8 @@ class InventoryDialog(BaseDialog):
         self.ui.cmbStatus.setCurrentText("Active")
 
         self.ui.spnQuantity.setValue(0)
+        self.ui.spnQuantity.setReadOnly(False)
+
         self.ui.spnMinimumQuantity.setValue(0)
         self.ui.spnReorderQuantity.setValue(0)
         self.ui.dsbUnitCost.setValue(0.00)
@@ -275,6 +283,10 @@ class InventoryDialog(BaseDialog):
             return
 
         self.set_form_data(inventory)
+
+        # Existing stock quantity must not be edited directly.
+        # Use Receive Stock or Adjust Stock instead.
+        self.ui.spnQuantity.setReadOnly(True)
 
     def set_inventory_read_only(
         self,
@@ -420,7 +432,9 @@ class InventoryDialog(BaseDialog):
         data = self.get_form_data()
 
         if self.is_add:
-            InventoryService.create(data)
+            InventoryService.create(
+                data,
+                user=self.user)
         else:
             InventoryService.update(
                 self.record_id,

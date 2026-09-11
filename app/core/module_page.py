@@ -32,7 +32,7 @@ class ModulePage(BasePage):
             self.record_name
         )
 
-    def selected_record(self):
+    def select_record(self):
 
         return self.selected_id(self.table)
 

@@ -1,0 +1,188 @@
+from app.base.base_dialog import BaseDialog
+from app.services.inventory_service import (
+    InventoryService
+)
+from app.services.inventory_transaction_service import (
+    InventoryTransactionService
+)
+from app.ui.generated.ui_adjust_stock_dialog import (
+    Ui_AdjustStockDialog
+)
+
+
+class AdjustStockDialog(BaseDialog):
+
+    def __init__(
+        self,
+        inventory_id,
+        user=None,
+        parent=None
+    ):
+        super().__init__(parent)
+
+        self.inventory_id = inventory_id
+        self.user = user or {}
+
+        self.ui = Ui_AdjustStockDialog()
+        self.ui.setupUi(self)
+
+        self.inventory = None
+
+        self.setup_dialog()
+
+    # ---------------------------------------------------------
+    # Setup
+    # ---------------------------------------------------------
+
+    def setup_dialog(self):
+
+        self.setWindowTitle(
+            "Stock Adjustment"
+        )
+
+        self.inventory = (
+            InventoryService.get_by_id(
+                self.inventory_id
+            )
+        )
+
+        if self.inventory is None:
+            raise ValueError(
+                "Inventory item not found."
+            )
+
+        self.load_inventory()
+
+        self.ui.cmbAdjustmentType.currentTextChanged.connect(
+            self.update_new_quantity
+        )
+
+        self.ui.dsbQuantity.valueChanged.connect(
+            self.update_new_quantity
+        )
+
+        self.ui.buttonBox.accepted.connect(
+            self.save_and_close
+        )
+
+        self.ui.buttonBox.rejected.connect(
+            self.reject
+        )
+
+    # ---------------------------------------------------------
+    # Load inventory
+    # ---------------------------------------------------------
+
+    def load_inventory(self):
+
+        self.ui.lblPartValue.setText(
+            f'{self.inventory["part_number"]} - '
+            f'{self.inventory["part_name"]}'
+        )
+
+        current_quantity = float(
+            self.inventory["quantity"] or 0
+        )
+
+        self.ui.lblCurrentQuantityValue.setText(
+            f"{current_quantity:g}"
+        )
+
+        self.ui.cmbAdjustmentType.setCurrentText(
+            "Increase"
+        )
+
+        self.ui.dsbQuantity.setValue(
+            1.00
+        )
+
+        self.ui.txtReference.clear()
+        self.ui.txtNotes.clear()
+
+        self.update_new_quantity()
+
+    # ---------------------------------------------------------
+    # New quantity preview
+    # ---------------------------------------------------------
+
+    def update_new_quantity(self):
+
+        current_quantity = float(
+            self.inventory["quantity"] or 0
+        )
+
+        quantity = float(
+            self.ui.dsbQuantity.value()
+        )
+
+        adjustment_type = (
+            self.ui.cmbAdjustmentType
+            .currentText()
+            .strip()
+        )
+
+        if adjustment_type == "Decrease":
+            new_quantity = (
+                current_quantity - quantity
+            )
+        else:
+            new_quantity = (
+                current_quantity + quantity
+            )
+
+        self.ui.lblNewQuantityValue.setText(
+            f"{new_quantity:g}"
+        )
+
+    # ---------------------------------------------------------
+    # Save
+    # ---------------------------------------------------------
+
+    def save(self):
+
+        InventoryTransactionService.adjust_stock(
+            inventory_id=self.inventory_id,
+            adjustment_type=(
+                self.ui.cmbAdjustmentType
+                .currentText()
+                .strip()
+            ),
+            quantity=self.ui.dsbQuantity.value(),
+            reference=(
+                self.ui.txtReference
+                .text()
+                .strip()
+            ),
+            notes=(
+                self.ui.txtNotes
+                .toPlainText()
+                .strip()
+            ),
+            user=self.user,
+        )
+
+    # ---------------------------------------------------------
+    # Save and close
+    # ---------------------------------------------------------
+
+    def save_and_close(self):
+
+        try:
+
+            self.save()
+
+            self.accept()
+
+        except ValueError as error:
+
+            self.warning(
+                "Stock Adjustment",
+                str(error)
+            )
+
+        except Exception as error:
+
+            self.warning(
+                "Stock Adjustment",
+                f"Unexpected error:\n{error}"
+            )

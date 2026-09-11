@@ -186,6 +186,12 @@ class WorkOrderDialog(BaseDialog):
             self.reopen_work_order
         )
 
+        self.ui.btnCancelWorkOrder.clicked.connect(
+            self.cancel_work_order
+        )
+
+        self.ui.dsbActualCost.setReadOnly(True)
+
     def issue_part(self):
 
         if not Permissions.has_permission(
@@ -212,10 +218,16 @@ class WorkOrderDialog(BaseDialog):
             parent=self
         )
 
-        if dialog.exec():
-            self.load_record(
-                self.record_id
-            )
+        if not dialog.exec():
+            return
+
+        #-----------------------------------------------------
+        # Refresh Work Order after issuing part
+        #-----------------------------------------------------
+
+        self.load_record(
+            self.record_id
+        )
 
         self.load_parts()
         self.load_history()
@@ -228,8 +240,6 @@ class WorkOrderDialog(BaseDialog):
             self.ui.dsbActualCost.setValue(
                 float(work_order["actual_cost"] or 0)
             )
-
-        self.load_history()
 
         if work_order["status"] == "Closed":
             self.set_closed_mode()
@@ -340,32 +350,41 @@ class WorkOrderDialog(BaseDialog):
     ):
 
         """
-        Populate the status combo with satatuses that may be
+        Populate the status combo with statuses that my be
         selected manually.
 
-        Completed and Closed are controlled by their
+        Complete, Closed and Cancelled are controlled by
         dedicated workflow actions, but the current status
         must remain visible when viewing an existing record.
         """
+
+        # -----------------------------------------------------
+        # Status that may be selected manually
+        # -----------------------------------------------------
 
         allowed_statuses = [
             "Open",
             "Assigned",
             "In Progress",
             "On Hold",
-            "Cancelled",
         ]
 
-        # Complete and Close cannot be selected
-        # manually, but must be visible for an existing
-        # work order that already has that status.
+        # ------------------------------------------------------
+        # Workflow-only statuses
+        # ------------------------------------------------------
+
         if current_status in {
             "Completed",
             "Closed",
+            "Cancelled",
         }:
             allowed_statuses.append(
                 current_status
             )
+
+        # ------------------------------------------------------
+        # Populate combo
+        # ------------------------------------------------------
 
         self.ui.cmbStatus.clear()
 
@@ -374,7 +393,12 @@ class WorkOrderDialog(BaseDialog):
                 status
             )
 
+        # -------------------------------------------------------
+        # Restore current status
+        # -------------------------------------------------------
+
         if current_status:
+
             self.ui.cmbStatus.setCurrentText(
                 current_status
             )
@@ -831,6 +855,10 @@ class WorkOrderDialog(BaseDialog):
                 False
             )
 
+            self.ui.btnCancelWorkOrder.setVisible(
+                False
+            )
+
     def set_technician_mode(
         self,
         enabled=True
@@ -990,6 +1018,10 @@ class WorkOrderDialog(BaseDialog):
 
     def load_record(self, record_id):
 
+        # ---------------------------------------------------------
+        # Temporarily disable Materials / History tabs
+        # ---------------------------------------------------------
+
         self.ui.tabWorkOrder.setTabEnabled(
             1,
             False
@@ -999,6 +1031,10 @@ class WorkOrderDialog(BaseDialog):
             2,
             False
         )
+
+        # ---------------------------------------------------------
+        # Load Work Order
+        # ---------------------------------------------------------
 
         work_order = WorkOrderService.get_by_id(
             record_id
@@ -1012,6 +1048,10 @@ class WorkOrderDialog(BaseDialog):
             self.reject()
             return
 
+        # ---------------------------------------------------------
+        # Load form data
+        # ---------------------------------------------------------
+
         self.restrict_status_options(
             work_order["status"]
         )
@@ -1020,39 +1060,48 @@ class WorkOrderDialog(BaseDialog):
             work_order
         )
 
+        # ---------------------------------------------------------
+        # Load Materials / History
+        # ---------------------------------------------------------
+
         self.ui.groupMaterials.setEnabled(True)
         self.ui.groupHistory.setEnabled(True)
 
         self.load_parts()
         self.load_history()
 
+        # ---------------------------------------------------------
+        # Apply Work Order mode
+        # ---------------------------------------------------------
+
         status = work_order["status"]
 
-        self.ui.btnComplete.setEnabled(
-            status not in {
-                "Completed",
-                "Closed",
-                "Cancelled",
-            }
-        )
-
-        self.ui.btnCloseWorkOrder.setEnabled(
-            status == "Completed"
-        )
-
-        self.ui.btnReopen.setEnabled(
-            status == "Completed"
-        )
-
-        if status == "Completed":
-            self.ui.cmbStatus.setEnabled(False)
-
-        self.set_work_order_read_only(
-            status == "Closed"
-        )
-
         if status == "Closed":
+
             self.set_closed_mode()
+
+        elif status == "Completed":
+
+            self.set_completed_mode()
+
+        elif status == "Cancelled":
+
+            self.set_cancelled_mode()
+
+
+        else:
+
+            self.set_editable_mode()
+
+        # ---------------------------------------------------------
+        # Workflow buttons
+        # ---------------------------------------------------------
+
+        self.update_workflow_buttons()
+
+        # ---------------------------------------------------------
+        # Enable Materials / History tabs
+        # ---------------------------------------------------------
 
         self.ui.tabWorkOrder.setTabEnabled(
             1,
@@ -1063,8 +1112,6 @@ class WorkOrderDialog(BaseDialog):
             2,
             True
         )
-
-        self.update_workflow_buttons()
 
     def load_history(self):
 
@@ -1658,6 +1705,95 @@ class WorkOrderDialog(BaseDialog):
             can_remove_parts
         )
 
+    def cancel_work_order(self):
+
+        if not Permissions.has_permission(
+            self.role,
+            "work_orders.cancel"
+        ):
+            self.warning(
+                "Cancel Work Order",
+                "You do not have permission "
+                "to cancel Work Orders."
+            )
+            return
+
+        if self.record_id is None:
+            return
+
+        reason, accepted = QInputDialog.getMultiLineText(
+            self,
+            "Cancel Work Order",
+            "Reason for cancellation:"
+        )
+
+        if not accepted:
+            return
+
+        reason = reason.strip()
+
+        if not reason:
+            self.warning(
+                "Cancel Work Order",
+                "A reason is required."
+            )
+            return
+
+        if not self.confirm(
+                "Cancel Work Order",
+                (
+                    "Cancel this Work Order?\n\n"
+                    "The Work Order will become read-only.\n\n"
+                    "Any materials already issued will remain "
+                    "charged to this Work Order."
+                )
+            ):
+            return
+
+        try:
+
+            WorkOrderService.cancel_work_order(
+                self.record_id,
+                reason,
+                user=self.user,
+            )
+
+        except ValueError as error:
+
+            self.warning(
+                "Cancel Work Order",
+                str(error)
+            )
+            return
+
+        except Exception as error:
+
+            self.error(
+                "Cancel Work Order",
+                (
+                    "Could not cancel the Work Order."
+                    f"\n\n{error}"
+                )
+            )
+            return
+
+        # ----------------------------------------------------
+        # Refresh dialog
+        # ----------------------------------------------------
+
+        self.load_record(
+            self.record_id
+        )
+
+        self.load_history()
+
+        self.update_workflow_buttons()
+
+        self.information(
+            "Cancel Work Order",
+            "Work Order cancelled successfully."
+        )
+
     def restrict_technician_status_options(
         self,
         current_status=None
@@ -1717,6 +1853,7 @@ class WorkOrderDialog(BaseDialog):
         self.ui.dsbEstimatedCost.setReadOnly(True)
         self.ui.dsbActualCost.setReadOnly(True)
         self.ui.dsbLabourHours.setReadOnly(True)
+        self.ui.dsbEstimatedHours.setReadOnly(True)
 
     # ---------------------------------------------------------
     # Notes
@@ -1739,6 +1876,7 @@ class WorkOrderDialog(BaseDialog):
 
         self.ui.btnComplete.setVisible(False)
         self.ui.btnCloseWorkOrder.setVisible(False)
+        self.ui.btnCancelWorkOrder.setVisible(False)
         self.ui.btnReopen.setVisible(False)
 
     # ---------------------------------------------------------
@@ -1765,6 +1903,242 @@ class WorkOrderDialog(BaseDialog):
 
         self.setWindowTitle(
             "View Closed Work Order"
+        )
+
+    def set_completed_mode(self):
+
+        #------------------------------------------------------
+        # General
+        #------------------------------------------------------
+
+        self.ui.txtWorkOrderNumber.setReadOnly(True)
+        self.ui.txtTitle.setReadOnly(True)
+        self.ui.teDescription.setReadOnly(True)
+
+        self.ui.cmbPriority.setEnabled(False)
+        self.ui.cmbStatus.setEnabled(False)
+
+        #---------------------------------------------------------
+        # Asignment
+        #---------------------------------------------------------
+
+        self.ui.cmbAsset.setEnabled(False)
+        self.ui.cmbTechnician.setEnabled(False)
+        self.ui.txtRequestedBy.setReadOnly(True)
+
+        #---------------------------------------------------------
+        # Dates / Costs
+        #---------------------------------------------------------
+
+        self.ui.dtDateCreated.setEnabled(False)
+        self.ui.dtDueDate.setEnabled(False)
+
+        self.ui.dsbEstimatedCost.setReadOnly(True)
+        self.ui.dsbActualCost.setReadOnly(True)
+        self.ui.dsbLabourHours.setReadOnly(True)
+
+        #-----------------------------------------------------------
+        # Notes
+        #-----------------------------------------------------------
+
+        self.ui.teNotes.setReadOnly(True)
+
+        #-----------------------------------------------------------
+        # Material
+        #-----------------------------------------------------------
+
+        self.ui.groupMaterials.setEnabled(False)
+
+        self.ui.btnIssuePart.setVisible(False)
+        self.ui.btnRemovePart.setVisible(False)
+
+        #-----------------------------------------------------------
+        # Save
+        #-----------------------------------------------------------
+
+        save_button = self.ui.buttonBox.button(
+            QDialogButtonBox.StandardButton.Save
+        )
+
+        if save_button is not None:
+            save_button.setVisible(False)
+
+        cancel_button = self.ui.buttonBox.button(
+            QDialogButtonBox.StandardButton.Cancel
+        )
+
+        if cancel_button is not None:
+            cancel_button.setText(
+                "Close"
+            )
+
+        self.setWindowTitle(
+            "View Completed Work Order"
+        )
+
+    def set_editable_mode(self):
+
+        # ---------------------------------------------------------
+        # General
+        # ---------------------------------------------------------
+
+        self.ui.txtWorkOrderNumber.setReadOnly(False)
+        self.ui.txtTitle.setReadOnly(False)
+        self.ui.teDescription.setReadOnly(False)
+
+        self.ui.cmbPriority.setEnabled(True)
+        self.ui.cmbStatus.setEnabled(True)
+
+        # ---------------------------------------------------------
+        # Assignment
+        # ---------------------------------------------------------
+
+        self.ui.cmbAsset.setEnabled(True)
+        self.ui.cmbTechnician.setEnabled(True)
+        self.ui.txtRequestedBy.setReadOnly(False)
+
+        # ---------------------------------------------------------
+        # Dates / Costs
+        # ---------------------------------------------------------
+
+        self.ui.dtDateCreated.setEnabled(True)
+        self.ui.dtDueDate.setEnabled(True)
+
+        self.ui.dsbEstimatedCost.setReadOnly(False)
+
+        # Actual Cost ALWAYS remains calculated/read-only.
+        self.ui.dsbActualCost.setReadOnly(True)
+
+        self.ui.dsbLabourHours.setReadOnly(False)
+
+        # ---------------------------------------------------------
+        # Notes
+        # ---------------------------------------------------------
+
+        self.ui.teNotes.setReadOnly(False)
+
+        # ---------------------------------------------------------
+        # Materials
+        # ---------------------------------------------------------
+
+        self.ui.groupMaterials.setEnabled(True)
+
+        # Visibility will still depend on permissions/status.
+        self.ui.btnIssuePart.setVisible(
+            Permissions.has_permission(
+                self.role,
+                "work_orders.issue_parts"
+            )
+        )
+
+        self.ui.btnRemovePart.setVisible(
+            Permissions.has_permission(
+                self.role,
+                "work_orders.remove_parts"
+            )
+        )
+
+        # ---------------------------------------------------------
+        # Save
+        # ---------------------------------------------------------
+
+        save_button = self.ui.buttonBox.button(
+            QDialogButtonBox.StandardButton.Save
+        )
+
+        if save_button is not None:
+            save_button.setVisible(True)
+
+        cancel_button = self.ui.buttonBox.button(
+            QDialogButtonBox.StandardButton.Cancel
+        )
+
+        if cancel_button is not None:
+            cancel_button.setText(
+                "Cancel"
+            )
+
+        self.setWindowTitle(
+            "Edit Work Order"
+        )
+
+    def set_cancelled_mode(self):
+
+        # ---------------------------------------------------------
+        # General
+        # ---------------------------------------------------------
+
+        self.ui.txtWorkOrderNumber.setReadOnly(True)
+        self.ui.txtTitle.setReadOnly(True)
+        self.ui.teDescription.setReadOnly(True)
+
+        self.ui.cmbPriority.setEnabled(False)
+        self.ui.cmbStatus.setEnabled(False)
+
+        # ---------------------------------------------------------
+        # Assignment
+        # ---------------------------------------------------------
+
+        self.ui.cmbAsset.setEnabled(False)
+        self.ui.cmbTechnician.setEnabled(False)
+        self.ui.txtRequestedBy.setReadOnly(True)
+
+        # ---------------------------------------------------------
+        # Dates / Costs
+        # ---------------------------------------------------------
+
+        self.ui.dtDateCreated.setEnabled(False)
+        self.ui.dtDueDate.setEnabled(False)
+
+        self.ui.dsbEstimatedCost.setReadOnly(True)
+        self.ui.dsbActualCost.setReadOnly(True)
+        self.ui.dsbLabourHours.setReadOnly(True)
+
+        # ---------------------------------------------------------
+        # Notes
+        # ---------------------------------------------------------
+
+        self.ui.teNotes.setReadOnly(True)
+
+        # ---------------------------------------------------------
+        # Materials
+        # ---------------------------------------------------------
+
+        self.ui.groupMaterials.setEnabled(False)
+
+        self.ui.btnIssuePart.setVisible(False)
+        self.ui.btnRemovePart.setVisible(False)
+
+        # ---------------------------------------------------------
+        # Workflow buttons
+        # ---------------------------------------------------------
+
+        self.ui.btnComplete.setVisible(False)
+        self.ui.btnCloseWorkOrder.setVisible(False)
+        self.ui.btnReopen.setVisible(False)
+
+        # ---------------------------------------------------------
+        # Save / Close button
+        # ---------------------------------------------------------
+
+        save_button = self.ui.buttonBox.button(
+            QDialogButtonBox.StandardButton.Save
+        )
+
+        if save_button is not None:
+            save_button.setVisible(False)
+
+        cancel_button = self.ui.buttonBox.button(
+            QDialogButtonBox.StandardButton.Cancel
+        )
+
+        if cancel_button is not None:
+            cancel_button.setText(
+                "Close"
+            )
+
+        self.setWindowTitle(
+            "View Cancelled Work Order"
         )
 
     def reopen_work_order(self):
@@ -1851,6 +2225,7 @@ class WorkOrderDialog(BaseDialog):
             self.ui.btnComplete.setVisible(False)
             self.ui.btnCloseWorkOrder.setVisible(False)
             self.ui.btnReopen.setVisible(False)
+            self.ui.btnCancelWorkOrder.setVisible(False)
             return
 
         work_order = WorkOrderService.get_by_id(
@@ -1861,6 +2236,7 @@ class WorkOrderDialog(BaseDialog):
             self.ui.btnComplete.setVisible(False)
             self.ui.btnCloseWorkOrder.setVisible(False)
             self.ui.btnReopen.setVisible(False)
+            self.ui.btnCancelWorkOrder.setVisible(False)
             return
 
         status = work_order["status"]
@@ -1879,6 +2255,11 @@ class WorkOrderDialog(BaseDialog):
         can_reopen = Permissions.has_permission(
             self.role,
             "work_orders.reopen"
+        )
+
+        can_cancel = Permissions.has_permission(
+            self.role,
+            "work_orders.cancel"
         )
 
         self.ui.btnComplete.setVisible(
@@ -1900,6 +2281,16 @@ class WorkOrderDialog(BaseDialog):
             can_reopen
             and status == "Completed"
             and pm_id is None
+        )
+
+        self.ui.btnCancelWorkOrder.setVisible(
+            can_cancel
+            and status in {
+                "Open",
+                "Assigned",
+                "In Progress",
+                "On Hold",
+            }
         )
 
     def update_meter_mode(self):

@@ -20,6 +20,9 @@ class DashboardService:
             "open_work_orders":
                 WorkOrderService.get_open_count(),
 
+            "overdue_work_orders":
+                WorkOrderService.count_overdue(),
+
             "pm_due_today":
                 PreventiveMaintenanceService
                 .get_due_today_count(),
@@ -36,8 +39,8 @@ class DashboardService:
                 TechnicianService.get_all()
             ),
 
-            "inventory_value":
-                InventoryService.get_total_stock_value(),
+            "due_today_work_orders":
+                WorkOrderService.get_due_today_count(),
 
             "low_stock": len(
                 InventoryService.get_low_stock()
@@ -63,4 +66,20 @@ class DashboardService:
             .get_due_list(
                 limit = 10
             )
+        )
+
+    @staticmethod
+    def get_due_today_work_orders_count():
+
+        return (
+            WorkOrderService
+            .get_due_today_count()
+        )
+
+    @staticmethod
+    def get_due_soon_work_orders_count():
+
+        return (
+            WorkOrderService
+            .get_due_soon_count()
         )

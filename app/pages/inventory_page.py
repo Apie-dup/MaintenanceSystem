@@ -5,6 +5,11 @@ from app.ui.generated.ui_inventory_page import Ui_InventoryPage
 from app.helpers.format_helper import FormatHelper
 from app.core.permissions import Permissions
 from app.helpers.table_helper import TableHelper
+from app.dialogs.receive_stock_dialog import ReceiveStockDialog
+from app.dialogs.inventory_transactions_dialog import (
+    InventoryTransactionsDialog
+)
+from app.dialogs.adjust_stock_dialog import AdjustStockDialog
 
 class InventoryPage(CrudPage):
 
@@ -116,6 +121,21 @@ class InventoryPage(CrudPage):
             "inventory.delete"
         )
 
+        can_receive_stock = Permissions.has_permission(
+            self.role,
+            "inventory.receive_stock"
+        )
+
+        can_adjust_stock = Permissions.has_permission(
+            self.role,
+            "inventory.adjust_stock"
+        )
+
+        can_view_transactions = Permissions.has_permission(
+            self.role,
+            "inventory.transactions"
+        )
+
         self.ui.btnAdd.setVisible(
             can_create
         )
@@ -126,6 +146,18 @@ class InventoryPage(CrudPage):
 
         self.ui.btnDelete.setVisible(
             can_delete
+        )
+
+        self.ui.btnReceiveStock.setVisible(
+            can_receive_stock
+        )
+
+        self.ui.btnAdjustStock.setVisible(
+            can_adjust_stock
+        )
+
+        self.ui.btnTransactions.setVisible(
+            can_view_transactions
         )
 
     def connect_signals(self):
@@ -139,6 +171,18 @@ class InventoryPage(CrudPage):
 
         self.ui.btnEdit.clicked.connect(
             self.edit_record
+        )
+
+        self.ui.btnReceiveStock.clicked.connect(
+            self.receive_stock
+        )
+
+        self.ui.btnAdjustStock.clicked.connect(
+            self.adjust_stock
+        )
+
+        self.ui.btnTransactions.clicked.connect(
+            self.show_transactions
         )
 
         self.ui.btnDelete.clicked.connect(
@@ -279,4 +323,98 @@ class InventoryPage(CrudPage):
             return
 
         super().delete_record()
-        
+
+    def receive_stock(self):
+        record_id = TableHelper.selected_id(
+            self.ui.tblInventory
+        )
+
+        if record_id is None:
+
+            self.warning(
+                "Receive Stock",
+                "Please select an inventory item."
+            )
+
+            return
+
+        dialog = ReceiveStockDialog(
+            inventory_id=record_id,
+            user=self.user,
+            parent=self,
+        )
+
+        if dialog.exec():
+
+            self.load_data()
+
+    def show_transactions(self):
+
+        record_id = TableHelper.selected_id(
+            self.ui.tblInventory
+        )
+
+        if record_id is None:
+            self.warning(
+                "Inventory Transactions",
+                "Please select an inventory item."
+            )
+            return
+
+        try:
+
+            dialog = InventoryTransactionsDialog(
+                inventory_id=record_id,
+                parent=self,
+            )
+
+            dialog.exec()
+
+        except ValueError as error:
+
+            self.warning(
+                "Inventory Transactions",
+                str(error)
+            )
+
+        except Exception as error:
+
+            self.warning(
+                "Inventory Transactions",
+                f"Unexpected error:\n{error}"
+            )
+
+    def adjust_stock(self):
+
+        record_id = TableHelper.selected_id(
+            self.ui.tblInventory
+        )
+
+        if record_id is None:
+            self.warning(
+                "Stock Adjustment",
+                "Please select an inventory item."
+            )
+            return
+
+        dialog = AdjustStockDialog(
+            inventory_id=record_id,
+            user=self.user,
+            parent=self,
+        )
+
+        if dialog.exec():
+            self.load_data()
+
+    def receive_stock(self):
+
+        if not Permissions.has_permission(
+            self.role,
+            "inventory.receive_stock"
+        ):
+            self.warning(
+                "Receive Stock",
+                "You do not have permission "
+                "to receive stock."
+            )
+            return

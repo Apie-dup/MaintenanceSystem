@@ -35,6 +35,7 @@ class Permissions:
             "work_orders.complete",
             "work_orders.close",
             "work_orders.reopen",
+            "work_orders.cancel",
             "work_orders.issue_parts",
             "work_orders.remove_parts",
 
@@ -53,6 +54,9 @@ class Permissions:
             "inventory.create",
             "inventory.edit",
             "inventory.delete",
+            "inventory.receive_stock",
+            "inventory.adjust_stock",
+            "inventory.transactions",
 
             # Suppliers
             "suppliers.create",
@@ -114,6 +118,9 @@ class Permissions:
             # Inventory
             "inventory.create",
             "inventory.edit",
+            "inventory.receive_stock",
+            "inventory.adjust_stock",
+            "inventory.transactions",
 
             # Suppliers
             "suppliers.create",

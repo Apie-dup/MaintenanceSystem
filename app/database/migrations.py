@@ -4,7 +4,7 @@ from app.core.logger import logger
 
 class MigrationManager:
 
-    LATEST_VERSION = 23
+    LATEST_VERSION = 26
 
     # ---------------------------------------------------------
     # Database version
@@ -145,6 +145,15 @@ class MigrationManager:
             elif version == 22:
                 MigrationManager.migrate_to_v23()
                 version = 23
+            elif version == 23:
+                MigrationManager.migrate_to_v24()
+                version = 24
+            elif version == 24:
+                MigrationManager.migrate_to_v25()
+                version = 25
+            elif version == 25:
+                MigrationManager.migrate_to_v26()
+                version = 26
             else:
                 raise RuntimeError(
                     f"No migration path exists from version {version}."
@@ -1453,4 +1462,233 @@ class MigrationManager:
             raise
 
         finally:
+            conn.close()
+
+    def migrate_to_v24():
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        try:
+            logger.info(
+                "Migrating database to Version 24..."
+            )
+
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS inventory_transactions (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    
+                    inventory_id INTEGER NOT NULL,
+                    
+                    transaction_type TEXT NOT NULL,
+                    
+                    quantity REAL NOT NULL,
+                    
+                    previous_quantity REAL NOT NULL,
+                    new_quantity REAL NOT NULL,
+                    
+                    unit_cost REAL NOT NULL DEFAULT 0,
+                    
+                    work_order_id INTEGER,
+                    
+                    reference TEXT,
+                    notes TEXT,
+                    
+                    user_id INTEGER,
+                    username TEXT,
+                    
+                    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+
+                    FOREIGN KEY (inventory_id)
+                        REFERENCES inventory(id),
+
+                    FOREIGN KEY (work_order_id)
+                        REFERENCES work_order(id)
+                )
+            """)
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_inventory_transactions_inventory_id
+                ON inventory_transactions(inventory_id)
+            """)
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_inventory_transactions_work_order_id
+                ON inventory_transactions(work_order_id)
+            """)
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_inventory_transactions_created_at
+                ON inventory_transactions(created_at)
+            """)
+
+            conn.commit()
+
+            logger.info(
+                "Inventory transactions history added."
+            )
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()
+
+    @staticmethod
+    def migrate_to_v25():
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        try:
+            logger.info(
+                "Migrating database to Version 25..."
+            )
+
+            cursor.execute("""
+                ALTER TABLE inventory_transactions
+                RENAME COLUMN quantity TO quantity_change
+            """)
+
+            conn.commit()
+
+            logger.info(
+                "Inventory transaction quantity column renamed "
+                "to quantity_change."
+            )
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()
+
+    @staticmethod
+    def migrate_to_v26():
+        conn = Database.connect()
+
+        try:
+            logger.info(
+                "Migrating database to Version 26..."
+            )
+
+            conn.execute(
+                "PRAGMA foreign_keys = OFF"
+            )
+
+            cursor = conn.cursor()
+
+            cursor.execute("""
+                CREATE TABLE inventory_transactions_new (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+                    inventory_id INTEGER NOT NULL,
+
+                    transaction_type TEXT NOT NULL,
+
+                    quantity_change REAL NOT NULL,
+
+                    previous_quantity REAL NOT NULL,
+                    new_quantity REAL NOT NULL,
+
+                    unit_cost REAL NOT NULL DEFAULT 0,
+
+                    work_order_id INTEGER,
+
+                    reference TEXT,
+                    notes TEXT,
+
+                    user_id INTEGER,
+                    username TEXT,
+
+                    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+
+                    FOREIGN KEY (inventory_id)
+                        REFERENCES inventory(id),
+
+                    FOREIGN KEY (work_order_id)
+                        REFERENCES work_orders(id)
+                )
+            """)
+
+            cursor.execute("""
+                INSERT INTO inventory_transactions_new
+                (
+                    id,
+                    inventory_id,
+                    transaction_type,
+                    quantity_change,
+                    previous_quantity,
+                    new_quantity,
+                    unit_cost,
+                    work_order_id,
+                    reference,
+                    notes,
+                    user_id,
+                    username,
+                    created_at
+                )
+                SELECT
+                    id,
+                    inventory_id,
+                    transaction_type,
+                    quantity_change,
+                    previous_quantity,
+                    new_quantity,
+                    unit_cost,
+                    work_order_id,
+                    reference,
+                    notes,
+                    user_id,
+                    username,
+                    created_at
+                FROM inventory_transactions
+            """)
+
+            cursor.execute("""
+                DROP TABLE inventory_transactions
+            """)
+
+            cursor.execute("""
+                ALTER TABLE inventory_transactions_new
+                RENAME TO inventory_transactions
+            """)
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_inventory_transactions_inventory_id
+                ON inventory_transactions(inventory_id)
+            """)
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_inventory_transactions_work_order_id
+                ON inventory_transactions(work_order_id)
+            """)
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_inventory_transactions_created_at
+                ON inventory_transactions(created_at)
+            """)
+
+            conn.commit()
+
+            logger.info(
+                "Inventory transaction foreign key corrected."
+            )
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.execute(
+                "PRAGMA foreign_keys = ON"
+            )
+
             conn.close()

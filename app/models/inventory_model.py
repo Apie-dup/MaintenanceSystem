@@ -90,53 +90,78 @@ class InventoryModel:
     # ---------------------------------------------------------
 
     @staticmethod
-    def insert(data):
-        conn = Database.connect()
-        cursor = conn.cursor()
+    def insert(
+        data,
+        connection=None
+    ):
 
-        cursor.execute("""
-            INSERT INTO inventory
-            (
-                part_number,
-                part_name,
-                description,
-                category,
-                supplier_id,
-                unit,
-                quantity,
-                minimum_quantity,
-                reorder_quantity,
-                unit_cost,
-                location,
-                barcode,
-                status,
-                notes
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            data["part_number"],
-            data["part_name"],
-            data["description"],
-            data["category"],
-            data["supplier_id"],
-            data["unit"],
-            data["quantity"],
-            data["minimum_quantity"],
-            data["reorder_quantity"],
-            data["unit_cost"],
-            data["location"],
-            data["barcode"],
-            data["status"],
-            data["notes"],
-        ))
+        owns_connection = (
+            connection is None
+        )
 
-        conn.commit()
+        conn = (
+            connection
+            or Database.connect()
+        )
 
-        record_id = cursor.lastrowid
+        try:
 
-        conn.close()
+            cursor = conn.cursor()
 
-        return record_id
+            cursor.execute("""
+                INSERT INTO inventory
+                (
+                    part_number,
+                    part_name,
+                    description,
+                    category,
+                    supplier_id,
+                    unit,
+                    quantity,
+                    minimum_quantity,
+                    reorder_quantity,
+                    unit_cost,
+                    location,
+                    barcode,
+                    status,
+                    notes
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                data["part_number"],
+                data["part_name"],
+                data["description"],
+                data["category"],
+                data["supplier_id"],
+                data["unit"],
+                data["quantity"],
+                data["minimum_quantity"],
+                data["reorder_quantity"],
+                data["unit_cost"],
+                data["location"],
+                data["barcode"],
+                data["status"],
+                data["notes"],
+            ))
+
+            record_id = cursor.lastrowid
+
+            if owns_connection:
+                conn.commit()
+
+            return record_id
+
+        except Exception:
+
+            if owns_connection:
+                conn.rollback()
+
+            raise
+
+        finally:
+
+            if owns_connection:
+                conn.close()
 
     # ---------------------------------------------------------
     # Update
@@ -281,30 +306,6 @@ class InventoryModel:
     # ---------------------------------------------------------
     # Dashboard
     # ---------------------------------------------------------
-
-    @staticmethod
-    def get_low_stock():
-        conn = Database.connect()
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT
-                inventory.id,
-                inventory.part_number,
-                inventory.part_name,
-                inventory.quantity,
-                inventory.minimum_quantity,
-                inventory.unit,
-                inventory.location,
-                inventory.status
-            FROM inventory
-            WHERE inventory.quantity <= inventory.minimum_quantity
-              AND inventory.status = 'Active'
-            ORDER BY inventory.part_name
-        """)
-        rows = cursor.fetchall()
-        conn.close()
-
-        return rows
 
     @staticmethod
     def get_total_stock_value():

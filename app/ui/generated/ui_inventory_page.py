@@ -23,7 +23,7 @@ class Ui_InventoryPage(object):
     def setupUi(self, InventoryPage):
         if not InventoryPage.objectName():
             InventoryPage.setObjectName(u"InventoryPage")
-        InventoryPage.resize(1359, 520)
+        InventoryPage.resize(1323, 520)
         self.verticalLayout = QVBoxLayout(InventoryPage)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.lblTitle = QLabel(InventoryPage)
@@ -80,6 +80,7 @@ class Ui_InventoryPage(object):
         __qtablewidgetitem12 = QTableWidgetItem()
         self.tblInventory.setHorizontalHeaderItem(12, __qtablewidgetitem12)
         self.tblInventory.setObjectName(u"tblInventory")
+        self.tblInventory.setAlternatingRowColors(True)
         self.tblInventory.setWordWrap(False)
         self.tblInventory.verticalHeader().setHighlightSections(False)
 
@@ -99,6 +100,21 @@ class Ui_InventoryPage(object):
         self.btnEdit.setMinimumSize(QSize(90, 30))
 
         self.horizontalLayout_2.addWidget(self.btnEdit)
+
+        self.btnReceiveStock = QPushButton(InventoryPage)
+        self.btnReceiveStock.setObjectName(u"btnReceiveStock")
+
+        self.horizontalLayout_2.addWidget(self.btnReceiveStock)
+
+        self.btnAdjustStock = QPushButton(InventoryPage)
+        self.btnAdjustStock.setObjectName(u"btnAdjustStock")
+
+        self.horizontalLayout_2.addWidget(self.btnAdjustStock)
+
+        self.btnTransactions = QPushButton(InventoryPage)
+        self.btnTransactions.setObjectName(u"btnTransactions")
+
+        self.horizontalLayout_2.addWidget(self.btnTransactions)
 
         self.btnRefresh = QPushButton(InventoryPage)
         self.btnRefresh.setObjectName(u"btnRefresh")
@@ -165,6 +181,9 @@ class Ui_InventoryPage(object):
         ___qtablewidgetitem12.setText(QCoreApplication.translate("InventoryPage", u"Notes", None))
         self.btnAdd.setText(QCoreApplication.translate("InventoryPage", u"Add", None))
         self.btnEdit.setText(QCoreApplication.translate("InventoryPage", u"Edit", None))
+        self.btnReceiveStock.setText(QCoreApplication.translate("InventoryPage", u"Receive Stock", None))
+        self.btnAdjustStock.setText(QCoreApplication.translate("InventoryPage", u"Adjust Stock", None))
+        self.btnTransactions.setText(QCoreApplication.translate("InventoryPage", u"Transactions", None))
         self.btnRefresh.setText(QCoreApplication.translate("InventoryPage", u"Refresh", None))
         self.btnDelete.setText(QCoreApplication.translate("InventoryPage", u"Delete", None))
         self.lblStatus.setText(QCoreApplication.translate("InventoryPage", u"Status", None))

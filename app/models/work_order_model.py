@@ -40,6 +40,30 @@ class WorkOrderModel:
                 work_orders.requested_by,
                 work_orders.date_created,
                 work_orders.due_date,
+
+                CASE
+                    WHEN work_orders.status IN (
+                        'Completed',
+                        'Closed',
+                        'Cancelled'
+                    )
+                        THEN 'Finished'
+
+                    WHEN work_orders.due_date < DATE('now')
+                        THEN 'Overdue'
+
+                    WHEN work_orders.due_date = DATE('now')
+                        THEN 'Due Today'
+
+                    WHEN work_orders.due_date <= DATE(
+                        'now',
+                        '+7 days'
+                    )
+                        THEN 'Due Soon'
+                        
+                    ELSE 'Upcoming'
+                END AS due_status,
+                
                 work_orders.estimated_cost,
                 work_orders.actual_cost,
                 work_orders.labour_hours,
@@ -48,12 +72,62 @@ class WorkOrderModel:
                 work_orders.created_at,
                 work_orders.completed_date,
                 work_orders.closed_date
+            
             FROM work_orders
+            
             LEFT JOIN assets
                 ON work_orders.asset_id = assets.id
+            
             LEFT JOIN technicians
                 ON work_orders.technician_id = technicians.id
-            ORDER BY work_orders.id DESC
+            
+            ORDER BY
+                CASE
+                    
+                    -- Overdue active Work Orders
+                    WHEN work_orders.status NOT IN (
+                        'Completed',
+                        'Closed',
+                        'Cancelled'
+                    )
+                    AND work_orders.due_date < DATE('now')
+                        THEN 0
+
+                    -- Due Today
+                    WHEN work_orders.status NOT IN (
+                        'Completed',
+                        'Closed',
+                        'Cancelled'
+                    )
+                    AND work_orders.due_date = DATE('now')
+                        THEN 1
+
+                    -- Due within the next 7 days
+                    WHEN work_orders.status NOT IN (
+                        'Completed',
+                        'Closed',
+                        'Cancelled'
+                    )
+                    AND work_orders.due_date <= DATE(
+                        'now',
+                        '+7 days'
+                    )
+                        THEN 2
+
+                    -- Other active Work Orders
+                    WHEN work_orders.status NOT IN (
+                        'Completed',
+                        'Closed',
+                        'Cancelled'
+                    )
+                        THEN 3
+
+                    -- Finished Work Orders
+                    ELSE 4
+                END,
+                
+                work_orders.due_date,
+                work_orders.id DESC
         """)
 
         rows = cursor.fetchall()
@@ -147,6 +221,30 @@ class WorkOrderModel:
                 work_orders.requested_by,
                 work_orders.date_created,
                 work_orders.due_date,
+
+                CASE
+                    WHEN work_orders.status IN (
+                        'Completed',
+                        'Closed',
+                        'Cancelled'
+                    )
+                        THEN 'Finished'
+
+                    WHEN work_orders.due_date < DATE('now')
+                        THEN 'Overdue'
+
+                    WHEN work_orders.due_date = DATE('now')
+                        THEN 'Due Today'
+
+                    WHEN work_orders.due_date <= DATE(
+                        'now',
+                        '+7 days'
+                    )
+                        THEN 'Due Soon'
+
+                    ELSE 'Upcoming'
+                END AS due_status,
+
                 work_orders.estimated_cost,
                 work_orders.actual_cost,
                 work_orders.labour_hours,
@@ -155,11 +253,15 @@ class WorkOrderModel:
                 work_orders.created_at,
                 work_orders.completed_date,
                 work_orders.closed_date
+            
             FROM work_orders
+            
             LEFT JOIN assets
                 ON work_orders.asset_id = assets.id
+            
             LEFT JOIN technicians
                 ON work_orders.technician_id = technicians.id
+            
             WHERE
                 work_orders.work_order_number LIKE ?
                 OR work_orders.title LIKE ?
@@ -172,8 +274,47 @@ class WorkOrderModel:
                 OR technicians.employee_number LIKE ?
                 OR technicians.first_name LIKE ?
                 OR technicians.last_name LIKE ?
-            ORDER BY work_orders.created_at DESC,
-                     work_orders.id DESC
+            
+            ORDER BY
+                CASE
+                    WHEN work_orders.status NOT IN (
+                        'Completed',
+                        'Closed',
+                        'Cancelled'
+                    )
+                    AND work_orders.due_date < DATE('now')
+                        THEN 0
+
+                    WHEN work_orders.status NOT IN (
+                        'Completed',
+                        'Closed',
+                        'Cancelled'
+                    )
+                    AND work_orders.due_date = DATE('now')
+                        THEN 1
+
+                    WHEN work_orders.status NOT IN (
+                        'Completed',
+                        'Closed',
+                        'Cancelled'
+                    )
+                    AND work_orders.due_date <= DATE(
+                        'now',
+                        '+7 days'
+                    )
+                        THEN 2
+
+                    WHEN work_orders.status NOT IN (
+                        'Completed',
+                        'Closed',
+                        'Cancelled'
+                    )
+                        THEN 3
+                    ELSE 4
+                END,
+                
+                work_orders.due_date,
+                work_orders.id DESC
         """, (
             search,
             search,
@@ -454,16 +595,58 @@ class WorkOrderModel:
                 assets.asset_name,
                 work_orders.priority,
                 work_orders.status,
-                work_orders.due_date
+                work_orders.due_date,
+
+                CASE
+                    WHEN work_orders.due_date < DATE('now')
+                        THEN 'Overdue'
+
+                    WHEN work_orders.due_date = DATE('now')
+                        THEN 'Due Today'
+
+                    WHEN work_orders.due_date <= DATE(
+                        'now',
+                        '+7 days'
+                    )
+                        THEN 'Due Soon'
+
+                    ELSE 'Upcoming'
+                END AS due_status
+            
             FROM work_orders
+            
             LEFT JOIN assets
                 ON work_orders.asset_id = assets.id
+            
             WHERE work_orders.status NOT IN (
                 'Completed',
                 'Closed',
                 'Cancelled'
             )
+            AND work_orders.due_date <= DATE(
+                'now',
+                '+7 days')
+            
             ORDER BY
+                
+                -- Due-date urgency first
+                CASE
+                    WHEN work_orders.due_date < DATE('now')
+                        THEN 1
+
+                    WHEN work_orders.due_date = DATE('now')
+                        THEN 2
+                    
+                    WHEN work_orders.due_date <= DATE(
+                        'now',
+                        '+7 days'
+                    )
+                        THEN 3
+                    
+                    ELSE 4
+                END,
+
+                -- Priority second
                 CASE work_orders.priority
                     WHEN 'Critical' THEN 1
                     WHEN 'Emergency' THEN 2
@@ -472,9 +655,17 @@ class WorkOrderModel:
                     WHEN 'Low' THEN 5
                     ELSE 6
                 END,
-                work_orders.due_date
+
+                -- Earliest due_date third
+                work_orders.due_date,
+
+                -- Stable final ordering
+                work_orders.id DESC
+            
             LIMIT ?
-        """, (limit,))
+        """, (
+            limit,
+        ))
 
         rows = cursor.fetchall()
         conn.close()
@@ -555,6 +746,7 @@ class WorkOrderModel:
         record_id,
         completed_date,
         meter_reading=None,
+        actual_cost=0,
         conn=None,
     ):
         
@@ -573,7 +765,8 @@ class WorkOrderModel:
                 SET
                     status = 'Completed',
                     completed_date = ?,
-                    meter_reading = ?
+                    meter_reading = ?,
+                    actual_cost = ?
                 WHERE id = ?
                   AND status NOT IN (
                       'Completed',
@@ -582,6 +775,7 @@ class WorkOrderModel:
             """, (
                 completed_date,
                 meter_reading,
+                actual_cost,
                 record_id,
             ))
 
@@ -671,29 +865,32 @@ class WorkOrderModel:
             or Database.connect()
         )
 
-        cursor = conn.cursor()
+        try:
 
-        cursor.execute("""
-            SELECT
-                work_orders.labour_hours,
-                technicians.hourly_rate
-            FROM work_orders
+            cursor = conn.cursor()
 
-            LEFT JOIN technicians
-                ON work_orders.technician_id
-                = technicians.id
+            # -------------------------------------------------
+            # Labour cost
+            # -------------------------------------------------
 
-            WHERE work_orders.id = ?
-        """, (
-            work_order_id,
-        ))
+            cursor.execute("""
+                SELECT
+                    work_orders.labour_hours,
+                    technicians.hourly_rate
+                FROM work_orders
 
-        work_order = cursor.fetchone()
+                LEFT JOIN technicians
+                    ON work_orders.technician_id
+                    = technicians.id
 
-        if work_order is None:
-            if owns_connection:
-                conn.close()
+                WHERE work_orders.id = ?
+            """, (
+                work_order_id,
+            ))
 
+            work_order = cursor.fetchone()
+
+            if work_order is None:
                 return 0.00
 
             labour_cost = (
@@ -706,11 +903,16 @@ class WorkOrderModel:
                 )
             )
 
+            # -------------------------------------------------
+            # Material cost
+            # -------------------------------------------------
+
             cursor.execute("""
-                SELECT COALESCE(
-                    SUM(total_cost),
-                    0
-                ) AS material_cost
+                SELECT
+                    COALESCE(
+                        SUM(total_cost),
+                        0
+                    ) AS material_cost
                 FROM work_order_parts
                 WHERE work_order_id = ?
             """, (
@@ -723,15 +925,14 @@ class WorkOrderModel:
                 material_row["material_cost"] or 0
             )
 
-            total = (
+            return (
                 labour_cost
                 + material_cost
             )
 
+        finally:
             if owns_connection:
                 conn.close()
-
-            return total
 
     @staticmethod
     def set_status(
@@ -791,42 +992,42 @@ class WorkOrderModel:
         if owns_connection:
             conn = Database.connect()
 
-            cursor = conn.cursor()
+        cursor = conn.cursor()
 
-            try:
+        try:
 
-                cursor.execute("""
-                    UPDATE work_orders
-                    SET
-                        status = 'In Progress',
-                        completed_date = NULL,
-                        closed_date = NULL
-                    WHERE id = ?
-                        AND status = 'Completed'
-                """, (
-                    record_id,
-                ))
+            cursor.execute("""
+                UPDATE work_orders
+                SET
+                    status = 'In Progress',
+                    completed_date = NULL,
+                    closed_date = NULL
+                WHERE id = ?
+                  AND status = 'Completed'
+            """, (
+                record_id,
+            ))
 
-                if cursor.rowcount == 0:
-                    raise ValueError(
-                        "Only completed Work Orders "
-                        "can be reopened."
-                    )
+            if cursor.rowcount == 0:
+                raise ValueError(
+                    "Only completed Work Orders "
+                    "can be reopened."
+                )
 
-                if owns_connection:
-                    conn.commit()
+            if owns_connection:
+                conn.commit()
 
-            except Exception:
+        except Exception:
 
-                if owns_connection:
-                    conn.rollback()
+            if owns_connection:
+                conn.rollback()
 
-                raise
+            raise
 
-            finally:
+        finally:
 
-                if owns_connection:
-                    conn.close()
+            if owns_connection:
+                conn.close()
 
     @staticmethod
     def pm_cycle_exists(
@@ -873,3 +1074,81 @@ class WorkOrderModel:
 
         finally:
             conn.close()
+
+    @staticmethod
+    def cancel(
+        record_id,
+        conn=None
+    ):
+
+        owns_connection = (
+            conn is None
+        )
+
+        if owns_connection:
+            conn = Database.connect()
+
+        cursor = conn.cursor()
+
+        try:
+
+            cursor.execute("""
+                UPDATE work_orders
+                SET
+                    status = 'Cancelled'
+                WHERE id = ?
+                  AND status NOT IN (
+                    'Completed',
+                    'Closed',
+                    'Cancelled'
+                )
+            """, (
+                record_id,
+            ))
+
+            if cursor.rowcount == 0:
+                raise ValueError(
+                    "Only an active Work Order "
+                    "can be cancelled."
+                )
+
+            if owns_connection:
+                conn.commit()
+
+        except Exception:
+
+            if owns_connection:
+                conn.rollback()
+
+            raise
+
+        finally:
+
+            if owns_connection:
+                conn.close()
+
+    @staticmethod
+    def count_overdue():
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT COUNT(*) AS total
+            FROM work_orders
+            WHERE status NOT IN (
+                'Completed',
+                'Closed',
+                'Cancelled'
+            )
+            AND due_date IS NOT NULL
+            AND due_date < DATE('now')
+        """)
+
+        row = cursor.fetchone()
+
+        conn.close()
+
+        return int(
+            row["total"] or 0
+        )

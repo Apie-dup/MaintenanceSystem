@@ -1,3 +1,4 @@
+from PySide6.QtCore import Qt
 from app.base.crud_page import CrudPage
 from app.dialogs.work_order_dialog import WorkOrderDialog
 from app.services.work_order_service import WorkOrderService
@@ -21,6 +22,7 @@ class WorkOrdersPage(CrudPage):
         ("status", "Status"),
         ("technician_display", "Technician"),
         ("due_date", "Due Date"),
+        ("due_status", "Due Status"),
         ("notes", "Notes"),
     ]
 
@@ -61,6 +63,8 @@ class WorkOrdersPage(CrudPage):
                 
         self.search_widget = self.ui.txtSearch
         self.status_label = self.ui.lblStatus
+
+        self.view_filter = None
 
         
         self.setup_page()
@@ -295,3 +299,151 @@ class WorkOrdersPage(CrudPage):
         dialog.exec()
 
         self.load_data()
+
+    def populate_table(self, rows):
+
+        # -------------------------------------------------------
+        # Let CrudPage populate the table normally
+        # -------------------------------------------------------
+
+        super().populate_table(
+            rows
+        )
+
+        # ------------------------------------------------------
+        # Find Due Status column
+        # ------------------------------------------------------
+
+        due_status_column = next(
+            (
+                index
+                for index, column in enumerate(
+                    self.TABLE_COLUMNS
+                )
+                if column[0] == "due_status"
+            ),
+            None
+        )
+
+        if due_status_column is not None:
+
+            TableHelper.highlight_due_status(
+                self.table,
+                due_status_column
+            )
+
+    def load_data(self):
+
+        records = self.service.get_all()
+
+        records = self.apply_view_filter(
+            records
+        )
+
+        self.populate_table(
+            records
+        )
+
+    def set_view_filter(
+        self,
+        view_filter=None
+    ):
+
+        self.view_filter = view_filter
+
+    def search(self, text):
+
+        text = text.strip()
+
+        if text:
+            records = self.service.search(
+                text
+            )
+        else:
+            records = self.service.get_all()
+
+        records = self.apply_view_filter(
+            records
+        )
+
+        self.populate_table(
+            records
+        )
+
+    def apply_view_filter(
+            self,
+            records
+    ):
+
+        if self.view_filter == "open":
+
+            return [
+                record
+                for record in records
+                if record["status"] not in {
+                    "Completed",
+                    "Closed",
+                    "Cancelled",
+                }
+            ]
+
+        if self.view_filter == "overdue":
+
+            return [
+                record
+                for record in records
+                if record["due_status"] == "Overdue"
+            ]
+
+        if self.view_filter == "due_today":
+            return [
+                record
+                for record in records
+                if record["due_status"] == "Due Today"
+            ]
+
+        if self.view_filter == "due_soon":
+            return [
+                record
+                for record in records
+                if record["due_status"] == "Due Soon"
+            ]
+
+        return records
+
+    def select_record(
+            self,
+            record_id
+    ):
+
+        for row in range(
+            self.table.rowCount()
+        ):
+
+            item = self.table.item(
+                row,
+                0
+            )
+
+            if item is None:
+                continue
+
+            item_id = item.data(
+                Qt.ItemDataRole.UserRole
+            )
+
+            if item_id == record_id:
+
+                self.table.selectRow(
+                    row
+                )
+
+                self.table.scrollToItem(
+                    item
+                )
+
+                self.selected_id_value = (
+                    record_id
+                )
+
+                return

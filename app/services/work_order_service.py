@@ -171,6 +171,10 @@ class WorkOrderService:
             data.get("status") or ""
         ).strip()
 
+        # --------------------------------------------------------
+        # Workflow-only statuses
+        # --------------------------------------------------------
+
         if (
             existing["status"] != "Completed"
             and requested_status == "Completed"
@@ -187,6 +191,15 @@ class WorkOrderService:
             raise ValueError(
                 "Work Order must be closed using "
                 "the Close Work Order workflow."
+            )
+
+        if (
+            existing["status"] != "Cancelled"
+            and requested_status == "Cancelled"
+        ):
+            raise ValueError(
+                "Work Order must be cancelled using "
+                "the Cancel Work Order workflow."
             )
 
         # Work with a copy so we do not modify
@@ -557,6 +570,65 @@ class WorkOrderService:
         try:
 
             #-------------------------------------------
+            # Finalize Work Order cost
+            #-------------------------------------------
+
+            cursor = conn.cursor()
+
+            cursor.execute("""
+                SELECT
+                    COALESCE(technicians.hourly_rate, 0)
+                        AS hourly_rate
+                    FROM work_orders
+                    
+                    LEFT JOIN technicians
+                        ON work_orders.technician_id
+                        = technicians.id
+                        
+                    WHERE work_orders.id = ?
+            """, (
+                record_id,
+            ))
+
+            technician_row = cursor.fetchone()
+
+            hourly_rate = float(
+                technician_row["hourly_rate"] or 0
+            )
+
+            labour_hours = float(
+                work_order["labour_hours"] or 0
+            )
+
+            labour_cost = (
+                labour_hours
+                * hourly_rate
+            )
+
+            cursor.execute("""
+                SELECT
+                    COALESCE(
+                        SUM(total_cost),
+                        0
+                    ) AS material_cost
+                FROM work_order_parts
+                WHERE work_order_id = ?
+            """, (
+                record_id,
+            ))
+
+            material_row = cursor.fetchone()
+
+            material_cost = float(
+                material_row["material_cost"] or 0
+            )
+
+            actual_cost = (
+                labour_cost
+                + material_cost
+            )
+
+            #-------------------------------------------
             # Complete Work Order
             #-------------------------------------------
 
@@ -568,6 +640,7 @@ class WorkOrderService:
                     if is_meter_based
                     else None
                 ),
+                actual_cost=actual_cost,
                 conn=conn
             )
 
@@ -709,7 +782,8 @@ class WorkOrderService:
 
             WorkOrderModel.close(
                 record_id,
-                DateHelper.today_string()
+                DateHelper.today_string(),
+                conn=conn,
             )
 
             WorkOrderHistoryService.log_closed(
@@ -725,7 +799,7 @@ class WorkOrderService:
                 if user
                 else None
             ),
-                conn=conn
+                conn=conn,
 
             )
 
@@ -971,6 +1045,23 @@ class WorkOrderService:
                 conn=conn
             )
 
+            # -------------------------------------------------
+            # Recalculate Actual Cost
+            # -------------------------------------------------
+
+            actual_cost = (
+                WorkOrderModel.calculate_actual_cost(
+                    record_id,
+                    connection=conn
+                )
+            )
+
+            WorkOrderModel.update_actual_cost(
+                record_id,
+                actual_cost,
+                connection=conn
+            )
+
             WorkOrderHistoryService.log_reopened(
                 record_id,
                 reason,
@@ -998,7 +1089,93 @@ class WorkOrderService:
 
             conn.close()
 
+    @staticmethod
+    def cancel_work_order(
+        record_id,
+        reason,
+        user=None,
+    ):
 
+        work_order = WorkOrderModel.get_by_id(
+            record_id
+        )
+
+        if work_order is None:
+            raise ValueError(
+                "Work Order not found."
+            )
+
+        if work_order["status"] == "Cancelled":
+            raise ValueError(
+                "This Work Order is already cancelled."
+            )
+
+        if work_order["status"] == "Completed":
+            raise ValueError(
+                "A completed Work Order cannot be cancelled."
+            )
+
+        if work_order["status"] == "Closed":
+            raise ValueError(
+                "A closed Work Order cannot be cancelled."
+            )
+
+        if not (reason or "").strip():
+            raise ValueError(
+                "A reason is required when cancelling "
+                "a Work Order."
+            )
+
+        old_status = work_order["status"]
+
+        conn = Database.connect()
+
+        try:
+
+            # -------------------------------------------------
+            # Cancel Work Order
+            # -------------------------------------------------
+
+            WorkOrderModel.cancel(
+                record_id,
+                conn=conn
+            )
+
+            # -------------------------------------------------
+            # Audit history
+            # -------------------------------------------------
+
+            WorkOrderHistoryService.log_cancelled(
+                record_id,
+                old_status=old_status,
+                reason=reason.strip(),
+                user_id=(
+                    user.get("id")
+                    if user
+                    else None
+                ),
+                username=(
+                    user.get("username")
+                    if user
+                    else None
+                ),
+                conn=conn,
+            )
+
+            # -------------------------------------------------
+            # Everything succeeded
+            # -------------------------------------------------
+
+            conn.commit()
+
+        except Exception:
+
+            conn.rollback()
+            raise
+
+        finally:
+
+            conn.close()
 
     @staticmethod
     def pm_cycle_exists(
@@ -1011,4 +1188,52 @@ class WorkOrderService:
             pm_id,
             pm_due_date=pm_due_date,
             pm_due_meter=pm_due_meter,
+        )
+
+    @staticmethod
+    def count_overdue():
+        return WorkOrderModel.count_overdue()
+
+    # ---------------------------------------------------------
+    # Dashboard - Due Today
+    # ---------------------------------------------------------
+
+    @staticmethod
+    def get_due_today():
+
+        records = WorkOrderService.get_all()
+
+        return [
+            work_order
+            for work_order in records
+            if work_order["due_status"] == "Due Today"
+        ]
+
+    @staticmethod
+    def get_due_today_count():
+
+        return len(
+            WorkOrderService.get_due_today()
+        )
+
+    # ---------------------------------------------------------
+    # Dashboard - Due Soon
+    # ---------------------------------------------------------
+
+    @staticmethod
+    def get_due_soon():
+
+        records = WorkOrderService.get_all()
+
+        return [
+            work_order
+            for work_order in records
+            if work_order["due_status"] == "Due Soon"
+        ]
+
+    @staticmethod
+    def get_due_soon_count():
+
+        return len(
+            WorkOrderService.get_due_soon()
         )
