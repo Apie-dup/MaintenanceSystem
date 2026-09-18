@@ -2,6 +2,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment
 from openpyxl.utils import get_column_letter
 from app.services.settings_service import SettingsService
+from app.helpers.date_helper import DateHelper
 
 class ReportExportHelper:
 
@@ -55,14 +56,19 @@ class ReportExportHelper:
             horizontal="center"
         )
 
-        #--------------------------------------------------
-        # Report period
-        #--------------------------------------------------
+        # -------------------------------------------------
+        # Report period and filters
+        # -------------------------------------------------
+
+        current_row = 2
 
         date_based_reports = {
             "Work Orders",
             "Maintenance Costs",
             "Technician Performance",
+            "Inventory Transactions",
+            "Asset Maintenance History",
+            "Technician Work History",
         }
 
         if (
@@ -71,10 +77,13 @@ class ReportExportHelper:
             and to_date
         ):
             period_cell = worksheet.cell(
-                row=2,
+                row=current_row,
                 column=1,
                 value=(
-                    f"Period: {from_date} to {to_date}"
+                    f"Period: "
+                    f"{DateHelper.display(from_date)} "
+                    f"to "
+                    f"{DateHelper.display(to_date)}"
                 )
             )
 
@@ -83,11 +92,92 @@ class ReportExportHelper:
                 size=10
             )
 
+            current_row += 1
+
+        # -------------------------------------------------
+        # Active filters
+        # -------------------------------------------------
+
+        if filters:
+
+            active_filters = []
+
+            for name, value in filters.items():
+
+                if value:
+                    active_filters.append(
+                        f"{name}: {value}"
+                    )
+
+            if active_filters:
+
+                filter_cell = worksheet.cell(
+                    row=current_row,
+                    column=1,
+                    value=" | ".join(active_filters)
+                )
+
+                filter_cell.font = Font(
+                    italic=True,
+                    size=10
+                )
+
+                current_row += 1
+
+        # -------------------------------------------------
+        # Report summary
+        # -------------------------------------------------
+
+        summary_start_row = current_row
+
+        if summary:
+
+            summary_items = [
+                (label, value)
+                for label, value in summary.items()
+                if label
+            ]
+
+            for column, (label, value) in enumerate(
+                summary_items,
+                start=1
+            ):
+
+                label_cell = worksheet.cell(
+                    row=summary_start_row,
+                    column=column,
+                    value=label
+                )
+
+                label_cell.font = Font(
+                    bold=True
+                )
+
+                label_cell.alignment = Alignment(
+                    horizontal="center"
+                )
+
+                value_cell = worksheet.cell(
+                    row=summary_start_row + 1,
+                    column=column,
+                    value=value
+                )
+
+                value_cell.alignment = Alignment(
+                    horizontal="center"
+                )
+
+            header_row = (
+                summary_start_row + 3
+            )
+
+        else:
+
+            header_row = 3
+
         # -------------------------------------------------
         # Column headings
         # -------------------------------------------------
-
-        header_row = 3
 
         for column in range(column_count):
 
@@ -137,7 +227,7 @@ class ReportExportHelper:
                 )
 
                 cell = worksheet.cell(
-                    row=row + 4,
+                    row=header_row + row + 1,
                     column=column + 1
                 )
 
@@ -154,7 +244,6 @@ class ReportExportHelper:
                 # -----------------------------------------
 
                 if text.startswith(currency_symbol):
-
                     try:
                         numeric_value = float(
                             text
@@ -164,14 +253,11 @@ class ReportExportHelper:
                         )
 
                         cell.value = numeric_value
-
                         cell.number_format = (
                             f'"{currency_symbol}" #,##0.00'
                         )
-
                     except ValueError:
                         cell.value = text
-
                     continue
 
                 # -----------------------------------------
@@ -185,17 +271,44 @@ class ReportExportHelper:
 
                     cell.value = numeric_value
 
-                    if "." in text:
+                    header_item = (
+                        table.horizontalHeaderItem(
+                            column
+                        )
+                    )
+
+                    heading = (
+                        header_item.text().strip()
+                        if header_item is not None
+                        else ""
+                    )
+
+                    # -----------------------------------------
+                    # Quantity change
+                    # -----------------------------------------
+
+                    if heading == "Change":
+
+                        if "." in text:
+                            cell.number_format = (
+                                "+#,##0.00;-#,##0.00;0.00"
+                            )
+                        else:
+                            cell.number_format = (
+                                "+#,##0;-#,##0;0"
+                            )
+
+                    # -----------------------------------------
+                    # Other numeric values
+                    # -----------------------------------------
+
+                    elif "." in text:
+
                         cell.number_format = (
                             "#,##0.00"
                         )
 
                 except ValueError:
-
-                    # Text such as:
-                    # EMP-000003
-                    # Abraham du Plessis
-                    # General Maintenance
                     cell.value = text
 
         # -------------------------------------------------
@@ -206,19 +319,24 @@ class ReportExportHelper:
             1,
             column_count + 1
         ):
-
             max_length = 0
 
-            column_letter = (
-                get_column_letter(
-                    column
-                )
+            column_letter = get_column_letter(
+                column
             )
+
+            header_cell = worksheet.cell(
+                row=header_row,
+                column=column
+            )
+
+            heading = str(
+                header_cell.value or ""
+            ).strip()
 
             for cell in worksheet[
                 column_letter
             ]:
-
                 if cell.value is None:
                     continue
 
@@ -227,18 +345,38 @@ class ReportExportHelper:
                     len(str(cell.value))
                 )
 
-            worksheet.column_dimensions[
-                column_letter
-            ].width = min(
-                max_length + 2,
-                40
-            )
+            # Notes needs extra width and wrapping
+            if heading == "Notes":
+                worksheet.column_dimensions[
+                    column_letter
+                ].width = 55
+
+                for row_number in range(
+                    header_row + 1,
+                    header_row + row_count + 1
+                ):
+                    worksheet.cell(
+                        row=row_number,
+                        column=column
+                    ).alignment = Alignment(
+                        vertical="top",
+                        wrap_text=True
+                    )
+            else:
+                worksheet.column_dimensions[
+                    column_letter
+                ].width = min(
+                    max_length + 2,
+                    40
+                )
 
         # -------------------------------------------------
         # Freeze headings
         # -------------------------------------------------
 
-        worksheet.freeze_panes = "A4"
+        worksheet.freeze_panes = (
+            f"A{header_row + 1}"
+        )
 
         # -------------------------------------------------
         # Excel filters
@@ -249,9 +387,9 @@ class ReportExportHelper:
             and row_count > 0
         ):
             worksheet.auto_filter.ref = (
-                f"A3:"
+                f"A{header_row}:"
                 f"{get_column_letter(column_count)}"
-                f"{row_count + 3}"
+                f"{header_row + row_count}"
             )
 
         # -------------------------------------------------

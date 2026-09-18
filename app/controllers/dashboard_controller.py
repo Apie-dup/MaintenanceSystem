@@ -25,6 +25,9 @@ class DashboardController(QMainWindow):
 
         self.ui.setupUi(self)
 
+        if not hasattr(self.ui, "btnTechnicians"):
+            self.ui.btnTechnicians = self.ui.btnThecnicians
+
         self.ui.btnDashboard.setChecked(True)
         self.ui.btnAssets.setChecked(True)
         self.ui.btnWorkOrders.setChecked(True)

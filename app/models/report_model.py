@@ -56,13 +56,15 @@ class ReportModel:
 
         if from_date:
             query += """
-                AND work_orders.date_created >= ?
+                AND DATE(work_orders.date_created)
+                    >= DATE(?)
             """
             parameters.append(from_date)
 
         if to_date:
             query += """
-                AND work_orders.date_created <= ?
+                AND DATE(work_orders.date_created)
+                    <= DATE(?)
             """
             parameters.append(to_date)
 
@@ -171,13 +173,15 @@ class ReportModel:
 
         if from_date:
             query += """
-                AND work_orders.date_created >= ?
+                AND DATE(work_orders.date_created)
+                    >= DATE(?)
             """
             parameters.append(from_date)
 
         if to_date:
             query += """
-                AND work_orders.date_created <= ?
+                AND DATE(work_orders.date_created)
+                    <= DATE(?)
             """
             parameters.append(to_date)
 
@@ -279,66 +283,66 @@ class ReportModel:
         conn = Database.connect()
         cursor = conn.cursor()
 
-        cursor.execute("""
-            SELECT
-                preventive_maintenance.id AS id,
-                preventive_maintenance.pm_number AS pm_number,
+        try:
 
-                assets.asset_number AS asset_number,
-                assets.asset_name AS asset_name,
+            cursor.execute("""
+                SELECT
+                    preventive_maintenance.id
+                        AS id,
 
-                preventive_maintenance.task AS task,
+                    preventive_maintenance.pm_number
+                        AS pm_number,
 
-                preventive_maintenance.frequency_type
-                    AS frequency_type,
+                    preventive_maintenance.asset_id
+                        AS asset_id,
 
-                preventive_maintenance.frequency_value
-                    AS frequency_value,
+                    assets.asset_number
+                        AS asset_number,
 
-                preventive_maintenance.last_service_date
-                    AS last_service_date,
+                    assets.asset_name
+                        AS asset_name,
 
-                preventive_maintenance.next_due_date
-                    AS next_due_date,
+                    preventive_maintenance.task
+                        AS task,
 
-                preventive_maintenance.priority
-                    AS priority,
+                    preventive_maintenance.frequency_type
+                        AS frequency_type,
 
-                CASE
-                    WHEN preventive_maintenance.active = 0
-                        THEN 'Inactive'
+                    preventive_maintenance.frequency_value
+                        AS frequency_value,
 
-                    WHEN preventive_maintenance.next_due_date
-                         < DATE('now')
-                        THEN 'Overdue'
+                    preventive_maintenance.last_service_date
+                        AS last_service_date,
 
-                    WHEN preventive_maintenance.next_due_date
-                         = DATE('now')
-                        THEN 'Due Today'
+                    preventive_maintenance.next_due_date
+                        AS next_due_date,
 
-                    WHEN preventive_maintenance.next_due_date
-                         <= DATE('now', '+7 days')
-                        THEN 'Due Soon'
+                    preventive_maintenance.last_service_meter
+                        AS last_service_meter,
 
-                    ELSE 'Scheduled'
-                END AS due_status
+                    preventive_maintenance.next_due_meter
+                        AS next_due_meter,
 
-            FROM preventive_maintenance
+                    preventive_maintenance.priority
+                        AS priority,
 
-            INNER JOIN assets
-                ON preventive_maintenance.asset_id
-                = assets.id
+                    preventive_maintenance.active
+                        AS active
 
-            ORDER BY
-                preventive_maintenance.next_due_date,
-                preventive_maintenance.pm_number
-        """)
+                FROM preventive_maintenance
 
-        rows = cursor.fetchall()
+                INNER JOIN assets
+                    ON preventive_maintenance.asset_id
+                    = assets.id
 
-        conn.close()
+                ORDER BY
+                    preventive_maintenance.pm_number
+            """)
 
-        return rows
+            return cursor.fetchall()
+
+        finally:
+            conn.close()
 
     @staticmethod
     def get_technician_performance(
@@ -376,6 +380,19 @@ class ReportModel:
                     END
                 ) AS completed_count,
 
+                SUM(
+                    CASE
+                        WHEN work_orders.status
+                            NOT IN (
+                                'Completed',
+                                'Closed',
+                                'Cancelled'
+                            )
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS open_count,
+
                 CASE
                     WHEN COUNT(work_orders.id) = 0
                         THEN 0
@@ -384,7 +401,10 @@ class ReportModel:
                             SUM(
                                 CASE
                                     WHEN work_orders.status
-                                        IN ('Completed', 'Closed')
+                                        IN (
+                                            'Completed',
+                                            'Closed'
+                                        )
                                     THEN 1
                                     ELSE 0
                                 END
@@ -392,27 +412,33 @@ class ReportModel:
                             * 100.0
                             / COUNT(work_orders.id)
                         )
-                END AS completion_rate,
+                    END AS completion_rate,
 
-                COALESCE(
-                    SUM(work_orders.labour_hours),
-                    0
-                ) AS labour_hours,
+                    COALESCE(
+                        SUM(work_orders.labour_hours),
+                        0
+                    ) AS labour_hours,
 
-                COALESCE(
-                    SUM(
-                        COALESCE(work_orders.labour_hours, 0)
-                        *
-                        COALESCE(technicians.hourly_rate, 0)
-                    ),
-                    0
-                ) AS labour_cost
+                    COALESCE(
+                        SUM(
+                            COALESCE(
+                                work_orders.labour_hours,
+                                0
+                            )
+                            *
+                            COALESCE(
+                                technicians.hourly_rate,
+                                0
+                            )
+                        ),
+                        0
+                    ) AS labour_cost
 
             FROM technicians
 
             LEFT JOIN work_orders
                 ON work_orders.technician_id
-                = technicians.id
+                 = technicians.id
         """
 
         parameters = []
@@ -463,3 +489,317 @@ class ReportModel:
         conn.close()
 
         return rows
+
+    @staticmethod
+    def get_inventory_transactions(
+        from_date,
+        to_date
+    ):
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        try:
+
+            cursor.execute("""
+                SELECT
+                    inventory_transactions.id,
+                    inventory_transactions.created_at,
+
+                    inventory.part_number,
+                    inventory.part_name,
+
+                    inventory_transactions.transaction_type,
+                    inventory_transactions.quantity_change,
+                    inventory_transactions.previous_quantity,
+                    inventory_transactions.new_quantity,
+                    inventory_transactions.unit_cost,
+
+                    work_orders.work_order_number,
+
+                    inventory_transactions.reference,
+                    inventory_transactions.username,
+                    inventory_transactions.notes
+
+                FROM inventory_transactions
+
+                LEFT JOIN inventory
+                    ON inventory_transactions.inventory_id
+                    = inventory.id
+
+                LEFT JOIN work_orders
+                    ON inventory_transactions.work_order_id
+                    = work_orders.id
+
+                WHERE DATE(
+                    inventory_transactions.created_at
+                ) BETWEEN ? AND ?
+
+                ORDER BY
+                    inventory_transactions.created_at DESC,
+                    inventory_transactions.id DESC
+            """, (
+                from_date,
+                to_date,
+            ))
+
+            return cursor.fetchall()
+
+        finally:
+            conn.close()
+
+    @staticmethod
+    def get_low_stock_reorder():
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT
+                inventory.id,
+                inventory.part_number,
+                inventory.part_name,
+                inventory.category,
+
+                COALESCE(
+                    suppliers.supplier_name,
+                    'No Supplier'
+                ) AS supplier_name,
+
+                inventory.quantity,
+                inventory.minimum_quantity,
+                inventory.reorder_quantity,
+                inventory.unit_cost,
+                inventory.location,
+                inventory.status,
+
+                (
+                    inventory.reorder_quantity
+                    * inventory.unit_cost
+                ) AS reorder_cost
+
+            FROM inventory
+
+            LEFT JOIN suppliers
+                ON inventory.supplier_id
+                = suppliers.id
+
+            WHERE
+                inventory.quantity
+                <= inventory.minimum_quantity
+
+            ORDER BY
+                inventory.quantity ASC,
+                inventory.part_number ASC
+        """)
+
+        rows = cursor.fetchall()
+
+        conn.close()
+
+        return rows
+
+    @staticmethod
+    def get_asset_maintenance_history(
+        from_date=None,
+        to_date=None,
+        status=None,
+        asset_number=None,
+    ):
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        try:
+
+            query = """
+                SELECT
+                    work_orders.id,
+                    work_orders.work_order_number,
+
+                    assets.asset_number,
+                    assets.asset_name,
+
+                    technicians.employee_number,
+
+                    (
+                        technicians.first_name
+                        || ' '
+                        || technicians.last_name
+                    ) AS technician_name,
+
+                    work_orders.title,
+                    work_orders.priority,
+                    work_orders.status,
+
+                    work_orders.date_created,
+                    work_orders.due_date,
+
+                    work_orders.completed_date
+                        AS completed_date,
+
+                    work_orders.labour_hours,
+                    work_orders.estimated_cost,
+                    work_orders.actual_cost
+
+                FROM work_orders
+
+                INNER JOIN assets
+                    ON work_orders.asset_id
+                    = assets.id
+
+                LEFT JOIN technicians
+                    ON work_orders.technician_id
+                    = technicians.id
+
+                WHERE 1 = 1
+            """
+
+            parameters = []
+
+            if from_date:
+                query += """
+                    AND DATE(work_orders.date_created)
+                        >= DATE(?)
+                """
+                parameters.append(from_date)
+
+            if to_date:
+                query += """
+                    AND DATE(work_orders.date_created)
+                        <= DATE(?)
+                """
+                parameters.append(to_date)
+
+            if status:
+                query += """
+                    AND work_orders.status = ?
+                """
+                parameters.append(status)
+
+            if asset_number:
+                query += """
+                    AND assets.asset_number = ?
+                """
+                parameters.append(asset_number)
+
+            query += """
+                ORDER BY
+                    work_orders.date_created DESC,
+                    work_orders.id DESC
+            """
+
+            cursor.execute(
+                query,
+                parameters
+            )
+
+            return cursor.fetchall()
+
+        finally:
+            conn.close()
+
+    @staticmethod
+    def get_technician_work_history(
+        from_date=None,
+        to_date=None,
+        status=None,
+        technician_id=None,
+    ):
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        try:
+
+            query = """
+                SELECT
+                    work_orders.id,
+                    work_orders.work_order_number,
+
+                    technicians.id
+                        AS technician_id,
+
+                    technicians.employee_number,
+
+                    (
+                        technicians.first_name
+                        || ' '
+                        || technicians.last_name
+                    ) AS technician_name,
+
+                    technicians.trade,
+
+                    assets.asset_number,
+                    assets.asset_name,
+
+                    work_orders.title,
+                    work_orders.priority,
+                    work_orders.status,
+
+                    work_orders.date_created,
+                    work_orders.due_date,
+                    work_orders.completed_date,
+
+                    work_orders.labour_hours,
+                    work_orders.actual_cost
+
+                FROM work_orders
+
+                INNER JOIN technicians
+                    ON work_orders.technician_id
+                    = technicians.id
+
+                LEFT JOIN assets
+                    ON work_orders.asset_id
+                    = assets.id
+
+                WHERE 1 = 1
+            """
+
+            parameters = []
+
+            if from_date:
+                query += """
+                    AND DATE(work_orders.date_created)
+                        >= DATE(?)
+                """
+                parameters.append(from_date)
+
+            if to_date:
+                query += """
+                    AND DATE(work_orders.date_created)
+                        <= DATE(?)
+                """
+                parameters.append(to_date)
+
+            if status:
+                query += """
+                    AND work_orders.status = ?
+                """
+                parameters.append(status)
+
+            if technician_id is not None:
+                query += """
+                    AND technicians.id = ?
+                """
+                parameters.append(
+                    technician_id
+                )
+
+            query += """
+                ORDER BY
+                    technicians.employee_number,
+                    work_orders.date_created DESC,
+                    work_orders.id DESC
+            """
+
+            cursor.execute(
+                query,
+                parameters
+            )
+
+            return cursor.fetchall()
+
+        finally:
+            conn.close()

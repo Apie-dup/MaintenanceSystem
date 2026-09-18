@@ -54,6 +54,18 @@ class DashboardService:
         }
 
     @staticmethod
+    def get_statistics():
+        summary = DashboardService.get_summary()
+
+        return {
+            "assets": summary.get("assets", 0),
+            "work_orders": summary.get("open_work_orders", 0),
+            "pm_due": summary.get("pm_due_today", 0),
+            "low_stock": summary.get("low_stock", 0),
+            "technicians": summary.get("technicians", 0),
+        }
+
+    @staticmethod
     def get_urgent_work_orders():
         return WorkOrderService.get_urgent(
             limit=10

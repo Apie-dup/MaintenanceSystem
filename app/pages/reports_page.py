@@ -17,6 +17,7 @@ from app.helpers.date_helper import DateHelper
 from app.helpers.currency_helper import CurrencyHelper
 from app.core.permissions import Permissions
 from app.services.asset_service import AssetService
+from app.services.technician_service import TechnicianService
 
 
 class ReportsPage(QWidget):
@@ -61,6 +62,21 @@ class ReportsPage(QWidget):
         ("stock_level", "Stock Level"),
     ]
 
+    INVENTORY_TRANSACTION_COLUMNS = [
+        ("created_at", "Date / Time"),
+        ("part_number", "Part Number"),
+        ("part_name", "Part Name"),
+        ("transaction_type", "Type"),
+        ("quantity_change", "Change"),
+        ("previous_quantity", "Previous"),
+        ("new_quantity", "New"),
+        ("unit_cost", "Unit Cost"),
+        ("work_order_number", "Work Order"),
+        ("reference", "Reference"),
+        ("username", "User"),
+        ("notes", "Notes"),
+    ]
+
     PREVENTIVE_MAINTENANCE_COLUMNS = [
         ("pm_number", "PM Number"),
         ("asset_number", "Asset Number"),
@@ -85,6 +101,53 @@ class ReportsPage(QWidget):
         ("completion_rate", "Completion %"),
         ("labour_hours", "Labour Hours"),
         ("labour_cost", "Labour Cost"),
+    ]
+
+    LOW_STOCK_REORDER_COLUMNS = [
+        ("part_number", "Part Number"),
+        ("part_name", "Part Name"),
+        ("category", "Category"),
+        ("supplier_name", "Supplier"),
+        ("quantity", "Quantity"),
+        ("minimum_quantity", "Minimum"),
+        ("reorder_quantity", "Reorder Qty"),
+        ("unit_cost", "Unit Cost"),
+        ("reorder_cost", "Reorder Cost"),
+        ("location", "Location"),
+        ("status", "Status"),
+    ]
+
+    ASSET_MAINTENANCE_HISTORY_COLUMNS = [
+        ("work_order_number", "Work Order"),
+        ("asset_number", "Asset Number"),
+        ("asset_name", "Asset"),
+        ("technician_name", "Technician"),
+        ("title", "Title"),
+        ("priority", "Priority"),
+        ("status", "Status"),
+        ("date_created", "Created"),
+        ("due_date", "Due"),
+        ("completed_date", "Completed"),
+        ("labour_hours", "Labour Hours"),
+        ("estimated_cost", "Estimated Cost"),
+        ("actual_cost", "Actual Cost"),
+    ]
+
+    TECHNICIAN_WORK_HISTORY_COLUMNS = [
+        ("work_order_number", "Work Order"),
+        ("employee_number", "Employee Number"),
+        ("technician_name", "Technician"),
+        ("trade", "Trade"),
+        ("asset_number", "Asset Number"),
+        ("asset_name", "Asset"),
+        ("title", "Title"),
+        ("priority", "Priority"),
+        ("status", "Status"),
+        ("date_created", "Created"),
+        ("due_date", "Due"),
+        ("completed_date", "Completed"),
+        ("labour_hours", "Labour Hours"),
+        ("actual_cost", "Actual Cost"),
     ]
 
     def __init__(self, parent=None):
@@ -118,7 +181,16 @@ class ReportsPage(QWidget):
             today.addMonths(-1)
         )
 
-        self.load_status_filter()
+        report_type = (
+        self.ui.cmbReportType
+            .currentText()
+            .strip()
+        )
+
+        self.update_status_filter(
+            report_type
+        )
+
         self.load_asset_filter()
 
         self.ui.cmbReportType.currentTextChanged.connect(
@@ -131,37 +203,7 @@ class ReportsPage(QWidget):
 
         self.apply_permissions()
 
-        TableHelper.setup(
-            self.ui.tblReport,
-            self.WORK_ORDER_COLUMNS
-        )
-
         self.generate_report()
-
-    def load_status_filter(self):
-
-        self.ui.cmbStatus.clear()
-
-        self.ui.cmbStatus.addItem(
-            "All Statuses",
-            None
-        )
-
-        statuses = [
-            "Open",
-            "Assigned",
-            "In Progress",
-            "On Hold",
-            "Completed",
-            "Closed",
-            "Cancelled",
-        ]
-
-        for status in statuses:
-            self.ui.cmbStatus.addItem(
-                status,
-                status
-            )
 
     def load_asset_filter(self):
 
@@ -184,6 +226,32 @@ class ReportsPage(QWidget):
             self.ui.cmbAsset.addItem(
                 display_text,
                 asset["asset_number"]
+            )
+
+    def load_technician_filter(self):
+
+        self.ui.cmbAsset.clear()
+
+        self.ui.cmbAsset.addItem(
+            "All Technicians",
+            None
+        )
+
+        technicians = (
+            TechnicianService.get_all()
+        )
+
+        for technician in technicians:
+
+            display_text = (
+                f'{technician["employee_number"]} - '
+                f'{technician["first_name"]} '
+                f'{technician["last_name"]}'
+            )
+
+            self.ui.cmbAsset.addItem(
+                display_text,
+                technician["id"]
             )
 
     def reset_summary(self):
@@ -233,21 +301,6 @@ class ReportsPage(QWidget):
         self.ui.btnPrint.setVisible(
             can_print
         )
-
-        #----------------------------------------------
-        # Initial table setup
-        #----------------------------------------------
-
-        TableHelper.setup(
-            self.ui.tblReport,
-            self.WORK_ORDER_COLUMNS
-        )
-
-        #----------------------------------------------
-        # Load initial report
-        #----------------------------------------------
-
-        self.generate_report()
 
     def connect_signals(self):
         self.ui.btnGenerate.clicked.connect(
@@ -359,16 +412,66 @@ class ReportsPage(QWidget):
                 ReportService.get_inventory_stock()
             )
 
-        elif report_type == "Preventive Maintenance":
+        elif report_type == "Inventory Transactions":
 
-            columns = self.PREVENTIVE_MAINTENANCE_COLUMNS
+            columns = (
+                self.INVENTORY_TRANSACTION_COLUMNS
+            )
 
             rows = (
-                ReportService.get_preventive_maintenance()
+                ReportService
+                .get_inventory_transactions(
+                    from_date,
+                    to_date
+                )
+            )
+
+        elif report_type == "Asset Maintenance History":
+
+            columns = (
+                self.ASSET_MAINTENANCE_HISTORY_COLUMNS
             )
 
             selected_status = (
-                self.ui.cmbStatus.currentText()
+                self.ui.cmbStatus
+                .currentText()
+                .strip()
+            )
+
+            selected_asset_number = (
+                self.ui.cmbAsset.currentData()
+            )
+
+            status = (
+                None
+                if selected_status == "All Statuses"
+                else selected_status
+            )
+
+            rows = (
+                ReportService
+                .get_asset_maintenance_history(
+                    from_date,
+                    to_date,
+                    status=status,
+                    asset_number=selected_asset_number,
+                )
+            )
+
+        elif report_type == "Preventive Maintenance":
+
+            columns = (
+                self.PREVENTIVE_MAINTENANCE_COLUMNS
+            )
+
+            rows = (
+                ReportService
+                .get_preventive_maintenance()
+            )
+
+            selected_status = (
+                self.ui.cmbStatus
+                .currentText()
                 .strip()
             )
 
@@ -382,9 +485,9 @@ class ReportsPage(QWidget):
 
                 row = dict(record)
 
-                #----------------------------------------------
+                # ----------------------------------------------
                 # PM Due Status filter
-                #----------------------------------------------
+                # ----------------------------------------------
 
                 if selected_status != "All Statuses":
 
@@ -393,9 +496,9 @@ class ReportsPage(QWidget):
                     ) != selected_status:
                         continue
 
-                #----------------------------------------------
+                # ----------------------------------------------
                 # Asset filter
-                #----------------------------------------------
+                # ----------------------------------------------
 
                 if selected_asset_number is not None:
 
@@ -410,6 +513,17 @@ class ReportsPage(QWidget):
 
             rows = filtered_rows
 
+        elif report_type == "Low Stock / Reorder":
+
+            columns = (
+                self.LOW_STOCK_REORDER_COLUMNS
+            )
+
+            rows = (
+                ReportService
+                .get_low_stock_reorder()
+            )
+
         elif report_type == "Technician Performance":
 
             columns = self.TECHNICIAN_PERFORMANCE_COLUMNS
@@ -417,6 +531,38 @@ class ReportsPage(QWidget):
             rows = ReportService.get_technician_performance(
                 from_date,
                 to_date
+            )
+
+        elif report_type == "Technician Work History":
+
+            columns = (
+                self.TECHNICIAN_WORK_HISTORY_COLUMNS
+            )
+
+            selected_status = (
+                self.ui.cmbStatus
+                .currentText()
+                .strip()
+            )
+
+            selected_technician_id = (
+                self.ui.cmbAsset.currentData()
+            )
+
+            status = (
+                None
+                if selected_status == "All Statuses"
+                else selected_status
+            )
+
+            rows = (
+                ReportService
+                .get_technician_work_history(
+                    from_date,
+                    to_date,
+                    status=status,
+                    technician_id=selected_technician_id,
+                )
             )
 
         else:
@@ -455,35 +601,69 @@ class ReportsPage(QWidget):
             self.ui.cmbReportType.currentText()
         )
 
-        # --------------------------------------------------
-        # Update available status choices
-        # --------------------------------------------------
+    # --------------------------------------------------
+    # Update available status choices
+    # --------------------------------------------------
 
         self.update_status_filter(
             report_type
         )
 
-        # --------------------------------------------------
-        # Determine available filters
-        # --------------------------------------------------
+    # --------------------------------------------------
+    # Determine available filters
+    # --------------------------------------------------
 
-        filters_enabled = (
+        filters_visible = (
             report_type
             not in {
                 "Inventory Stock",
+                "Inventory Transactions",
+                "Low Stock / Reorder",
                 "Technician Performance",
             }
         )
 
-        self.ui.cmbStatus.setEnabled(
-            filters_enabled
+        self.ui.lblStatus_2.setVisible(
+            filters_visible
         )
 
-        self.ui.cmbAsset.setEnabled(
-            filters_enabled
+        self.ui.cmbStatus.setVisible(
+            filters_visible
         )
 
-        if not filters_enabled:
+        self.ui.lblAsset.setVisible(
+            filters_visible
+        )
+
+        self.ui.cmbAsset.setVisible(
+            filters_visible
+        )
+
+    # --------------------------------------------------
+    # Asset / Technician filter
+    # --------------------------------------------------
+
+        if report_type == "Technician Work History":
+
+            self.ui.lblAsset.setText(
+                "Technician:"
+            )
+
+            self.load_technician_filter()
+
+        else:
+
+            self.ui.lblAsset.setText(
+                "Asset:"
+            )
+
+            self.load_asset_filter()
+
+    # --------------------------------------------------
+    # Reset hidden filters
+    # --------------------------------------------------
+
+        if not filters_visible:
 
             self.ui.cmbStatus.setCurrentIndex(
                 0
@@ -493,27 +673,27 @@ class ReportsPage(QWidget):
                 0
             )
 
-        # --------------------------------------------------
-        # Update summary labels
-        # --------------------------------------------------
+    # --------------------------------------------------
+    # Update summary labels
+    # --------------------------------------------------
 
         self.update_summary_labels(
             report_type
         )
 
-        # --------------------------------------------------
-        # Generate selected report
-        # --------------------------------------------------
+    # --------------------------------------------------
+    # Generate selected report
+    # --------------------------------------------------
 
         self.generate_report()
 
     def clear_filters(self):
-        
+
         today = QDate.currentDate()
 
-        #---------------------------------------------------
-        # Reset date range
-        #---------------------------------------------------
+    # --------------------------------------------------
+    # Reset date range
+    # --------------------------------------------------
 
         self.ui.dtToDate.setDate(
             today
@@ -523,9 +703,9 @@ class ReportsPage(QWidget):
             today.addMonths(-1)
         )
 
-        #---------------------------------------------------
-        # Reset filters
-        #---------------------------------------------------
+    # --------------------------------------------------
+    # Reset filters
+    # --------------------------------------------------
 
         if self.ui.cmbStatus.count() > 0:
             self.ui.cmbStatus.setCurrentIndex(
@@ -537,9 +717,15 @@ class ReportsPage(QWidget):
                 0
             )
 
-        #-----------------------------------------------------
-        # Regenerate current report
-        #-----------------------------------------------------
+    # --------------------------------------------------
+    # Restore date-filter state
+    # --------------------------------------------------
+
+        self.update_date_filter_state()
+
+    # --------------------------------------------------
+    # Regenerate current report
+    # --------------------------------------------------
 
         self.generate_report()
 
@@ -746,6 +932,99 @@ class ReportsPage(QWidget):
                     except ValueError:
                         pass
 
+        elif report_type == "Inventory Transactions":
+
+            change_column = 4
+            previous_column = 5
+            new_column = 6
+            unit_cost_column = 7
+
+            for row in range(
+                table.rowCount()
+            ):
+
+                # -------------------------------------------------
+                # Quantity Change
+                # -------------------------------------------------
+
+                item = table.item(
+                    row,
+                    change_column
+                )
+
+                if item is not None:
+
+                    try:
+                        value = float(
+                            item.text()
+                        )
+
+                        if value > 0:
+                            item.setText(
+                                f"+{value:g}"
+                            )
+                        else:
+                            item.setText(
+                                f"{value:g}"
+                            )
+
+                    except ValueError:
+                        pass
+
+                # -------------------------------------------------
+                # Previous / New Quantity
+                # -------------------------------------------------
+
+                for column in (
+                    previous_column,
+                    new_column,
+                ):
+
+                    item = table.item(
+                        row,
+                        column
+                    )
+
+                    if item is None:
+                        continue
+
+                    try:
+                        value = float(
+                            item.text()
+                        )
+
+                        item.setText(
+                            f"{value:g}"
+                        )
+
+                    except ValueError:
+                        pass
+
+                # -------------------------------------------------
+                # Unit Cost
+                # -------------------------------------------------
+
+                item = table.item(
+                    row,
+                    unit_cost_column
+                )
+
+                if item is not None:
+
+                    try:
+                        value = float(
+                            item.text()
+                        )
+
+                        item.setText(
+                            SettingsService.format_currency(
+                                value
+                            )
+                        )
+
+                    except ValueError:
+                        pass
+
         elif report_type == "Technician Performance":
 
             completion_rate_column = 5
@@ -883,6 +1162,231 @@ class ReportsPage(QWidget):
 
                         item.setText(
                             f"{value:,.2f}"
+                        )
+
+                    except ValueError:
+                        pass
+
+        elif report_type == "Low Stock / Reorder":
+
+            quantity_columns = (
+                4,  # Quantity
+                5,  # Minimum
+                6,  # Reorder Qty
+            )
+
+            cost_columns = (
+                7,  # Unit Cost
+                8,  # Reorder Cost
+            )
+
+            for row in range(
+                table.rowCount()
+            ):
+
+                for column in quantity_columns:
+
+                    item = table.item(
+                        row,
+                        column
+                    )
+
+                    if item is None:
+                        continue
+
+                    try:
+                        value = float(
+                            item.text()
+                        )
+
+                        item.setText(
+                            f"{value:.2f}"
+                        )
+
+                    except ValueError:
+                        pass
+
+                for column in cost_columns:
+
+                    item = table.item(
+                        row,
+                        column
+                    )
+
+                    if item is None:
+                        continue
+
+                    try:
+                        value = float(
+                            item.text()
+                        )
+
+                        item.setText(
+                            SettingsService.format_currency(
+                                value
+                            )
+                        )
+
+                    except ValueError:
+                        pass
+
+        elif report_type == "Asset Maintenance History":
+
+            date_columns = (
+                7,  # Created
+                8,  # Due
+                9,  # Completed
+            )
+
+            labour_column = 10
+
+            cost_columns = (
+                11,  # Estimated Cost
+                12,  # Actual Cost
+            )
+
+            for row in range(
+                table.rowCount()
+            ):
+
+                for column in date_columns:
+
+                    item = table.item(
+                        row,
+                        column
+                    )
+
+                    if item is None:
+                        continue
+
+                    text = (
+                        item.text()
+                        .strip()
+                    )
+
+                    if not text:
+                        continue
+
+                    item.setText(
+                        DateHelper.display(
+                            text
+                        )
+                    )
+
+                item = table.item(
+                    row,
+                    labour_column
+                )
+
+                if item is not None:
+
+                    try:
+                        value = float(
+                            item.text() or 0
+                        )
+
+                        item.setText(
+                            f"{value:.2f}"
+                        )
+
+                    except ValueError:
+                        pass
+
+                for column in cost_columns:
+
+                    item = table.item(
+                        row,
+                        column
+                    )
+
+                    if item is None:
+                        continue
+
+                    try:
+                        value = float(
+                            item.text() or 0
+                        )
+
+                        item.setText(
+                            SettingsService.format_currency(
+                                value
+                            )
+                        )
+
+                    except ValueError:
+                        pass
+
+        elif report_type == "Technician Work History":
+
+            date_columns = (
+                9,   # Created
+                10,  # Due
+                11,  # Completed
+            )
+
+            labour_column = 12
+            cost_column = 13
+
+            for row in range(
+                table.rowCount()
+            ):
+
+                for column in date_columns:
+
+                    item = table.item(
+                        row,
+                        column
+                    )
+
+                    if item is None:
+                        continue
+
+                    text = item.text().strip()
+
+                    if not text:
+                        continue
+
+                    item.setText(
+                        DateHelper.display(
+                            text
+                        )
+                    )
+
+                item = table.item(
+                    row,
+                    labour_column
+                )
+
+                if item is not None:
+
+                    try:
+                        value = float(
+                            item.text() or 0
+                        )
+
+                        item.setText(
+                            f"{value:.2f}"
+                        )
+
+                    except ValueError:
+                        pass
+
+                item = table.item(
+                    row,
+                    cost_column
+                )
+
+                if item is not None:
+
+                    try:
+                        value = float(
+                            item.text() or 0
+                        )
+
+                        item.setText(
+                            SettingsService.format_currency(
+                                value
+                            )
                         )
 
                     except ValueError:
@@ -1096,6 +1600,68 @@ class ReportsPage(QWidget):
 
             return
 
+        # ---------------------------------------------------------
+        # Inventory Transactions
+        # ---------------------------------------------------------
+
+        if report_type == "Inventory Transactions":
+
+            transaction_count = len(rows)
+
+            stock_in = sum(
+                float(
+                    row["quantity_change"] or 0
+                )
+                for row in rows
+                    if float(
+                    row["quantity_change"] or 0
+                ) > 0
+            )
+
+            stock_out = sum(
+                abs(
+                    float(
+                        row["quantity_change"] or 0
+                    )
+                )
+                for row in rows
+                if float(
+                    row["quantity_change"] or 0
+                ) < 0
+            )
+
+            movement_value = sum(
+                abs(
+                    float(
+                        row["quantity_change"] or 0
+                    )
+                )
+                * float(
+                    row["unit_cost"] or 0
+                )
+                for row in rows
+            )
+
+            self.ui.lblTotalValue.setText(
+                str(transaction_count)
+            )
+
+            self.ui.lblOpenValue.setText(
+                f"{stock_in:g}"
+            )
+
+            self.ui.lblCompletedValue.setText(
+                f"{stock_out:g}"
+            )
+
+            self.ui.lblTotalCostValue.setText(
+                SettingsService.format_currency(
+                    movement_value
+                )
+            )
+
+            return
+
         #---------------------------------------------------------
         # Technician Performance
         #---------------------------------------------------------
@@ -1145,11 +1711,162 @@ class ReportsPage(QWidget):
 
             return
 
+        # ---------------------------------------------------------
+        # Low Stock / Reorder
+        # ---------------------------------------------------------
+
+        if report_type == "Low Stock / Reorder":
+
+            item_count = len(rows)
+
+            out_of_stock_count = sum(
+                1
+            for row in rows
+                if float(
+                    row["quantity"] or 0
+                )<= 0
+            )
+
+            reorder_units = sum(
+                float(
+                    row["reorder_quantity"] or 0
+                )
+                for row in rows
+            )
+
+            reorder_value = sum(
+                float(
+                    row["reorder_cost"] or 0
+                )
+                for row in rows
+            )
+
+            self.ui.lblTotalValue.setText(
+                str(item_count)
+            )
+
+            self.ui.lblOpenValue.setText(
+                str(out_of_stock_count)
+            )
+
+            self.ui.lblCompletedValue.setText(
+                f"{reorder_units:g}"
+            )
+
+            self.ui.lblTotalCostValue.setText(
+                SettingsService.format_currency(
+                    reorder_value
+                )
+            )
+
+            return
+
+        if report_type == "Asset Maintenance History":
+
+            work_order_count = len(rows)
+
+            completed_count = sum(
+                1
+                for row in rows
+                if (
+                    row["status"] or ""
+                ) in {
+                    "Completed",
+                    "Closed",
+                }
+            )
+
+            labour_hours = sum(
+                float(
+                    row["labour_hours"] or 0
+                )
+                for row in rows
+            )
+
+            total_cost = sum(
+                float(
+                    row["actual_cost"] or 0
+                )
+                for row in rows
+            )
+
+            self.ui.lblTotalValue.setText(
+                str(work_order_count)
+            )
+
+            self.ui.lblOpenValue.setText(
+                str(completed_count)
+            )
+
+            self.ui.lblCompletedValue.setText(
+                f"{labour_hours:.2f}"
+            )
+
+            self.ui.lblTotalCostValue.setText(
+                SettingsService.format_currency(
+                    total_cost
+                )
+            )
+
+            return
+
+        # ---------------------------------------------------------
+        # Technician Work History
+        # ---------------------------------------------------------
+
+        if report_type == "Technician Work History":
+
+            work_order_count = len(rows)
+
+            completed_count = sum(
+                1
+                for row in rows
+                if (
+                    row["status"] or ""
+                ) in {
+                    "Completed",
+                    "Closed",
+                }
+            )
+
+            labour_hours = sum(
+                float(
+                    row["labour_hours"] or 0
+                )
+                for row in rows
+            )
+
+            actual_cost = sum(
+                float(
+                    row["actual_cost"] or 0
+                )
+                for row in rows
+            )
+
+            self.ui.lblTotalValue.setText(
+                str(work_order_count)
+            )
+
+            self.ui.lblOpenValue.setText(
+                str(completed_count)
+            )
+
+            self.ui.lblCompletedValue.setText(
+                f"{labour_hours:.2f}"
+            )
+
+            self.ui.lblTotalCostValue.setText(
+                SettingsService.format_currency(
+                    actual_cost
+                )
+            )
+
+            return
+
     def update_summary_labels(
         self,
         report_type,
     ):
-
         if report_type == "Preventive Maintenance":
 
             self.ui.lblTotal.setText(
@@ -1210,6 +1927,26 @@ class ReportsPage(QWidget):
 
             return
 
+        if report_type == "Inventory Transactions":
+
+            self.ui.lblTotal.setText(
+                "Transactions"
+            )
+
+            self.ui.lblOpen.setText(
+                "Stock In"
+            )
+
+            self.ui.lblCompleted.setText(
+                "Stock Out"
+            )
+
+            self.ui.lblTotalCost.setText(
+                "Movement Value"
+            )
+
+            return
+
         if report_type == "Technician Performance":
 
             self.ui.lblTotal.setText(
@@ -1230,6 +1967,64 @@ class ReportsPage(QWidget):
 
             return
 
+        if report_type == "Low Stock / Reorder":
+
+            self.ui.lblTotal.setText(
+                "Items"
+            )
+
+            self.ui.lblOpen.setText(
+                "Out of Stock"
+            )
+
+            self.ui.lblCompleted.setText(
+                "Reorder Units"
+            )
+
+            self.ui.lblTotalCost.setText(
+                "Reorder Value"
+            )
+            return
+
+        if report_type == "Asset Maintenance History":
+
+            self.ui.lblTotal.setText(
+                "Work Orders"
+            )
+            self.ui.lblOpen.setText(
+                "Completed"
+            )
+
+            self.ui.lblCompleted.setText(
+                "Labour Hours"
+            )
+
+            self.ui.lblTotalCost.setText(
+                "Total Cost"
+            )
+
+            return
+
+        if report_type == "Technician Work History":
+
+            self.ui.lblTotal.setText(
+                "Work Orders"
+            )
+
+            self.ui.lblOpen.setText(
+                "Completed"
+            )
+
+            self.ui.lblCompleted.setText(
+                "Labour Hours"
+            )
+
+            self.ui.lblTotalCost.setText(
+                "Actual Cost"
+            )
+
+            return
+
         # Default: Work Orders
         self.ui.lblTotal.setText(
             "Total"
@@ -1244,19 +2039,24 @@ class ReportsPage(QWidget):
         )
 
         self.ui.lblTotalCost.setText(
-            "Total Cost"
+            "Actual Cost"
         )
 
     def update_date_filter_state(self):
 
         report_type = (
-            self.ui.cmbReportType.currentText()
+            self.ui.cmbReportType
+            .currentText()
+            .strip()
         )
 
         uses_date_filter = report_type in (
             "Work Orders",
             "Maintenance Costs",
             "Technician Performance",
+            "Inventory Transactions",
+            "Asset Maintenance History",
+            "Technician Work History",
         )
 
         self.ui.dtFromDate.setEnabled(
@@ -1291,20 +2091,31 @@ class ReportsPage(QWidget):
             )
             return
 
+        report_type = (
+            self.ui.cmbReportType
+            .currentText()
+            .strip()
+        )
+
+        filter_name = (
+            "Technician"
+            if report_type == "Technician Work History"
+            else "Asset"
+        )
+
         filters = {
             "Status": (
-                self.ui.cmbStatus.currentText()
-                if self.ui.cmbStatus.isEnabled()
-                else None
-            ),
+            self.ui.cmbStatus.currentText()
+            if self.ui.cmbStatus.isVisible()
+            else None
+        ),
 
-            "Asset": (
-                self.ui.cmbAsset.currentText()
-                if self.ui.cmbAsset.isEnabled()
-                else None
-            ),
-        }
-
+        filter_name: (
+            self.ui.cmbAsset.currentText()
+            if self.ui.cmbAsset.isVisible()
+            else None
+        ),
+    }
         summary = {
             self.ui.lblTotal.text():
                 self.ui.lblTotalValue.text(),
@@ -1318,12 +2129,6 @@ class ReportsPage(QWidget):
             self.ui.lblTotalCost.text():
                 self.ui.lblTotalCostValue.text(),
         }
-
-        report_type = (
-            self.ui.cmbReportType
-            .currentText()
-            .strip()
-        )
 
         default_name = (
             report_type
@@ -1347,6 +2152,17 @@ class ReportsPage(QWidget):
         if not file_path:
             return
 
+        from_date = (
+            self.ui.dtFromDate
+            .date()
+            .toString("yyyy-MM-dd")
+        )
+        to_date = (
+            self.ui.dtToDate
+            .date()
+            .toString("yyyy-MM-dd")
+        )
+
         try:
 
             if "PDF" in selected_filter:
@@ -1355,18 +2171,6 @@ class ReportsPage(QWidget):
                     ".pdf"
                 ):
                     file_path += ".pdf"
-
-                from_date = (
-                    self.ui.dtFromDate
-                    .date()
-                    .toString("yyyy-MM-dd")
-                )
-
-                to_date = (
-                    self.ui.dtToDate
-                    .date()
-                    .toString("yyyy-MM-dd")
-                )
 
                 PdfReportExportHelper.export_table_to_pdf(
                     table,
@@ -1385,24 +2189,14 @@ class ReportsPage(QWidget):
                 ):
                     file_path += ".xlsx"
 
-                from_date = (
-                    self.ui.dtFromDate
-                    .date()
-                    .toString("yyyy-MM-dd")
-                )
-
-                to_date = (
-                    self.ui.dtToDate
-                    .date()
-                    .toString("yyyy-MM-dd")
-                )
-
                 ReportExportHelper.export_table_to_excel(
                     table,
                     file_path,
                     report_type,
                     from_date,
-                    to_date
+                    to_date,
+                    filters=filters,
+                    summary=summary,
                 )
 
             QMessageBox.information(
@@ -1419,7 +2213,7 @@ class ReportsPage(QWidget):
                 (
                     "The report could not be saved because "
                     "the file is currently in use.\n\n"
-                    "Close the existing PDF file and try again, "
+                    "Close the existing file and try again, "
                     "or save the report with a different filename."
                 )
             )
@@ -1452,6 +2246,8 @@ class ReportsPage(QWidget):
             if report_type in {
                 "Work Orders",
                 "Maintenance Costs",
+                "Asset Maintenance History",
+                "Technician Work History",
             }:
 
                 statuses = [
@@ -1567,16 +2363,22 @@ class ReportsPage(QWidget):
             .toString("yyyy-MM-dd")
         )
 
+        filter_name = (
+            "Technician"
+            if report_type == "Technician Work History"
+            else "Asset"
+        )
+
         filters = {
             "Status": (
                 self.ui.cmbStatus.currentText()
-                if self.ui.cmbStatus.isEnabled()
+                if self.ui.cmbStatus.isVisible()
                 else None
             ),
 
-            "Asset": (
+            filter_name: (
                 self.ui.cmbAsset.currentText()
-                if self.ui.cmbAsset.isEnabled()
+                if self.ui.cmbAsset.isVisible()
                 else None
             ),
         }

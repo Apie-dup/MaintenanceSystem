@@ -48,12 +48,32 @@
           </item>
           <item>
            <property name="text">
+            <string>Inventory Transactions</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
             <string>Preventive Maintenance</string>
            </property>
           </item>
           <item>
            <property name="text">
             <string>Technician Performance</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Low Stock / Reorder</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Asset Maintenance History</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Technician Work History</string>
            </property>
           </item>
          </widget>

@@ -56,19 +56,23 @@ class WorkOrderDialog(BaseDialog):
         self.ui.setupUi(self)
 
         self.user = getattr(
-            parent, 
-            "user", 
+            parent,
+            "user",
             {}
         )
 
-        if not self.user and parent is None:
+        if not self.user and parent is not None:
             main_window = parent.window()
 
-            self.user = getattr(
-                main_window,
-                "user",
-                {}
-            )
+            if main_window is not None:
+                self.user = getattr(
+                    main_window,
+                    "user",
+                    {}
+                )
+
+        if not self.user:
+            self.user = {}
 
         self.role = self.user.get(
             "role",

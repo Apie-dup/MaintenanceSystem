@@ -2,7 +2,11 @@ from datetime import datetime
 
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.styles import (
+    getSampleStyleSheet,
+    ParagraphStyle
+)
+from xml.sax.saxutils import escape
 from reportlab.lib.units import mm
 from reportlab.platypus import (
     SimpleDocTemplate,
@@ -62,6 +66,9 @@ class PdfReportExportHelper:
             "Work Orders",
             "Maintenance Costs",
             "Technician Performance",
+            "Inventory Transactions",
+            "Asset Maintenance History",
+            "Technician Work History",
         }
 
         if (
@@ -240,6 +247,24 @@ class PdfReportExportHelper:
                 else ""
             )
 
+        notes_column = next(
+            (
+                index
+                for index, heading in enumerate(
+                    headings
+                )
+                if heading == "Notes"
+            ),
+            None
+        )
+
+        body_cell_style = ParagraphStyle(
+            "ReportBodyCell",
+            parent=styles["Normal"],
+            fontSize=6,
+            leading=7,
+        )
+
         data.append(headings)
 
         # -------------------------------------------------
@@ -257,11 +282,29 @@ class PdfReportExportHelper:
                     column
                 )
 
-                row_data.append(
+                text = (
                     item.text()
                     if item is not None
                     else ""
                 )
+
+                if (
+                    notes_column is not None
+                    and column == notes_column
+                ):
+
+                    row_data.append(
+                        Paragraph(
+                            escape(text),
+                            body_cell_style
+                        )
+                    )
+
+                else:
+
+                    row_data.append(
+                        text
+                    )
 
             data.append(row_data)
 
@@ -282,6 +325,18 @@ class PdfReportExportHelper:
         column_weights = []
 
         for column in range(column_count):
+
+            # -------------------------------------------------
+            # Notes needs extra width because it may contain
+            # longer descriptive text.
+            # -------------------------------------------------
+
+            if (
+                notes_column is not None
+                and column == notes_column
+            ):
+                column_weights.append(50)
+                continue
 
             maximum_length = 1
 
@@ -593,9 +648,12 @@ class PdfReportExportHelper:
         total_fuel = 0.0
         total_fuel_cost = 0.0
 
-        body_style = styles["Normal"]
-        body_style.fontSize = 6
-        body_style.leading = 7
+        body_style = ParagraphStyle(
+            "VehicleLogbookBody",
+            parent=styles["Normal"],
+            fontSize=6,
+            leading=7,
+        )
 
         #--------------------------------------------------
         # Logbook rows
@@ -793,9 +851,12 @@ class PdfReportExportHelper:
             Spacer(1, 5 * mm)
         )
 
-        totals_style = styles["Normal"]
-        totals_style.fontSize = 8
-        totals_style.leading = 10
+        totals_style = ParagraphStyle(
+            "VehicleLogbookTotals",
+            parent=styles["Normal"],
+            fontSize=8,
+            leading=10,
+        )
 
         currency_symbol = (
             SettingsService.currency_symbol()
