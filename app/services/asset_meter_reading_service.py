@@ -38,9 +38,9 @@ class AssetMeterReadingService:
                 latest["reading"] or 0
             )
 
-            if reading < previous:
+            if reading <= previous:
                 raise ValueError(
-                    "Meter reading cannot be lower "
+                    "Meter reading cannot be greater "
                     "than the previous reading."
                 )
 
