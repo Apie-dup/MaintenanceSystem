@@ -147,7 +147,7 @@ class ReportsPage(QWidget):
         ("due_date", "Due"),
         ("completed_date", "Completed"),
         ("labour_hours", "Labour Hours"),
-        ("actual_cost", "Actual Cost"),
+        ("actual_cost", "Labour Cost"),
     ]
 
     def __init__(self, parent=None):
@@ -2020,7 +2020,7 @@ class ReportsPage(QWidget):
             )
 
             self.ui.lblTotalCost.setText(
-                "Actual Cost"
+                "Labour Cost"
             )
 
             return

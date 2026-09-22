@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
+    <width>845</width>
     <height>702</height>
    </rect>
   </property>
@@ -31,7 +31,7 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="General">
+     <widget class="QWidget" name="tabGeneral">
       <attribute name="title">
        <string>General</string>
       </attribute>
@@ -402,7 +402,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="Materials">
+     <widget class="QWidget" name="tabMaterials">
       <attribute name="title">
        <string>Materials</string>
       </attribute>
@@ -446,7 +446,89 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="History">
+     <widget class="QWidget" name="tabLabour">
+      <attribute name="title">
+       <string>Labour</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_7">
+       <item>
+        <widget class="QTableWidget" name="tblLabour">
+         <column>
+          <property name="text">
+           <string>Technician</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Work Date</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Hours</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Hourly Rate</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Labour Cost</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Description</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Entered By</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Created At</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QPushButton" name="btnAddLabour">
+           <property name="text">
+            <string>Add Labour</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnRemoveLabour">
+           <property name="text">
+            <string>Remove Labour</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Orientation::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabHistory">
       <attribute name="title">
        <string>History</string>
       </attribute>

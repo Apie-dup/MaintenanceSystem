@@ -116,35 +116,70 @@ class ReportModel:
                     AS work_order_count,
 
                 COALESCE(
-                    SUM(work_orders.labour_hours),
+                    SUM(
+                        CASE
+                            WHEN labour.entry_count > 0
+                            THEN labour.labour_hours
+                            ELSE COALESCE(
+                                work_orders.labour_hours,
+                                0
+                            )
+                        END
+                    ),
                     0
                 ) AS labour_hours,
 
                 COALESCE(
                     SUM(
-                        COALESCE(work_orders.labour_hours, 0)
-                        *
-                        COALESCE(technicians.hourly_rate, 0)
+                        CASE
+                            WHEN labour.entry_count > 0
+                            THEN labour.labour_cost
+                            ELSE
+                                COALESCE(
+                                    work_orders.labour_hours,
+                                    0
+                                )
+                                *
+                                COALESCE(
+                                    technicians.hourly_rate,
+                                    0
+                                )
+                        END
                     ),
                     0
                 ) AS labour_cost,
 
                 COALESCE(
                     SUM(
-                        COALESCE(parts.material_cost, 0)
+                        COALESCE(
+                            parts.material_cost,
+                            0
+                        )
                     ),
                     0
                 ) AS material_cost,
 
                 COALESCE(
                     SUM(
-                        (
-                            COALESCE(work_orders.labour_hours, 0)
-                            *
-                            COALESCE(technicians.hourly_rate, 0)
-                        )
+                        CASE
+                            WHEN labour.entry_count > 0
+                            THEN labour.labour_cost
+                            ELSE
+                                COALESCE(
+                                    work_orders.labour_hours,
+                                    0
+                                )
+                                *
+                                COALESCE(
+                                    technicians.hourly_rate,
+                                    0
+                                )
+                        END
                         +
-                        COALESCE(parts.material_cost, 0)
+                        COALESCE(
+                            parts.material_cost,
+                            0
+                        )
                     ),
                     0
                 ) AS total_cost
@@ -160,11 +195,24 @@ class ReportModel:
             LEFT JOIN (
                 SELECT
                     work_order_id,
+                    COUNT(id) AS entry_count,
+                    SUM(hours) AS labour_hours,
+                    SUM(labour_cost) AS labour_cost
+                FROM work_order_labour
+                GROUP BY work_order_id
+            ) AS labour
+                ON labour.work_order_id
+                = work_orders.id
+
+            LEFT JOIN (
+                SELECT
+                    work_order_id,
                     SUM(total_cost) AS material_cost
                 FROM work_order_parts
                 GROUP BY work_order_id
             ) AS parts
-                ON parts.work_order_id = work_orders.id
+                ON parts.work_order_id
+                = work_orders.id
 
             WHERE 1 = 1
         """
@@ -349,11 +397,122 @@ class ReportModel:
         from_date=None,
         to_date=None
     ):
-
         conn = Database.connect()
         cursor = conn.cursor()
 
         query = """
+            WITH detailed_labour AS (
+                SELECT
+                    work_order_id,
+                    technician_id,
+                    SUM(hours) AS labour_hours,
+                    SUM(labour_cost) AS labour_cost
+                FROM work_order_labour
+                GROUP BY
+                    work_order_id,
+                    technician_id
+            ),
+
+            work_order_has_labour AS (
+                SELECT DISTINCT
+                    work_order_id
+                FROM work_order_labour
+            ),
+
+            technician_work AS (
+                -- -----------------------------------------
+                -- Detailed labour
+                -- -----------------------------------------
+
+                SELECT
+                    dl.technician_id,
+                    wo.id AS work_order_id,
+                    wo.status,
+                    dl.labour_hours,
+                    dl.labour_cost
+                FROM detailed_labour AS dl
+
+                INNER JOIN work_orders AS wo
+                    ON wo.id = dl.work_order_id
+
+                WHERE 1 = 1
+        """
+
+        parameters = []
+
+        if from_date:
+            query += """
+                AND DATE(wo.date_created)
+                    >= DATE(?)
+            """
+            parameters.append(from_date)
+
+        if to_date:
+            query += """
+                AND DATE(wo.date_created)
+                    <= DATE(?)
+            """
+            parameters.append(to_date)
+
+        query += """
+
+                UNION ALL
+
+                -- -----------------------------------------
+                -- Legacy labour
+                -- Only when no detailed labour exists
+                -- -----------------------------------------
+
+                SELECT
+                    wo.technician_id,
+                    wo.id AS work_order_id,
+                    wo.status,
+
+                    COALESCE(
+                        wo.labour_hours,
+                        0
+                    ) AS labour_hours,
+
+                    (
+                        COALESCE(
+                            wo.labour_hours,
+                            0
+                        )
+                        *
+                        COALESCE(
+                            t.hourly_rate,
+                            0
+                        )
+                    ) AS labour_cost
+
+                FROM work_orders AS wo
+
+                INNER JOIN technicians AS t
+                    ON t.id = wo.technician_id
+
+                LEFT JOIN work_order_has_labour AS whl
+                    ON whl.work_order_id = wo.id
+
+                WHERE whl.work_order_id IS NULL
+        """
+
+        if from_date:
+            query += """
+                AND DATE(wo.date_created)
+                    >= DATE(?)
+            """
+            parameters.append(from_date)
+
+        if to_date:
+            query += """
+                AND DATE(wo.date_created)
+                    <= DATE(?)
+            """
+            parameters.append(to_date)
+
+        query += """
+            )
+
             SELECT
                 technicians.id AS id,
 
@@ -368,39 +527,52 @@ class ReportModel:
 
                 technicians.trade AS trade,
 
-                COUNT(work_orders.id)
-                    AS work_order_count,
+                COUNT(
+                    technician_work.work_order_id
+                ) AS work_order_count,
 
-                SUM(
-                    CASE
-                        WHEN work_orders.status
-                            IN ('Completed', 'Closed')
-                        THEN 1
-                        ELSE 0
-                    END
+                COALESCE(
+                    SUM(
+                        CASE
+                            WHEN technician_work.status
+                                IN (
+                                    'Completed',
+                                    'Closed'
+                                )
+                            THEN 1
+                            ELSE 0
+                        END
+                    ),
+                    0
                 ) AS completed_count,
 
-                SUM(
-                    CASE
-                        WHEN work_orders.status
-                            NOT IN (
-                                'Completed',
-                                'Closed',
-                                'Cancelled'
-                            )
-                        THEN 1
-                        ELSE 0
-                    END
+                COALESCE(
+                    SUM(
+                        CASE
+                            WHEN technician_work.status
+                                NOT IN (
+                                    'Completed',
+                                    'Closed',
+                                    'Cancelled'
+                                )
+                            THEN 1
+                            ELSE 0
+                        END
+                    ),
+                    0
                 ) AS open_count,
 
                 CASE
-                    WHEN COUNT(work_orders.id) = 0
-                        THEN 0
+                    WHEN COUNT(
+                        technician_work.work_order_id
+                    ) = 0
+                    THEN 0
+
                     ELSE
                         (
                             SUM(
                                 CASE
-                                    WHEN work_orders.status
+                                    WHEN technician_work.status
                                         IN (
                                             'Completed',
                                             'Closed'
@@ -410,68 +582,39 @@ class ReportModel:
                                 END
                             )
                             * 100.0
-                            / COUNT(work_orders.id)
+                            /
+                            COUNT(
+                                technician_work.work_order_id
+                            )
                         )
-                    END AS completion_rate,
+                END AS completion_rate,
 
-                    COALESCE(
-                        SUM(work_orders.labour_hours),
-                        0
-                    ) AS labour_hours,
+                COALESCE(
+                    SUM(
+                        technician_work.labour_hours
+                    ),
+                    0
+                ) AS labour_hours,
 
-                    COALESCE(
-                        SUM(
-                            COALESCE(
-                                work_orders.labour_hours,
-                                0
-                            )
-                            *
-                            COALESCE(
-                                technicians.hourly_rate,
-                                0
-                            )
-                        ),
-                        0
-                    ) AS labour_cost
+                COALESCE(
+                    SUM(
+                        technician_work.labour_cost
+                    ),
+                    0
+                ) AS labour_cost
 
             FROM technicians
 
-            LEFT JOIN work_orders
-                ON work_orders.technician_id
-                 = technicians.id
-        """
+            LEFT JOIN technician_work
+                ON technician_work.technician_id
+                = technicians.id
 
-        parameters = []
-
-        date_conditions = []
-
-        if from_date:
-            date_conditions.append(
-                "work_orders.date_created >= ?"
-            )
-            parameters.append(from_date)
-
-        if to_date:
-            date_conditions.append(
-                "work_orders.date_created <= ?"
-            )
-            parameters.append(to_date)
-
-        if date_conditions:
-            query += """
-                AND
-            """ + " AND ".join(
-                date_conditions
-            )
-
-        query += """
             GROUP BY
                 technicians.id,
                 technicians.employee_number,
                 technicians.first_name,
                 technicians.last_name,
-                technicians.trade,
-                technicians.hourly_rate
+                technicians.trade
 
             ORDER BY
                 completed_count DESC,
@@ -706,13 +849,88 @@ class ReportModel:
         status=None,
         technician_id=None,
     ):
-
         conn = Database.connect()
         cursor = conn.cursor()
 
         try:
 
             query = """
+                WITH detailed_labour AS (
+                    SELECT
+                        work_order_id,
+                        technician_id,
+                        SUM(hours) AS labour_hours,
+                        SUM(labour_cost) AS labour_cost
+                    FROM work_order_labour
+                    GROUP BY
+                        work_order_id,
+                        technician_id
+                ),
+
+                work_order_has_labour AS (
+                    SELECT DISTINCT
+                        work_order_id
+                    FROM work_order_labour
+                ),
+
+                technician_work AS (
+
+                    -- -------------------------------------
+                    -- Detailed labour
+                    -- -------------------------------------
+
+                    SELECT
+                        dl.technician_id,
+                        wo.id AS work_order_id,
+                        dl.labour_hours,
+                        dl.labour_cost
+
+                    FROM detailed_labour AS dl
+
+                    INNER JOIN work_orders AS wo
+                        ON wo.id = dl.work_order_id
+
+                    WHERE 1 = 1
+
+                    UNION ALL
+
+                    -- -------------------------------------
+                    -- Legacy labour
+                    -- Only when no detailed labour exists
+                    -- -------------------------------------
+
+                    SELECT
+                        wo.technician_id,
+                        wo.id AS work_order_id,
+
+                        COALESCE(
+                            wo.labour_hours,
+                            0
+                        ) AS labour_hours,
+
+                        (
+                            COALESCE(
+                                wo.labour_hours,
+                                0
+                            )
+                            *
+                            COALESCE(
+                                t.hourly_rate,
+                                0
+                            )
+                        ) AS labour_cost
+
+                    FROM work_orders AS wo
+
+                    INNER JOIN technicians AS t
+                        ON t.id = wo.technician_id
+
+                    LEFT JOIN work_order_has_labour AS whl
+                        ON whl.work_order_id = wo.id
+
+                    WHERE whl.work_order_id IS NULL
+                )
+
                 SELECT
                     work_orders.id,
                     work_orders.work_order_number,
@@ -741,14 +959,20 @@ class ReportModel:
                     work_orders.due_date,
                     work_orders.completed_date,
 
-                    work_orders.labour_hours,
-                    work_orders.actual_cost
+                    technician_work.labour_hours,
 
-                FROM work_orders
+                    technician_work.labour_cost
+                        AS actual_cost
+
+                FROM technician_work
+
+                INNER JOIN work_orders
+                    ON work_orders.id
+                    = technician_work.work_order_id
 
                 INNER JOIN technicians
-                    ON work_orders.technician_id
-                    = technicians.id
+                    ON technicians.id
+                    = technician_work.technician_id
 
                 LEFT JOIN assets
                     ON work_orders.asset_id

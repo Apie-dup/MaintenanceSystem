@@ -13,6 +13,9 @@ from app.database.connection import Database
 from app.services.pm_service_history_service import (
     PMServiceHistoryService
 )
+from app.services.work_order_labour_service import (
+    WorkOrderLabourService
+)
 
 
 
@@ -402,11 +405,51 @@ class WorkOrderService:
         data
     ):
 
-        labour_cost = (
-            WorkOrderService.calculate_labour_cost(
-                data
+        # ---------------------------------------------------------
+        # Labour Cost
+        # ---------------------------------------------------------
+
+        labour_cost = 0.00
+
+        if work_order_id is not None:
+
+            labour_entries = (
+                WorkOrderLabourService.get_by_work_order(
+                    work_order_id
+                )
             )
-        )
+
+            if labour_entries:
+
+                # Detailed labour entries are authoritative.
+                labour_cost = (
+                    WorkOrderLabourService.get_total_cost(
+                        work_order_id
+                    )
+                )
+
+            else:
+
+                # Legacy Work Order:
+                # retain the existing aggregate labour calculation.
+                labour_cost = (
+                    WorkOrderService.calculate_labour_cost(
+                        data
+                    )
+                )
+
+        else:
+
+            # New Work Orders have no persisted labour entries yet.
+            labour_cost = (
+                WorkOrderService.calculate_labour_cost(
+                    data
+                )
+            )
+
+        # ---------------------------------------------------------
+        # Material Cost
+        # ---------------------------------------------------------
 
         material_cost = 0.00
 
@@ -417,7 +460,14 @@ class WorkOrderService:
                 )
             )
 
-        return labour_cost + material_cost
+        # ---------------------------------------------------------
+        # Actual Cost
+        # ---------------------------------------------------------
+
+        return (
+            float(labour_cost or 0)
+            + float(material_cost or 0)
+        )
 
     
     @staticmethod

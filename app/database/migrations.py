@@ -4,7 +4,7 @@ from app.core.logger import logger
 
 class MigrationManager:
 
-    LATEST_VERSION = 26
+    LATEST_VERSION = 27
 
     # ---------------------------------------------------------
     # Database version
@@ -154,6 +154,9 @@ class MigrationManager:
             elif version == 25:
                 MigrationManager.migrate_to_v26()
                 version = 26
+            elif version == 26:
+                MigrationManager.migrate_to_v27()
+                version = 27
             else:
                 raise RuntimeError(
                     f"No migration path exists from version {version}."
@@ -1691,4 +1694,76 @@ class MigrationManager:
                 "PRAGMA foreign_keys = ON"
             )
 
+            conn.close()
+
+    @staticmethod
+    def migrate_to_v27():
+        conn = Database.connect()
+
+        try:
+            logger.info(
+                "Migrating database to Version 27..."
+            )
+
+            cursor = conn.cursor()
+
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS work_order_labour (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+                    work_order_id INTEGER NOT NULL,
+                    technician_id INTEGER NOT NULL,
+
+                    work_date TEXT NOT NULL,
+
+                    hours REAL NOT NULL DEFAULT 0,
+                    hourly_rate REAL NOT NULL DEFAULT 0,
+                    labour_cost REAL NOT NULL DEFAULT 0,
+
+                    description TEXT,
+                    notes TEXT,
+
+                    user_id INTEGER,
+                    username TEXT,
+
+                    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+
+                    FOREIGN KEY (work_order_id)
+                        REFERENCES work_orders(id)
+                        ON DELETE CASCADE,
+
+                    FOREIGN KEY (technician_id)
+                        REFERENCES technicians(id)
+                )
+            """)
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_work_order_labour_work_order_id
+                ON work_order_labour(work_order_id)
+            """)
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_work_order_labour_technician_id
+                ON work_order_labour(technician_id)
+            """)
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_work_order_labour_work_date
+                ON work_order_labour(work_date)
+            """)
+
+            conn.commit()
+
+            logger.info(
+                "Work order labour table created."
+            )
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
             conn.close()

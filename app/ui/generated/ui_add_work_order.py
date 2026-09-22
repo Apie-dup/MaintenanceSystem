@@ -26,7 +26,7 @@ class Ui_AddWorkOrderDialog(object):
     def setupUi(self, AddWorkOrderDialog):
         if not AddWorkOrderDialog.objectName():
             AddWorkOrderDialog.setObjectName(u"AddWorkOrderDialog")
-        AddWorkOrderDialog.resize(600, 702)
+        AddWorkOrderDialog.resize(845, 702)
         AddWorkOrderDialog.setMinimumSize(QSize(0, 0))
         self.verticalLayout = QVBoxLayout(AddWorkOrderDialog)
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -37,11 +37,11 @@ class Ui_AddWorkOrderDialog(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.tabWorkOrder.sizePolicy().hasHeightForWidth())
         self.tabWorkOrder.setSizePolicy(sizePolicy)
-        self.General = QWidget()
-        self.General.setObjectName(u"General")
-        self.verticalLayout_3 = QVBoxLayout(self.General)
+        self.tabGeneral = QWidget()
+        self.tabGeneral.setObjectName(u"tabGeneral")
+        self.verticalLayout_3 = QVBoxLayout(self.tabGeneral)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
-        self.groupGeneralInfo = QGroupBox(self.General)
+        self.groupGeneralInfo = QGroupBox(self.tabGeneral)
         self.groupGeneralInfo.setObjectName(u"groupGeneralInfo")
         sizePolicy.setHeightForWidth(self.groupGeneralInfo.sizePolicy().hasHeightForWidth())
         self.groupGeneralInfo.setSizePolicy(sizePolicy)
@@ -113,7 +113,7 @@ class Ui_AddWorkOrderDialog(object):
 
         self.verticalLayout_3.addWidget(self.groupGeneralInfo)
 
-        self.groupAssignment = QGroupBox(self.General)
+        self.groupAssignment = QGroupBox(self.tabGeneral)
         self.groupAssignment.setObjectName(u"groupAssignment")
         sizePolicy.setHeightForWidth(self.groupAssignment.sizePolicy().hasHeightForWidth())
         self.groupAssignment.setSizePolicy(sizePolicy)
@@ -156,7 +156,7 @@ class Ui_AddWorkOrderDialog(object):
 
         self.verticalLayout_3.addWidget(self.groupAssignment)
 
-        self.groupDatesCosts = QGroupBox(self.General)
+        self.groupDatesCosts = QGroupBox(self.tabGeneral)
         self.groupDatesCosts.setObjectName(u"groupDatesCosts")
         sizePolicy.setHeightForWidth(self.groupDatesCosts.sizePolicy().hasHeightForWidth())
         self.groupDatesCosts.setSizePolicy(sizePolicy)
@@ -245,7 +245,7 @@ class Ui_AddWorkOrderDialog(object):
 
         self.verticalLayout_3.addWidget(self.groupDatesCosts)
 
-        self.groupNotes = QGroupBox(self.General)
+        self.groupNotes = QGroupBox(self.tabGeneral)
         self.groupNotes.setObjectName(u"groupNotes")
         sizePolicy1.setHeightForWidth(self.groupNotes.sizePolicy().hasHeightForWidth())
         self.groupNotes.setSizePolicy(sizePolicy1)
@@ -263,12 +263,12 @@ class Ui_AddWorkOrderDialog(object):
 
         self.verticalLayout_3.addWidget(self.groupNotes)
 
-        self.tabWorkOrder.addTab(self.General, "")
-        self.Materials = QWidget()
-        self.Materials.setObjectName(u"Materials")
-        self.verticalLayout_5 = QVBoxLayout(self.Materials)
+        self.tabWorkOrder.addTab(self.tabGeneral, "")
+        self.tabMaterials = QWidget()
+        self.tabMaterials.setObjectName(u"tabMaterials")
+        self.verticalLayout_5 = QVBoxLayout(self.tabMaterials)
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
-        self.groupMaterials = QGroupBox(self.Materials)
+        self.groupMaterials = QGroupBox(self.tabMaterials)
         self.groupMaterials.setObjectName(u"groupMaterials")
         self.layoutMaterials = QVBoxLayout(self.groupMaterials)
         self.layoutMaterials.setObjectName(u"layoutMaterials")
@@ -300,12 +300,59 @@ class Ui_AddWorkOrderDialog(object):
 
         self.verticalLayout_5.addWidget(self.groupMaterials)
 
-        self.tabWorkOrder.addTab(self.Materials, "")
-        self.History = QWidget()
-        self.History.setObjectName(u"History")
-        self.verticalLayout_6 = QVBoxLayout(self.History)
+        self.tabWorkOrder.addTab(self.tabMaterials, "")
+        self.tabLabour = QWidget()
+        self.tabLabour.setObjectName(u"tabLabour")
+        self.verticalLayout_7 = QVBoxLayout(self.tabLabour)
+        self.verticalLayout_7.setObjectName(u"verticalLayout_7")
+        self.tblLabour = QTableWidget(self.tabLabour)
+        if (self.tblLabour.columnCount() < 8):
+            self.tblLabour.setColumnCount(8)
+        __qtablewidgetitem = QTableWidgetItem()
+        self.tblLabour.setHorizontalHeaderItem(0, __qtablewidgetitem)
+        __qtablewidgetitem1 = QTableWidgetItem()
+        self.tblLabour.setHorizontalHeaderItem(1, __qtablewidgetitem1)
+        __qtablewidgetitem2 = QTableWidgetItem()
+        self.tblLabour.setHorizontalHeaderItem(2, __qtablewidgetitem2)
+        __qtablewidgetitem3 = QTableWidgetItem()
+        self.tblLabour.setHorizontalHeaderItem(3, __qtablewidgetitem3)
+        __qtablewidgetitem4 = QTableWidgetItem()
+        self.tblLabour.setHorizontalHeaderItem(4, __qtablewidgetitem4)
+        __qtablewidgetitem5 = QTableWidgetItem()
+        self.tblLabour.setHorizontalHeaderItem(5, __qtablewidgetitem5)
+        __qtablewidgetitem6 = QTableWidgetItem()
+        self.tblLabour.setHorizontalHeaderItem(6, __qtablewidgetitem6)
+        __qtablewidgetitem7 = QTableWidgetItem()
+        self.tblLabour.setHorizontalHeaderItem(7, __qtablewidgetitem7)
+        self.tblLabour.setObjectName(u"tblLabour")
+
+        self.verticalLayout_7.addWidget(self.tblLabour)
+
+        self.horizontalLayout_3 = QHBoxLayout()
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.btnAddLabour = QPushButton(self.tabLabour)
+        self.btnAddLabour.setObjectName(u"btnAddLabour")
+
+        self.horizontalLayout_3.addWidget(self.btnAddLabour)
+
+        self.btnRemoveLabour = QPushButton(self.tabLabour)
+        self.btnRemoveLabour.setObjectName(u"btnRemoveLabour")
+
+        self.horizontalLayout_3.addWidget(self.btnRemoveLabour)
+
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_3.addItem(self.horizontalSpacer_2)
+
+
+        self.verticalLayout_7.addLayout(self.horizontalLayout_3)
+
+        self.tabWorkOrder.addTab(self.tabLabour, "")
+        self.tabHistory = QWidget()
+        self.tabHistory.setObjectName(u"tabHistory")
+        self.verticalLayout_6 = QVBoxLayout(self.tabHistory)
         self.verticalLayout_6.setObjectName(u"verticalLayout_6")
-        self.groupHistory = QGroupBox(self.History)
+        self.groupHistory = QGroupBox(self.tabHistory)
         self.groupHistory.setObjectName(u"groupHistory")
         self.verticalLayout_4 = QVBoxLayout(self.groupHistory)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
@@ -317,7 +364,7 @@ class Ui_AddWorkOrderDialog(object):
 
         self.verticalLayout_6.addWidget(self.groupHistory)
 
-        self.tabWorkOrder.addTab(self.History, "")
+        self.tabWorkOrder.addTab(self.tabHistory, "")
 
         self.verticalLayout.addWidget(self.tabWorkOrder)
 
@@ -388,14 +435,33 @@ class Ui_AddWorkOrderDialog(object):
         self.lblActualCost.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Actual Cost:", None))
         self.lblMeterReading.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Meter Reading:", None))
         self.groupNotes.setTitle(QCoreApplication.translate("AddWorkOrderDialog", u"Notes", None))
-        self.tabWorkOrder.setTabText(self.tabWorkOrder.indexOf(self.General), QCoreApplication.translate("AddWorkOrderDialog", u"General", None))
+        self.tabWorkOrder.setTabText(self.tabWorkOrder.indexOf(self.tabGeneral), QCoreApplication.translate("AddWorkOrderDialog", u"General", None))
         self.groupMaterials.setTitle(QCoreApplication.translate("AddWorkOrderDialog", u"Materials Used", None))
         self.btnIssuePart.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Issue Parts", None))
         self.btnRemovePart.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Remove Parts", None))
         self.lblMaterialTotal.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Materials Total: 0.00", None))
-        self.tabWorkOrder.setTabText(self.tabWorkOrder.indexOf(self.Materials), QCoreApplication.translate("AddWorkOrderDialog", u"Materials", None))
+        self.tabWorkOrder.setTabText(self.tabWorkOrder.indexOf(self.tabMaterials), QCoreApplication.translate("AddWorkOrderDialog", u"Materials", None))
+        ___qtablewidgetitem = self.tblLabour.horizontalHeaderItem(0)
+        ___qtablewidgetitem.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Technician", None))
+        ___qtablewidgetitem1 = self.tblLabour.horizontalHeaderItem(1)
+        ___qtablewidgetitem1.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Work Date", None))
+        ___qtablewidgetitem2 = self.tblLabour.horizontalHeaderItem(2)
+        ___qtablewidgetitem2.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Hours", None))
+        ___qtablewidgetitem3 = self.tblLabour.horizontalHeaderItem(3)
+        ___qtablewidgetitem3.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Hourly Rate", None))
+        ___qtablewidgetitem4 = self.tblLabour.horizontalHeaderItem(4)
+        ___qtablewidgetitem4.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Labour Cost", None))
+        ___qtablewidgetitem5 = self.tblLabour.horizontalHeaderItem(5)
+        ___qtablewidgetitem5.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Description", None))
+        ___qtablewidgetitem6 = self.tblLabour.horizontalHeaderItem(6)
+        ___qtablewidgetitem6.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Entered By", None))
+        ___qtablewidgetitem7 = self.tblLabour.horizontalHeaderItem(7)
+        ___qtablewidgetitem7.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Created At", None))
+        self.btnAddLabour.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Add Labour", None))
+        self.btnRemoveLabour.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Remove Labour", None))
+        self.tabWorkOrder.setTabText(self.tabWorkOrder.indexOf(self.tabLabour), QCoreApplication.translate("AddWorkOrderDialog", u"Labour", None))
         self.groupHistory.setTitle(QCoreApplication.translate("AddWorkOrderDialog", u"Work Order History", None))
-        self.tabWorkOrder.setTabText(self.tabWorkOrder.indexOf(self.History), QCoreApplication.translate("AddWorkOrderDialog", u"History", None))
+        self.tabWorkOrder.setTabText(self.tabWorkOrder.indexOf(self.tabHistory), QCoreApplication.translate("AddWorkOrderDialog", u"History", None))
         self.btnComplete.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Complete Work Order", None))
         self.btnCloseWorkOrder.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Close Work Order", None))
         self.btnReopen.setText(QCoreApplication.translate("AddWorkOrderDialog", u"Reopen Work Order", None))

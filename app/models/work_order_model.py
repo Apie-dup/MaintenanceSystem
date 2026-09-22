@@ -140,50 +140,68 @@ class WorkOrderModel:
     # ---------------------------------------------------------
 
     @staticmethod
-    def get_by_id(record_id):
-        conn = Database.connect()
+    def get_by_id(
+        record_id,
+        connection=None
+    ):
+        owns_connection = (
+            connection is None
+        )
+
+        conn = (
+            connection
+            or Database.connect()
+        )
+
         cursor = conn.cursor()
 
-        cursor.execute("""
-            SELECT
-                work_orders.id,
-                work_orders.work_order_number,
-                work_orders.asset_id,
-                assets.asset_number,
-                assets.asset_name,
-                work_orders.title,
-                work_orders.description,
-                work_orders.priority,
-                work_orders.status,
-                work_orders.technician_id,
-                technicians.employee_number,
-                technicians.first_name,
-                technicians.last_name,
-                work_orders.requested_by,
-                work_orders.date_created,
-                work_orders.due_date,
-                work_orders.estimated_cost,
-                work_orders.estimated_hours,
-                work_orders.actual_cost,
-                work_orders.labour_hours,
-                work_orders.meter_reading,
-                work_orders.notes,
-                work_orders.pm_id,
-                work_orders.created_at,
-                work_orders.completed_date,
-                work_orders.closed_date
-            FROM work_orders
-            LEFT JOIN assets
-                ON work_orders.asset_id = assets.id
-            LEFT JOIN technicians
-                ON work_orders.technician_id = technicians.id
-            WHERE work_orders.id = ?
-        """, (record_id,))
+        try:
+            cursor.execute("""
+                SELECT
+                    work_orders.id,
+                    work_orders.work_order_number,
+                    work_orders.asset_id,
+                    assets.asset_number,
+                    assets.asset_name,
+                    work_orders.title,
+                    work_orders.description,
+                    work_orders.priority,
+                    work_orders.status,
+                    work_orders.technician_id,
+                    technicians.employee_number,
+                    technicians.first_name,
+                    technicians.last_name,
+                    work_orders.requested_by,
+                    work_orders.date_created,
+                    work_orders.due_date,
+                    work_orders.estimated_cost,
+                    work_orders.estimated_hours,
+                    work_orders.actual_cost,
+                    work_orders.labour_hours,
+                    work_orders.meter_reading,
+                    work_orders.notes,
+                    work_orders.pm_id,
+                    work_orders.created_at,
+                    work_orders.completed_date,
+                    work_orders.closed_date
+                FROM work_orders
 
-        row = cursor.fetchone()
-        conn.close()
+                LEFT JOIN assets
+                    ON work_orders.asset_id = assets.id
 
-        return row
+                LEFT JOIN technicians
+                    ON work_orders.technician_id = technicians.id
+
+                WHERE work_orders.id = ?
+            """, (
+                record_id,
+            ))
+
+            return cursor.fetchone()
+
+        finally:
+            if owns_connection:
+                conn.close()
 
     # ---------------------------------------------------------
     # Search
@@ -554,18 +572,61 @@ class WorkOrderModel:
 
         cursor = conn.cursor()
 
-        cursor.execute("""
-            UPDATE work_orders
-            SET actual_cost = ?
-            WHERE id = ?
-        """, (
-            actual_cost,
-            work_order_id
-        ))
+        try:
+            cursor.execute("""
+                UPDATE work_orders
+                SET actual_cost = ?
+                WHERE id = ?
+            """, (
+                actual_cost,
+                work_order_id
+            ))
 
-        if owns_connection:
-            conn.commit()
-            conn.close()
+            if owns_connection:
+                conn.commit()
+
+        except Exception:
+            if owns_connection:
+                conn.rollback()
+            raise
+
+        finally:
+            if owns_connection:
+                conn.close()
+
+    @staticmethod
+    def update_labour_hours(
+        work_order_id,
+        labour_hours,
+        connection=None
+    ):
+        owns_connection = connection is None
+
+        conn = connection or Database.connect()
+
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute("""
+                UPDATE work_orders
+                SET labour_hours = ?
+                WHERE id = ?
+            """, (
+                labour_hours,
+                work_order_id
+            ))
+
+            if owns_connection:
+                conn.commit()
+
+        except Exception:
+            if owns_connection:
+                conn.rollback()
+            raise
+
+        finally:
+            if owns_connection:
+                conn.close()
 
     @staticmethod
     def get_open_count():
@@ -855,7 +916,6 @@ class WorkOrderModel:
         work_order_id,
         connection=None
     ):
-
         owns_connection = (
             connection is None
         )
@@ -866,46 +926,80 @@ class WorkOrderModel:
         )
 
         try:
-
             cursor = conn.cursor()
 
-            # -------------------------------------------------
-            # Labour cost
-            # -------------------------------------------------
+        # -------------------------------------------------
+        # Check for detailed labour entries
+        # -------------------------------------------------
 
             cursor.execute("""
                 SELECT
-                    work_orders.labour_hours,
-                    technicians.hourly_rate
-                FROM work_orders
-
-                LEFT JOIN technicians
-                    ON work_orders.technician_id
-                    = technicians.id
-
-                WHERE work_orders.id = ?
+                    COUNT(*) AS labour_entry_count,
+                    COALESCE(
+                        SUM(labour_cost),
+                        0
+                    ) AS labour_cost
+                FROM work_order_labour
+                WHERE work_order_id = ?
             """, (
                 work_order_id,
             ))
 
-            work_order = cursor.fetchone()
+            labour_row = cursor.fetchone()
 
-            if work_order is None:
-                return 0.00
-
-            labour_cost = (
-                float(
-                    work_order["labour_hours"] or 0
-                )
-                *
-                float(
-                    work_order["hourly_rate"] or 0
-                )
+            labour_entry_count = int(
+                labour_row["labour_entry_count"] or 0
             )
 
-            # -------------------------------------------------
-            # Material cost
-            # -------------------------------------------------
+        # -------------------------------------------------
+        # Detailed labour cost
+        # -------------------------------------------------
+
+            if labour_entry_count > 0:
+
+                labour_cost = float(
+                    labour_row["labour_cost"] or 0
+                )
+
+        # -------------------------------------------------
+        # Legacy labour cost
+        # -------------------------------------------------
+
+            else:
+
+                cursor.execute("""
+                    SELECT
+                        work_orders.labour_hours,
+                        technicians.hourly_rate
+                    FROM work_orders
+
+                    LEFT JOIN technicians
+                        ON work_orders.technician_id
+                        = technicians.id
+
+                    WHERE work_orders.id = ?
+                """, (
+                    work_order_id,
+                ))
+
+                work_order = cursor.fetchone()
+
+                if work_order is None:
+                    return 0.00
+
+                labour_cost = (
+                    float(
+                        work_order["labour_hours"] or 0
+                    )
+                    *
+                    float(
+                        work_order["hourly_rate"] or 0
+                    )
+                )
+
+        # -------------------------------------------------
+        # Material cost
+        # -------------------------------------------------
 
             cursor.execute("""
                 SELECT
@@ -924,6 +1018,10 @@ class WorkOrderModel:
             material_cost = float(
                 material_row["material_cost"] or 0
             )
+
+        # -------------------------------------------------
+        # Actual cost
+        # -------------------------------------------------
 
             return (
                 labour_cost

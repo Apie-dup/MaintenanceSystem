@@ -2,8 +2,10 @@ from PySide6.QtCore import QDate, Qt
 from PySide6.QtWidgets import (
     QDialogButtonBox,
     QFormLayout,
-    QSizePolicy,
+    QMessageBox,
     QInputDialog,
+    QTableWidgetItem,
+    QDialog,
 )
 
 from app.base.base_dialog import BaseDialog
@@ -23,6 +25,14 @@ from app.core.permissions import Permissions
 from app.services.preventive_maintenance_service import (
     PreventiveMaintenanceService
 )
+from app.dialogs.work_order_labour_dialog import (
+    WorkOrderLabourDialog
+)
+
+from app.services.work_order_labour_service import (
+    WorkOrderLabourService
+)
+from app.models.work_order_model import WorkOrderModel
 
 
 
@@ -49,11 +59,24 @@ class WorkOrderDialog(BaseDialog):
         ("notes", "Notes"),
     ]
 
+    LABOUR_COLUMNS = [
+        ("technician_name", "Technician"),
+        ("work_date", "Work Date"),
+        ("hours", "Hours"),
+        ("hourly_rate", "Hourly Rate"),
+        ("labour_cost", "Labour Cost"),
+        ("description", "Description"),
+        ("username", "Entered By"),
+        ("created_at", "Created At"),
+    ]
+
     def __init__(self, parent=None):
         super().__init__(parent)
 
         self.ui = Ui_AddWorkOrderDialog()
         self.ui.setupUi(self)
+
+        self.work_order_id = None
 
         self.user = getattr(
             parent,
@@ -91,6 +114,9 @@ class WorkOrderDialog(BaseDialog):
         # Add mode has no persisted work order yet, so material actions
         # are enabled only after opening an existing record.
         self.ui.groupMaterials.setEnabled(False)
+
+        self.ui.btnAddLabour.setEnabled(False)
+        self.ui.btnRemoveLabour.setEnabled(False)
 
     # ---------------------------------------------------------
     # Setup
@@ -153,6 +179,11 @@ class WorkOrderDialog(BaseDialog):
         )
 
         TableHelper.setup(
+            self.ui.tblLabour,
+            self.LABOUR_COLUMNS
+)
+
+        TableHelper.setup(
             self.ui.tblHistory,
             self.HISTORY_COLUMNS
         )
@@ -192,6 +223,14 @@ class WorkOrderDialog(BaseDialog):
 
         self.ui.btnCancelWorkOrder.clicked.connect(
             self.cancel_work_order
+        )
+
+        self.ui.btnAddLabour.clicked.connect(
+            self.add_labour
+        )
+
+        self.ui.btnRemoveLabour.clicked.connect(
+            self.remove_labour
         )
 
         self.ui.dsbActualCost.setReadOnly(True)
@@ -458,6 +497,161 @@ class WorkOrderDialog(BaseDialog):
         self.ui.lblMaterialTotal.setText(
             FormatHelper.currency(total)
         )
+
+    def load_labour(self):
+        if self.work_order_id is None:
+            self.ui.tblLabour.setRowCount(0)
+            return
+
+        records = (
+            WorkOrderLabourService.get_by_work_order(
+                self.work_order_id
+            )
+        )
+
+        TableHelper.populate(
+            self.ui.tblLabour,
+            records,
+            self.LABOUR_COLUMNS
+        )
+
+        self.update_labour_hours_mode()
+
+    def add_labour(self):
+        if self.work_order_id is None:
+            QMessageBox.warning(
+                self,
+                "Labour",
+                "Save the Work Order before adding labour."
+            )
+            return
+
+        work_order = WorkOrderModel.get_by_id(
+            self.work_order_id
+        )
+
+        if work_order is None:
+            QMessageBox.warning(
+                self,
+                "Labour",
+                "The work order could not be found."
+            )
+            return
+
+        existing_entries = (
+            WorkOrderLabourService.get_by_work_order(
+                self.work_order_id
+            )
+        )
+
+        legacy_hours = float(
+            work_order["labour_hours"] or 0
+        )
+
+        if (
+            not existing_entries
+            and legacy_hours > 0
+        ):
+            QMessageBox.warning(
+                self,
+                "Legacy Labour Hours",
+                "This Work Order already contains "
+                f"{legacy_hours:,.2f} legacy labour hours.\n\n"
+                "The existing labour hours must be cleared "
+                "before detailed labour entries can be added."
+            )
+            return
+
+        dialog = WorkOrderLabourDialog(
+            work_order_id=self.work_order_id,
+            user=self.user,
+            parent=self
+        )
+
+        if (
+            dialog.exec()
+            == QDialog.DialogCode.Accepted
+        ):
+            self.load_labour()
+            self.refresh_labour_totals()
+            self.load_history()
+
+    def refresh_labour_totals(self):
+        if self.work_order_id is None:
+            return
+
+        work_order = WorkOrderModel.get_by_id(
+            self.work_order_id
+        )
+
+        if work_order is None:
+            return
+
+        self.ui.dsbLabourHours.setValue(
+            float(
+                work_order["labour_hours"]
+                or 0
+            )
+        )
+
+        self.ui.dsbActualCost.setValue(
+            float(
+                work_order["actual_cost"]
+                or 0
+            )
+        )
+
+    def remove_labour(self):
+        labour_id = TableHelper.selected_id(
+            self.ui.tblLabour
+        )
+
+        if labour_id is None:
+            QMessageBox.warning(
+                self,
+                "Labour",
+                "Please select a labour entry to remove."
+            )
+            return
+
+        reply = QMessageBox.question(
+            self,
+            "Remove Labour",
+            "Are you sure you want to remove "
+            "the selected labour entry?",
+            QMessageBox.StandardButton.Yes
+            | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No
+        )
+
+        if (
+            reply
+            != QMessageBox.StandardButton.Yes
+        ):
+            return
+
+        try:
+            WorkOrderLabourService.delete_labour(
+                labour_id,
+                user=self.user
+            )
+            self.load_labour()
+            self.refresh_labour_totals()
+            self.load_history()
+            
+        except ValueError as error:
+            QMessageBox.warning(
+                self,
+                "Labour",
+                str(error)
+            )
+
+        except Exception as error:
+            QMessageBox.critical(
+                self,
+                "Labour",
+                f"Unable to remove labour.\n\n{error}"
+            )
 
     # ---------------------------------------------------------
     # Clear fields
@@ -1022,8 +1216,10 @@ class WorkOrderDialog(BaseDialog):
 
     def load_record(self, record_id):
 
+        self.work_order_id = record_id
+
         # ---------------------------------------------------------
-        # Temporarily disable Materials / History tabs
+        # Temporarily disable Materials / Labour / History tabs
         # ---------------------------------------------------------
 
         self.ui.tabWorkOrder.setTabEnabled(
@@ -1033,6 +1229,11 @@ class WorkOrderDialog(BaseDialog):
 
         self.ui.tabWorkOrder.setTabEnabled(
             2,
+            False
+        )
+
+        self.ui.tabWorkOrder.setTabEnabled(
+            3,
             False
         )
 
@@ -1065,13 +1266,17 @@ class WorkOrderDialog(BaseDialog):
         )
 
         # ---------------------------------------------------------
-        # Load Materials / History
+        # Load Materials / Labour / History
         # ---------------------------------------------------------
 
         self.ui.groupMaterials.setEnabled(True)
         self.ui.groupHistory.setEnabled(True)
 
+        self.ui.btnAddLabour.setEnabled(True)
+        self.ui.btnRemoveLabour.setEnabled(True)
+
         self.load_parts()
+        self.load_labour()
         self.load_history()
 
         # ---------------------------------------------------------
@@ -1092,7 +1297,6 @@ class WorkOrderDialog(BaseDialog):
 
             self.set_cancelled_mode()
 
-
         else:
 
             self.set_editable_mode()
@@ -1104,7 +1308,7 @@ class WorkOrderDialog(BaseDialog):
         self.update_workflow_buttons()
 
         # ---------------------------------------------------------
-        # Enable Materials / History tabs
+        # Enable Materials / Labour / History tabs
         # ---------------------------------------------------------
 
         self.ui.tabWorkOrder.setTabEnabled(
@@ -1114,6 +1318,11 @@ class WorkOrderDialog(BaseDialog):
 
         self.ui.tabWorkOrder.setTabEnabled(
             2,
+            True
+        )
+
+        self.ui.tabWorkOrder.setTabEnabled(
+            3,
             True
         )
 
@@ -1875,6 +2084,13 @@ class WorkOrderDialog(BaseDialog):
         self.ui.btnRemovePart.setVisible(False)
 
     # ---------------------------------------------------------
+    # Labour
+    # ---------------------------------------------------------
+
+        self.ui.btnAddLabour.setVisible(False)
+        self.ui.btnRemoveLabour.setVisible(False)
+
+    # ---------------------------------------------------------
     # Work Order actions
     # ---------------------------------------------------------
 
@@ -1956,6 +2172,13 @@ class WorkOrderDialog(BaseDialog):
         self.ui.btnIssuePart.setVisible(False)
         self.ui.btnRemovePart.setVisible(False)
 
+        # ---------------------------------------------------------
+        # Labour
+        # ---------------------------------------------------------
+
+        self.ui.btnAddLabour.setVisible(False)
+        self.ui.btnRemoveLabour.setVisible(False)
+
         #-----------------------------------------------------------
         # Save
         #-----------------------------------------------------------
@@ -2013,7 +2236,7 @@ class WorkOrderDialog(BaseDialog):
         # Actual Cost ALWAYS remains calculated/read-only.
         self.ui.dsbActualCost.setReadOnly(True)
 
-        self.ui.dsbLabourHours.setReadOnly(False)
+        self.update_labour_hours_mode()
 
         # ---------------------------------------------------------
         # Notes
@@ -2041,6 +2264,17 @@ class WorkOrderDialog(BaseDialog):
                 "work_orders.remove_parts"
             )
         )
+
+        # ---------------------------------------------------------
+        # Labour
+        # ---------------------------------------------------------
+
+        self.ui.btnAddLabour.setVisible(True)
+        self.ui.btnRemoveLabour.setVisible(True)
+
+        self.ui.btnAddLabour.setEnabled(True)
+        self.ui.btnRemoveLabour.setEnabled(True)
+
 
         # ---------------------------------------------------------
         # Save
@@ -2112,6 +2346,13 @@ class WorkOrderDialog(BaseDialog):
 
         self.ui.btnIssuePart.setVisible(False)
         self.ui.btnRemovePart.setVisible(False)
+
+        # ---------------------------------------------------------
+        # Labour
+        # ---------------------------------------------------------
+
+        self.ui.btnAddLabour.setVisible(False)
+        self.ui.btnRemoveLabour.setVisible(False)
 
         # ---------------------------------------------------------
         # Workflow buttons
@@ -2339,4 +2580,22 @@ class WorkOrderDialog(BaseDialog):
 
         self.ui.dsbMeterReading.setVisible(
             show_meter
+        )
+
+    def update_labour_hours_mode(self):
+        if self.work_order_id is None:
+            return
+
+        labour_entries = (
+            WorkOrderLabourService.get_by_work_order(
+                self.work_order_id
+            )
+        )
+
+        has_detailed_labour = bool(
+            labour_entries
+        )
+
+        self.ui.dsbLabourHours.setReadOnly(
+            has_detailed_labour
         )
