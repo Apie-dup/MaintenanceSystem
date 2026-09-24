@@ -48,6 +48,7 @@ class Ui_ReportsPage(object):
         self.cmbReportType.addItem("")
         self.cmbReportType.addItem("")
         self.cmbReportType.addItem("")
+        self.cmbReportType.addItem("")
         self.cmbReportType.setObjectName(u"cmbReportType")
 
         self.horizontalLayout_3.addWidget(self.cmbReportType)
@@ -275,8 +276,9 @@ class Ui_ReportsPage(object):
         self.cmbReportType.setItemText(4, QCoreApplication.translate("ReportsPage", u"Preventive Maintenance", None))
         self.cmbReportType.setItemText(5, QCoreApplication.translate("ReportsPage", u"Technician Performance", None))
         self.cmbReportType.setItemText(6, QCoreApplication.translate("ReportsPage", u"Low Stock / Reorder", None))
-        self.cmbReportType.setItemText(7, QCoreApplication.translate("ReportsPage", u"Asset Maintenance History", None))
-        self.cmbReportType.setItemText(8, QCoreApplication.translate("ReportsPage", u"Technician Work History", None))
+        self.cmbReportType.setItemText(7, QCoreApplication.translate("ReportsPage", u"Purchase Orders", None))
+        self.cmbReportType.setItemText(8, QCoreApplication.translate("ReportsPage", u"Asset Maintenance History", None))
+        self.cmbReportType.setItemText(9, QCoreApplication.translate("ReportsPage", u"Technician Work History", None))
 
         self.lblFromDate.setText(QCoreApplication.translate("ReportsPage", u"From Date:", None))
         self.lblToDate.setText(QCoreApplication.translate("ReportsPage", u"To Date:", None))

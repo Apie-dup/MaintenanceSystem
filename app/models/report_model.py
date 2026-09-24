@@ -1027,3 +1027,126 @@ class ReportModel:
 
         finally:
             conn.close()
+
+    @staticmethod
+    def get_purchase_orders(
+        from_date=None,
+        to_date=None,
+        status=None,
+        supplier_id=None,
+    ):
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        try:
+
+            query = """
+                SELECT
+                    purchase_orders.id,
+                    purchase_orders.purchase_order_number,
+
+                    suppliers.supplier_code,
+                    suppliers.supplier_name,
+
+                    purchase_orders.order_date,
+                    purchase_orders.expected_date,
+                    purchase_orders.status,
+                    purchase_orders.reference,
+
+                    COALESCE(
+                        SUM(
+                            purchase_order_items.quantity_ordered
+                        ),
+                        0
+                    ) AS quantity_ordered,
+
+                    COALESCE(
+                        SUM(
+                            purchase_order_items.quantity_received
+                        ),
+                        0
+                    ) AS quantity_received,
+
+                    COALESCE(
+                        SUM(
+                            purchase_order_items.quantity_ordered
+                            - purchase_order_items.quantity_received
+                        ),
+                        0
+                    ) AS quantity_outstanding,
+
+                    COALESCE(
+                        SUM(
+                            purchase_order_items.quantity_ordered
+                            * purchase_order_items.unit_cost
+                        ),
+                        0
+                    ) AS total
+
+                FROM purchase_orders
+
+                INNER JOIN suppliers
+                    ON purchase_orders.supplier_id
+                    = suppliers.id
+
+                LEFT JOIN purchase_order_items
+                    ON purchase_orders.id
+                    = purchase_order_items.purchase_order_id
+
+                WHERE 1 = 1
+            """
+
+            parameters = []
+
+            if from_date:
+                query += """
+                    AND DATE(purchase_orders.order_date)
+                        >= DATE(?)
+                """
+                parameters.append(from_date)
+
+            if to_date:
+                query += """
+                    AND DATE(purchase_orders.order_date)
+                        <= DATE(?)
+                """
+                parameters.append(to_date)
+
+            if status:
+                query += """
+                    AND purchase_orders.status = ?
+                """
+                parameters.append(status)
+
+            if supplier_id:
+                query += """
+                    AND purchase_orders.supplier_id = ?
+                """
+                parameters.append(supplier_id)
+
+            query += """
+                GROUP BY
+                    purchase_orders.id,
+                    purchase_orders.purchase_order_number,
+                    suppliers.supplier_code,
+                    suppliers.supplier_name,
+                    purchase_orders.order_date,
+                    purchase_orders.expected_date,
+                    purchase_orders.status,
+                    purchase_orders.reference
+
+                ORDER BY
+                    purchase_orders.order_date DESC,
+                    purchase_orders.id DESC
+            """
+
+            cursor.execute(
+                query,
+                parameters
+            )
+
+            return cursor.fetchall()
+
+        finally:
+            conn.close()

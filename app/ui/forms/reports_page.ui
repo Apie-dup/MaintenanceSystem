@@ -68,6 +68,11 @@
           </item>
           <item>
            <property name="text">
+            <string>Purchase Orders</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
             <string>Asset Maintenance History</string>
            </property>
           </item>

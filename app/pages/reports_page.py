@@ -18,6 +18,7 @@ from app.helpers.currency_helper import CurrencyHelper
 from app.core.permissions import Permissions
 from app.services.asset_service import AssetService
 from app.services.technician_service import TechnicianService
+from app.services.supplier_service import SupplierService
 
 
 class ReportsPage(QWidget):
@@ -115,6 +116,20 @@ class ReportsPage(QWidget):
         ("reorder_cost", "Reorder Cost"),
         ("location", "Location"),
         ("status", "Status"),
+    ]
+
+    PURCHASE_ORDER_COLUMNS = [
+        ("purchase_order_number", "PO Number"),
+        ("supplier_code", "Supplier Code"),
+        ("supplier_name", "Supplier"),
+        ("order_date", "Order Date"),
+        ("expected_date", "Expected Date"),
+        ("status", "Status"),
+        ("reference", "Reference"),
+        ("quantity_ordered", "Qty Ordered"),
+        ("quantity_received", "Qty Received"),
+        ("quantity_outstanding", "Outstanding"),
+        ("total", "Total"),
     ]
 
     ASSET_MAINTENANCE_HISTORY_COLUMNS = [
@@ -252,6 +267,31 @@ class ReportsPage(QWidget):
             self.ui.cmbAsset.addItem(
                 display_text,
                 technician["id"]
+            )
+
+    def load_supplier_filter(self):
+
+        self.ui.cmbAsset.clear()
+
+        self.ui.cmbAsset.addItem(
+            "All Suppliers",
+            None
+        )
+
+        suppliers = (
+            SupplierService.get_all()
+        )
+
+        for supplier in suppliers:
+
+            display_text = (
+                f'{supplier["supplier_code"]} - '
+                f'{supplier["supplier_name"]}'
+            )
+
+            self.ui.cmbAsset.addItem(
+                display_text,
+                supplier["id"]
             )
 
     def reset_summary(self):
@@ -565,6 +605,35 @@ class ReportsPage(QWidget):
                 )
             )
 
+        elif report_type == "Purchase Orders":
+
+            columns = self.PURCHASE_ORDER_COLUMNS
+
+            selected_status = (
+                self.ui.cmbStatus
+                .currentText()
+                .strip()
+            )
+
+            selected_supplier_id = (
+                self.ui.cmbAsset.currentData()
+            )
+
+            status = (
+                None
+                if selected_status == "All Statuses"
+                else selected_status
+            )
+
+            rows = (
+                ReportService.get_purchase_orders(
+                    from_date,
+                    to_date,
+                    status=status,
+                    supplier_id=selected_supplier_id,
+                )
+        )
+
         else:
             self.ui.lblStatus.setText(
                 "This report is not implemented yet."
@@ -646,10 +715,18 @@ class ReportsPage(QWidget):
         if report_type == "Technician Work History":
 
             self.ui.lblAsset.setText(
-                "Technician:"
-            )
+            "Technician:"
+        )
 
             self.load_technician_filter()
+
+        elif report_type == "Purchase Orders":
+
+            self.ui.lblAsset.setText(
+                "Supplier:"
+            )
+
+            self.load_supplier_filter()
 
         else:
 
@@ -1392,6 +1469,101 @@ class ReportsPage(QWidget):
                     except ValueError:
                         pass
 
+        elif report_type == "Purchase Orders":
+
+            date_columns = (
+                3,  # Order Date
+                4,  # Expected Date
+            )
+
+            quantity_columns = (
+                7,  # Qty Ordered
+                8,  # Qty Received
+                9,  # Outstanding
+            )
+
+            total_column = 10
+
+            for row in range(
+                table.rowCount()
+            ):
+
+                # -----------------------------------------
+                # Dates
+                # -----------------------------------------
+
+                for column in date_columns:
+
+                    item = table.item(
+                        row,
+                        column
+                    )
+
+                    if item is None:
+                        continue
+
+                    text = item.text().strip()
+
+                    if not text:
+                        continue
+
+                    item.setText(
+                        DateHelper.display(
+                            text
+                        )
+                    )
+
+                # -----------------------------------------
+                # Quantities
+                # -----------------------------------------
+
+                for column in quantity_columns:
+
+                    item = table.item(
+                        row,
+                        column
+                    )
+
+                    if item is None:
+                        continue
+
+                    try:
+                        value = float(
+                            item.text() or 0
+                        )
+
+                        item.setText(
+                            f"{value:g}"
+                        )
+
+                    except ValueError:
+                        pass
+
+                # -----------------------------------------
+                # Total
+                # -----------------------------------------
+
+                item = table.item(
+                    row,
+                    total_column
+                )
+
+                if item is not None:
+
+                    try:
+                        value = float(
+                            item.text() or 0
+                        )
+
+                        item.setText(
+                            SettingsService.format_currency(
+                                value
+                            )
+                        )
+
+                    except ValueError:
+                        pass
+
         self.update_summary(
             report_type,
             rows,
@@ -1761,6 +1933,59 @@ class ReportsPage(QWidget):
 
             return
 
+        # ---------------------------------------------------------
+        # Purchase Orders
+        # ---------------------------------------------------------
+
+        if report_type == "Purchase Orders":
+
+            purchase_order_count = len(rows)
+
+            ordered_quantity = sum(
+                float(
+                    row["quantity_ordered"] or 0
+                )
+                for row in rows
+            )
+
+            received_quantity = sum(
+                float(
+                    row["quantity_received"] or 0
+                )
+                for row in rows
+            )
+
+            total_value = sum(
+                float(
+                    row["total"] or 0
+                )
+                for row in rows
+            )
+
+            self.ui.lblTotalValue.setText(
+                str(purchase_order_count)
+            )
+
+            self.ui.lblOpenValue.setText(
+                f"{ordered_quantity:g}"
+            )
+
+            self.ui.lblCompletedValue.setText(
+                f"{received_quantity:g}"
+            )
+
+            self.ui.lblTotalCostValue.setText(
+                SettingsService.format_currency(
+                    total_value
+                )
+            )
+
+            return
+
+        # -------------------------------------------------------------------------------------
+        # Asset Maintenance History
+        # -------------------------------------------------------------------------------------
+
         if report_type == "Asset Maintenance History":
 
             work_order_count = len(rows)
@@ -1986,6 +2211,26 @@ class ReportsPage(QWidget):
             )
             return
 
+        if report_type == "Purchase Orders":
+
+            self.ui.lblTotal.setText(
+                "Purchase Orders"
+            )
+
+            self.ui.lblOpen.setText(
+                "Ordered Qty"
+            )
+
+            self.ui.lblCompleted.setText(
+                "Received Qty"
+            )
+
+            self.ui.lblTotalCost.setText(
+                "Total Value"
+            )
+
+            return
+
         if report_type == "Asset Maintenance History":
 
             self.ui.lblTotal.setText(
@@ -2057,6 +2302,7 @@ class ReportsPage(QWidget):
             "Inventory Transactions",
             "Asset Maintenance History",
             "Technician Work History",
+            "Purchase Orders",
         )
 
         self.ui.dtFromDate.setEnabled(
@@ -2097,11 +2343,14 @@ class ReportsPage(QWidget):
             .strip()
         )
 
-        filter_name = (
-            "Technician"
-            if report_type == "Technician Work History"
-            else "Asset"
-        )
+        if report_type == "Technician Work History":
+            filter_name = "Technician"
+
+        elif report_type == "Purchase Orders":
+            filter_name = "Supplier"
+
+        else:
+            filter_name = "Asset"
 
         filters = {
             "Status": (
@@ -2261,6 +2510,17 @@ class ReportsPage(QWidget):
                     "Cancelled",
                 ]
 
+            elif report_type == "Purchase Orders":
+
+                statuses = [
+                    "All Statuses",
+                    "Draft",
+                    "Ordered",
+                    "Partially Received",
+                    "Received",
+                    "Cancelled",
+                ]
+
             # --------------------------------------------------
             # Preventive Maintenance
             # --------------------------------------------------
@@ -2363,11 +2623,14 @@ class ReportsPage(QWidget):
             .toString("yyyy-MM-dd")
         )
 
-        filter_name = (
-            "Technician"
-            if report_type == "Technician Work History"
-            else "Asset"
-        )
+        if report_type == "Technician Work History":
+            filter_name = "Technician"
+
+        elif report_type == "Purchase Orders":
+            filter_name = "Supplier"
+
+        else:
+            filter_name = "Asset"
 
         filters = {
             "Status": (

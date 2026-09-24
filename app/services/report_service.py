@@ -118,3 +118,17 @@ class ReportService:
                 technician_id=technician_id,
             )
         )
+
+    @staticmethod
+    def get_purchase_orders(
+        from_date=None,
+        to_date=None,
+        status=None,
+        supplier_id=None,
+    ):
+        return ReportModel.get_purchase_orders(
+            from_date,
+            to_date,
+            status=status,
+            supplier_id=supplier_id,
+        )

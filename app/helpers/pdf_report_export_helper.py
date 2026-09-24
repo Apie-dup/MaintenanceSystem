@@ -69,6 +69,7 @@ class PdfReportExportHelper:
             "Inventory Transactions",
             "Asset Maintenance History",
             "Technician Work History",
+             "Purchase Orders",
         }
 
         if (

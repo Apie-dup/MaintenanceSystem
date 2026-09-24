@@ -69,6 +69,7 @@ class ReportExportHelper:
             "Inventory Transactions",
             "Asset Maintenance History",
             "Technician Work History",
+             "Purchase Orders",
         }
 
         if (
@@ -363,13 +364,36 @@ class ReportExportHelper:
                         wrap_text=True
                     )
             else:
-                worksheet.column_dimensions[
-                    column_letter
-                ].width = min(
+
+                column_width = min(
                     max_length + 2,
                     40
                 )
 
+                # Currency values display wider than their
+                # underlying numeric values in Excel.
+                currency_headings = {
+                    "Estimated Cost",
+                    "Actual Cost",
+                    "Labour Cost",
+                    "Material Cost",
+                    "Total Cost",
+                    "Unit Cost",
+                    "Stock Value",
+                    "Reorder Cost",
+                    "Total",
+                }
+
+                if heading in currency_headings:
+                    column_width = max(
+                        column_width,
+                        14
+                    )
+
+                worksheet.column_dimensions[
+                    column_letter
+                ].width = column_width
+                
         # -------------------------------------------------
         # Freeze headings
         # -------------------------------------------------
