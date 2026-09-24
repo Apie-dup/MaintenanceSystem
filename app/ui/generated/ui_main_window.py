@@ -24,7 +24,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(800, 600)
+        MainWindow.resize(800, 602)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
@@ -57,6 +57,10 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.btnDashboard)
 
+        self.verticalSpacer_8 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout.addItem(self.verticalSpacer_8)
+
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout.addItem(self.verticalSpacer)
@@ -84,6 +88,10 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.btnVehicleLogbook)
 
+        self.verticalSpacer_9 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout.addItem(self.verticalSpacer_9)
+
         self.verticalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout.addItem(self.verticalSpacer_3)
@@ -93,6 +101,10 @@ class Ui_MainWindow(object):
         self.btnTechnicians.setCheckable(False)
 
         self.verticalLayout.addWidget(self.btnTechnicians)
+
+        self.verticalSpacer_10 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout.addItem(self.verticalSpacer_10)
 
         self.verticalSpacer_4 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
@@ -104,11 +116,20 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.btnInventory)
 
+        self.btnPurchaseOrders = QPushButton(self.navigationFrame)
+        self.btnPurchaseOrders.setObjectName(u"btnPurchaseOrders")
+
+        self.verticalLayout.addWidget(self.btnPurchaseOrders)
+
         self.btnSuppliers = QPushButton(self.navigationFrame)
         self.btnSuppliers.setObjectName(u"btnSuppliers")
         self.btnSuppliers.setCheckable(False)
 
         self.verticalLayout.addWidget(self.btnSuppliers)
+
+        self.verticalSpacer_11 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout.addItem(self.verticalSpacer_11)
 
         self.verticalSpacer_5 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
@@ -191,6 +212,9 @@ class Ui_MainWindow(object):
         self.page = QWidget()
         self.page.setObjectName(u"page")
         self.stackedWidget.addWidget(self.page)
+        self.pagePurchaseOrders = QWidget()
+        self.pagePurchaseOrders.setObjectName(u"pagePurchaseOrders")
+        self.stackedWidget.addWidget(self.pagePurchaseOrders)
 
         self.horizontalLayout.addWidget(self.stackedWidget)
 
@@ -208,7 +232,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(3)
+        self.stackedWidget.setCurrentIndex(12)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -225,6 +249,7 @@ class Ui_MainWindow(object):
         self.btnVehicleLogbook.setText(QCoreApplication.translate("MainWindow", u"Vehicle Logbook", None))
         self.btnTechnicians.setText(QCoreApplication.translate("MainWindow", u"Technicians", None))
         self.btnInventory.setText(QCoreApplication.translate("MainWindow", u"Inventory", None))
+        self.btnPurchaseOrders.setText(QCoreApplication.translate("MainWindow", u"Purchase Orders", None))
         self.btnSuppliers.setText(QCoreApplication.translate("MainWindow", u"Suppliers", None))
         self.btnReports.setText(QCoreApplication.translate("MainWindow", u"Reports", None))
         self.btnUsers.setText(QCoreApplication.translate("MainWindow", u"Users", None))

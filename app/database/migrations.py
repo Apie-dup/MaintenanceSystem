@@ -4,7 +4,7 @@ from app.core.logger import logger
 
 class MigrationManager:
 
-    LATEST_VERSION = 27
+    LATEST_VERSION = 28
 
     # ---------------------------------------------------------
     # Database version
@@ -121,42 +121,59 @@ class MigrationManager:
             elif version == 14:
                 MigrationManager.migrate_to_v15()
                 version = 15
+
             elif version == 15:
                 MigrationManager.migrate_to_v16()
                 version = 16
+
             elif version == 16:
                 MigrationManager.migrate_to_v17()
                 version = 17
+
             elif version == 17:
                 MigrationManager.migrate_to_v18()
                 version = 18
+
             elif version == 18:
                 MigrationManager.migrate_to_v19()
                 version = 19
+
             elif version == 19:
                 MigrationManager.migrate_to_v20()
                 version = 20
+
             elif version == 20:
                 MigrationManager.migrate_to_v21()
                 version = 21
+
             elif version == 21:
                 MigrationManager.migrate_to_v22()
                 version = 22
+
             elif version == 22:
                 MigrationManager.migrate_to_v23()
                 version = 23
+
             elif version == 23:
                 MigrationManager.migrate_to_v24()
                 version = 24
+
             elif version == 24:
                 MigrationManager.migrate_to_v25()
                 version = 25
+
             elif version == 25:
                 MigrationManager.migrate_to_v26()
                 version = 26
+
             elif version == 26:
                 MigrationManager.migrate_to_v27()
                 version = 27
+
+            elif version == 27:
+                MigrationManager.migrate_to_v28()
+                version = 28
+
             else:
                 raise RuntimeError(
                     f"No migration path exists from version {version}."
@@ -1759,6 +1776,114 @@ class MigrationManager:
 
             logger.info(
                 "Work order labour table created."
+            )
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()
+
+    @staticmethod
+    def migrate_to_v28():
+        conn = Database.connect()
+
+        try:
+            logger.info(
+                "Migrating database to Version 28..."
+            )
+
+            cursor = conn.cursor()
+
+            # -----------------------------------------------------
+            # Purchase Orders
+            # -----------------------------------------------------
+
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS purchase_orders (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+                    purchase_order_number TEXT NOT NULL UNIQUE,
+                    supplier_id INTEGER NOT NULL,
+
+                    order_date TEXT NOT NULL,
+                    expected_date TEXT,
+
+                    status TEXT NOT NULL DEFAULT 'Draft',
+
+                    reference TEXT,
+                    notes TEXT,
+
+                    user_id INTEGER,
+                    username TEXT,
+
+                    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+
+                    FOREIGN KEY (supplier_id)
+                        REFERENCES suppliers(id)
+                )
+            """)
+
+            # -----------------------------------------------------
+            # Purchase Order Items
+            # -----------------------------------------------------
+
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS purchase_order_items (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+                    purchase_order_id INTEGER NOT NULL,
+                    inventory_id INTEGER NOT NULL,
+
+                    quantity_ordered REAL NOT NULL DEFAULT 0,
+                    quantity_received REAL NOT NULL DEFAULT 0,
+
+                    unit_cost REAL NOT NULL DEFAULT 0,
+
+                    notes TEXT,
+
+                    FOREIGN KEY (purchase_order_id)
+                        REFERENCES purchase_orders(id)
+                        ON DELETE CASCADE,
+
+                    FOREIGN KEY (inventory_id)
+                        REFERENCES inventory(id)
+                )
+            """)
+
+            # -----------------------------------------------------
+            # Indexes
+            # -----------------------------------------------------
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_purchase_orders_supplier_id
+                ON purchase_orders(supplier_id)
+            """)
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_purchase_orders_status
+                ON purchase_orders(status)
+            """)
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_purchase_order_items_purchase_order_id
+                ON purchase_order_items(purchase_order_id)
+            """)
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_purchase_order_items_inventory_id
+                ON purchase_order_items(inventory_id)
+            """)
+
+            conn.commit()
+
+            logger.info(
+                "Purchase order tables created."
             )
 
         except Exception:

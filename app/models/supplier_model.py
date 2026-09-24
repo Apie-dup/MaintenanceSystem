@@ -1,5 +1,3 @@
-from genericpath import exists
-
 from app.database.connection import Database
 from app.helpers.code_generator import CodeGenerator
 

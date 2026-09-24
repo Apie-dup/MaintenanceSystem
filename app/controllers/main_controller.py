@@ -17,6 +17,7 @@ from app.pages.work_orders_page import WorkOrdersPage
 from app.pages.preventive_maintenance_page import PreventiveMaintenancePage
 from app.pages.technicians_page import TechniciansPage
 from app.pages.inventory_page import InventoryPage
+from app.pages.purchase_orders_page import PurchaseOrdersPage
 from app.pages.suppliers_page import SuppliersPage
 from app.pages.reports_page import ReportsPage
 from app.pages.settings_page import SettingsPage
@@ -217,6 +218,7 @@ class MainController(QMainWindow):
             self.ui.btnVehicleLogbook,
             self.ui.btnTechnicians,
             self.ui.btnInventory,
+            self.ui.btnPurchaseOrders,
             self.ui.btnSuppliers,
             self.ui.btnReports,
             self.ui.btnLookups,
@@ -322,6 +324,7 @@ class MainController(QMainWindow):
             self.ui.btnVehicleLogbook,
             self.ui.btnTechnicians,
             self.ui.btnInventory,
+            self.ui.btnPurchaseOrders,
             self.ui.btnSuppliers,
             self.ui.btnReports,
             self.ui.btnLookups,
@@ -366,6 +369,8 @@ class MainController(QMainWindow):
         self.technicians_page = TechniciansPage(self)
 
         self.inventory_page = InventoryPage(self)
+
+        self.purchase_orders_page = PurchaseOrdersPage(self)
 
         self.suppliers_page = SuppliersPage(self)
 
@@ -416,6 +421,12 @@ class MainController(QMainWindow):
             self.ui.pageInventory,
             self.inventory_page
         )
+
+        self.page_manager.add_page(
+            self.ui.pagePurchaseOrders,
+            self.purchase_orders_page
+        )
+
 
         self.page_manager.add_page(
             self.ui.pageSuppliers,
@@ -476,6 +487,10 @@ class MainController(QMainWindow):
             lambda: self.show_inventory(
                 low_stock=False
             )
+        )
+
+        self.ui.btnPurchaseOrders.clicked.connect(
+            self.show_purchase_orders
         )
 
         self.ui.btnSuppliers.clicked.connect(
@@ -630,6 +645,17 @@ class MainController(QMainWindow):
 
         self.navigation.show(
             self.ui.pageInventory
+        )
+
+    def show_purchase_orders(self):
+        self.set_active_navigation(
+            self.ui.btnPurchaseOrders
+        )
+
+        self.purchase_orders_page.load_data()
+
+        self.navigation.show(
+            self.ui.pagePurchaseOrders
         )
 
     def show_suppliers(self):

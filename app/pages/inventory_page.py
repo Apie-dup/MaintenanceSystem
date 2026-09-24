@@ -10,6 +10,12 @@ from app.dialogs.inventory_transactions_dialog import (
     InventoryTransactionsDialog
 )
 from app.dialogs.adjust_stock_dialog import AdjustStockDialog
+from app.dialogs.purchase_order_dialog import (
+    PurchaseOrderDialog,
+)
+from app.services.purchase_order_service import (
+    PurchaseOrderService,
+)
 
 class InventoryPage(CrudPage):
 
@@ -77,9 +83,13 @@ class InventoryPage(CrudPage):
             ""
         )
 
+        self.low_stock_mode = False
+
         self.setup_page()
 
     def show_low_stock(self):
+
+        self.low_stock_mode = True
 
         records = (
             InventoryService.get_low_stock()
@@ -89,8 +99,18 @@ class InventoryPage(CrudPage):
             records
         )
 
+        self.ui.btnCreatePurchaseOrder.setVisible(
+            True
+        )
+
 
     def show_all(self):
+
+        self.low_stock_mode = False
+
+        self.ui.btnCreatePurchaseOrder.setVisible(
+            False
+        )
 
         if self.search_widget is not None:
             self.search_widget.clear()
@@ -98,10 +118,19 @@ class InventoryPage(CrudPage):
         self.load_data()
 
     def setup_page(self):
+
         self.validate_configuration()
+
         self.setup_table()
+
         self.connect_signals()
+
         self.apply_permissions()
+
+        self.ui.btnCreatePurchaseOrder.setVisible(
+            False
+        )
+
         self.load_data()
 
     def apply_permissions(self):
@@ -183,6 +212,10 @@ class InventoryPage(CrudPage):
 
         self.ui.btnTransactions.clicked.connect(
             self.show_transactions
+        )
+
+        self.ui.btnCreatePurchaseOrder.clicked.connect(
+            self.create_purchase_order
         )
 
         self.ui.btnDelete.clicked.connect(
@@ -324,30 +357,6 @@ class InventoryPage(CrudPage):
 
         super().delete_record()
 
-    def receive_stock(self):
-        record_id = TableHelper.selected_id(
-            self.ui.tblInventory
-        )
-
-        if record_id is None:
-
-            self.warning(
-                "Receive Stock",
-                "Please select an inventory item."
-            )
-
-            return
-
-        dialog = ReceiveStockDialog(
-            inventory_id=record_id,
-            user=self.user,
-            parent=self,
-        )
-
-        if dialog.exec():
-
-            self.load_data()
-
     def show_transactions(self):
 
         record_id = TableHelper.selected_id(
@@ -406,15 +415,97 @@ class InventoryPage(CrudPage):
         if dialog.exec():
             self.load_data()
 
-    def receive_stock(self):
+    def create_purchase_order(self):
 
-        if not Permissions.has_permission(
-            self.role,
-            "inventory.receive_stock"
-        ):
+        record_id = TableHelper.selected_id(
+            self.ui.tblInventory
+        )
+
+        if record_id is None:
             self.warning(
-                "Receive Stock",
-                "You do not have permission "
-                "to receive stock."
+                "Create Purchase Order",
+                "Please select an inventory item."
             )
             return
+
+        inventory = InventoryService.get_by_id(
+            record_id
+        )
+
+        if inventory is None:
+            self.warning(
+                "Create Purchase Order",
+                "Inventory item not found."
+            )
+            return
+
+        if inventory["supplier_id"] is None:
+            self.warning(
+                "Create Purchase Order",
+                (
+                    "This inventory item does not "
+                    "have a supplier assigned."
+                ),
+            )
+            return
+
+        open_order = (
+            PurchaseOrderService
+            .get_open_order_for_inventory(
+                record_id
+            )
+        )
+
+        if open_order is not None:
+            outstanding = float(
+                open_order[
+                    "quantity_outstanding"
+                ] or 0
+            )
+
+            self.information(
+                "Create Purchase Order",
+                (
+                    f'{inventory["part_name"]} already '
+                    f'has {outstanding:.2f} '
+                    f'{inventory["unit"]} outstanding '
+                    f'on '
+                    f'{open_order["purchase_order_number"]} '
+                    f'({open_order["status"]}).'
+                ),
+            )
+            return
+
+        dialog = PurchaseOrderDialog(
+            parent=self
+        )
+
+        dialog.new_record()
+
+        dialog.prefill_from_inventory(
+            inventory
+        )
+
+        dialog.exec()
+
+    def receive_stock(self):
+
+        record_id = TableHelper.selected_id(
+            self.ui.tblInventory
+        )
+
+        if record_id is None:
+            self.warning(
+                "Receive Stock",
+                "Please select an inventory item."
+            )
+            return
+
+        dialog = ReceiveStockDialog(
+            inventory_id=record_id,
+            user=self.user,
+            parent=self,
+        )
+
+        if dialog.exec():
+            self.load_data()

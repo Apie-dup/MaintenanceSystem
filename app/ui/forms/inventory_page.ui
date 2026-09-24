@@ -176,6 +176,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="btnCreatePurchaseOrder">
+       <property name="text">
+        <string>Create Purchase Order</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="btnRefresh">
        <property name="minimumSize">
         <size>

@@ -50,40 +50,57 @@ class InventoryModel:
     # ---------------------------------------------------------
 
     @staticmethod
-    def get_by_id(record_id):
-        conn = Database.connect()
-        cursor = conn.cursor()
+    def get_by_id(
+        record_id,
+        connection=None,
+    ):
+        owns_connection = connection is None
 
-        cursor.execute("""
-            SELECT
-                inventory.id,
-                inventory.part_number,
-                inventory.part_name,
-                inventory.description,
-                inventory.category,
-                inventory.supplier_id,
-                suppliers.supplier_code,
-                suppliers.supplier_name,
-                inventory.unit,
-                inventory.quantity,
-                inventory.minimum_quantity,
-                inventory.reorder_quantity,
-                inventory.unit_cost,
-                inventory.location,
-                inventory.barcode,
-                inventory.status,
-                inventory.notes,
-                inventory.created_at
-            FROM inventory
-            LEFT JOIN suppliers
-                ON inventory.supplier_id = suppliers.id
-            WHERE inventory.id = ?
-        """, (record_id,))
+        conn = (
+            connection
+            or Database.connect()
+        )
 
-        row = cursor.fetchone()
-        conn.close()
+        try:
+            cursor = conn.cursor()
 
-        return row
+            cursor.execute("""
+                SELECT
+                    inventory.id,
+                    inventory.part_number,
+                    inventory.part_name,
+                    inventory.description,
+                    inventory.category,
+                    inventory.supplier_id,
+                    suppliers.supplier_code,
+                    suppliers.supplier_name,
+                    inventory.unit,
+                    inventory.quantity,
+                    inventory.minimum_quantity,
+                    inventory.reorder_quantity,
+                    inventory.unit_cost,
+                    inventory.location,
+                    inventory.barcode,
+                    inventory.status,
+                    inventory.notes,
+                    inventory.created_at
+
+                FROM inventory
+
+                LEFT JOIN suppliers
+                    ON inventory.supplier_id
+                    = suppliers.id
+
+                WHERE inventory.id = ?
+            """, (
+                record_id,
+            ))
+
+            return cursor.fetchone()
+
+        finally:
+            if owns_connection:
+                conn.close()
 
     # ---------------------------------------------------------
     # Insert

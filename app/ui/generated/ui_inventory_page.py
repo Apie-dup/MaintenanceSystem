@@ -116,6 +116,11 @@ class Ui_InventoryPage(object):
 
         self.horizontalLayout_2.addWidget(self.btnTransactions)
 
+        self.btnCreatePurchaseOrder = QPushButton(InventoryPage)
+        self.btnCreatePurchaseOrder.setObjectName(u"btnCreatePurchaseOrder")
+
+        self.horizontalLayout_2.addWidget(self.btnCreatePurchaseOrder)
+
         self.btnRefresh = QPushButton(InventoryPage)
         self.btnRefresh.setObjectName(u"btnRefresh")
         self.btnRefresh.setMinimumSize(QSize(90, 30))
@@ -184,6 +189,7 @@ class Ui_InventoryPage(object):
         self.btnReceiveStock.setText(QCoreApplication.translate("InventoryPage", u"Receive Stock", None))
         self.btnAdjustStock.setText(QCoreApplication.translate("InventoryPage", u"Adjust Stock", None))
         self.btnTransactions.setText(QCoreApplication.translate("InventoryPage", u"Transactions", None))
+        self.btnCreatePurchaseOrder.setText(QCoreApplication.translate("InventoryPage", u"Create Purchase Order", None))
         self.btnRefresh.setText(QCoreApplication.translate("InventoryPage", u"Refresh", None))
         self.btnDelete.setText(QCoreApplication.translate("InventoryPage", u"Delete", None))
         self.lblStatus.setText(QCoreApplication.translate("InventoryPage", u"Status", None))

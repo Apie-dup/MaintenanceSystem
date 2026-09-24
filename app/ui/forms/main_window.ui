@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>600</height>
+    <height>602</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -74,6 +74,19 @@
         </widget>
        </item>
        <item>
+        <spacer name="verticalSpacer_8">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Orientation::Vertical</enum>
@@ -124,6 +137,19 @@
         </widget>
        </item>
        <item>
+        <spacer name="verticalSpacer_9">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
         <spacer name="verticalSpacer_3">
          <property name="orientation">
           <enum>Qt::Orientation::Vertical</enum>
@@ -145,6 +171,19 @@
           <bool>false</bool>
          </property>
         </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_10">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
        <item>
         <spacer name="verticalSpacer_4">
@@ -170,6 +209,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="btnPurchaseOrders">
+         <property name="text">
+          <string>Purchase Orders</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="btnSuppliers">
          <property name="text">
           <string>Suppliers</string>
@@ -178,6 +224,19 @@
           <bool>false</bool>
          </property>
         </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_11">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
        <item>
         <spacer name="verticalSpacer_5">
@@ -268,7 +327,7 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>3</number>
+       <number>12</number>
       </property>
       <widget class="QWidget" name="pageDashboard"/>
       <widget class="QWidget" name="pageAssets"/>
@@ -282,6 +341,7 @@
       <widget class="QWidget" name="pageSettings"/>
       <widget class="QWidget" name="pageUsers"/>
       <widget class="QWidget" name="page"/>
+      <widget class="QWidget" name="pagePurchaseOrders"/>
      </widget>
     </item>
    </layout>
