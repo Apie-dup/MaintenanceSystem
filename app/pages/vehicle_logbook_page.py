@@ -40,6 +40,9 @@ class VehicleLogbookPage(CrudPage):
         ("start_meter", "Start km"),
         ("end_meter", "End km"),
         ("distance", "Distance"),
+        ("start_hours", "Start Hours"),
+        ("end_hours", "End Hours"),
+        ("hours_used", "Hours Used"),
         ("purpose", "Purpose"),
         ("fuel_quantity", "Fuel"),
         ("work_order_number", "Work Order"),
@@ -74,7 +77,6 @@ class VehicleLogbookPage(CrudPage):
             VehicleLogbookService
         )
 
-        # We will add this in the next step.
         self.dialog_class = VehicleLogbookDialog
 
         self.table = self.ui.tblLogbook

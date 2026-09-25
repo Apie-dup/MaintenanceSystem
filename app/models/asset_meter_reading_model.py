@@ -189,6 +189,7 @@ class AssetMeterReadingModel:
     @staticmethod
     def get_by_logbook_id(
         logbook_id,
+        meter_type,
         conn=None,
     ):
 
@@ -204,9 +205,12 @@ class AssetMeterReadingModel:
                 SELECT *
                 FROM asset_meter_readings
                 WHERE logbook_id = ?
+                    AND meter_type = ?
                 LIMIT 1
             """, (
                 logbook_id,
+                meter_type,
+
             ))
 
             return cursor.fetchone()
@@ -219,6 +223,7 @@ class AssetMeterReadingModel:
     @staticmethod
     def update_logbook_reading(
         logbook_id,
+        meter_type,
         asset_id,
         reading,
         reading_date,
@@ -238,17 +243,18 @@ class AssetMeterReadingModel:
                 
                 SET
                     asset_id = ?,
-                    meter_type = 'Kilometers',
                     reading = ?,
                     reading_date = ?,
                     source_type = 'Vehicle Logbook'
                     
                 WHERE logbook_id = ?
+                    AND meter_type = ? 
             """, (
                 asset_id,
                 reading,
                 reading_date,
                 logbook_id,
+                meter_type,
             ))
 
             if owns_connection:
@@ -292,6 +298,44 @@ class AssetMeterReadingModel:
 
         except Exception:
 
+            if owns_connection:
+                conn.rollback()
+
+            raise
+
+        finally:
+
+            if owns_connection:
+                conn.close()
+
+    @staticmethod
+    def delete_by_logbook_id_and_meter_type(
+        logbook_id,
+        meter_type,
+        conn=None,
+    ):
+
+        owns_connection = conn is None
+
+        if owns_connection:
+            conn = Database.connect()
+
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute("""
+                DELETE FROM asset_meter_readings
+                WHERE logbook_id = ?
+                    AND meter_type = ?
+            """, (
+                logbook_id,
+                meter_type,
+            ))
+
+            if owns_connection:
+                conn.commit()
+
+        except Exception:
             if owns_connection:
                 conn.rollback()
 

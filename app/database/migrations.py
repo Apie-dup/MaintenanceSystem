@@ -4,7 +4,7 @@ from app.core.logger import logger
 
 class MigrationManager:
 
-    LATEST_VERSION = 28
+    LATEST_VERSION = 29
 
     # ---------------------------------------------------------
     # Database version
@@ -173,6 +173,10 @@ class MigrationManager:
             elif version == 27:
                 MigrationManager.migrate_to_v28()
                 version = 28
+
+            elif version == 28:
+                MigrationManager.migrate_to_v29()
+                version = 29
 
             else:
                 raise RuntimeError(
@@ -1884,6 +1888,49 @@ class MigrationManager:
 
             logger.info(
                 "Purchase order tables created."
+            )
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()
+
+    @staticmethod
+    def migrate_to_v29():
+        conn = Database.connect()
+
+        try:
+            logger.info(
+                "Migrating database to Version 29..."
+            )
+
+            cursor = conn.cursor()
+
+            # -----------------------------------------------------
+            # Vehicle Logbook Hour Meter Readings
+            # -----------------------------------------------------
+
+            cursor.execute("""
+                ALTER TABLE vehicle_logbook
+                ADD COLUMN start_hours REAL DEFAULT 0
+            """)
+
+            cursor.execute("""
+                ALTER TABLE vehicle_logbook
+                ADD COLUMN end_hours REAL DEFAULT 0
+            """)
+
+            cursor.execute("""
+                ALTER TABLE vehicle_logbook
+                ADD COLUMN hours_used REAL DEFAULT 0
+            """)
+
+            conn.commit()
+
+            logger.info(
+                "Vehicle logbook hour meter fields added."
             )
 
         except Exception:

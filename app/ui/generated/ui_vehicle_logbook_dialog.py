@@ -16,15 +16,16 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractButton, QApplication, QComboBox, QDateEdit,
-    QDialog, QDialogButtonBox, QDoubleSpinBox, QHBoxLayout,
-    QLabel, QLineEdit, QPlainTextEdit, QSizePolicy,
-    QSpacerItem, QVBoxLayout, QWidget)
+    QDialog, QDialogButtonBox, QDoubleSpinBox, QGridLayout,
+    QGroupBox, QHBoxLayout, QLabel, QLineEdit,
+    QPlainTextEdit, QSizePolicy, QSpacerItem, QVBoxLayout,
+    QWidget)
 
 class Ui_VehicleLogbookDialog(object):
     def setupUi(self, VehicleLogbookDialog):
         if not VehicleLogbookDialog.objectName():
             VehicleLogbookDialog.setObjectName(u"VehicleLogbookDialog")
-        VehicleLogbookDialog.resize(518, 698)
+        VehicleLogbookDialog.resize(518, 684)
         self.verticalLayout = QVBoxLayout(VehicleLogbookDialog)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.horizontalLayout = QHBoxLayout()
@@ -77,10 +78,6 @@ class Ui_VehicleLogbookDialog(object):
 
         self.verticalLayout.addLayout(self.horizontalLayout_3)
 
-        self.verticalSpacer_2 = QSpacerItem(20, 6, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-
-        self.verticalLayout.addItem(self.verticalSpacer_2)
-
         self.horizontalLayout_4 = QHBoxLayout()
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
         self.label = QLabel(VehicleLogbookDialog)
@@ -110,10 +107,6 @@ class Ui_VehicleLogbookDialog(object):
 
 
         self.verticalLayout.addLayout(self.horizontalLayout_5)
-
-        self.verticalSpacer_3 = QSpacerItem(20, 5, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-
-        self.verticalLayout.addItem(self.verticalSpacer_3)
 
         self.horizontalLayout_6 = QHBoxLayout()
         self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
@@ -151,18 +144,18 @@ class Ui_VehicleLogbookDialog(object):
 
         self.verticalLayout.addLayout(self.horizontalLayout_13)
 
-        self.verticalSpacer_4 = QSpacerItem(20, 5, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-
-        self.verticalLayout.addItem(self.verticalSpacer_4)
-
+        self.groupReadings = QGroupBox(VehicleLogbookDialog)
+        self.groupReadings.setObjectName(u"groupReadings")
+        self.gridLayout = QGridLayout(self.groupReadings)
+        self.gridLayout.setObjectName(u"gridLayout")
         self.horizontalLayout_7 = QHBoxLayout()
         self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
-        self.lblStartMeter = QLabel(VehicleLogbookDialog)
+        self.lblStartMeter = QLabel(self.groupReadings)
         self.lblStartMeter.setObjectName(u"lblStartMeter")
 
         self.horizontalLayout_7.addWidget(self.lblStartMeter)
 
-        self.dsbStartMeter = QDoubleSpinBox(VehicleLogbookDialog)
+        self.dsbStartMeter = QDoubleSpinBox(self.groupReadings)
         self.dsbStartMeter.setObjectName(u"dsbStartMeter")
         self.dsbStartMeter.setDecimals(1)
         self.dsbStartMeter.setMaximum(9999999.000000000000000)
@@ -170,16 +163,32 @@ class Ui_VehicleLogbookDialog(object):
         self.horizontalLayout_7.addWidget(self.dsbStartMeter)
 
 
-        self.verticalLayout.addLayout(self.horizontalLayout_7)
+        self.gridLayout.addLayout(self.horizontalLayout_7, 0, 0, 1, 1)
+
+        self.horizontalLayout_14 = QHBoxLayout()
+        self.horizontalLayout_14.setObjectName(u"horizontalLayout_14")
+        self.lblStartHours = QLabel(self.groupReadings)
+        self.lblStartHours.setObjectName(u"lblStartHours")
+
+        self.horizontalLayout_14.addWidget(self.lblStartHours)
+
+        self.dsbStartHours = QDoubleSpinBox(self.groupReadings)
+        self.dsbStartHours.setObjectName(u"dsbStartHours")
+        self.dsbStartHours.setMaximum(999999999.990000009536743)
+
+        self.horizontalLayout_14.addWidget(self.dsbStartHours)
+
+
+        self.gridLayout.addLayout(self.horizontalLayout_14, 0, 1, 1, 1)
 
         self.horizontalLayout_8 = QHBoxLayout()
         self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
-        self.lblEndMeter = QLabel(VehicleLogbookDialog)
+        self.lblEndMeter = QLabel(self.groupReadings)
         self.lblEndMeter.setObjectName(u"lblEndMeter")
 
         self.horizontalLayout_8.addWidget(self.lblEndMeter)
 
-        self.dsbEndMeter = QDoubleSpinBox(VehicleLogbookDialog)
+        self.dsbEndMeter = QDoubleSpinBox(self.groupReadings)
         self.dsbEndMeter.setObjectName(u"dsbEndMeter")
         self.dsbEndMeter.setDecimals(1)
         self.dsbEndMeter.setMaximum(9999999.000000000000000)
@@ -187,16 +196,32 @@ class Ui_VehicleLogbookDialog(object):
         self.horizontalLayout_8.addWidget(self.dsbEndMeter)
 
 
-        self.verticalLayout.addLayout(self.horizontalLayout_8)
+        self.gridLayout.addLayout(self.horizontalLayout_8, 1, 0, 1, 1)
+
+        self.horizontalLayout_15 = QHBoxLayout()
+        self.horizontalLayout_15.setObjectName(u"horizontalLayout_15")
+        self.lblEndHours = QLabel(self.groupReadings)
+        self.lblEndHours.setObjectName(u"lblEndHours")
+
+        self.horizontalLayout_15.addWidget(self.lblEndHours)
+
+        self.dsbEndHours = QDoubleSpinBox(self.groupReadings)
+        self.dsbEndHours.setObjectName(u"dsbEndHours")
+        self.dsbEndHours.setMaximum(999999999.990000009536743)
+
+        self.horizontalLayout_15.addWidget(self.dsbEndHours)
+
+
+        self.gridLayout.addLayout(self.horizontalLayout_15, 1, 1, 1, 1)
 
         self.horizontalLayout_9 = QHBoxLayout()
         self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
-        self.lblDistance = QLabel(VehicleLogbookDialog)
+        self.lblDistance = QLabel(self.groupReadings)
         self.lblDistance.setObjectName(u"lblDistance")
 
         self.horizontalLayout_9.addWidget(self.lblDistance)
 
-        self.dsbDistance = QDoubleSpinBox(VehicleLogbookDialog)
+        self.dsbDistance = QDoubleSpinBox(self.groupReadings)
         self.dsbDistance.setObjectName(u"dsbDistance")
         self.dsbDistance.setReadOnly(True)
         self.dsbDistance.setDecimals(1)
@@ -205,47 +230,59 @@ class Ui_VehicleLogbookDialog(object):
         self.horizontalLayout_9.addWidget(self.dsbDistance)
 
 
-        self.verticalLayout.addLayout(self.horizontalLayout_9)
+        self.gridLayout.addLayout(self.horizontalLayout_9, 2, 0, 1, 1)
 
-        self.verticalSpacer_5 = QSpacerItem(20, 5, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        self.horizontalLayout_16 = QHBoxLayout()
+        self.horizontalLayout_16.setObjectName(u"horizontalLayout_16")
+        self.lblHoursUsed = QLabel(self.groupReadings)
+        self.lblHoursUsed.setObjectName(u"lblHoursUsed")
 
-        self.verticalLayout.addItem(self.verticalSpacer_5)
+        self.horizontalLayout_16.addWidget(self.lblHoursUsed)
+
+        self.dsbHoursUsed = QDoubleSpinBox(self.groupReadings)
+        self.dsbHoursUsed.setObjectName(u"dsbHoursUsed")
+        self.dsbHoursUsed.setReadOnly(True)
+        self.dsbHoursUsed.setMaximum(999999999.990000009536743)
+
+        self.horizontalLayout_16.addWidget(self.dsbHoursUsed)
+
+
+        self.gridLayout.addLayout(self.horizontalLayout_16, 2, 1, 2, 1)
 
         self.horizontalLayout_10 = QHBoxLayout()
         self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
-        self.lblFuelQuantity = QLabel(VehicleLogbookDialog)
+        self.lblFuelQuantity = QLabel(self.groupReadings)
         self.lblFuelQuantity.setObjectName(u"lblFuelQuantity")
 
         self.horizontalLayout_10.addWidget(self.lblFuelQuantity)
 
-        self.dsbFuelQuantity = QDoubleSpinBox(VehicleLogbookDialog)
+        self.dsbFuelQuantity = QDoubleSpinBox(self.groupReadings)
         self.dsbFuelQuantity.setObjectName(u"dsbFuelQuantity")
         self.dsbFuelQuantity.setMaximum(9999999.000000000000000)
 
         self.horizontalLayout_10.addWidget(self.dsbFuelQuantity)
 
 
-        self.verticalLayout.addLayout(self.horizontalLayout_10)
+        self.gridLayout.addLayout(self.horizontalLayout_10, 3, 0, 1, 1)
 
         self.horizontalLayout_11 = QHBoxLayout()
         self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
-        self.lblFuelCost = QLabel(VehicleLogbookDialog)
+        self.lblFuelCost = QLabel(self.groupReadings)
         self.lblFuelCost.setObjectName(u"lblFuelCost")
 
         self.horizontalLayout_11.addWidget(self.lblFuelCost)
 
-        self.dsbFuelCost = QDoubleSpinBox(VehicleLogbookDialog)
+        self.dsbFuelCost = QDoubleSpinBox(self.groupReadings)
         self.dsbFuelCost.setObjectName(u"dsbFuelCost")
         self.dsbFuelCost.setMaximum(9999999.000000000000000)
 
         self.horizontalLayout_11.addWidget(self.dsbFuelCost)
 
 
-        self.verticalLayout.addLayout(self.horizontalLayout_11)
+        self.gridLayout.addLayout(self.horizontalLayout_11, 4, 0, 1, 1)
 
-        self.verticalSpacer_6 = QSpacerItem(20, 6, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
-        self.verticalLayout.addItem(self.verticalSpacer_6)
+        self.verticalLayout.addWidget(self.groupReadings)
 
         self.horizontalLayout_12 = QHBoxLayout()
         self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
@@ -289,9 +326,13 @@ class Ui_VehicleLogbookDialog(object):
         self.lblTo.setText(QCoreApplication.translate("VehicleLogbookDialog", u"To:", None))
         self.lblPurpose.setText(QCoreApplication.translate("VehicleLogbookDialog", u"Purpose:", None))
         self.lblDefectFaultRepoted.setText(QCoreApplication.translate("VehicleLogbookDialog", u"Defect / Fault Reported:", None))
+        self.groupReadings.setTitle(QCoreApplication.translate("VehicleLogbookDialog", u"Readings", None))
         self.lblStartMeter.setText(QCoreApplication.translate("VehicleLogbookDialog", u"Start km:", None))
+        self.lblStartHours.setText(QCoreApplication.translate("VehicleLogbookDialog", u"Start Hours:", None))
         self.lblEndMeter.setText(QCoreApplication.translate("VehicleLogbookDialog", u"End km:", None))
+        self.lblEndHours.setText(QCoreApplication.translate("VehicleLogbookDialog", u"End Hours:", None))
         self.lblDistance.setText(QCoreApplication.translate("VehicleLogbookDialog", u"Distance:", None))
+        self.lblHoursUsed.setText(QCoreApplication.translate("VehicleLogbookDialog", u"Hours Used:", None))
         self.lblFuelQuantity.setText(QCoreApplication.translate("VehicleLogbookDialog", u"Fuel Qty:", None))
         self.lblFuelCost.setText(QCoreApplication.translate("VehicleLogbookDialog", u"Fuel Cost:", None))
         self.lblNotes.setText(QCoreApplication.translate("VehicleLogbookDialog", u"Notes:", None))

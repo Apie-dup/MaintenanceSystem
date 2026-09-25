@@ -40,6 +40,26 @@ class VehicleLogbookService:
             data.get("end_meter") or 0
         )
 
+        start_hours_value = data.get("start_hours")
+        end_hours_value = data.get("end_hours")
+
+        has_hours = (
+            start_hours_value not in (None, "")
+            or end_hours_value not in (None, "")
+        )
+
+        start_hours = (
+            float(start_hours_value or 0)
+            if has_hours
+            else 0
+        )
+
+        end_hours = (
+            float(end_hours_value or 0)
+            if has_hours
+            else 0
+        )
+
         if not asset_id:
             raise ValueError(
                 "Vehicle is required."
@@ -65,8 +85,27 @@ class VehicleLogbookService:
                 "End Meter cannot be less than Start Meter."
             )
 
+        if start_hours < 0:
+            raise ValueError(
+                "Start Hours cannot be negative."
+            )
+
+        if end_hours < 0:
+            raise ValueError(
+                "End Hours cannot be negative."
+            )
+
+        if end_hours < start_hours:
+            raise ValueError(
+                "End Hours cannot be less than Start Hours."
+            )
+
         distance = (
             end_meter - start_meter
+        )
+
+        hours_used = (
+            end_hours - start_hours
         )
 
         record_data = dict(data)
@@ -81,6 +120,18 @@ class VehicleLogbookService:
 
         record_data["distance"] = (
             distance
+        )
+
+        record_data["start_hours"] = (
+            start_hours
+        )
+
+        record_data["end_hours"] = (
+            end_hours
+        )
+
+        record_data["hours_used"] = (
+            hours_used
         )
 
         record_data["user_id"] = (
@@ -106,19 +157,54 @@ class VehicleLogbookService:
                 )
             )
 
-            AssetMeterReadingService.add_reading(
-                asset_id=asset_id,
-                meter_type="Kilometers",
-                reading=end_meter,
-                reading_date=log_date,
-                notes=(
-                    "Recorded from vehicle "
-                    "logbook entry."
-                ),
-                source_type="Vehicle Logbook",
-                logbook_id=logbook_id,
-                conn=conn,
+            latest_kilometers = (
+                AssetMeterReadingModel.get_latest_reading(
+                    asset_id,
+                    "Kilometers",
+                    conn=conn,
+                )
             )
+
+            previous_kilometers = None
+
+            if latest_kilometers is not None:
+                previous_kilometers = float(
+                    latest_kilometers["reading"] or 0
+                )
+
+            if (
+                previous_kilometers is None
+                or end_meter > previous_kilometers
+            ):
+                AssetMeterReadingService.add_reading(
+                    asset_id=asset_id,
+                    meter_type="Kilometers",
+                    reading=end_meter,
+                    reading_date=log_date,
+                    notes=(
+                        "Recorded from vehicle "
+                        "logbook entry."
+                    ),
+                    source_type="Vehicle Logbook",
+                    logbook_id=logbook_id,
+                    conn=conn,
+                )
+
+            if has_hours:
+
+                AssetMeterReadingService.add_reading(
+                    asset_id=asset_id,
+                    meter_type="Running Hours",
+                    reading=end_hours,
+                    reading_date=log_date,
+                    notes=(
+                        "Recorded from vehicle "
+                        "logbook entry."
+                    ),
+                    source_type="Vehicle Logbook",
+                    logbook_id=logbook_id,
+                    conn=conn,
+                )
 
             conn.commit()
 
@@ -162,6 +248,26 @@ class VehicleLogbookService:
             data.get("end_meter") or 0
         )
 
+        start_hours_value = data.get("start_hours")
+        end_hours_value = data.get("end_hours")
+
+        has_hours = (
+            start_hours_value not in (None, "")
+            or end_hours_value not in (None, "")
+        )
+
+        start_hours = (
+            float(start_hours_value or 0)
+            if has_hours
+            else 0
+        )
+
+        end_hours = (
+            float(end_hours_value or 0)
+            if has_hours
+            else 0
+        )
+
         if not asset_id:
             raise ValueError(
                 "Vehicle is required."
@@ -187,6 +293,21 @@ class VehicleLogbookService:
                 "End Meter cannot be less than Start Meter."
             )
 
+        if start_hours < 0:
+            raise ValueError(
+                "Start Hours cannot be negative."
+            )
+
+        if end_hours < 0:
+            raise ValueError(
+                "End Hours cannot be negative."
+            )
+
+        if end_hours < start_hours:
+            raise ValueError(
+                "End Hours cannot be less than Start Hours."
+            )
+
         record_data = dict(data)
 
         record_data["start_meter"] = (
@@ -201,6 +322,18 @@ class VehicleLogbookService:
             end_meter - start_meter
         )
 
+        record_data["start_hours"] = (
+            start_hours
+        )
+
+        record_data["end_hours"] = (
+            end_hours
+        )
+
+        record_data["hours_used"] = (
+            end_hours - start_hours
+        )
+
         conn = Database.connect()
 
         try:
@@ -211,18 +344,23 @@ class VehicleLogbookService:
                 conn=conn
             )
 
-            meter_record = (
+            # -------------------------------------------------
+            # Kilometers
+            # -------------------------------------------------
+            kilometer_record = (
                 AssetMeterReadingModel
                 .get_by_logbook_id(
                     record_id,
+                    "Kilometers",
                     conn=conn,
                 )
             )
 
-            if meter_record is not None:
+            if kilometer_record is not None:
 
                 AssetMeterReadingModel.update_logbook_reading(
                     logbook_id=record_id,
+                    meter_type="Kilometers",
                     asset_id=asset_id,
                     reading=end_meter,
                     reading_date=log_date,
@@ -231,17 +369,86 @@ class VehicleLogbookService:
 
             else:
 
-                AssetMeterReadingService.add_reading(
-                    asset_id=asset_id,
-                    meter_type="Kilometers",
-                    reading=end_meter,
-                    reading_date=log_date,
-                    notes=(
-                        "Recorded from vehicle "
-                        "log entry."
-                    ),
-                    source_type="Vehicle Logbook",
+                latest_kilometers = (
+                    AssetMeterReadingModel.get_latest_reading(
+                        asset_id,
+                        "Kilometers",
+                        conn=conn,
+                    )
+                )
+
+                previous_kilometers = None
+
+                if latest_kilometers is not None:
+                    previous_kilometers = float(
+                        latest_kilometers["reading"] or 0
+                    )
+
+                if (
+                    previous_kilometers is None
+                    or end_meter > previous_kilometers
+                ):
+                    AssetMeterReadingService.add_reading(
+                        asset_id=asset_id,
+                        meter_type="Kilometers",
+                        reading=end_meter,
+                        reading_date=log_date,
+                        notes=(
+                            "Recorded from vehicle "
+                            "logbook entry."
+                        ),
+                        source_type="Vehicle Logbook",
+                        logbook_id=record_id,
+                        conn=conn,
+                    )
+
+            # -------------------------------------------------
+            # Running Hours
+            # -------------------------------------------------
+
+            hours_record = (
+                AssetMeterReadingModel
+                .get_by_logbook_id(
+                    record_id,
+                    "Running Hours",
+                    conn=conn,
+                )
+            )
+
+            if has_hours:
+
+                if hours_record is not None:
+
+                    AssetMeterReadingModel.update_logbook_reading(
+                        logbook_id=record_id,
+                        meter_type="Running Hours",
+                        asset_id=asset_id,
+                        reading=end_hours,
+                        reading_date=log_date,
+                        conn=conn,
+                    )
+
+                else:
+
+                    AssetMeterReadingService.add_reading(
+                        asset_id=asset_id,
+                        meter_type="Running Hours",
+                        reading=end_hours,
+                        reading_date=log_date,
+                        notes=(
+                            "Recorded from vehicle "
+                            "logbook entry."
+                        ),
+                        source_type="Vehicle Logbook",
+                        logbook_id=record_id,
+                        conn=conn,
+                    )
+
+            elif hours_record is not None:
+
+                AssetMeterReadingModel.delete_by_logbook_id_and_meter_type(
                     logbook_id=record_id,
+                    meter_type="Running Hours",
                     conn=conn,
                 )
 

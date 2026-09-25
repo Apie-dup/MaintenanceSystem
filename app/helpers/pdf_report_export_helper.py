@@ -638,6 +638,9 @@ class PdfReportExportHelper:
             "Start km",
             "End km",
             "Distance",
+            "Start Hrs",
+            "End Hrs",
+            "Hours Used",
             "Purpose",
             "Defect / Fault",
             "Fuel",
@@ -646,6 +649,7 @@ class PdfReportExportHelper:
         ]]
 
         total_distance = 0.0
+        total_hours = 0.0
         total_fuel = 0.0
         total_fuel_cost = 0.0
 
@@ -666,6 +670,10 @@ class PdfReportExportHelper:
                 record["distance"] or 0
             )
 
+            hours_used = float(
+                record["hours_used"] or 0
+            )
+
             fuel = float(
                 record["fuel_quantity"] or 0
             )
@@ -675,6 +683,7 @@ class PdfReportExportHelper:
             )
 
             total_distance += distance
+            total_hours += hours_used
             total_fuel += fuel
             total_fuel_cost += fuel_cost
 
@@ -697,6 +706,10 @@ class PdfReportExportHelper:
                 f'{float(record["start_meter"] or 0):,.1f}',
                 f'{float(record["end_meter"] or 0):,.1f}',
                 f"{distance:,.1f}",
+                f'{float(record["start_hours"] or 0):,.1f}',
+                f'{float(record["end_hours"] or 0):,.1f}',
+                f"{hours_used:,.1f}",
+
                 Paragraph(
                     record["purpose"] or "",
                     body_style
@@ -724,18 +737,21 @@ class PdfReportExportHelper:
         )
 
         column_weights = [
-            8, # Date
-            12, # Driver
-            12, # From
-            12, # To
-            9, # Start km
-            9, # End km
-            8, # Distance
-            13, # Purpose
-            18, # Defect / Fault
-            7, # Fuel
-            8, # Fuel_cost
-            14, # Notes
+            7,   # Date
+            10,  # Driver
+            9,   # From
+            9,   # To
+            7,   # Start km
+            7,   # End km
+            6,   # Distance
+            7,   # Start Hrs
+            7,   # End Hrs
+            7,   # Hours Used
+            11,  # Purpose
+            14,  # Defect / Fault
+            6,   # Fuel
+            7,   # Fuel Cost
+            11,  # Notes
         ]
 
         total_weight = sum(
@@ -868,10 +884,13 @@ class PdfReportExportHelper:
                 (
                     f"<b>Total Distance:</b> "
                     f"{total_distance:,.1f} km"
-                    f"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                    f"&nbsp;&nbsp;&nbsp;&nbsp;"
+                    f"<b>Total Hours:</b> "
+                    f"{total_hours:,.1f} hrs"
+                    f"&nbsp;&nbsp;&nbsp;&nbsp;"
                     f"<b>Total Fuel:</b> "
                     f"{total_fuel:,.2f}"
-                    f"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                    f"&nbsp;&nbsp;&nbsp;&nbsp;"
                     f"<b>Total Fuel Cost:</b> "
                     f"{currency_symbol} "
                     f"{total_fuel_cost:,.2f}"

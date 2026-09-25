@@ -23,6 +23,10 @@ class VehicleLogbookModel:
                 vehicle_logbook.end_meter,
                 vehicle_logbook.distance,
 
+                vehicle_logbook.start_hours,
+                vehicle_logbook.end_hours,
+                vehicle_logbook.hours_used,
+
                 vehicle_logbook.origin,
                 vehicle_logbook.destination,
                 vehicle_logbook.purpose,
@@ -140,6 +144,10 @@ class VehicleLogbookModel:
                     end_meter,
                     distance,
 
+                    start_hours,
+                    end_hours,
+                    hours_used,
+
                     origin,
                     destination,
                     purpose,
@@ -157,7 +165,9 @@ class VehicleLogbookModel:
                 (
                     ?, ?, ?,
                     ?, ?, ?,
-                    ?, ?, ?, ?,
+                    ?, ?, ?,
+                    ?, ?, ?,
+                    ?,
                     ?, ?,
                     ?,
                     ?, ?
@@ -170,6 +180,10 @@ class VehicleLogbookModel:
                 data["start_meter"],
                 data["end_meter"],
                 data["distance"],
+
+                data.get("start_hours", 0),
+                data.get("end_hours", 0),
+                data.get("hours_used", 0),
 
                 data.get("origin"),
                 data.get("destination"),
@@ -230,6 +244,10 @@ class VehicleLogbookModel:
                     start_meter = ?,
                     end_meter = ?,
                     distance = ?,
+
+                    start_hours = ?,
+                    end_hours = ?,
+                    hours_used = ?,
                     
                     origin = ?,
                     destination = ?,
@@ -250,6 +268,10 @@ class VehicleLogbookModel:
                 data["start_meter"],
                 data["end_meter"],
                 data["distance"],
+
+                data.get("start_hours", 0),
+                data.get("end_hours", 0),
+                data.get("hours_used", 0),
 
                 data.get("origin"),
                 data.get("destination"),
@@ -337,6 +359,10 @@ class VehicleLogbookModel:
                 vehicle_logbook.end_meter,
                 vehicle_logbook.distance,
 
+                vehicle_logbook.start_hours,
+                vehicle_logbook.end_hours,
+                vehicle_logbook.hours_used,
+
                 vehicle_logbook.origin,
                 vehicle_logbook.destination,
                 vehicle_logbook.purpose,
@@ -409,6 +435,9 @@ class VehicleLogbookModel:
                 vehicle_logbook.start_meter,
                 vehicle_logbook.end_meter,
                 vehicle_logbook.distance,
+                vehicle_logbook.start_hours,
+                vehicle_logbook.end_hours,
+                vehicle_logbook.hours_used,
                 vehicle_logbook.origin,
                 vehicle_logbook.destination,
                 vehicle_logbook.purpose,
@@ -487,6 +516,10 @@ class VehicleLogbookModel:
                 vehicle_logbook.start_meter,
                 vehicle_logbook.end_meter,
                 vehicle_logbook.distance,
+
+                vehicle_logbook.start_hours,
+                vehicle_logbook.end_hours,
+                vehicle_logbook.hours_used,
 
                 vehicle_logbook.purpose,
 

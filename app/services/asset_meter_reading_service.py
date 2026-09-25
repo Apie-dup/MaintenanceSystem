@@ -40,7 +40,7 @@ class AssetMeterReadingService:
 
             if reading <= previous:
                 raise ValueError(
-                    "Meter reading cannot be greater "
+                    "Meter reading must be greater "
                     "than the previous reading."
                 )
 

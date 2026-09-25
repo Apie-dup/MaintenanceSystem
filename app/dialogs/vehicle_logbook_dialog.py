@@ -47,6 +47,10 @@ class VehicleLogbookDialog(BaseDialog):
             True
         )
 
+        self.ui.dsbHoursUsed.setReadOnly(
+            True
+        )
+
     def connect_signals(self):
 
         self.ui.cmbAsset.currentIndexChanged.connect(
@@ -59,6 +63,14 @@ class VehicleLogbookDialog(BaseDialog):
 
         self.ui.dsbEndMeter.valueChanged.connect(
             self.calculate_distance
+        )
+
+        self.ui.dsbStartHours.valueChanged.connect(
+            self.calculate_hours
+        )
+
+        self.ui.dsbEndHours.valueChanged.connect(
+            self.calculate_hours
         )
 
         self.ui.buttonBox.accepted.connect(
@@ -79,9 +91,18 @@ class VehicleLogbookDialog(BaseDialog):
             self.ui.dsbStartMeter.setValue(0)
             self.ui.dsbEndMeter.setValue(0)
             self.ui.dsbDistance.setValue(0)
+
+            self.ui.dsbStartHours.setValue(0)
+            self.ui.dsbEndHours.setValue(0)
+            self.ui.dsbHoursUsed.setValue(0)
+
             return
 
-        latest = (
+        # -------------------------------------------------
+        # Kilometers
+        # -------------------------------------------------
+
+        latest_kilometers = (
             AssetMeterReadingService
             .get_latest_reading_value(
                 asset_id,
@@ -89,18 +110,43 @@ class VehicleLogbookDialog(BaseDialog):
             )
         )
 
-        if latest is None:
-            latest = 0
+        if latest_kilometers is None:
+            latest_kilometers = 0
 
         self.ui.dsbStartMeter.setValue(
-            latest
+            latest_kilometers
         )
 
         self.ui.dsbEndMeter.setValue(
-            latest
+            latest_kilometers
         )
 
         self.calculate_distance()
+
+        # -------------------------------------------------
+        # Running Hours
+        # -------------------------------------------------
+
+        latest_hours = (
+            AssetMeterReadingService
+            .get_latest_reading_value(
+                asset_id,
+                "Running Hours"
+            )
+        )
+
+        if latest_hours is None:
+            latest_hours = 0
+
+        self.ui.dsbStartHours.setValue(
+            latest_hours
+        )
+
+        self.ui.dsbEndHours.setValue(
+            latest_hours
+        )
+
+        self.calculate_hours()
 
     def load_assets(self):
 
@@ -163,6 +209,10 @@ class VehicleLogbookDialog(BaseDialog):
         self.ui.dsbEndMeter.setValue(0)
         self.ui.dsbDistance.setValue(0)
 
+        self.ui.dsbStartHours.setValue(0)
+        self.ui.dsbEndHours.setValue(0)
+        self.ui.dsbHoursUsed.setValue(0)
+
         self.ui.dsbFuelQuantity.setValue(0)
         self.ui.dsbFuelCost.setValue(0)
 
@@ -187,6 +237,25 @@ class VehicleLogbookDialog(BaseDialog):
             distance
         )
 
+    def calculate_hours(self):
+
+        start_hours = (
+            self.ui.dsbStartHours.value()
+        )
+
+        end_hours = (
+            self.ui.dsbEndHours.value()
+        )
+
+        hours_used = max(
+            0,
+            end_hours - start_hours
+        )
+
+        self.ui.dsbHoursUsed.setValue(
+            hours_used
+        )
+
     def get_form_data(self):
 
         return {
@@ -205,6 +274,24 @@ class VehicleLogbookDialog(BaseDialog):
 
             "end_meter":
                 self.ui.dsbEndMeter.value(),
+
+            "start_hours": (
+                self.ui.dsbStartHours.value()
+                if (
+                        self.ui.dsbStartHours.value() > 0
+                        or self.ui.dsbEndHours.value() > 0
+                    )
+                    else None
+            ),
+
+            "end_hours": (
+                self.ui.dsbEndHours.value()
+                if (
+                    self.ui.dsbStartHours.value() > 0
+                    or self.ui.dsbEndHours.value() > 0
+                )
+                else None
+            ),
 
             "origin":
                 self.ui.txtFrom.text().strip(),
@@ -248,6 +335,16 @@ class VehicleLogbookDialog(BaseDialog):
             self.warning(
                 "Validation",
                 "End km cannot be less than Start km."
+            )
+            return
+
+        if (
+            data["end_hours"]
+            < data["start_hours"]
+        ):
+            self.warning(
+                "Validation",
+                "End Hours cannot be less than Start Hours."
             )
             return
 
@@ -341,6 +438,14 @@ class VehicleLogbookDialog(BaseDialog):
             float(record["end_meter"] or 0)
         )
 
+        self.ui.dsbStartHours.setValue(
+            float(record["start_hours"] or 0)
+        )
+
+        self.ui.dsbEndHours.setValue(
+            float(record["end_hours"] or 0)
+        )
+
         self.ui.dsbFuelQuantity.setValue(
             float(record["fuel_quantity"] or 0)
         )
@@ -354,3 +459,4 @@ class VehicleLogbookDialog(BaseDialog):
         )
 
         self.calculate_distance()
+        self.calculate_hours()
