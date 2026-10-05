@@ -24,7 +24,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(800, 602)
+        MainWindow.resize(800, 690)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
@@ -87,6 +87,16 @@ class Ui_MainWindow(object):
         self.btnVehicleLogbook.setObjectName(u"btnVehicleLogbook")
 
         self.verticalLayout.addWidget(self.btnVehicleLogbook)
+
+        self.btnVehicleSops = QPushButton(self.navigationFrame)
+        self.btnVehicleSops.setObjectName(u"btnVehicleSops")
+
+        self.verticalLayout.addWidget(self.btnVehicleSops)
+
+        self.btnSopInspections = QPushButton(self.navigationFrame)
+        self.btnSopInspections.setObjectName(u"btnSopInspections")
+
+        self.verticalLayout.addWidget(self.btnSopInspections)
 
         self.verticalSpacer_9 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
@@ -215,6 +225,12 @@ class Ui_MainWindow(object):
         self.pagePurchaseOrders = QWidget()
         self.pagePurchaseOrders.setObjectName(u"pagePurchaseOrders")
         self.stackedWidget.addWidget(self.pagePurchaseOrders)
+        self.pageVehicleSops = QWidget()
+        self.pageVehicleSops.setObjectName(u"pageVehicleSops")
+        self.stackedWidget.addWidget(self.pageVehicleSops)
+        self.pageSopInspections = QWidget()
+        self.pageSopInspections.setObjectName(u"pageSopInspections")
+        self.stackedWidget.addWidget(self.pageSopInspections)
 
         self.horizontalLayout.addWidget(self.stackedWidget)
 
@@ -232,7 +248,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(12)
+        self.stackedWidget.setCurrentIndex(14)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -247,6 +263,8 @@ class Ui_MainWindow(object):
         self.btnWorkOrders.setText(QCoreApplication.translate("MainWindow", u"Work Orders", None))
         self.btnPM.setText(QCoreApplication.translate("MainWindow", u"Preventive Maintenance", None))
         self.btnVehicleLogbook.setText(QCoreApplication.translate("MainWindow", u"Vehicle Logbook", None))
+        self.btnVehicleSops.setText(QCoreApplication.translate("MainWindow", u"Vehicle SOPs", None))
+        self.btnSopInspections.setText(QCoreApplication.translate("MainWindow", u" SOP Inspections", None))
         self.btnTechnicians.setText(QCoreApplication.translate("MainWindow", u"Technicians", None))
         self.btnInventory.setText(QCoreApplication.translate("MainWindow", u"Inventory", None))
         self.btnPurchaseOrders.setText(QCoreApplication.translate("MainWindow", u"Purchase Orders", None))

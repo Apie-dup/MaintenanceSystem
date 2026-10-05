@@ -4,7 +4,7 @@ from app.core.logger import logger
 
 class MigrationManager:
 
-    LATEST_VERSION = 29
+    LATEST_VERSION = 33
 
     # ---------------------------------------------------------
     # Database version
@@ -177,6 +177,22 @@ class MigrationManager:
             elif version == 28:
                 MigrationManager.migrate_to_v29()
                 version = 29
+
+            elif version == 29:
+                MigrationManager.migrate_to_v30()
+                version = 30
+
+            elif version == 30:
+                MigrationManager.migrate_to_v31()
+                version = 31
+
+            elif version == 31:
+                MigrationManager.migrate_to_v32()
+                version = 32
+
+            elif version == 32:
+                MigrationManager.migrate_to_v33()
+                version = 33
 
             else:
                 raise RuntimeError(
@@ -1931,6 +1947,314 @@ class MigrationManager:
 
             logger.info(
                 "Vehicle logbook hour meter fields added."
+            )
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()
+
+    @staticmethod
+    def migrate_to_v30():
+        conn = Database.connect()
+
+        try:
+            logger.info(
+                "Migrating database to Version 30..."
+            )
+
+            cursor = conn.cursor()
+
+            # -----------------------------------------------------
+            # Vehicle SOP Definitions
+            # -----------------------------------------------------
+
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS vehicle_sops
+                (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+                    sop_number TEXT NOT NULL UNIQUE,
+
+                    asset_id INTEGER NOT NULL,
+
+                    sop_name TEXT NOT NULL,
+
+                    frequency TEXT NOT NULL,
+
+                    description TEXT,
+
+                    active INTEGER NOT NULL DEFAULT 1,
+
+                    notes TEXT,
+
+                    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+
+                    FOREIGN KEY (asset_id)
+                        REFERENCES assets(id)
+                        ON DELETE CASCADE
+                )
+            """)
+
+            # -----------------------------------------------------
+            # Vehicle SOP Checklist Items
+            # -----------------------------------------------------
+
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS vehicle_sop_items
+                (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+                    sop_id INTEGER NOT NULL,
+
+                    sequence INTEGER NOT NULL DEFAULT 1,
+
+                    check_description TEXT NOT NULL,
+
+                    required INTEGER NOT NULL DEFAULT 1,
+
+                    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+
+                    FOREIGN KEY (sop_id)
+                        REFERENCES vehicle_sops(id)
+                        ON DELETE CASCADE
+                )
+            """)
+
+            # -----------------------------------------------------
+            # Indexes
+            # -----------------------------------------------------
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_vehicle_sops_asset
+                ON vehicle_sops(asset_id)
+            """)
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_vehicle_sops_frequency
+                ON vehicle_sops(frequency)
+            """)
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_vehicle_sop_items_sop
+                ON vehicle_sop_items(sop_id)
+            """)
+
+            conn.commit()
+
+            logger.info(
+                "Vehicle SOP definition tables created."
+            )
+
+        except Exception:
+            conn.rollback()
+            raise
+
+        finally:
+            conn.close()
+
+    @staticmethod
+    def migrate_to_v31():
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        print(
+            "Migrating database to version 31..."
+        )
+
+        # -----------------------------------------------------
+        # Vehicle SOP Inspection Header
+        # -----------------------------------------------------
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS
+            vehicle_sop_inspections (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+                inspection_number TEXT NOT NULL UNIQUE,
+
+                sop_id INTEGER NOT NULL,
+                asset_id INTEGER NOT NULL,
+
+                sop_number TEXT NOT NULL,
+                sop_name TEXT NOT NULL,
+                frequency TEXT NOT NULL,
+
+                inspection_date TEXT NOT NULL,
+
+                operator_name TEXT,
+
+                meter_type TEXT,
+                meter_reading REAL,
+
+                status TEXT NOT NULL DEFAULT 'In Progress',
+
+                comments TEXT,
+
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+
+                FOREIGN KEY (sop_id)
+                    REFERENCES vehicle_sops(id)
+                    ON DELETE RESTRICT,
+
+                FOREIGN KEY (asset_id)
+                    REFERENCES assets(id)
+                    ON DELETE RESTRICT
+            )
+        """)
+
+        # -----------------------------------------------------
+        # Vehicle SOP Inspection Items
+        # -----------------------------------------------------
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS
+            vehicle_sop_inspection_items (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+                inspection_id INTEGER NOT NULL,
+
+                sop_item_id INTEGER,
+
+                sequence INTEGER NOT NULL,
+
+                check_description TEXT NOT NULL,
+
+                required INTEGER NOT NULL DEFAULT 1,
+
+                result TEXT,
+
+                comments TEXT,
+
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+
+                FOREIGN KEY (inspection_id)
+                    REFERENCES vehicle_sop_inspections(id)
+                    ON DELETE CASCADE,
+
+                FOREIGN KEY (sop_item_id)
+                    REFERENCES vehicle_sop_items(id)
+                    ON DELETE SET NULL
+            )
+        """)
+
+        # -----------------------------------------------------
+        # Indexes
+        # -----------------------------------------------------
+
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS
+            idx_vehicle_sop_inspections_sop
+            ON vehicle_sop_inspections(sop_id)
+        """)
+
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS
+            idx_vehicle_sop_inspections_asset
+            ON vehicle_sop_inspections(asset_id)
+        """)
+
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS
+            idx_vehicle_sop_inspections_date
+            ON vehicle_sop_inspections(inspection_date)
+        """)
+
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS
+            idx_vehicle_sop_inspection_items_inspection
+            ON vehicle_sop_inspection_items(inspection_id)
+        """)
+
+        conn.commit()
+        conn.close()
+
+        MigrationManager.set_database_version(
+            31
+        )
+
+        print(
+            "Migration to version 31 complete."
+        )
+
+    @staticmethod
+    def migrate_to_v32():
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        print(
+            "Migrating database to version 32..."
+        )
+
+        cursor.execute("""
+            ALTER TABLE asset_meter_readings
+            ADD COLUMN sop_inspection_id INTEGER
+            REFERENCES vehicle_sop_inspections(id)
+            ON DELETE SET NULL
+        """)
+        
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS
+            idx_asset_meter_readings_sop_inspection
+            ON asset_meter_readings(sop_inspection_id)
+        """)
+
+        conn.commit()
+        conn.close()
+
+        MigrationManager.set_database_version(
+            32
+        )
+
+        print(
+            "Migration to version 32 complete."
+        )
+
+    @staticmethod
+    def migrate_to_v33():
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        try:
+            logger.info(
+                "Migrating database to Version 33..."
+            )
+
+            if not MigrationManager.column_exists(
+                cursor,
+                "work_orders",
+                "sop_inspection_item_id"
+            ):
+                cursor.execute("""
+                    ALTER TABLE work_orders
+                    ADD COLUMN sop_inspection_item_id INTEGER
+                    REFERENCES vehicle_sop_inspection_items(id)
+                    ON DELETE SET NULL
+                """)
+
+                logger.info(
+                    "Added sop_inspection_item_id "
+                    "to work_orders."
+                )
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_work_orders_sop_inspection_item
+                ON work_orders(sop_inspection_item_id)
+            """)
+
+            conn.commit()
+
+            logger.info(
+                "SOP inspection Work Order link added."
             )
 
         except Exception:

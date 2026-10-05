@@ -34,6 +34,10 @@ from app.dialogs.work_order_dialog import WorkOrderDialog
 from app.dialogs.preventive_maintenance_dialog import (
     PreventiveMaintenanceDialog
 )
+from app.pages.vehicle_sop_page import VehicleSopPage
+from app.pages.vehicle_sop_inspection_page import (
+    VehicleSopInspectionPage
+)
 
 
 class MainController(QMainWindow):
@@ -216,6 +220,8 @@ class MainController(QMainWindow):
             self.ui.btnWorkOrders,
             self.ui.btnPM,
             self.ui.btnVehicleLogbook,
+            self.ui.btnVehicleSops,
+            self.ui.btnSopInspections,
             self.ui.btnTechnicians,
             self.ui.btnInventory,
             self.ui.btnPurchaseOrders,
@@ -322,6 +328,8 @@ class MainController(QMainWindow):
             self.ui.btnWorkOrders,
             self.ui.btnPM,
             self.ui.btnVehicleLogbook,
+            self.ui.btnVehicleSops,
+            self.ui.btnSopInspections,
             self.ui.btnTechnicians,
             self.ui.btnInventory,
             self.ui.btnPurchaseOrders,
@@ -390,6 +398,18 @@ class MainController(QMainWindow):
             )
         )
 
+        self.vehicle_sop_page = VehicleSopPage(
+            user=self.user,
+            parent=self,
+        )
+
+        self.vehicle_sop_inspection_page = (
+            VehicleSopInspectionPage(
+                user=self.user,
+                parent=self,
+            )
+        )
+
     def register_pages(self):
 
         self.page_manager.add_page(
@@ -453,6 +473,16 @@ class MainController(QMainWindow):
             self.vehicle_logbook_page
         )
 
+        self.page_manager.add_page(
+            self.ui.pageVehicleSops,
+            self.vehicle_sop_page
+        )
+
+        self.page_manager.add_page(
+            self.ui.pageSopInspections,
+            self.vehicle_sop_inspection_page
+        )
+
     def register_navigation(self):
 
         self.ui.btnDashboard.clicked.connect(
@@ -477,6 +507,14 @@ class MainController(QMainWindow):
             lambda: self.show_vehicle_logbook(
                 unresolved_defects=False
             )
+        )
+
+        self.ui.btnVehicleSops.clicked.connect(
+            self.show_vehicle_sops
+        )
+
+        self.ui.btnSopInspections.clicked.connect(
+            self.show_sop_inspections
         )
 
         self.ui.btnTechnicians.clicked.connect(
@@ -598,6 +636,30 @@ class MainController(QMainWindow):
 
         self.navigation.show(
             self.ui.pageVehicleLogbook
+        )
+
+    def show_vehicle_sops(self):
+
+        self.set_active_navigation(
+            self.ui.btnVehicleSops
+        )
+
+        self.vehicle_sop_page.load_data()
+
+        self.navigation.show(
+            self.ui.pageVehicleSops
+        )
+
+    def show_sop_inspections(self):
+
+        self.set_active_navigation(
+            self.ui.btnSopInspections
+        )
+
+        self.vehicle_sop_inspection_page.load_data()
+
+        self.navigation.show(
+            self.ui.pageSopInspections
         )
 
     def show_pm(
@@ -755,6 +817,8 @@ class MainController(QMainWindow):
             self.ui.btnLookups: "lookups",
             self.ui.btnUsers: "users",
             self.ui.btnSettings: "settings",
+            self.ui.btnVehicleSops: "vehicle_sops",
+            self.ui.btnSopInspections: "sop_inspections",
         }
 
         for button, permission in permissions.items():

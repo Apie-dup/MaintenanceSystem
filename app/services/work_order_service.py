@@ -113,6 +113,11 @@ class WorkOrderService:
             None
         )
 
+        save_data.setdefault(
+            "sop_inspection_item_id",
+            None
+        )
+
         WorkOrderService.validate_data(
             save_data
         )
@@ -240,6 +245,11 @@ class WorkOrderService:
         # Preserve PM relationship.
         save_data["pm_id"] = existing["pm_id"]
 
+        # Preserve SOP inspection relationship.
+        save_data["sop_inspection_item_id"] = (
+            existing["sop_inspection_item_id"]
+        )
+
         # Recalculate actual cost.
         save_data["actual_cost"] = (
             WorkOrderService.calculate_actual_cost(
@@ -359,6 +369,112 @@ class WorkOrderService:
     def open_pm_work_order_exists(pm_id):
         return WorkOrderModel.open_pm_work_order_exists(
             pm_id
+        )
+
+    @staticmethod
+    def open_sop_failure_work_order_exists(
+        sop_inspection_item_id
+    ):
+        return (
+            WorkOrderModel
+            .open_sop_failure_work_order_exists(
+                sop_inspection_item_id
+            )
+        )
+
+    @staticmethod
+    def create_from_sop_failure(
+        inspection,
+        inspection_item,
+        user=None
+    ):
+        if inspection is None:
+            raise ValueError(
+                "SOP inspection not found."
+            )
+
+        if inspection_item is None:
+            raise ValueError(
+                "SOP inspection item not found."
+            )
+
+        if inspection_item["result"] != "Fail":
+            raise ValueError(
+                "A Work Order can only be created "
+                "from a failed checklist item."
+            )
+
+        inspection_item_id = inspection_item["id"]
+
+        if (
+            WorkOrderService
+            .open_sop_failure_work_order_exists(
+                inspection_item_id
+            )
+        ):
+            raise ValueError(
+                "An active Work Order already exists "
+                "for this failed checklist item."
+            )
+
+        work_order_number = (
+            WorkOrderService.get_next_work_order_number()
+        )
+
+        inspection_number = inspection["inspection_number"]
+        sop_name = inspection["sop_name"]
+        check_description = (
+            inspection_item["check_description"]
+        )
+
+        description = (
+            f"Failed SOP inspection item.\n\n"
+            f"Inspection: {inspection_number}\n"
+            f"SOP: {sop_name}\n"
+            f"Failed Check: {check_description}"
+        )
+
+        item_comments = (
+            inspection_item["comments"] or ""
+        ).strip()
+
+        if item_comments:
+            description += (
+                f"\nInspection Comments: {item_comments}"
+            )
+
+        data = {
+            "work_order_number": work_order_number,
+            "asset_id": inspection["asset_id"],
+            "title": check_description,
+            "description": description,
+            "priority": "Medium",
+            "status": "Open",
+            "technician_id": None,
+            "requested_by": (
+                inspection["operator_name"]
+                or "SOP Inspection"
+            ),
+            "date_created": DateHelper.today_string(),
+            "due_date": DateHelper.today_string(),
+            "estimated_cost": 0.0,
+            "estimated_hours": 0.0,
+            "actual_cost": 0.0,
+            "labour_hours": 0.0,
+            "meter_reading": None,
+            "notes": (
+                f"Generated from SOP inspection "
+                f"{inspection_number}."
+            ),
+            "pm_id": None,
+            "pm_due_date": None,
+            "pm_due_meter": None,
+            "sop_inspection_item_id": inspection_item_id,
+        }
+
+        return WorkOrderService.create(
+            data,
+            user=user
         )
 
     @staticmethod
@@ -1080,6 +1196,20 @@ class WorkOrderService:
                 "A Work Order generated from Preventive Maintenance "
                 "cannot be reopened after completion."
             )
+
+        if work_order["sop_inspection_item_id"] is not None:
+
+            if (
+                WorkOrderService
+                .open_sop_failure_work_order_exists(
+                    work_order["sop_inspection_item_id"]
+                )
+            ):
+                raise ValueError(
+                    "This Work Order cannot be reopened because "
+                    "another active Work Order already exists "
+                    "for the same failed SOP checklist item."
+                )
 
         if not (reason or "").strip():
             raise ValueError(

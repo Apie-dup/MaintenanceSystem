@@ -13,6 +13,7 @@ class AssetMeterReadingModel:
         source_type="Manual",
         work_order_id=None,
         logbook_id=None,
+        sop_inspection_id=None,
         conn=None,
     ):
 
@@ -36,9 +37,10 @@ class AssetMeterReadingModel:
                     notes,
                     source_type,
                     work_order_id,
-                    logbook_id
+                    logbook_id,
+                    sop_inspection_id
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 asset_id,
                 meter_type,
@@ -48,6 +50,7 @@ class AssetMeterReadingModel:
                 source_type,
                 work_order_id,
                 logbook_id,
+                sop_inspection_id,
             ))
 
             record_id = cursor.lastrowid
@@ -73,6 +76,7 @@ class AssetMeterReadingModel:
     def get_latest_reading(
         asset_id,
         meter_type,
+        sop_inspection_id=None,
         conn=None,
     ):
 
@@ -96,6 +100,7 @@ class AssetMeterReadingModel:
                     source_type,
                     work_order_id,
                     logbook_id,
+                    sop_inspection_id,
                     notes,
                     created_at
                 FROM asset_meter_readings
@@ -138,6 +143,7 @@ class AssetMeterReadingModel:
                     asset_meter_readings.source_type,
                     asset_meter_readings.work_order_id,
                     asset_meter_readings.logbook_id,
+                    asset_meter_readings.sop_inspection_id,
                     work_orders.work_order_number,
                     asset_meter_readings.notes,
                     asset_meter_readings.created_at
@@ -166,6 +172,7 @@ class AssetMeterReadingModel:
                     asset_meter_readings.source_type,
                     asset_meter_readings.work_order_id,
                     asset_meter_readings.logbook_id,
+                    asset_meter_readings.sop_inspection_id,
                     work_orders.work_order_number,
                     asset_meter_readings.notes,
                     asset_meter_readings.created_at

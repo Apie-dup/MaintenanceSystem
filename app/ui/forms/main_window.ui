@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>602</height>
+    <height>690</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -133,6 +133,20 @@
         <widget class="QPushButton" name="btnVehicleLogbook">
          <property name="text">
           <string>Vehicle Logbook</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnVehicleSops">
+         <property name="text">
+          <string>Vehicle SOPs</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnSopInspections">
+         <property name="text">
+          <string> SOP Inspections</string>
          </property>
         </widget>
        </item>
@@ -327,7 +341,7 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>12</number>
+       <number>14</number>
       </property>
       <widget class="QWidget" name="pageDashboard"/>
       <widget class="QWidget" name="pageAssets"/>
@@ -342,6 +356,8 @@
       <widget class="QWidget" name="pageUsers"/>
       <widget class="QWidget" name="page"/>
       <widget class="QWidget" name="pagePurchaseOrders"/>
+      <widget class="QWidget" name="pageVehicleSops"/>
+      <widget class="QWidget" name="pageSopInspections"/>
      </widget>
     </item>
    </layout>

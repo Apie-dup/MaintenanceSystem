@@ -181,6 +181,7 @@ class WorkOrderModel:
                     work_orders.meter_reading,
                     work_orders.notes,
                     work_orders.pm_id,
+                    work_orders.sop_inspection_item_id,
                     work_orders.created_at,
                     work_orders.completed_date,
                     work_orders.closed_date
@@ -384,9 +385,10 @@ class WorkOrderModel:
                     notes,
                     pm_id,
                     pm_due_date,
-                    pm_due_meter
+                    pm_due_meter,
+                    sop_inspection_item_id
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 data["work_order_number"],
                 data["asset_id"],
@@ -407,6 +409,7 @@ class WorkOrderModel:
                 data.get("pm_id"),
                 data.get("pm_due_date"),
                 data.get("pm_due_meter"),
+                data.get("sop_inspection_item_id")
             ))
 
             record_id = cursor.lastrowid
@@ -755,6 +758,33 @@ class WorkOrderModel:
         conn.close()
 
         return exists
+
+    @staticmethod
+    def open_sop_failure_work_order_exists(
+        sop_inspection_item_id
+    ):
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute("""
+                SELECT 1
+                FROM work_orders
+                WHERE sop_inspection_item_id = ?
+                AND status NOT IN (
+                    'Completed',
+                    'Closed',
+                    'Cancelled'
+                )
+                LIMIT 1
+            """, (
+                sop_inspection_item_id,
+            ))
+
+            return cursor.fetchone() is not None
+
+        finally:
+            conn.close()
 
     @staticmethod
     def get_pm_history(pm_id):
