@@ -110,6 +110,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="btnPrintInspectionForm">
+       <property name="text">
+        <string>Print Inspection Form</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="btnRefresh">
        <property name="text">
         <string>Refresh</string>

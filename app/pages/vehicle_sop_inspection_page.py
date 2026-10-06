@@ -10,6 +10,13 @@ from app.dialogs.vehicle_sop_inspection_dialog import (
     VehicleSopInspectionDialog
 )
 from app.services.message_service import MessageService
+from pathlib import Path
+
+from PySide6.QtWidgets import QFileDialog
+
+from app.helpers.pdf_report_export_helper import (
+    PdfReportExportHelper
+)
 
 
 class VehicleSopInspectionPage(CrudPage):
@@ -112,6 +119,10 @@ class VehicleSopInspectionPage(CrudPage):
             self.delete_inspection
         )
 
+        self.ui.btnPrint.clicked.connect(
+            self.print_completed_inspection
+        )
+
     # ---------------------------------------------------------
     # Load
     # ---------------------------------------------------------
@@ -191,6 +202,163 @@ class VehicleSopInspectionPage(CrudPage):
 
         if dialog.exec():
             self.load_data()
+
+    # ---------------------------------------------------------
+    # Print completed inspection
+    # ---------------------------------------------------------
+
+    def print_completed_inspection(self):
+
+        inspection_id = TableHelper.selected_id(
+            self.ui.tblInspections
+        )
+
+        if not inspection_id:
+
+            MessageService.warning(
+                self,
+                "Print Inspection",
+                "Select an inspection to print."
+            )
+
+            return
+
+        # -----------------------------------------------------
+        # Load inspection
+        # -----------------------------------------------------
+
+        inspection = (
+            VehicleSopInspectionService.get_by_id(
+                inspection_id
+            )
+        )
+
+        if not inspection:
+
+            MessageService.warning(
+                self,
+                "Print Inspection",
+                "The selected inspection could not be found."
+            )
+
+            return
+
+        # -----------------------------------------------------
+        # Completed inspections only
+        # -----------------------------------------------------
+
+        if inspection["status"] != "Completed":
+
+            MessageService.warning(
+                self,
+                "Cannot Print Inspection",
+                (
+                    "Only completed SOP inspections can "
+                    "be printed as completed inspection "
+                    "reports."
+                )
+            )
+
+            return
+
+        # -----------------------------------------------------
+        # Load historical checklist
+        # -----------------------------------------------------
+
+        items = (
+            VehicleSopInspectionService.get_items(
+                inspection_id
+            )
+        )
+
+        if not items:
+
+            MessageService.warning(
+                self,
+                "Cannot Print Inspection",
+                (
+                    "The selected inspection does not "
+                    "contain any checklist items."
+                )
+            )
+
+            return
+
+        # -----------------------------------------------------
+        # Suggested filename
+        # -----------------------------------------------------
+
+        inspection_number = (
+            inspection["inspection_number"]
+            or "Inspection"
+        )
+
+        asset_number = (
+            inspection["asset_number"]
+            or "Asset"
+        )
+
+        suggested_filename = (
+            f"{inspection_number}_"
+            f"{asset_number}_"
+            f"Completed_Inspection.pdf"
+        )
+
+        # -----------------------------------------------------
+        # Select location
+        # -----------------------------------------------------
+
+        file_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save Completed Inspection",
+            suggested_filename,
+            "PDF Files (*.pdf)"
+        )
+
+        if not file_path:
+            return
+
+        if not file_path.lower().endswith(
+            ".pdf"
+        ):
+            file_path += ".pdf"
+
+        # -----------------------------------------------------
+        # Create PDF
+        # -----------------------------------------------------
+
+        try:
+
+            PdfReportExportHelper\
+                .export_completed_sop_inspection_to_pdf(
+                    inspection,
+                    items,
+                    file_path
+                )
+
+        except Exception as error:
+
+            MessageService.error(
+                self,
+                "Cannot Print Inspection",
+                (
+                    "The completed inspection PDF could "
+                    "not be created.\n\n"
+                    f"{error}"
+                )
+            )
+
+            return
+
+        MessageService.information(
+            self,
+            "Inspection PDF Created",
+            (
+                "The completed inspection PDF was "
+                "created successfully.\n\n"
+                f"{Path(file_path).name}"
+            )
+        )
 
     # ---------------------------------------------------------
     # Delete

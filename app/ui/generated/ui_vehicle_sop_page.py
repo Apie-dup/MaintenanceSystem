@@ -91,6 +91,11 @@ class Ui_VehicleSopPage(object):
 
         self.horizontalLayout_2.addWidget(self.btnChecklist)
 
+        self.btnPrintInspectionForm = QPushButton(VehicleSopPage)
+        self.btnPrintInspectionForm.setObjectName(u"btnPrintInspectionForm")
+
+        self.horizontalLayout_2.addWidget(self.btnPrintInspectionForm)
+
         self.btnRefresh = QPushButton(VehicleSopPage)
         self.btnRefresh.setObjectName(u"btnRefresh")
 
@@ -130,6 +135,7 @@ class Ui_VehicleSopPage(object):
         self.btnEdit.setText(QCoreApplication.translate("VehicleSopPage", u"Edit", None))
         self.btnDelete.setText(QCoreApplication.translate("VehicleSopPage", u"Delete", None))
         self.btnChecklist.setText(QCoreApplication.translate("VehicleSopPage", u"Checklist", None))
+        self.btnPrintInspectionForm.setText(QCoreApplication.translate("VehicleSopPage", u"Print Inspection Form", None))
         self.btnRefresh.setText(QCoreApplication.translate("VehicleSopPage", u"Refresh", None))
     # retranslateUi
 

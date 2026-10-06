@@ -86,6 +86,11 @@ class Ui_VehicleSopInspectionPage(object):
 
         self.horizontalLayout_2.addWidget(self.btnOpen)
 
+        self.btnPrint = QPushButton(VehicleSopInspectionPage)
+        self.btnPrint.setObjectName(u"btnPrint")
+
+        self.horizontalLayout_2.addWidget(self.btnPrint)
+
         self.btnDelete = QPushButton(VehicleSopInspectionPage)
         self.btnDelete.setObjectName(u"btnDelete")
 
@@ -132,6 +137,7 @@ class Ui_VehicleSopInspectionPage(object):
         ___qtablewidgetitem7.setText(QCoreApplication.translate("VehicleSopInspectionPage", u"Status", None))
         self.btnNew.setText(QCoreApplication.translate("VehicleSopInspectionPage", u"New Inspection", None))
         self.btnOpen.setText(QCoreApplication.translate("VehicleSopInspectionPage", u"Open / View", None))
+        self.btnPrint.setText(QCoreApplication.translate("VehicleSopInspectionPage", u"Print Completed Inspection", None))
         self.btnDelete.setText(QCoreApplication.translate("VehicleSopInspectionPage", u"Delete", None))
         self.btnRefresh.setText(QCoreApplication.translate("VehicleSopInspectionPage", u"Refresh", None))
     # retranslateUi

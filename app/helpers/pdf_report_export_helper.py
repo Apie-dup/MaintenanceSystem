@@ -955,3 +955,1042 @@ class PdfReportExportHelper:
             onLaterPages=draw_footer
         )
 
+    @staticmethod
+    def export_sop_inspection_form_to_pdf(
+        sop,
+        items,
+        file_path,
+    ):
+
+        page_size = A4
+
+        document = SimpleDocTemplate(
+            file_path,
+            pagesize=page_size,
+            rightMargin=15 * mm,
+            leftMargin=15 * mm,
+            topMargin=12 * mm,
+            bottomMargin=18 * mm,
+        )
+
+        styles = getSampleStyleSheet()
+        elements = []
+
+        # -------------------------------------------------
+        # Title
+        # -------------------------------------------------
+
+        organization_name = (
+            SettingsService.organization_name()
+        )
+
+        elements.append(
+            Paragraph(
+                f"<b>{escape(organization_name)}</b>",
+                styles["Title"]
+            )
+        )
+
+        elements.append(
+            Spacer(1, 2 * mm)
+        )
+
+        elements.append(
+            Paragraph(
+                "<b>VEHICLE / EQUIPMENT INSPECTION</b>",
+                styles["Heading2"]
+            )
+        )
+
+        elements.append(
+            Spacer(1, 5 * mm)
+        )
+
+        # -------------------------------------------------
+        # SOP details
+        # -------------------------------------------------
+
+        details = [
+            [
+                "SOP No.",
+                sop["sop_number"],
+                "Frequency",
+                sop["frequency"],
+            ],
+            [
+                "SOP",
+                sop["sop_name"],
+                "",
+                "",
+            ],
+            [
+                "Asset",
+                (
+                    f'{sop["asset_number"]} - '
+                    f'{sop["asset_name"]}'
+                ),
+                "",
+                "",
+            ],
+        ]
+
+        details_table = Table(
+            details,
+            colWidths=[
+                25 * mm,
+                75 * mm,
+                25 * mm,
+                50 * mm,
+            ]
+        )
+
+        details_table.setStyle(
+            TableStyle([
+                (
+                    "GRID",
+                    (0, 0),
+                    (-1, -1),
+                    0.5,
+                    colors.grey
+                ),
+                (
+                    "FONTNAME",
+                    (0, 0),
+                    (0, -1),
+                    "Helvetica-Bold"
+                ),
+                (
+                    "FONTNAME",
+                    (2, 0),
+                    (2, -1),
+                    "Helvetica-Bold"
+                ),
+                (
+                    "VALIGN",
+                    (0, 0),
+                    (-1, -1),
+                    "MIDDLE"
+                ),
+                (
+                    "FONTSIZE",
+                    (0, 0),
+                    (-1, -1),
+                    9
+                ),
+                (
+                    "TOPPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    5
+                ),
+                (
+                    "BOTTOMPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    5
+                ),
+            ])
+        )
+
+        elements.append(details_table)
+
+        elements.append(Spacer(1, 5 * mm))
+
+        # -------------------------------------------------
+        # Inspection details completed by operator
+        # -------------------------------------------------
+
+        operator_data = [
+            [
+                "Inspection Date:",
+                "________________________",
+                "Operator / Driver:",
+                "____________________________",
+            ],
+            [
+                "Meter Type:",
+                "________________________",
+                "Meter Reading:",
+                "____________________________",
+            ],
+        ]
+
+        operator_table = Table(
+            operator_data,
+            colWidths=[
+                28 * mm,
+                55 * mm,
+                30 * mm,
+                62 * mm,
+            ]
+        )
+
+        operator_table.setStyle(
+            TableStyle([
+                (
+                    "FONTNAME",
+                    (0, 0),
+                    (0, -1),
+                    "Helvetica-Bold"
+                ),
+                (
+                    "FONTNAME",
+                    (2, 0),
+                    (2, -1),
+                    "Helvetica-Bold"
+                ),
+                (
+                    "FONTSIZE",
+                    (0, 0),
+                    (-1, -1),
+                    9
+                ),
+                (
+                    "VALIGN",
+                    (0, 0),
+                    (-1, -1),
+                    "MIDDLE"
+                ),
+                (
+                    "TOPPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    3
+                ),
+                (
+                    "BOTTOMPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    4
+                ),
+            ])
+        )
+
+        elements.append(operator_table)
+        elements.append(Spacer(1, 4 * mm))
+
+        # -------------------------------------------------
+        # Checklist
+        # -------------------------------------------------
+
+        checklist_data = [[
+            "No.",
+            "Inspection Item",
+            "Req.",
+            "Pass",
+            "Fail",
+            "N/A",
+            "Comments",
+        ]]
+
+        body_style = ParagraphStyle(
+            "SopInspectionFormBody",
+            parent=styles["Normal"],
+            fontSize=8,
+            leading=9,
+        )
+
+        for item in items:
+
+            checklist_data.append([
+                str(item["sequence"]),
+                Paragraph(
+                    escape(
+                        item["check_description"]
+                        or ""
+                    ),
+                    body_style
+                ),
+                "Yes" if item["required"] else "No",
+                "",
+                "",
+                "",
+                "",
+            ])
+
+        checklist_table = Table(
+            checklist_data,
+            colWidths=[
+                9 * mm,    # No.
+                61 * mm,   # Inspection Item
+                12 * mm,   # Required
+                12 * mm,   # Pass
+                12 * mm,   # Fail
+                12 * mm,   # N/A
+                57 * mm,   # Comments
+            ],
+            repeatRows=1,
+        )
+
+        checklist_table.setStyle(
+            TableStyle([
+                (
+                    "BACKGROUND",
+                    (0, 0),
+                    (-1, 0),
+                    colors.HexColor("#333333")
+                ),
+                (
+                    "TEXTCOLOR",
+                    (0, 0),
+                    (-1, 0),
+                    colors.white
+                ),
+                (
+                    "FONTNAME",
+                    (0, 0),
+                    (-1, 0),
+                    "Helvetica-Bold"
+                ),
+                (
+                    "ALIGN",
+                    (0, 0),
+                    (-1, 0),
+                    "CENTER"
+                ),
+                (
+                    "ALIGN",
+                    (0, 1),
+                    (0, -1),
+                    "CENTER"
+                ),
+                (
+                    "ALIGN",
+                    (2, 1),
+                    (5, -1),
+                    "CENTER"
+                ),
+                (
+                    "VALIGN",
+                    (0, 0),
+                    (-1, -1),
+                    "MIDDLE"
+                ),
+                (
+                    "GRID",
+                    (0, 0),
+                    (-1, -1),
+                    0.5,
+                    colors.grey
+                ),
+                (
+                    "FONTSIZE",
+                    (0, 0),
+                    (-1, 0),
+                    8
+                ),
+                (
+                    "TOPPADDING",
+                    (0, 1),
+                    (-1, -1),
+                    5
+                ),
+                (
+                    "BOTTOMPADDING",
+                    (0, 1),
+                    (-1, -1),
+                    5
+                ),
+            ])
+        )
+
+        elements.append(checklist_table)
+        elements.append(Spacer(1, 5 * mm))
+
+        # -------------------------------------------------
+        # General defects / comments
+        # -------------------------------------------------
+
+        elements.append(
+            Paragraph(
+                "<b>DEFECTS / GENERAL COMMENTS</b>",
+                styles["Normal"]
+            )
+        )
+
+        elements.append(
+            Spacer(1, 2 * mm)
+        )
+
+        comments_table = Table(
+            [
+                [""],
+                [""],
+                [""],
+            ],
+            colWidths=[175 * mm],
+            rowHeights=[8 * mm, 8 * mm, 8 * mm],
+        )
+
+        comments_table.setStyle(
+            TableStyle([
+                (
+                    "GRID",
+                    (0, 0),
+                    (-1, -1),
+                    0.5,
+                    colors.grey
+                ),
+            ])
+        )
+
+        elements.append(comments_table)
+        elements.append(Spacer(1, 5 * mm))
+
+        # -------------------------------------------------
+        # Operator declaration
+        # -------------------------------------------------
+
+        declaration_style = ParagraphStyle(
+            "SopInspectionDeclaration",
+            parent=styles["Normal"],
+            fontSize=8,
+            leading=10,
+        )
+
+        elements.append(
+            Paragraph(
+                (
+                    "I confirm that the above inspection was "
+                    "performed and that the information recorded "
+                    "on this form is correct."
+                ),
+                declaration_style
+            )
+        )
+
+        elements.append(Spacer(1, 4 * mm))
+
+        signature_table = Table(
+            [[
+                "Operator Signature:",
+                "____________________________",
+                "Date:",
+                "__________________",
+            ]],
+            colWidths=[
+                32 * mm,
+                62 * mm,
+                15 * mm,
+                45 * mm,
+            ],
+        )
+
+        signature_table.setStyle(
+            TableStyle([
+                (
+                    "FONTNAME",
+                    (0, 0),
+                    (0, 0),
+                    "Helvetica-Bold"
+                ),
+                (
+                    "FONTNAME",
+                    (2, 0),
+                    (2, 0),
+                    "Helvetica-Bold"
+                ),
+                (
+                    "FONTSIZE",
+                    (0, 0),
+                    (-1, -1),
+                    9
+                ),
+            ])
+        )
+
+        elements.append(signature_table)
+        elements.append(Spacer(1, 6 * mm))
+
+        # -------------------------------------------------
+        # Maintenance follow-up
+        # -------------------------------------------------
+
+        elements.append(
+            Paragraph(
+                "<b>MAINTENANCE FOLLOW-UP</b>",
+                styles["Normal"]
+            )
+        )
+        elements.append(
+            Spacer(1, 2 * mm)
+        )
+
+        follow_up_data = [
+            [
+                "Work Order No.:",
+                "____________________________",
+            ],
+            [
+                "Action / Comments:",
+                "",
+            ],
+            [
+                "",
+                "",
+            ],
+        ]
+
+        follow_up_table = Table(
+            follow_up_data,
+            colWidths=[
+                38 * mm,
+                137 * mm,
+            ],
+            rowHeights=[
+                8 * mm,
+                9 * mm,
+                9 * mm,
+            ],
+        )
+
+        follow_up_table.setStyle(
+            TableStyle([
+                (
+                    "GRID",
+                    (0, 0),
+                    (-1, -1),
+                    0.5,
+                    colors.grey
+                ),
+                (
+                    "FONTNAME",
+                    (0, 0),
+                    (0, 1),
+                    "Helvetica-Bold"
+                ),
+                (
+                    "FONTSIZE",
+                    (0, 0),
+                    (-1, -1),
+                    9
+                ),
+                (
+                    "VALIGN",
+                    (0, 0),
+                    (-1, -1),
+                    "TOP"
+                ),
+            ])
+        )
+
+        elements.append(follow_up_table)
+
+        # -------------------------------------------------
+        # Footer
+        # -------------------------------------------------
+
+        def draw_footer(canvas, doc):
+
+            canvas.saveState()
+
+            generated = datetime.now().strftime(
+                "%d-%b-%Y %H:%M"
+            )
+
+            organization_name = (
+                SettingsService.organization_name()
+            )
+
+            system_name = (
+                SettingsService.system_name()
+            )
+
+            footer_text = (
+                f"{organization_name} - {system_name}"
+            )
+
+            canvas.setFont(
+                "Helvetica",
+                8
+            )
+
+            canvas.drawString(
+                document.leftMargin,
+                8 * mm,
+                footer_text
+            )
+
+            page_text = (
+                f"Form generated: {generated}"
+                f"    |    Page {doc.page}"
+            )
+
+            canvas.drawRightString(
+                page_size[0]
+                - document.rightMargin,
+                8 * mm,
+                page_text
+            )
+
+            canvas.restoreState()
+
+        # -------------------------------------------------
+        # Create PDF
+        # -------------------------------------------------
+
+        document.build(
+            elements,
+            onFirstPage=draw_footer,
+            onLaterPages=draw_footer
+        )
+
+    @staticmethod
+    def export_completed_sop_inspection_to_pdf(
+        inspection,
+        items,
+        file_path,
+    ):
+
+        page_size = A4
+
+        document = SimpleDocTemplate(
+            file_path,
+            pagesize=page_size,
+            rightMargin=15 * mm,
+            leftMargin=15 * mm,
+            topMargin=12 * mm,
+            bottomMargin=18 * mm,
+        )
+
+        styles = getSampleStyleSheet()
+        elements = []
+
+        organization_name = (
+            SettingsService.organization_name()
+        )
+
+        # -------------------------------------------------
+        # Title
+        # -------------------------------------------------
+
+        elements.append(
+            Paragraph(
+                f"<b>{escape(organization_name)}</b>",
+                styles["Title"]
+            )
+        )
+
+        elements.append(Spacer(1, 2 * mm))
+
+        elements.append(
+            Paragraph(
+                "<b>COMPLETED VEHICLE / EQUIPMENT INSPECTION</b>",
+                styles["Heading2"]
+            )
+        )
+
+        elements.append(Spacer(1, 5 * mm))
+
+        # -------------------------------------------------
+        # Inspection / SOP details
+        # -------------------------------------------------
+
+        asset_text = (
+            f'{inspection["asset_number"]} - '
+            f'{inspection["asset_name"]}'
+        )
+
+        details = [
+            [
+                "Inspection No.",
+                inspection["inspection_number"],
+                "Status",
+                inspection["status"],
+            ],
+            [
+                "Inspection Date",
+                inspection["inspection_date"],
+                "Frequency",
+                inspection["frequency"],
+            ],
+            [
+                "SOP No.",
+                inspection["sop_number"],
+                "SOP",
+                inspection["sop_name"],
+            ],
+            [
+                "Asset",
+                asset_text,
+                "",
+                "",
+            ],
+            [
+                "Operator",
+                inspection["operator_name"] or "",
+                "",
+                "",
+            ],
+        ]
+
+        details_table = Table(
+            details,
+            colWidths=[
+                28 * mm,
+                60 * mm,
+                25 * mm,
+                62 * mm,
+            ]
+        )
+
+        details_table.setStyle(
+            TableStyle([
+                (
+                    "GRID",
+                    (0, 0),
+                    (-1, -1),
+                    0.5,
+                    colors.grey
+                ),
+                (
+                    "FONTNAME",
+                    (0, 0),
+                    (0, -1),
+                    "Helvetica-Bold"
+                ),
+                (
+                    "FONTNAME",
+                    (2, 0),
+                    (2, -1),
+                    "Helvetica-Bold"
+                ),
+                (
+                    "FONTSIZE",
+                    (0, 0),
+                    (-1, -1),
+                    9
+                ),
+                (
+                    "VALIGN",
+                    (0, 0),
+                    (-1, -1),
+                    "MIDDLE"
+                ),
+                (
+                    "TOPPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    4
+                ),
+                (
+                    "BOTTOMPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    4
+                ),
+            ])
+        )
+
+        elements.append(details_table)
+        elements.append(Spacer(1, 4 * mm))
+
+        # -------------------------------------------------
+        # Meter
+        # -------------------------------------------------
+
+        meter_type = (
+            inspection["meter_type"]
+            or ""
+        )
+
+        meter_reading = (
+            ""
+            if inspection["meter_reading"] is None
+            else str(inspection["meter_reading"])
+        )
+
+        meter_table = Table(
+            [[
+                "Meter Type:",
+                meter_type,
+                "Meter Reading:",
+                meter_reading,
+            ]],
+            colWidths=[
+                25 * mm,
+                60 * mm,
+                28 * mm,
+                62 * mm,
+            ]
+        )
+
+        meter_table.setStyle(
+            TableStyle([
+                (
+                    "FONTNAME",
+                    (0, 0),
+                    (0, 0),
+                    "Helvetica-Bold"
+                ),
+                (
+                    "FONTNAME",
+                    (2, 0),
+                    (2, 0),
+                    "Helvetica-Bold"
+                ),
+                (
+                    "FONTSIZE",
+                    (0, 0),
+                    (-1, -1),
+                    9
+                ),
+            ])
+        )
+
+        elements.append(meter_table)
+        elements.append(Spacer(1, 4 * mm))
+
+        # -------------------------------------------------
+        # Checklist
+        # -------------------------------------------------
+
+        checklist_data = [[
+            "No.",
+            "Inspection Item",
+            "Req.",
+            "Result",
+            "Comments",
+            "Work Order",
+        ]]
+
+        body_style = ParagraphStyle(
+            "CompletedSopInspectionBody",
+            parent=styles["Normal"],
+            fontSize=8,
+            leading=9,
+        )
+
+        for item in items:
+
+            checklist_data.append([
+                str(item["sequence"]),
+                Paragraph(
+                    escape(
+                        item["check_description"]
+                        or ""
+                    ),
+                    body_style
+                ),
+                (
+                    "Yes"
+                    if item["required"]
+                    else "No"
+                ),
+                item["result"] or "",
+                Paragraph(
+                    escape(
+                        item["comments"]
+                        or ""
+                    ),
+                    body_style
+                ),
+                item["work_order_number"] or "",
+            ])
+
+        checklist_table = Table(
+            checklist_data,
+            colWidths=[
+                9 * mm,
+                55 * mm,
+                12 * mm,
+                18 * mm,
+                56 * mm,
+                25 * mm,
+            ],
+            repeatRows=1,
+        )
+
+        checklist_table.setStyle(
+            TableStyle([
+                (
+                    "BACKGROUND",
+                    (0, 0),
+                    (-1, 0),
+                    colors.HexColor("#333333")
+                ),
+                (
+                    "TEXTCOLOR",
+                    (0, 0),
+                    (-1, 0),
+                    colors.white
+                ),
+                (
+                    "FONTNAME",
+                    (0, 0),
+                    (-1, 0),
+                    "Helvetica-Bold"
+                ),
+                (
+                    "ALIGN",
+                    (0, 0),
+                    (-1, 0),
+                    "CENTER"
+                ),
+                (
+                    "ALIGN",
+                    (0, 1),
+                    (0, -1),
+                    "CENTER"
+                ),
+                (
+                    "ALIGN",
+                    (2, 1),
+                    (3, -1),
+                    "CENTER"
+                ),
+                (
+                    "ALIGN",
+                    (5, 1),
+                    (5, -1),
+                    "CENTER"
+                ),
+                (
+                    "VALIGN",
+                    (0, 0),
+                    (-1, -1),
+                    "MIDDLE"
+                ),
+                (
+                    "GRID",
+                    (0, 0),
+                    (-1, -1),
+                    0.5,
+                    colors.grey
+                ),
+                (
+                    "FONTSIZE",
+                    (0, 0),
+                    (-1, 0),
+                    8
+                ),
+                (
+                    "TOPPADDING",
+                    (0, 1),
+                    (-1, -1),
+                    4
+                ),
+                (
+                    "BOTTOMPADDING",
+                    (0, 1),
+                    (-1, -1),
+                    4
+                ),
+            ])
+        )
+
+        elements.append(checklist_table)
+        elements.append(Spacer(1, 5 * mm))
+
+        # -------------------------------------------------
+        # Inspection comments
+        # -------------------------------------------------
+
+        elements.append(
+            Paragraph(
+                "<b>INSPECTION COMMENTS</b>",
+                styles["Normal"]
+            )
+        )
+
+        elements.append(Spacer(1, 2 * mm))
+
+        comments = (
+            inspection["comments"]
+            or ""
+        )
+
+        comments_table = Table(
+            [[
+                Paragraph(
+                    escape(comments),
+                    body_style
+                )
+            ]],
+            colWidths=[175 * mm],
+            rowHeights=[18 * mm],
+        )
+
+        comments_table.setStyle(
+            TableStyle([
+                (
+                    "BOX",
+                    (0, 0),
+                    (-1, -1),
+                    0.5,
+                    colors.grey
+                ),
+                (
+                    "VALIGN",
+                    (0, 0),
+                    (-1, -1),
+                    "TOP"
+                ),
+                (
+                    "TOPPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    5
+                ),
+                (
+                    "LEFTPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    5
+                ),
+            ])
+        )
+
+        elements.append(comments_table)
+
+        # -------------------------------------------------
+        # Footer
+        # -------------------------------------------------
+
+        def draw_footer(canvas, doc):
+
+            canvas.saveState()
+
+            generated = datetime.now().strftime(
+                "%d-%b-%Y %H:%M"
+            )
+
+            system_name = (
+                SettingsService.system_name()
+            )
+
+            canvas.setFont(
+                "Helvetica",
+                8
+            )
+
+            canvas.drawString(
+                document.leftMargin,
+                8 * mm,
+                (
+                    f"{organization_name} - "
+                    f"{system_name}"
+                )
+            )
+
+            canvas.drawRightString(
+                page_size[0]
+                - document.rightMargin,
+                8 * mm,
+                (
+                    f"Printed: {generated}"
+                    f"    |    Page {doc.page}"
+                )
+            )
+
+            canvas.restoreState()
+
+        # -------------------------------------------------
+        # Create PDF
+        # -------------------------------------------------
+
+        document.build(
+            elements,
+            onFirstPage=draw_footer,
+            onLaterPages=draw_footer
+        )

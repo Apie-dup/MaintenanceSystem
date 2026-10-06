@@ -109,6 +109,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="btnPrint">
+       <property name="text">
+        <string>Print Completed Inspection</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="btnDelete">
        <property name="text">
         <string>Delete</string>
