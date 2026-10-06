@@ -14,6 +14,12 @@ business logic and database access.
 
 ---
 
+## Application Preview
+
+![Maintenance Management System Dashboard](docs/screenshots/dashboard.png)
+
+---
+
 ## Current Features
 
 - User authentication and role-based permissions
