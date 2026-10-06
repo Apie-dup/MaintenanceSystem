@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QMainWindow, QLabel
 from PySide6.QtCore import QTimer
-from PySide6.QtGui import QAction, QIcon, QPixmap
+from PySide6.QtGui import QAction, QIcon
 
 from app.ui.generated.ui_dashboard import Ui_DashboardWindow
 from app.services.dashboard_service import DashboardService
@@ -56,15 +56,6 @@ class DashboardController(QMainWindow):
         self.timer.start(1000)  # Update every second
 
         self.update_status_bar()
-
-        pixmap = QPixmap("app/resources/logo.png")
-
-        self.ui.lblLogo.setPixmap(
-            pixmap.scaled(
-                90,
-                90
-            )
-        )
 
         self.setWindowTitle(f"Maintenance Management System - {user.get('fullname', '')}")
         self.ui.btnAssets.clicked.connect(self.open_assets)

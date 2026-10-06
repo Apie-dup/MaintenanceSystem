@@ -42,7 +42,7 @@ Stores application login accounts.
 |---------|------|-------------|
 | id | INTEGER | Primary Key |
 | username | TEXT | Login name |
-| password_hash | TEXT | Encrypted password |
+| password_hash | TEXT | bcrypt password hash |
 | full_name | TEXT | Display name |
 | role | TEXT | User role |
 | active | INTEGER | Active account |

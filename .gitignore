@@ -3,28 +3,51 @@ __pycache__/
 *.py[cod]
 *.pyo
 
-# Virtual Environment
+# Virtual environments
 venv/
+.venv/
 
 # VS Code
 .vscode/
 
+# Environment / local configuration
+.env
+.env.*
+!.env.example
+
 # Logs
 logs/
+*.log
 
 # Backup files
 backups/
+*.bak
+*.backup
 
-# SQLite database
-database/*.db
+# SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-shm
+*.db-wal
 
 # Qt generated cache
 *.qmlc
 *.jsc
 
-# Generated reports
-*_report_*.pdf
-*_report_*.xlsx
-work_orders.pdf
-work_orders.xlsx
-technician_performance.pdf
+# Generated reports and exports
+*.pdf
+*.xlsx
+
+# Microsoft Excel temporary files
+~$*
+
+# Build / packaging output
+build/
+dist/
+*.egg-info/
+
+# Operating system files
+.DS_Store
+Thumbs.db
