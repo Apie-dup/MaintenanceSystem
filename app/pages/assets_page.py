@@ -1,5 +1,3 @@
-from tkinter import dialog
-
 from app.base.crud_page import CrudPage
 from app.dialogs.asset_dialog import AssetDialog
 from app.services.asset_service import AssetService

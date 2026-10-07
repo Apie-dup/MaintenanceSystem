@@ -207,3 +207,230 @@ class AssetHistoryModel:
         conn.close()
 
         return rows
+
+    @staticmethod
+    def get_summary(asset_id):
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        try:
+
+            # -------------------------------------------------
+            # Completed maintenance
+            # -------------------------------------------------
+
+            cursor.execute("""
+                SELECT
+                    COUNT(*) AS work_order_count,
+
+                    COALESCE(
+                        SUM(actual_cost),
+                        0
+                    ) AS maintenance_cost,
+
+                    MAX(completed_date)
+                        AS last_maintenance_date
+
+                FROM work_orders
+
+                WHERE asset_id = ?
+                  AND status IN (
+                      'Completed',
+                      'Closed'
+                  )
+            """, (
+                asset_id,
+            ))
+
+            work_order_row = cursor.fetchone()
+
+            # -------------------------------------------------
+            # Labour hours and cost
+            #
+            # Use detailed labour entries where available.
+            # Otherwise fall back to the legacy Work Order
+            # labour_hours and technician hourly rate.
+            # -------------------------------------------------
+
+            cursor.execute("""
+                SELECT
+                    COALESCE(
+                        SUM(
+                            CASE
+
+                                WHEN EXISTS (
+                                    SELECT 1
+                                    FROM work_order_labour
+                                    WHERE work_order_labour.work_order_id
+                                        = work_orders.id
+                                )
+                                THEN (
+                                    SELECT COALESCE(
+                                        SUM(work_order_labour.hours),
+                                        0
+                                    )
+                                    FROM work_order_labour
+                                    WHERE work_order_labour.work_order_id
+                                        = work_orders.id
+                                )
+
+                                ELSE
+                                    COALESCE(
+                                        work_orders.labour_hours,
+                                        0
+                                    )
+
+                            END
+                        ),
+                        0
+                    ) AS labour_hours,
+
+                    COALESCE(
+                        SUM(
+                            CASE
+
+                                WHEN EXISTS (
+                                    SELECT 1
+                                    FROM work_order_labour
+                                    WHERE work_order_labour.work_order_id
+                                        = work_orders.id
+                                )
+                                THEN (
+                                    SELECT COALESCE(
+                                        SUM(work_order_labour.labour_cost),
+                                        0
+                                    )
+                                    FROM work_order_labour
+                                    WHERE work_order_labour.work_order_id
+                                        = work_orders.id
+                                )
+
+                                ELSE
+                                    COALESCE(
+                                        work_orders.labour_hours,
+                                        0
+                                    )
+                                    *
+                                    COALESCE(
+                                        technicians.hourly_rate,
+                                        0
+                                    )
+
+                            END
+                        ),
+                        0
+                    ) AS labour_cost
+
+                FROM work_orders
+
+                LEFT JOIN technicians
+                    ON work_orders.technician_id
+                        = technicians.id
+
+                WHERE work_orders.asset_id = ?
+                  AND work_orders.status IN (
+                      'Completed',
+                      'Closed'
+                  )
+            """, (
+                asset_id,
+            ))
+
+            labour_row = cursor.fetchone()
+
+            # -------------------------------------------------
+            # Detailed parts cost
+            # -------------------------------------------------
+
+            cursor.execute("""
+                SELECT
+                    COALESCE(
+                        SUM(work_order_parts.total_cost),
+                        0
+                    ) AS parts_cost
+
+                FROM work_order_parts
+
+                INNER JOIN work_orders
+                    ON work_order_parts.work_order_id
+                        = work_orders.id
+
+                WHERE work_orders.asset_id = ?
+                  AND work_orders.status IN (
+                      'Completed',
+                      'Closed'
+                  )
+            """, (
+                asset_id,
+            ))
+
+            parts_row = cursor.fetchone()
+
+            # -------------------------------------------------
+            # Open Work Orders
+            # -------------------------------------------------
+
+            cursor.execute("""
+                SELECT
+                    COUNT(*) AS open_work_order_count
+
+                FROM work_orders
+
+                WHERE asset_id = ?
+                  AND status NOT IN (
+                      'Completed',
+                      'Closed',
+                      'Cancelled'
+                  )
+            """, (
+                asset_id,
+            ))
+
+            open_row = cursor.fetchone()
+
+            return {
+                "work_order_count": int(
+                    work_order_row[
+                        "work_order_count"
+                    ] or 0
+                ),
+
+                "open_work_order_count": int(
+                    open_row[
+                        "open_work_order_count"
+                    ] or 0
+                ),
+
+                "labour_hours": float(
+                    labour_row[
+                        "labour_hours"
+                    ] or 0
+                ),
+
+                "labour_cost": float(
+                    labour_row[
+                        "labour_cost"
+                    ] or 0
+                ),
+
+                "parts_cost": float(
+                    parts_row[
+                        "parts_cost"
+                    ] or 0
+                ),
+
+                "maintenance_cost": float(
+                    work_order_row[
+                        "maintenance_cost"
+                    ] or 0
+                ),
+
+                "last_maintenance_date":
+                    work_order_row[
+                        "last_maintenance_date"
+                    ],
+            }
+
+        finally:
+            conn.close()

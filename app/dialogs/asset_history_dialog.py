@@ -46,6 +46,7 @@ class AssetHistoryDialog(QDialog):
         self.connect_signals()
 
         self.load_asset()
+        self.load_summary()
         self.load_history()
 
     def configure_table(self):
@@ -237,6 +238,7 @@ class AssetHistoryDialog(QDialog):
 
             dialog.exec()
 
+            self.load_summary()
             self.load_history()
             return
 
@@ -256,6 +258,7 @@ class AssetHistoryDialog(QDialog):
 
             dialog.exec()
 
+            self.load_summary()
             self.load_history()
             return
 
@@ -275,6 +278,7 @@ class AssetHistoryDialog(QDialog):
 
             dialog.exec()
 
+            self.load_summary()
             self.load_history()
             return
 
@@ -284,3 +288,42 @@ class AssetHistoryDialog(QDialog):
 
         if source_type == "meter_reading":
             return
+
+    def load_summary(self):
+
+        summary = AssetHistoryService.get_summary(
+            self.asset_id
+        )
+
+        self.ui.lblCompletedMaintenance.setText(
+            str(summary["work_order_count"])
+        )
+
+        self.ui.lblOpenWorkOrders.setText(
+            str(summary["open_work_order_count"])
+        )
+
+        self.ui.lblLabourHours.setText(
+            f'{summary["labour_hours"]:.2f}'
+        )
+
+        self.ui.lblMaintenanceCost.setText(
+            f'N${summary["maintenance_cost"]:,.2f}'
+        )
+
+        self.ui.lblLabourCost.setText(
+            f'N${summary["labour_cost"]:,.2f}'
+        )
+
+        self.ui.lblPartsCost.setText(
+            f'N${summary["parts_cost"]:,.2f}'
+        )
+
+        last_maintenance = (
+            summary["last_maintenance_date"]
+            or "-"
+        )
+
+        self.ui.lblLastMaintenance.setText(
+            str(last_maintenance)
+        )

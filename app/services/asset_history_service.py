@@ -14,3 +14,15 @@ class AssetHistoryService:
         return AssetHistoryModel.get_history(
             asset_id
         )
+
+    @staticmethod
+    def get_summary(asset_id):
+
+        if not asset_id:
+            raise ValueError(
+                "Asset is required."
+            )
+
+        return AssetHistoryModel.get_summary(
+            asset_id
+        )
