@@ -178,6 +178,13 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="btnPrintBlank">
+       <property name="text">
+        <string>Print Blank Logbook</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
   </layout>

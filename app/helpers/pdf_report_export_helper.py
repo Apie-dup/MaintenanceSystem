@@ -1994,3 +1994,381 @@ class PdfReportExportHelper:
             onFirstPage=draw_footer,
             onLaterPages=draw_footer
         )
+
+    @staticmethod
+    def export_vehicle_logbook_form_to_pdf(
+        asset,
+        file_path,
+    ):
+        page_size = landscape(A4)
+
+        document = SimpleDocTemplate(
+            file_path,
+            pagesize=page_size,
+            rightMargin=10 * mm,
+            leftMargin=10 * mm,
+            topMargin=10 * mm,
+            bottomMargin=15 * mm,
+        )
+
+        styles = getSampleStyleSheet()
+        elements = []
+
+        # -------------------------------------------------
+        # Title
+        # -------------------------------------------------
+
+        organization_name = (
+            SettingsService.organization_name()
+        )
+
+        elements.append(
+            Paragraph(
+                f"<b>{escape(organization_name)}</b>",
+                styles["Title"]
+            )
+        )
+
+        elements.append(
+            Spacer(1, 2 * mm)
+        )
+
+        elements.append(
+            Paragraph(
+                "<b>VEHICLE / EQUIPMENT LOGBOOK</b>",
+                styles["Heading2"]
+            )
+        )
+
+        elements.append(
+            Spacer(1, 4 * mm)
+        )
+
+        # -------------------------------------------------
+        # Asset / period details
+        # -------------------------------------------------
+
+        asset_number = (
+            asset["asset_number"]
+            if asset
+            else ""
+        )
+
+        asset_name = (
+            asset["asset_name"]
+            if asset
+            else ""
+        )
+
+        details = [
+            [
+                "Asset Number",
+                asset_number,
+                "Asset Name",
+                asset_name,
+            ],
+            [
+                "Period",
+                "____________________________",
+                "Sheet No.",
+                "____________",
+            ],
+        ]
+
+        details_table = Table(
+            details,
+            colWidths=[
+                28 * mm,
+                75 * mm,
+                25 * mm,
+                75 * mm,
+            ]
+        )
+
+        details_table.setStyle(
+            TableStyle([
+                (
+                    "GRID",
+                    (0, 0),
+                    (-1, -1),
+                    0.5,
+                    colors.grey
+                ),
+                (
+                    "FONTNAME",
+                    (0, 0),
+                    (0, -1),
+                    "Helvetica-Bold"
+                ),
+                (
+                    "FONTNAME",
+                    (2, 0),
+                    (2, -1),
+                    "Helvetica-Bold"
+                ),
+                (
+                    "FONTSIZE",
+                    (0, 0),
+                    (-1, -1),
+                    8
+                ),
+                (
+                    "VALIGN",
+                    (0, 0),
+                    (-1, -1),
+                    "MIDDLE"
+                ),
+                (
+                    "LEFTPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    4
+                ),
+                (
+                    "RIGHTPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    4
+                ),
+                (
+                    "TOPPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    4
+                ),
+                (
+                    "BOTTOMPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    4
+                ),
+            ])
+        )
+
+        elements.append(details_table)
+        elements.append(Spacer(1, 5 * mm))
+
+        # -------------------------------------------------
+        # Blank logbook table
+        # -------------------------------------------------
+
+        headers = [
+            "Date",
+            "Driver /\nOperator",
+            "Start\nKm",
+            "End\nKm",
+            "Km",
+            "Start\nHrs",
+            "End\nHrs",
+            "Hrs",
+            "From",
+            "To",
+            "Purpose",
+            "Fuel\nQty",
+            "Fuel\nCost",
+            "Defect / Remarks",
+        ]
+
+        table_data = [headers]
+
+        # Blank rows for manual entries.
+        for _ in range(12):
+            table_data.append(
+                [""] * len(headers)
+            )
+
+        logbook_table = Table(
+            table_data,
+            colWidths=[
+                16 * mm,   # Date
+                24 * mm,   # Driver / Operator
+                16 * mm,   # Start Km
+                16 * mm,   # End Km
+                13 * mm,   # Km
+                16 * mm,   # Start Hrs
+                16 * mm,   # End Hrs
+                13 * mm,   # Hrs
+                18 * mm,   # From
+                18 * mm,   # To
+                29 * mm,   # Purpose
+                15 * mm,   # Fuel Qty
+                17 * mm,   # Fuel Cost
+                35 * mm,   # Defect / Remarks
+            ],
+            repeatRows=1,
+            rowHeights=[
+                10 * mm
+            ] + [
+                8 * mm
+            ] * 12,
+        )
+
+        logbook_table.setStyle(
+            TableStyle([
+                (
+                    "GRID",
+                    (0, 0),
+                    (-1, -1),
+                    0.5,
+                    colors.grey
+                ),
+                (
+                    "FONTNAME",
+                    (0, 0),
+                    (-1, 0),
+                    "Helvetica-Bold"
+                ),
+                (
+                    "FONTSIZE",
+                    (0, 0),
+                    (-1, 0),
+                    6.5
+                ),
+                (
+                    "FONTSIZE",
+                    (0, 1),
+                    (-1, -1),
+                    7
+                ),
+                (
+                    "ALIGN",
+                    (0, 0),
+                    (-1, 0),
+                    "CENTER"
+                ),
+                (
+                    "VALIGN",
+                    (0, 0),
+                    (-1, -1),
+                    "MIDDLE"
+                ),
+                (
+                    "LEFTPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    2
+                ),
+                (
+                    "RIGHTPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    2
+                ),
+                (
+                    "TOPPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    2
+                ),
+                (
+                    "BOTTOMPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    2
+                ),
+            ])
+        )
+
+        elements.append(logbook_table)
+        elements.append(Spacer(1, 5 * mm))
+
+        # -------------------------------------------------
+        # Totals / authorization
+        # -------------------------------------------------
+
+        totals = [
+            [
+                "Total Kilometres",
+                "____________________",
+                "Total Running Hours",
+                "____________________",
+            ],
+            [
+                "Checked By",
+                "____________________",
+                "Signature",
+                "____________________",
+            ],
+            [
+                "Date",
+                "____________________",
+                "",
+                "",
+            ],
+        ]
+
+        totals_table = Table(
+            totals,
+            colWidths=[
+                32 * mm,
+                70 * mm,
+                35 * mm,
+                70 * mm,
+            ]
+        )
+
+        totals_table.setStyle(
+            TableStyle([
+                (
+                    "FONTNAME",
+                    (0, 0),
+                    (0, -1),
+                    "Helvetica-Bold"
+                ),
+                (
+                    "FONTNAME",
+                    (2, 0),
+                    (2, 1),
+                    "Helvetica-Bold"
+                ),
+                (
+                    "FONTSIZE",
+                    (0, 0),
+                    (-1, -1),
+                    8
+                ),
+                (
+                    "VALIGN",
+                    (0, 0),
+                    (-1, -1),
+                    "MIDDLE"
+                ),
+                (
+                    "BOTTOMPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    4
+                ),
+            ])
+        )
+
+        elements.append(totals_table)
+
+        # -------------------------------------------------
+        # Footer
+        # -------------------------------------------------
+
+        def draw_footer(canvas, doc):
+            canvas.saveState()
+
+            canvas.setFont(
+                "Helvetica",
+                7
+            )
+
+            canvas.drawCentredString(
+                page_size[0] / 2,
+                7 * mm,
+                (
+                    "Maintenance Management System"
+                    f"    |    Page {doc.page}"
+                )
+            )
+
+            canvas.restoreState()
+
+        document.build(
+            elements,
+            onFirstPage=draw_footer,
+            onLaterPages=draw_footer
+        )

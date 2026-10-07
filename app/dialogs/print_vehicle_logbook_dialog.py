@@ -8,14 +8,21 @@ from app.services.asset_service import AssetService
 
 class PrintVehicleLogbookDialog(QDialog):
 
-    def __init__(self, parent=None):
+    def __init__(
+        self,
+        parent=None,
+        blank_form=False,
+    ):
         super().__init__(parent)
+
+        self.blank_form = blank_form
 
         self.ui = Ui_PrintVehicleLogbookDialog()
         self.ui.setupUi(self)
 
         self.load_vehicles()
         self.setup_dates()
+        self.setup_mode()
         self.connect_signals()
 
     def load_vehicles(self):
@@ -57,6 +64,29 @@ class PrintVehicleLogbookDialog(QDialog):
             today
         )
 
+    def setup_mode(self):
+
+        if not self.blank_form:
+            return
+
+        self.setWindowTitle(
+            "Print Blank Vehicle Logbook"
+        )
+
+        self.ui.lblTitle.setText(
+            "Print Blank Vehicle / Equipment Logbook"
+        )
+
+        self.ui.lblFromDate.setVisible(False)
+        self.ui.dtFromDate.setVisible(False)
+
+        self.ui.lblToDate.setVisible(False)
+        self.ui.dtToDate.setVisible(False)
+
+        self.ui.btnCreatePdf.setText(
+            "Create Blank PDF"
+        )
+
     def connect_signals(self):
 
         self.ui.btnCancel.clicked.connect(
@@ -72,11 +102,13 @@ class PrintVehicleLogbookDialog(QDialog):
         if self.ui.cmbVehicle.currentIndex() < 0:
             return
 
-        if (
-            self.ui.dtFromDate.date()
-            > self.ui.dtToDate.date()
-        ):
-            return
+        if not self.blank_form:
+
+            if (
+                self.ui.dtFromDate.date()
+                > self.ui.dtToDate.date()
+            ):
+                return
 
         self.accept()
 

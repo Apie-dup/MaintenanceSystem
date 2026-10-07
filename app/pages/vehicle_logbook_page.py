@@ -21,6 +21,12 @@ from app.dialogs.print_vehicle_logbook_dialog import(
 from app.dialogs.work_order_dialog import (
     WorkOrderDialog
 )
+from app.services.asset_service import (
+    AssetService
+)
+
+
+
 
 class VehicleLogbookPage(CrudPage):
 
@@ -146,6 +152,10 @@ class VehicleLogbookPage(CrudPage):
             self.print_logbook
         )
 
+        self.ui.btnPrintBlank.clicked.connect(
+            self.print_blank_logbook
+        )
+
     def print_logbook(self):
 
         # -------------------------------------------------
@@ -235,6 +245,90 @@ class VehicleLogbookPage(CrudPage):
                 (
                     "Unable to export "
                     "Vehicle Logbook.\n\n"
+                    f"{error}"
+                )
+            )
+
+    def print_blank_logbook(self):
+
+        # -------------------------------------------------
+        # Select vehicle
+        # -------------------------------------------------
+
+        dialog = PrintVehicleLogbookDialog(
+            self,
+            blank_form=True,
+        )
+
+        if not dialog.exec():
+            return
+
+        asset_id = dialog.asset_id()
+
+        # -------------------------------------------------
+        # Get selected asset
+        # -------------------------------------------------
+
+        asset = None
+
+        for item in AssetService.get_all():
+            if item["id"] == asset_id:
+                asset = item
+                break
+
+        if asset is None:
+            MessageService.error(
+                self,
+                "Vehicle Logbook",
+                "Unable to load the selected vehicle."
+            )
+            return
+
+        # -------------------------------------------------
+        # Save file
+        # -------------------------------------------------
+
+        default_name = (
+            f'Blank_Logbook_{asset["asset_number"]}.pdf'
+        )
+
+        file_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save Blank Vehicle Logbook",
+            default_name,
+            "PDF Files (*.pdf)"
+        )
+
+        if not file_path:
+            return
+
+        if not file_path.lower().endswith(".pdf"):
+            file_path += ".pdf"
+
+        # -------------------------------------------------
+        # Create PDF
+        # -------------------------------------------------
+
+        try:
+
+            PdfReportExportHelper.export_vehicle_logbook_form_to_pdf(
+                asset=asset,
+                file_path=file_path,
+            )
+
+            MessageService.information(
+                self,
+                "Vehicle Logbook",
+                "Blank Vehicle Logbook exported successfully."
+            )
+
+        except Exception as error:
+
+            MessageService.error(
+                self,
+                "Vehicle Logbook",
+                (
+                    "Unable to export Blank Vehicle Logbook.\n\n"
                     f"{error}"
                 )
             )

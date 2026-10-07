@@ -124,6 +124,11 @@ class Ui_VehicleLogbookPage(object):
 
         self.horizontalLayout_2.addWidget(self.btnPrint)
 
+        self.btnPrintBlank = QPushButton(VehicleLogbookPage)
+        self.btnPrintBlank.setObjectName(u"btnPrintBlank")
+
+        self.horizontalLayout_2.addWidget(self.btnPrintBlank)
+
 
         self.verticalLayout.addLayout(self.horizontalLayout_2)
 
@@ -171,5 +176,6 @@ class Ui_VehicleLogbookPage(object):
         self.btnOpenWorkOrder.setText(QCoreApplication.translate("VehicleLogbookPage", u"Open Work Order", None))
         self.btnDelete.setText(QCoreApplication.translate("VehicleLogbookPage", u"Delete", None))
         self.btnPrint.setText(QCoreApplication.translate("VehicleLogbookPage", u"Print Logbook", None))
+        self.btnPrintBlank.setText(QCoreApplication.translate("VehicleLogbookPage", u"Print Blank Logbook", None))
     # retranslateUi
 
