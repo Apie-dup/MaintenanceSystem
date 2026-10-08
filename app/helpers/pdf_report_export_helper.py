@@ -2372,3 +2372,300 @@ class PdfReportExportHelper:
             onFirstPage=draw_footer,
             onLaterPages=draw_footer
         )
+
+    # ---------------------------------------------------------
+    # Export Asset Maintenance History
+    # ---------------------------------------------------------
+
+    @staticmethod
+    def export_asset_history_to_pdf(
+        asset,
+        summary,
+        history,
+        file_path,
+    ):
+        page_size = landscape(A4)
+
+        document = SimpleDocTemplate(
+            file_path,
+            pagesize=page_size,
+            leftMargin=10 * mm,
+            rightMargin=10 * mm,
+            topMargin=12 * mm,
+            bottomMargin=18 * mm,
+        )
+
+        styles = getSampleStyleSheet()
+        elements = []
+
+        def safe(value):
+            if value is None or value == "":
+                return "-"
+            return escape(str(value))
+
+        def money(value):
+            return f"N${float(value or 0):,.2f}"
+
+        def format_meter(value):
+
+            if value is None or value == "":
+                return "-"
+
+            try:
+                return f"{float(value):,.2f}"
+            except (TypeError, ValueError):
+                return safe(value)
+
+        # -------------------------------------------------
+        # Title
+        # -------------------------------------------------
+
+        elements.append(
+            Paragraph(
+                "<b>Asset Maintenance History</b>",
+                styles["Title"],
+            )
+        )
+
+        elements.append(Spacer(1, 5 * mm))
+
+        # -------------------------------------------------
+        # Asset information
+        # -------------------------------------------------
+
+        elements.append(
+            Paragraph(
+                "<b>Asset Information</b>",
+                styles["Heading2"],
+            )
+        )
+
+        asset_data = [
+            [
+                "Asset Number",
+                safe(asset["asset_number"]),
+                "Asset Name",
+                safe(asset["asset_name"]),
+            ],
+            [
+                "Category",
+                safe(asset["category"]),
+                "Location",
+                safe(asset["location"]),
+            ],
+            [
+                "Manufacturer",
+                safe(asset["manufacturer"]),
+                "Status",
+                safe(asset["status"]),
+            ],
+        ]
+
+        asset_table = Table(
+            asset_data,
+            colWidths=[
+                35 * mm,
+                95 * mm,
+                35 * mm,
+                95 * mm,
+            ],
+        )
+
+        asset_table.setStyle(
+            TableStyle([
+                ("FONTNAME", (0, 0), (-1, -1), "Helvetica"),
+                ("FONTSIZE", (0, 0), (-1, -1), 9),
+                ("FONTNAME", (0, 0), (0, -1), "Helvetica-Bold"),
+                ("FONTNAME", (2, 0), (2, -1), "Helvetica-Bold"),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+            ])
+        )
+
+        elements.append(asset_table)
+        elements.append(Spacer(1, 5 * mm))
+
+        # -------------------------------------------------
+        # Maintenance summary
+        # -------------------------------------------------
+
+        elements.append(
+            Paragraph(
+                "<b>Maintenance Summary</b>",
+                styles["Heading2"],
+            )
+        )
+
+        summary_data = [
+            [
+                "Completed Maintenance",
+                str(summary["work_order_count"]),
+                "Open Work Orders",
+                str(summary["open_work_order_count"]),
+            ],
+            [
+                "Labour Hours",
+                f'{summary["labour_hours"]:.2f}',
+                "Maintenance Cost",
+                money(summary["maintenance_cost"]),
+            ],
+            [
+                "Labour Cost",
+                money(summary["labour_cost"]),
+                "Parts Cost",
+                money(summary["parts_cost"]),
+            ],
+            [
+                "Last Maintenance",
+                safe(summary["last_maintenance_date"]),
+                "",
+                "",
+            ],
+        ]
+
+        summary_table = Table(
+            summary_data,
+            colWidths=[
+                45 * mm,
+                85 * mm,
+                45 * mm,
+                85 * mm,
+            ],
+        )
+
+        summary_table.setStyle(
+            TableStyle([
+                ("FONTNAME", (0, 0), (-1, -1), "Helvetica"),
+                ("FONTSIZE", (0, 0), (-1, -1), 9),
+                ("FONTNAME", (0, 0), (0, -1), "Helvetica-Bold"),
+                ("FONTNAME", (2, 0), (2, -1), "Helvetica-Bold"),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+            ])
+        )
+
+        elements.append(summary_table)
+        elements.append(Spacer(1, 6 * mm))
+
+        # -------------------------------------------------
+        # Maintenance history
+        # -------------------------------------------------
+
+        elements.append(
+            Paragraph(
+                "<b>Maintenance History</b>",
+                styles["Heading2"],
+            )
+        )
+
+        cell_style = ParagraphStyle(
+            "AssetHistoryCell",
+            parent=styles["Normal"],
+            fontSize=8,
+            leading=10,
+        )
+
+        history_data = [[
+            "Date",
+            "Type",
+            "Reference",
+            "Description",
+            "Status",
+            "Meter",
+        ]]
+
+        for record in history:
+            history_data.append([
+                Paragraph(safe(record["event_date"]), cell_style),
+                Paragraph(safe(record["event_type"]), cell_style),
+                Paragraph(safe(record["reference"]), cell_style),
+                Paragraph(safe(record["description"]), cell_style),
+                Paragraph(safe(record["status"]), cell_style),
+                Paragraph(
+                    format_meter(record["meter"]),
+                    cell_style
+                ),
+            ])
+
+        if not history:
+            history_data.append([
+                "No maintenance history available.",
+                "",
+                "",
+                "",
+                "",
+                "",
+            ])
+
+        history_table = Table(
+            history_data,
+            colWidths=[
+                28 * mm,
+                42 * mm,
+                43 * mm,
+                87 * mm,
+                37 * mm,
+                23 * mm,
+            ],
+            repeatRows=1,
+            hAlign="LEFT",
+        )
+
+        table_commands = [
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#e5e7eb")),
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+            ("FONTSIZE", (0, 0), (-1, 0), 8),
+            ("VALIGN", (0, 0), (-1, -1), "TOP"),
+            ("GRID", (0, 0), (-1, -1), 0.25, colors.grey),
+            ("LEFTPADDING", (0, 0), (-1, -1), 4),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 4),
+            ("TOPPADDING", (0, 0), (-1, -1), 5),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+        ]
+
+        if not history:
+            table_commands.append(
+                ("SPAN", (0, 1), (-1, 1))
+            )
+
+        history_table.setStyle(
+            TableStyle(table_commands)
+        )
+
+        elements.append(history_table)
+
+        # -------------------------------------------------
+        # Footer
+        # -------------------------------------------------
+
+        generated = datetime.now().strftime(
+            "%d-%b-%Y %H:%M"
+        )
+
+        organization_name = SettingsService.organization_name()
+        system_name = SettingsService.system_name()
+
+        def draw_footer(canvas, doc):
+            canvas.saveState()
+
+            canvas.setFont("Helvetica", 8)
+
+            canvas.drawString(
+                document.leftMargin,
+                8 * mm,
+                f"{organization_name} - {system_name}",
+            )
+
+            canvas.drawRightString(
+                page_size[0] - document.rightMargin,
+                8 * mm,
+                f"Generated: {generated} | Page {doc.page}",
+            )
+
+            canvas.restoreState()
+
+        document.build(
+            elements,
+            onFirstPage=draw_footer,
+            onLaterPages=draw_footer,
+        )

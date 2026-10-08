@@ -15,10 +15,10 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractButton, QApplication, QDialog, QDialogButtonBox,
-    QGridLayout, QGroupBox, QHeaderView, QLabel,
-    QSizePolicy, QTableWidget, QTableWidgetItem, QVBoxLayout,
-    QWidget)
+from PySide6.QtWidgets import (QApplication, QDialog, QGridLayout, QGroupBox,
+    QHBoxLayout, QHeaderView, QLabel, QPushButton,
+    QSizePolicy, QSpacerItem, QTableWidget, QTableWidgetItem,
+    QVBoxLayout, QWidget)
 
 class Ui_AssetHistoryDialog(object):
     def setupUi(self, AssetHistoryDialog):
@@ -152,11 +152,26 @@ class Ui_AssetHistoryDialog(object):
 
         self.verticalLayout.addWidget(self.tblHistory)
 
-        self.buttonBox = QDialogButtonBox(AssetHistoryDialog)
-        self.buttonBox.setObjectName(u"buttonBox")
-        self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Close)
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
-        self.verticalLayout.addWidget(self.buttonBox)
+        self.horizontalLayout.addItem(self.horizontalSpacer)
+
+        self.btnExportPdf = QPushButton(AssetHistoryDialog)
+        self.btnExportPdf.setObjectName(u"btnExportPdf")
+        self.btnExportPdf.setMinimumSize(QSize(110, 0))
+
+        self.horizontalLayout.addWidget(self.btnExportPdf)
+
+        self.btnClose = QPushButton(AssetHistoryDialog)
+        self.btnClose.setObjectName(u"btnClose")
+        self.btnClose.setMinimumSize(QSize(80, 0))
+
+        self.horizontalLayout.addWidget(self.btnClose)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout)
 
 
         self.retranslateUi(AssetHistoryDialog)
@@ -195,5 +210,7 @@ class Ui_AssetHistoryDialog(object):
         ___qtablewidgetitem4.setText(QCoreApplication.translate("AssetHistoryDialog", u"Status", None))
         ___qtablewidgetitem5 = self.tblHistory.horizontalHeaderItem(5)
         ___qtablewidgetitem5.setText(QCoreApplication.translate("AssetHistoryDialog", u"Meter", None))
+        self.btnExportPdf.setText(QCoreApplication.translate("AssetHistoryDialog", u"Export PDF", None))
+        self.btnClose.setText(QCoreApplication.translate("AssetHistoryDialog", u"Close", None))
     # retranslateUi
 

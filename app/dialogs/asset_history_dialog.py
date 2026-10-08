@@ -1,5 +1,7 @@
 from PySide6.QtWidgets import (
     QDialog,
+    QFileDialog,
+    QMessageBox,
     QHeaderView,
     QTableWidgetItem,
 )
@@ -25,6 +27,9 @@ from app.dialogs.preventive_maintenance_dialog import (
 
 from app.dialogs.vehicle_logbook_dialog import (
     VehicleLogbookDialog
+)
+from app.helpers.pdf_report_export_helper import(
+    PdfReportExportHelper
 )
 
 
@@ -101,8 +106,12 @@ class AssetHistoryDialog(QDialog):
 
     def connect_signals(self):
 
-        self.ui.buttonBox.rejected.connect(
+        self.ui.btnClose.clicked.connect(
             self.reject
+        )
+
+        self.ui.btnExportPdf.clicked.connect(
+            self.export_pdf
         )
 
         self.ui.tblHistory.itemDoubleClicked.connect(
@@ -326,4 +335,72 @@ class AssetHistoryDialog(QDialog):
 
         self.ui.lblLastMaintenance.setText(
             str(last_maintenance)
+        )
+
+    # ---------------------------------------------------------
+    # Export Asset Maintenance History to PDF
+    # ---------------------------------------------------------
+
+    def export_pdf(self):
+
+        asset = AssetService.get_by_id(
+            self.asset_id
+        )
+
+        if asset is None:
+            QMessageBox.warning(
+                self,
+                "Export PDF",
+                "Asset could not be found."
+            )
+            return
+
+        default_filename = (
+            f"{asset['asset_number']}_"
+            f"Maintenance_History.pdf"
+        )
+
+        file_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Export Asset Maintenance History",
+            default_filename,
+            "PDF Files (*.pdf)"
+        )
+
+        if not file_path:
+            return
+
+        if not file_path.lower().endswith(".pdf"):
+            file_path += ".pdf"
+
+        try:
+
+            summary = AssetHistoryService.get_summary(
+                self.asset_id
+            )
+
+            history = AssetHistoryService.get_history(
+                self.asset_id
+            )
+
+            PdfReportExportHelper.export_asset_history_to_pdf(
+                asset=asset,
+                summary=summary,
+                history=history,
+                file_path=file_path,
+            )
+
+        except Exception as error:
+
+            QMessageBox.critical(
+                self,
+                "Export Failed",
+                f"Unable to export PDF:\n{error}"
+            )
+            return
+
+        QMessageBox.information(
+            self,
+            "Export PDF",
+            "Asset Maintenance History exported successfully."
         )
