@@ -125,7 +125,7 @@ class LoginController(QMainWindow):
             else:
 
                 self.settings.setValue(
-                    "login/rememeber_me",
+                    "login/remember_me",
                     False
                 )
 
