@@ -86,8 +86,16 @@ class AssetDocumentDialog(QDialog):
 
         self.ui.chkExpiryDate.setChecked(False)
 
+        self.ui.dateExpiry.setMinimumDate(
+            QDate(1900, 1, 1)
+        )
+
+        self.ui.dateExpiry.setSpecialValueText(
+            "No Expiry Date"
+        )
+
         self.ui.dateExpiry.setDate(
-            QDate.currentDate()
+            self.ui.dateExpiry.minimumDate()
         )
 
         self.ui.dateExpiry.setEnabled(False)
@@ -120,8 +128,29 @@ class AssetDocumentDialog(QDialog):
         )
 
         self.ui.chkExpiryDate.toggled.connect(
-            self.ui.dateExpiry.setEnabled
+            self.toggle_expiry_date
         )
+
+    # ---------------------------------------------------------
+    # Toggle optional expiry date
+    # ---------------------------------------------------------
+
+    def toggle_expiry_date(self, checked):
+
+        self.ui.dateExpiry.setEnabled(checked)
+
+        if checked:
+            if (
+                self.ui.dateExpiry.date()
+                == self.ui.dateExpiry.minimumDate()
+            ):
+                self.ui.dateExpiry.setDate(
+                    QDate.currentDate()
+                )
+        else:
+            self.ui.dateExpiry.setDate(
+                self.ui.dateExpiry.minimumDate()
+            )
 
     # ---------------------------------------------------------
     # Browse for document
