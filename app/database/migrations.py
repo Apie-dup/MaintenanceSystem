@@ -4,7 +4,7 @@ from app.core.logger import logger
 
 class MigrationManager:
 
-    LATEST_VERSION = 33
+    LATEST_VERSION = 34
 
     # ---------------------------------------------------------
     # Database version
@@ -193,6 +193,10 @@ class MigrationManager:
             elif version == 32:
                 MigrationManager.migrate_to_v33()
                 version = 33
+
+            elif version == 33:
+                MigrationManager.migrate_to_v34()
+                version = 34
 
             else:
                 raise RuntimeError(
@@ -2259,6 +2263,86 @@ class MigrationManager:
 
         except Exception:
             conn.rollback()
+            raise
+
+        finally:
+            conn.close()
+
+    # ---------------------------------------------------------
+    # Version 34
+    # Asset Documentation
+    # ---------------------------------------------------------
+
+    @staticmethod
+    def migrate_to_v34():
+
+        conn = Database.connect()
+        cursor = conn.cursor()
+
+        try:
+            logger.info(
+                "Migrating database to Version 34..."
+            )
+
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS asset_documents (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+                    asset_id INTEGER NOT NULL,
+
+                    document_name TEXT NOT NULL,
+                    document_type TEXT NOT NULL,
+                    description TEXT,
+
+                    file_name TEXT NOT NULL,
+                    file_path TEXT NOT NULL UNIQUE,
+                    file_size INTEGER NOT NULL DEFAULT 0,
+
+                    upload_date TEXT NOT NULL
+                        DEFAULT CURRENT_TIMESTAMP,
+
+                    expiry_date TEXT,
+                    uploaded_by INTEGER,
+
+                    FOREIGN KEY (asset_id)
+                        REFERENCES assets(id)
+                        ON DELETE RESTRICT,
+
+                    FOREIGN KEY (uploaded_by)
+                        REFERENCES users(id)
+                        ON DELETE SET NULL
+                )
+            """)
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_asset_documents_asset
+                ON asset_documents(asset_id)
+            """)
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_asset_documents_type
+                ON asset_documents(document_type)
+            """)
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS
+                    idx_asset_documents_expiry
+                ON asset_documents(expiry_date)
+            """)
+
+            conn.commit()
+
+            logger.info(
+                "Asset Documentation tables created."
+            )
+
+        except Exception:
+            conn.rollback()
+            logger.exception(
+                "Migration to Version 34 failed."
+            )
             raise
 
         finally:

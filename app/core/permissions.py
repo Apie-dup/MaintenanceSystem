@@ -30,6 +30,12 @@ class Permissions:
             "asset_meter_readings",
             "asset_meter_readings.create",
 
+            # Asset Documentation
+            "asset_documents",
+            "asset_documents.create",
+            "asset_documents.edit",
+            "asset_documents.delete",
+
             # Work Orders
             "work_orders.create",
             "work_orders.edit",
@@ -101,6 +107,12 @@ class Permissions:
             "assets.edit",
             "asset_meter_readings",
             "asset_meter_readings.create",
+
+            # Asset Documentation
+            "asset_documents",
+            "asset_documents.create",
+            "asset_documents.edit",
+            "asset_documents.delete",
 
             # Work Orders
             "work_orders.create",
@@ -174,6 +186,9 @@ class Permissions:
 
             # Assets
             "asset_meter_readings",
+
+            # Asset Documentation
+            "asset_documents",
 
             # Viewer may export reports.
             "reports.export",

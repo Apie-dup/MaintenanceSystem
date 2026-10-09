@@ -9,6 +9,9 @@ from app.dialogs.asset_meter_reading_dialog import AssetMeterReadingDialog
 from app.dialogs.asset_history_dialog import(
     AssetHistoryDialog
 )
+from app.dialogs.asset_documents_dialog import (
+    AssetDocumentsDialog
+)
 
 
 class AssetsPage(CrudPage):
@@ -103,6 +106,10 @@ class AssetsPage(CrudPage):
 
         self.table.itemDoubleClicked.connect(
             self.handle_double_click
+        )
+
+        self.ui.btnDocuments.clicked.connect(
+            self.open_documents
         )
 
     def handle_double_click(self, _item):
@@ -273,6 +280,15 @@ class AssetsPage(CrudPage):
             can_view_meter_readings
         )
 
+        can_view_documents = Permissions.has_permission(
+            self.role,
+            "asset_documents"
+        )
+
+        self.ui.btnDocuments.setVisible(
+            can_view_documents
+        )
+
     def open_meter_readings(self):
 
         record_id = TableHelper.selected_id(
@@ -318,6 +334,35 @@ class AssetsPage(CrudPage):
 
         dialog = AssetHistoryDialog(
             asset_id=record_id,
+            parent=self,
+        )
+
+        dialog.exec()
+
+    # ---------------------------------------------------------
+    # Asset Documentation
+    # ---------------------------------------------------------
+
+    def open_documents(self):
+
+        if not Permissions.has_permission(
+            self.role,
+            "asset_documents"
+        ):
+            self.warning(
+                "Asset Documentation",
+                "You do not have permission to view asset documents."
+            )
+            return
+
+        record_id = self.require_selection()
+
+        if record_id is None:
+            return
+
+        dialog = AssetDocumentsDialog(
+            asset_id=record_id,
+            user=self.user,
             parent=self,
         )
 

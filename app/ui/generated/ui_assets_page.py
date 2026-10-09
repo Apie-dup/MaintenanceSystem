@@ -115,6 +115,12 @@ class Ui_AssetsWindow(object):
 
         self.horizontalLayout_2.addWidget(self.btnHistory)
 
+        self.btnDocuments = QPushButton(AssetsWindow)
+        self.btnDocuments.setObjectName(u"btnDocuments")
+        self.btnDocuments.setMinimumSize(QSize(100, 0))
+
+        self.horizontalLayout_2.addWidget(self.btnDocuments)
+
         self.btnRefresh = QPushButton(AssetsWindow)
         self.btnRefresh.setObjectName(u"btnRefresh")
         self.btnRefresh.setMinimumSize(QSize(90, 30))
@@ -188,6 +194,10 @@ class Ui_AssetsWindow(object):
         self.btnAdd.setText(QCoreApplication.translate("AssetsWindow", u"Add", None))
         self.btnEdit.setText(QCoreApplication.translate("AssetsWindow", u"Edit", None))
         self.btnHistory.setText(QCoreApplication.translate("AssetsWindow", u"Maintenance History", None))
+#if QT_CONFIG(tooltip)
+        self.btnDocuments.setToolTip("")
+#endif // QT_CONFIG(tooltip)
+        self.btnDocuments.setText(QCoreApplication.translate("AssetsWindow", u"Documents", None))
         self.btnRefresh.setText(QCoreApplication.translate("AssetsWindow", u"Refresh", None))
         self.btnDelete.setText(QCoreApplication.translate("AssetsWindow", u"Delete", None))
         self.btnMeterReadings.setText(QCoreApplication.translate("AssetsWindow", u"Meter Readings", None))
