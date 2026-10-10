@@ -38,6 +38,7 @@ from app.pages.vehicle_sop_page import VehicleSopPage
 from app.pages.vehicle_sop_inspection_page import (
     VehicleSopInspectionPage
 )
+from app.core.auth_session import AuthSession
 
 
 class MainController(QMainWindow):
@@ -861,6 +862,9 @@ class MainController(QMainWindow):
             return
 
     def logout(self):
+
+        # Clear the authenticated session
+        AuthSession.clear()
 
         # Local import avoids circular import
         from app.controllers.login_controller import (

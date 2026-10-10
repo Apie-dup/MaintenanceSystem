@@ -15,6 +15,7 @@ from app.services.auth_service import (
 from app.controllers.main_controller import (
     MainController
 )
+from app.core.auth_session import AuthSession
 
 
 class LoginController(QMainWindow):
@@ -106,6 +107,16 @@ class LoginController(QMainWindow):
         )
 
         if user:
+
+            try:
+                AuthSession.start(user)
+            except (ValueError, PermissionError) as error:
+                QMessageBox.critical(
+                    self,
+                    "Login Failed",
+                    str(error)
+                )
+                return
 
             if (
                 self.ui.chkRememberMe

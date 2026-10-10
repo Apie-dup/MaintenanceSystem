@@ -7,7 +7,7 @@ from pathlib import Path
 from app.database.connection import Database
 from app.models.asset_document_model import AssetDocumentModel
 from app.services.asset_service import AssetService
-from app.core.permissions import Permissions
+from app.core.auth_session import AuthSession
 
 
 class AssetDocumentService:
@@ -18,22 +18,15 @@ class AssetDocumentService:
 
     @staticmethod
     def require_permission(user, permission):
+        """
+        Authorize document operations using the
+        current authenticated session.
 
-        if not isinstance(user, dict):
-            raise PermissionError(
-                "An authenticated user is required."
-            )
+        The user argument is retained temporarily
+        for compatibility with existing dialogs.
+        """
 
-        role = user.get("role", "")
-
-        if not Permissions.has_permission(
-            role,
-            permission
-        ):
-            raise PermissionError(
-                "You do not have permission "
-                "to perform this document operation."
-            )
+        AuthSession.require_permission(permission)
 
     # ---------------------------------------------------------
     # Managed document storage
