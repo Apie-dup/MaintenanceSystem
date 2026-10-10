@@ -861,6 +861,14 @@ class MainController(QMainWindow):
             self.show_assets()
             return
 
+    def closeEvent(self, event):
+        """
+        Clear the authenticated session when
+        the main window closes.
+        """
+        AuthSession.clear()
+        super().closeEvent(event)
+
     def logout(self):
 
         # Clear the authenticated session
