@@ -1,4 +1,8 @@
 from PySide6.QtCore import QDate, Signal
+from PySide6.QtWidgets import (
+    QDialog,
+    QTableWidgetItem,
+)
 
 from app.services.asset_service import AssetService
 from app.services.asset_meter_reading_service import (
@@ -8,12 +12,7 @@ from app.ui.generated.ui_asset_meter_reading_dialog import (
     Ui_AssetMeterReadingDialog
 )
 
-from app.core.permissions import Permissions
-
-from PySide6.QtWidgets import (
-    QDialog,
-    QTableWidgetItem,
-)
+from app.core.auth_session import AuthSession
 
 
 class AssetMeterReadingDialog(QDialog):
@@ -259,8 +258,7 @@ class AssetMeterReadingDialog(QDialog):
 
     def record_reading(self):
 
-        if not Permissions.has_permission(
-            self.role,
+        if not AuthSession.has_permission(
             "asset_meter_readings.create"
         ):
             self.warning(
@@ -395,8 +393,7 @@ class AssetMeterReadingDialog(QDialog):
 
     def apply_permissions(self):
 
-        can_create = Permissions.has_permission(
-            self.role,
+        can_create = AuthSession.has_permission(
             "asset_meter_readings.create"
         )
 
