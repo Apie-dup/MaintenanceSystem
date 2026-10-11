@@ -1,4 +1,5 @@
 from app.models.asset_model import AssetModel
+from app.core.auth_session import AuthSession
 
 
 class AssetService:
@@ -22,21 +23,25 @@ class AssetService:
     @staticmethod
     def create(data):
 
+        AuthSession.require_permission("assets.create")
+
         if data["purchase_cost"] < 0:
             raise ValueError(
                 "Purchase cost cannot be negative."
             )
-        
+
         return AssetModel.insert(data)
 
     @staticmethod
     def update(record_id, data):
 
+        AuthSession.require_permission("assets.edit")
+
         if data["purchase_cost"] < 0:
             raise ValueError(
                 "Purchase cost cannot be negative."
             )
-        
+
         AssetModel.update(
             record_id,
             data
@@ -44,6 +49,9 @@ class AssetService:
 
     @staticmethod
     def delete(record_id):
+
+        AuthSession.require_permission("assets.delete")
+
         AssetModel.delete(record_id)
 
     @staticmethod
