@@ -16,6 +16,7 @@ from app.services.pm_service_history_service import (
 from app.services.work_order_labour_service import (
     WorkOrderLabourService
 )
+from app.core.auth_session import AuthSession
 
 
 
@@ -592,6 +593,10 @@ class WorkOrderService:
         user=None,
         meter_reading=None
     ):
+
+        AuthSession.require_permission(
+            "work_orders.complete"
+        )
 
         work_order = WorkOrderModel.get_by_id(
             record_id
