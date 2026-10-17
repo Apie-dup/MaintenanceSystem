@@ -162,10 +162,27 @@ class WorkOrderService:
     # ---------------------------------------------------------
 
     @staticmethod
-    def update(record_id, 
+    def update(record_id,
                data,
                user=None
             ):
+
+        # ---------------------------------------------------------
+        # Authorization
+        # ---------------------------------------------------------
+
+        can_edit = AuthSession.has_permission(
+            "work_orders.edit"
+        )
+
+        can_update = AuthSession.has_permission(
+            "work_orders.update"
+        )
+
+        if not (can_edit or can_update):
+            raise PermissionError(
+                "You do not have permission to update Work Orders."
+            )
 
         existing = WorkOrderModel.get_by_id(
             record_id
@@ -176,9 +193,131 @@ class WorkOrderService:
                 "Work Order not found."
             )
 
+        # ---------------------------------------------------------
+        # Technician field-level authorization
+        # ---------------------------------------------------------
+
+        if not can_edit:
+
+            protected_fields = (
+                "work_order_number",
+                "asset_id",
+                "title",
+                "description",
+                "priority",
+                "technician_id",
+                "requested_by",
+                "date_created",
+                "due_date",
+                "estimated_cost",
+                "estimated_hours",
+            )
+
+            for field in protected_fields:
+
+                if field not in data:
+                    raise ValueError(
+                        f"Missing Work Order field: {field}"
+                    )
+
+                submitted_value = data[field]
+                existing_value = existing[field]
+
+                text_fields = {
+                    "work_order_number",
+                    "title",
+                    "description",
+                    "priority",
+                    "requested_by",
+                }
+
+                numeric_fields = {
+                    "estimated_cost",
+                    "estimated_hours",
+                }
+
+                if field in text_fields:
+                    submitted_value = str(
+                        submitted_value or ""
+                    ).strip()
+
+                    existing_value = str(
+                        existing_value or ""
+                    ).strip()
+
+                elif field in numeric_fields:
+                    submitted_value = float(
+                        submitted_value or 0
+                    )
+
+                    existing_value = float(
+                        existing_value or 0
+                    )
+
+                if submitted_value != existing_value:
+                    raise PermissionError(
+                        f"You do not have permission "
+                        f"to change '{field}'."
+                    )
+
         requested_status = (
             data.get("status") or ""
         ).strip()
+
+        # ---------------------------------------------------------
+        # Technician status restrictions
+        # ---------------------------------------------------------
+
+        if not can_edit:
+
+            allowed_technician_statuses = {
+                "Assigned",
+                "In Progress",
+                "On Hold",
+            }
+
+            if (
+                requested_status != existing["status"]
+                and requested_status
+                not in allowed_technician_statuses
+            ):
+                raise PermissionError(
+                    "You do not have permission to change "
+                    f"the Work Order status to '{requested_status}'."
+                )
+
+        # ---------------------------------------------------------
+        # Technician labour-hour restrictions
+        # ---------------------------------------------------------
+
+        if not can_edit:
+
+            detailed_labour = (
+                WorkOrderLabourService.get_by_work_order(
+                    record_id
+                )
+            )
+
+            if detailed_labour:
+
+                submitted_hours = data.get(
+                    "labour_hours"
+                )
+
+                existing_hours = existing[
+                    "labour_hours"
+                ]
+
+                if (
+                    submitted_hours is None
+                    or float(submitted_hours)
+                    != float(existing_hours or 0)
+                ):
+                    raise PermissionError(
+                        "Labour Hours cannot be changed "
+                        "manually when detailed labour "
+                        "entries exist."
+                    )
 
         # --------------------------------------------------------
         # Workflow-only statuses
@@ -215,6 +354,16 @@ class WorkOrderService:
         # the dictionary supplied by the dialog.
         save_data = dict(data)
 
+        # ---------------------------------------------------------
+        # Protect meter readings during Technician updates
+        # ---------------------------------------------------------
+
+        if not can_edit:
+
+            save_data["meter_reading"] = (
+                existing["meter_reading"]
+            )
+
         # Apply automatic status rules.
         save_data = (
             WorkOrderService.apply_automatic_status(
@@ -222,6 +371,27 @@ class WorkOrderService:
                 save_data
             )
         )
+
+        # ---------------------------------------------------------
+        # Verify final Technician status after automatic rules
+        # ---------------------------------------------------------
+
+        if not can_edit:
+
+            final_status = save_data["status"]
+
+            if (
+                final_status != existing["status"]
+                and final_status not in {
+                    "Assigned",
+                    "In Progress",
+                    "On Hold",
+                }
+            ):
+                raise PermissionError(
+                    "You do not have permission to change "
+                    f"the Work Order status to '{final_status}'."
+                )
 
         # Validate the resulting data.
         WorkOrderService.validate_data(
