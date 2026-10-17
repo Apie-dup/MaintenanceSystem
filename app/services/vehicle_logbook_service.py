@@ -4,6 +4,7 @@ from app.services.asset_meter_reading_service import (
     AssetMeterReadingService
 )
 from app.models.asset_meter_reading_model import AssetMeterReadingModel
+from app.core.auth_session import AuthSession
 
 
 class VehicleLogbookService:
@@ -26,6 +27,10 @@ class VehicleLogbookService:
 
     @staticmethod
     def create(data, user=None):
+
+        AuthSession.require_permission(
+            "vehicle_logbook.create"
+        )
 
         asset_id = data.get("asset_id")
         log_date = (
@@ -222,6 +227,10 @@ class VehicleLogbookService:
         record_id,
         data,
     ):
+
+        AuthSession.require_permission(
+            "vehicle_logbook.edit"
+        )
 
         existing = (
             VehicleLogbookModel.get_by_id(
@@ -464,6 +473,10 @@ class VehicleLogbookService:
     @staticmethod
     def delete(record_id):
 
+        AuthSession.require_permission(
+            "vehicle_logbook.delete"
+        )
+
         record = (
             VehicleLogbookModel.get_by_id(
                 record_id
@@ -526,6 +539,10 @@ class VehicleLogbookService:
         logbook_id,
         work_order_id
     ):
+
+        AuthSession.require_permission(
+            "work_orders.create"
+        )
 
         if not logbook_id:
             raise ValueError(

@@ -24,6 +24,8 @@ from app.dialogs.work_order_dialog import (
 from app.services.asset_service import (
     AssetService
 )
+from app.core.auth_session import AuthSession
+from app.services.work_order_service import WorkOrderService
 
 
 
@@ -106,9 +108,32 @@ class VehicleLogbookPage(CrudPage):
 
         self.connect_signals()
 
+        self.apply_permissions()
+
         self.load_data()
 
         self.update_work_order_buttons()
+
+    def apply_permissions(self):
+
+        self.ui.btnAdd.setEnabled(
+            AuthSession.has_permission("vehicle_logbook.create")
+        )
+
+        self.ui.btnEdit.setEnabled(
+            AuthSession.has_permission("vehicle_logbook.edit")
+        )
+
+        self.ui.btnDelete.setEnabled(
+            AuthSession.has_permission("vehicle_logbook.delete")
+        )
+
+    def edit_record(self):
+
+        if not AuthSession.has_permission("vehicle_logbook.edit"):
+            return
+
+        super().edit_record()
 
     def connect_signals(self):
 
@@ -335,6 +360,14 @@ class VehicleLogbookPage(CrudPage):
 
     def create_work_order(self):
 
+        if not AuthSession.has_permission("work_orders.create"):
+            MessageService.warning(
+                self,
+                "Permission Denied",
+                "You do not have permission to create Work Orders."
+            )
+            return
+
         record_id = self.require_selection()
 
         if record_id is None:
@@ -427,11 +460,40 @@ class VehicleLogbookPage(CrudPage):
             )
             return
 
+        # ---------------------------------------------------------
+        # Open linked Work Order using current session permissions
+        # ---------------------------------------------------------
+
         dialog = WorkOrderDialog(self)
 
         dialog.edit_record(
             work_order_id
         )
+
+        # Administrator / Maintenance Manager
+        if AuthSession.has_permission("work_orders.edit"):
+            pass
+
+        # Technician
+        elif AuthSession.has_permission("work_orders.update"):
+
+            work_order = WorkOrderService.get_by_id(
+                work_order_id
+            )
+
+            if (
+                work_order is not None
+                and work_order["status"] not in {
+                    "Completed",
+                    "Closed",
+                    "Cancelled",
+                }
+            ):
+                dialog.set_technician_mode(True)
+
+        # Viewer or any user without editing permissions
+        else:
+            dialog.set_work_order_read_only(True)
 
         if dialog.exec():
             self.load_data()
@@ -459,8 +521,12 @@ class VehicleLogbookPage(CrudPage):
             logbook["work_order_id"] is not None
         )
 
+        can_create_work_order = AuthSession.has_permission(
+            "work_orders.create"
+        )
+
         self.ui.btnCreateWorkOrder.setEnabled(
-            not has_work_order
+            can_create_work_order and not has_work_order
         )
 
         self.ui.btnOpenWorkOrder.setEnabled(

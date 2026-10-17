@@ -36,6 +36,12 @@ class Permissions:
             "asset_documents.edit",
             "asset_documents.delete",
 
+            # Vehicle Logbook
+            "vehicle_logbook",
+            "vehicle_logbook.create",
+            "vehicle_logbook.edit",
+            "vehicle_logbook.delete",
+
             # Work Orders
             "work_orders.create",
             "work_orders.edit",
@@ -114,6 +120,11 @@ class Permissions:
             "asset_documents.edit",
             "asset_documents.delete",
 
+            # Vehicle Logbook
+            "vehicle_logbook",
+            "vehicle_logbook.create",
+            "vehicle_logbook.edit",
+
             # Work Orders
             "work_orders.create",
             "work_orders.edit",
@@ -167,6 +178,11 @@ class Permissions:
             "asset_meter_readings",
             "asset_meter_readings.create",
 
+            # Vehicle Logbook
+            "vehicle_logbook",
+            "vehicle_logbook.create",
+            "vehicle_logbook.edit",
+
             # Inventory is view-only through the
             # Inventory page for now.
         },
@@ -189,6 +205,9 @@ class Permissions:
 
             # Asset Documentation
             "asset_documents",
+
+            # Vehicle Logbook
+            "vehicle_logbook",
 
             # Viewer may export reports.
             "reports.export",
