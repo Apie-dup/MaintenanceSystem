@@ -378,7 +378,7 @@ class PreventiveMaintenancePage(CrudPage):
                 )
             )
 
-        except ValueError as error:
+        except (ValueError, PermissionError) as error:
             self.warning(
                 "Generate Work Order",
                 str(error)

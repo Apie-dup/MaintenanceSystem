@@ -23,6 +23,7 @@ from app.dialogs.vehicle_sop_inspection_result_dialog import (
 )
 from app.services.message_service import MessageService
 from app.services.work_order_service import WorkOrderService
+from app.core.auth_session import AuthSession
 
 
 class VehicleSopInspectionDialog(QDialog):
@@ -486,6 +487,9 @@ class VehicleSopInspectionDialog(QDialog):
 
         self.ui.btnCreateWorkOrder.setEnabled(
             completed
+            and AuthSession.has_permission(
+                "work_orders.create"
+            )
         )
 
         if completed:
@@ -709,7 +713,7 @@ class VehicleSopInspectionDialog(QDialog):
 
             self.load_inspection_items()
 
-        except ValueError as error:
+        except (ValueError, PermissionError) as error:
 
             MessageService.warning(
                 self,

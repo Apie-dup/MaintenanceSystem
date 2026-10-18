@@ -108,9 +108,9 @@ class BaseDialog(QDialog):
 
             self.accept()
 
-        except ValueError as error:
+        except (ValueError, PermissionError) as error:
             logger.warning(
-                "Business-rule error while saving %s: %s",
+                "Validation or permission error while saving %s: %s",
                 self.ENTITY_NAME,
                 error,
             )

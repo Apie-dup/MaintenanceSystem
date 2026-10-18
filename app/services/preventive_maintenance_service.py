@@ -6,6 +6,7 @@ from app.helpers.date_helper import DateHelper
 from app.services.work_order_service import WorkOrderService
 from app.models.work_order_model import WorkOrderModel
 from app.services.asset_meter_reading_service import AssetMeterReadingService
+from app.core.auth_session import AuthSession
 
    
 
@@ -475,8 +476,12 @@ class PreventiveMaintenanceService:
         user=None,
     ):
 
+        AuthSession.require_permission(
+            "pm.generate_work_order"
+        )
+
         pm = PreventiveMaintenanceModel.get_by_id(
-        pm_id
+            pm_id
         )
 
         if pm is None:
@@ -679,7 +684,7 @@ class PreventiveMaintenanceService:
 
         }
 
-        return WorkOrderService.create(
+        return WorkOrderService._create_validated(
             data,
             user=user
         )

@@ -107,6 +107,25 @@ class WorkOrderService:
         user=None
     ):
 
+        AuthSession.require_permission(
+            "work_orders.create"
+        )
+
+        return WorkOrderService._create_validated(
+            data,
+            user=user
+        )
+
+    @staticmethod
+    def _create_validated(
+        data,
+        user=None
+    ):
+
+        AuthSession.require_permission(
+            "work_orders.create"
+        )
+
         save_data = dict(data)
 
         save_data.setdefault(
@@ -449,6 +468,11 @@ class WorkOrderService:
 
     @staticmethod
     def delete(record_id):
+
+        AuthSession.require_permission(
+            "work_orders.delete"
+        )
+
         WorkOrderModel.delete(record_id)
 
     # ---------------------------------------------------------

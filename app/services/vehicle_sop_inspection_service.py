@@ -16,6 +16,7 @@ from app.services.asset_meter_reading_service import (
     AssetMeterReadingService
 )
 from app.services.work_order_service import WorkOrderService
+from app.core.auth_session import AuthSession
 
 
 class VehicleSopInspectionService:
@@ -526,6 +527,11 @@ class VehicleSopInspectionService:
         inspection_item_id,
         user=None
     ):
+
+        AuthSession.require_permission(
+            "work_orders.create"
+        )
+
         inspection = (
             VehicleSopInspectionService.get_by_id(
                 inspection_id
