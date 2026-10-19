@@ -199,6 +199,13 @@ class CrudPage(BasePage):
         try:
             self.service.delete(record_id)
 
+        except (ValueError, PermissionError) as error:
+            self.warning(
+                f"Delete {self.entity_name}",
+                str(error)
+            )
+            return
+
         except Exception as error:
             self.error(
                 f"Delete {self.entity_name}",

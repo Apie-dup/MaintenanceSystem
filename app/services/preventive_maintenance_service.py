@@ -138,6 +138,10 @@ class PreventiveMaintenanceService:
     @staticmethod
     def create(data):
 
+        AuthSession.require_permission(
+            "pm.create"
+        )
+
         save_data = dict(data)
 
         PreventiveMaintenanceService.validate(
@@ -166,6 +170,10 @@ class PreventiveMaintenanceService:
 
     @staticmethod
     def update(record_id, data):
+
+        AuthSession.require_permission(
+            "pm.edit"
+        )
 
         save_data = dict(data)
 
@@ -197,6 +205,11 @@ class PreventiveMaintenanceService:
 
     @staticmethod
     def delete(record_id):
+
+        AuthSession.require_permission(
+            "pm.delete"
+        )
+
         if PreventiveMaintenanceModel.has_history(
             record_id
         ):
