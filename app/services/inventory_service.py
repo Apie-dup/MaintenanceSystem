@@ -1,3 +1,4 @@
+from app.core.auth_session import AuthSession
 from app.models.inventory_model import InventoryModel
 from app.services.supplier_service import SupplierService
 from app.database.connection import Database
@@ -97,6 +98,10 @@ class InventoryService:
         user=None
     ):
 
+        AuthSession.require_permission(
+            "inventory.create"
+        )
+
         InventoryService.validate(data)
 
         if InventoryModel.part_number_exists(
@@ -167,6 +172,10 @@ class InventoryService:
         data
     ):
 
+        AuthSession.require_permission(
+            "inventory.edit"
+        )
+
         existing = InventoryModel.get_by_id(
             record_id
         )
@@ -207,6 +216,11 @@ class InventoryService:
 
     @staticmethod
     def delete(record_id):
+
+        AuthSession.require_permission(
+            "inventory.delete"
+        )
+
         InventoryModel.delete(
             record_id
         )
