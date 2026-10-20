@@ -1,3 +1,4 @@
+from app.core.auth_session import AuthSession
 from app.models.supplier_model import SupplierModel
 
 
@@ -30,6 +31,8 @@ class SupplierService:
     @staticmethod
     def create(data):
 
+        AuthSession.require_permission("suppliers.create")
+
         if not data["supplier_name"].strip():
             raise ValueError(
                 "Supplier name is required."
@@ -46,6 +49,8 @@ class SupplierService:
 
     @staticmethod
     def update(supplier_id, data):
+
+        AuthSession.require_permission("suppliers.edit")
 
         if not data["supplier_name"].strip():
             raise ValueError(
@@ -67,6 +72,9 @@ class SupplierService:
 
     @staticmethod
     def delete(supplier_id):
+
+        AuthSession.require_permission("suppliers.delete")
+
         SupplierModel.delete(
             supplier_id
         )
