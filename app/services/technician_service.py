@@ -1,3 +1,4 @@
+from app.core.auth_session import AuthSession
 from app.models.technician_model import TechnicianModel
 
 
@@ -69,6 +70,8 @@ class TechnicianService:
     @staticmethod
     def create(data):
 
+        AuthSession.require_permission("technicians.create")
+
         TechnicianService.validate(data)
 
         if TechnicianModel.employee_number_exists(
@@ -86,6 +89,8 @@ class TechnicianService:
 
     @staticmethod
     def update(record_id, data):
+
+        AuthSession.require_permission("technicians.edit")
 
         TechnicianService.validate(data)
 
@@ -108,6 +113,8 @@ class TechnicianService:
 
     @staticmethod
     def delete(record_id):
+
+        AuthSession.require_permission("technicians.delete")
 
         if TechnicianModel.is_used_in_work_orders(
             record_id
