@@ -1,4 +1,5 @@
 import bcrypt
+from app.core.auth_session import AuthSession
 
 from app.models.user_model import UserModel
 
@@ -61,6 +62,8 @@ class UserService:
 
     @staticmethod
     def create(data):
+
+        AuthSession.require_permission("users.create")
 
         username = (
             data["username"]
@@ -125,6 +128,8 @@ class UserService:
 
     @staticmethod
     def update(record_id, data):
+
+        AuthSession.require_permission("users.edit")
 
         username = (
             data["username"]
@@ -199,6 +204,8 @@ class UserService:
 
     @staticmethod
     def set_active(record_id, active):
+
+        AuthSession.require_permission("users.activate")
 
         user = UserModel.get_by_id(
             record_id
