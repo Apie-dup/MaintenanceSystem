@@ -1,3 +1,4 @@
+from app.core.auth_session import AuthSession
 from app.database.connection import Database
 from app.models.purchase_order_model import PurchaseOrderModel
 from app.models.purchase_order_item_model import PurchaseOrderItemModel
@@ -646,6 +647,11 @@ class PurchaseOrderService:
         user=None,
         notes=None,
     ):
+
+        AuthSession.require_permission(
+            "inventory.receive_stock"
+        )
+
         quantity = float(
             quantity or 0
         )

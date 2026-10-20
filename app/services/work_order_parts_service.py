@@ -1,3 +1,4 @@
+from app.core.auth_session import AuthSession
 from app.database.connection import Database
 from app.models.inventory_model import InventoryModel
 from app.models.work_order_model import WorkOrderModel
@@ -49,6 +50,10 @@ class WorkOrderPartService:
         data,
         user=None
     ):
+
+        AuthSession.require_permission(
+            "work_orders.issue_parts"
+        )
 
         conn = Database.connect()
 
@@ -320,6 +325,10 @@ class WorkOrderPartService:
         user=None
     ):
 
+        AuthSession.require_permission(
+            "work_orders.remove_parts"
+        )
+
         conn = Database.connect()
 
         try:
@@ -441,16 +450,6 @@ class WorkOrderPartService:
                 ),
                 user=user,
                 connection=conn,
-            )
-
-            #---------------------------------------------------
-            # Restore inventory
-            #---------------------------------------------------
-
-            InventoryModel.update_quantity(
-                inventory_id,
-                new_quantity,
-                connection=conn
             )
 
             #---------------------------------------------------

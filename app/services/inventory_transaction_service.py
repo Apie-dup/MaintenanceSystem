@@ -1,3 +1,4 @@
+from app.core.auth_session import AuthSession
 from app.models.inventory_transaction_model import(
     InventoryTransactionModel,
 )
@@ -163,6 +164,10 @@ class InventoryTransactionService:
         user=None
     ):
 
+        AuthSession.require_permission(
+            "inventory.receive_stock"
+        )
+
         quantity = float(
             quantity or 0
         )
@@ -252,6 +257,10 @@ class InventoryTransactionService:
         notes=None,
         user=None
     ):
+
+        AuthSession.require_permission(
+            "inventory.adjust_stock"
+        )
 
         quantity = float(
             quantity or 0
