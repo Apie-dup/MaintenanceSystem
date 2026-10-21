@@ -42,6 +42,11 @@ class Permissions:
             "vehicle_logbook.edit",
             "vehicle_logbook.delete",
 
+            # Vehicle SOP
+            "vehicle_sops.create",
+            "vehicle_sops.edit",
+            "vehicle_sops.delete",
+
             # Work Orders
             "work_orders.create",
             "work_orders.edit",
@@ -124,6 +129,10 @@ class Permissions:
             "vehicle_logbook",
             "vehicle_logbook.create",
             "vehicle_logbook.edit",
+
+            # Vehicle SOP
+            "vehicle_sops.create",
+            "vehicle_sops.edit",
 
             # Work Orders
             "work_orders.create",

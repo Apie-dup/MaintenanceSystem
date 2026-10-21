@@ -1,3 +1,4 @@
+from app.core.auth_session import AuthSession
 from app.models.vehicle_sop_model import VehicleSopModel
 from app.models.asset_model import AssetModel
 
@@ -83,6 +84,9 @@ class VehicleSopService:
 
     @staticmethod
     def create(data):
+
+        AuthSession.require_permission("vehicle_sops.create")
+
         VehicleSopService.validate(data)
 
         clean_data = dict(data)
@@ -115,6 +119,9 @@ class VehicleSopService:
 
     @staticmethod
     def update(data):
+
+        AuthSession.require_permission("vehicle_sops.edit")
+
         sop_id = data.get("id")
 
         if not sop_id:
@@ -161,6 +168,9 @@ class VehicleSopService:
 
     @staticmethod
     def delete(sop_id):
+
+        AuthSession.require_permission("vehicle_sops.delete")
+
         existing = VehicleSopModel.get_by_id(sop_id)
 
         if existing is None:
