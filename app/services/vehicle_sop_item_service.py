@@ -1,3 +1,4 @@
+from app.core.auth_session import AuthSession
 from app.models.vehicle_sop_item_model import (
     VehicleSopItemModel
 )
@@ -73,6 +74,9 @@ class VehicleSopItemService:
 
     @staticmethod
     def create(data):
+
+        AuthSession.require_permission("vehicle_sops.create")
+
         VehicleSopItemService.validate(data)
 
         clean_data = dict(data)
@@ -95,6 +99,9 @@ class VehicleSopItemService:
 
     @staticmethod
     def update(data):
+
+        AuthSession.require_permission("vehicle_sops.edit")
+
         item_id = data.get("id")
 
         if not item_id:
@@ -133,6 +140,9 @@ class VehicleSopItemService:
 
     @staticmethod
     def delete(item_id):
+
+        AuthSession.require_permission("vehicle_sops.delete")
+
         existing = VehicleSopItemModel.get_by_id(
             item_id
         )
