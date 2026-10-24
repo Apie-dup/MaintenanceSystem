@@ -146,6 +146,10 @@ class VehicleSopInspectionService:
     @staticmethod
     def create(data):
 
+        AuthSession.require_permission(
+            "sop_inspections.create"
+        )
+
         sop = (
             VehicleSopInspectionService
             .validate_new_inspection(data)
@@ -250,6 +254,10 @@ class VehicleSopInspectionService:
     @staticmethod
     def update(data):
 
+        AuthSession.require_permission(
+            "sop_inspections.edit"
+        )
+
         inspection_id = data.get("id")
 
         if not inspection_id:
@@ -337,6 +345,10 @@ class VehicleSopInspectionService:
         comments=None,
     ):
 
+        AuthSession.require_permission(
+            "sop_inspections.edit"
+        )
+
         item = (
             VehicleSopInspectionItemModel
             .get_by_id(
@@ -386,6 +398,10 @@ class VehicleSopInspectionService:
 
     @staticmethod
     def complete(inspection_id):
+
+        AuthSession.require_permission(
+            "sop_inspections.complete"
+        )
 
         inspection = (
             VehicleSopInspectionModel.get_by_id(
@@ -499,6 +515,10 @@ class VehicleSopInspectionService:
 
     @staticmethod
     def delete(inspection_id):
+
+        AuthSession.require_permission(
+            "sop_inspections.delete"
+        )
 
         inspection = (
             VehicleSopInspectionModel.get_by_id(

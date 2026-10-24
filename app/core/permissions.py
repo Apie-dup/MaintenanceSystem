@@ -47,6 +47,12 @@ class Permissions:
             "vehicle_sops.edit",
             "vehicle_sops.delete",
 
+            # Vehicle SOP Inspections
+            "sop_inspections.create",
+            "sop_inspections.edit",
+            "sop_inspections.complete",
+            "sop_inspections.delete",
+
             # Work Orders
             "work_orders.create",
             "work_orders.edit",
@@ -134,6 +140,11 @@ class Permissions:
             "vehicle_sops.create",
             "vehicle_sops.edit",
 
+            # Vehicle SOP Inspections
+            "sop_inspections.create",
+            "sop_inspections.edit",
+            "sop_inspections.complete",
+
             # Work Orders
             "work_orders.create",
             "work_orders.edit",
@@ -177,6 +188,7 @@ class Permissions:
             "dashboard",
             "work_orders",
             "inventory",
+            "sop_inspections",
 
             # Work Orders
             "work_orders.update",
@@ -191,6 +203,11 @@ class Permissions:
             "vehicle_logbook",
             "vehicle_logbook.create",
             "vehicle_logbook.edit",
+
+            # Vehicle SOP Inspections
+            "sop_inspections.create",
+            "sop_inspections.edit",
+            "sop_inspections.complete",
 
             # Inventory is view-only through the
             # Inventory page for now.
